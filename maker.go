@@ -44,6 +44,7 @@ func WheelStart(surname string) {
 }
 
 func WheelStartWithMass(sur, mass string) {
+	log.SetFlags(log.Llongfile)
 	c := model.Character{}
 	model.FindByNameChar(&c, sur)
 	//s := model.FindSecondStrokesByCharacter(c)
@@ -51,32 +52,45 @@ func WheelStartWithMass(sur, mass string) {
 	var nc2 []string
 	var nc3 []string
 	var fives []model.Five
-	model.FindFiveWithFirstByMass(&fives, "金", mass)
+	model.FindFiveWithFirstByMass(&fives, "金", []string{mass})
 	var tf []model.ThreeFive
-	log.Println(fives)
+
 	for _, v := range fives {
+		log.Println(v.StringFive())
 		tf = model.FindStrokesWithFive(v)
-		log.Println(tf)
+
 		var secondStk []int
 		var thirdStk []int
 		for _, value := range tf {
 			secondStk = append(secondStk, value.SecondStrokes)
 			thirdStk = append(thirdStk, value.ThirdStrokes)
 		}
-		log.Println(secondStk)
-		model.FindCharactersByStrokes(&cs, secondStk)
+		model.FindCharactersWithFiveByStrokes(&cs, "土", secondStk)
 		nc2 = nil
 		for _, v := range cs {
 			nc2 = append(nc2, v.NameChar)
 		}
+		if nc2 == nil {
+			continue
+		}
+		log.Println(secondStk)
 		log.Println("second name", nc2)
-		log.Println(thirdStk)
 		model.FindCharactersByStrokes(&cs, thirdStk)
 		nc3 = nil
 		for _, v := range cs {
 			nc3 = append(nc3, v.NameChar)
 		}
+		log.Println(thirdStk)
 		log.Println("third name", nc3)
 	}
 
 }
+
+//func SecondNameList(sur string) []string {
+//	c := model.Character{}
+//	model.FindByNameChar(&c, sur)
+//	if c.FixStrokes == 0 {
+//		var cs []model.Character
+//		model.FindCharactersWithFiveByStrokes(&cs, "", []int{c.Strokes})
+//	}
+//}
