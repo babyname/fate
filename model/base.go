@@ -37,7 +37,7 @@ func (b *Base) BeforeCreate(scope *gorm.Scope) error {
 
 func connectString() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s%sloc=%s&charset=utf8&parseTime=true",
-		"root", "123456", "localhost", "3306", "bbname", "?", url.QueryEscape("Asia/Shanghai"))
+		"root", "", "localhost", "4000", "fate", "?", url.QueryEscape("Asia/Shanghai"))
 }
 
 func CreateDB() *DB {
@@ -65,4 +65,8 @@ func RunMigrate() {
 	for _, v := range migrate {
 		ORM().AutoMigrate(v)
 	}
+}
+
+func (b Base) IsNil() bool {
+	return uuid.Equal(b.ID, uuid.Nil)
 }
