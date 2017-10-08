@@ -14,7 +14,7 @@ func main() {
 	log.Println(sur)
 	f := fate.NewFactory(sur)
 
-	fmt.Println("是否使用最优五行配置：1. Yes 2. No 其他. Yes")
+	fmt.Println("是否使用最优五行配置：1. Yes 2. No 默认:Yes")
 	five := 0
 	fmt.Scanln(&five)
 	log.Println(five)
