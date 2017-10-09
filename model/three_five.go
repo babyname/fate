@@ -1,5 +1,10 @@
 package model
 
+import (
+	"fmt"
+	"log"
+)
+
 type ThreeFive struct {
 	Base
 	SurStrokes    int
@@ -17,6 +22,28 @@ type ThreeFive struct {
 
 func init() {
 	SetMigrate(ThreeFive{})
+}
+
+func NewThreeFive(sur, sec, trd int) ThreeFive {
+	tf := ThreeFive{
+		SurStrokes:    sur,
+		SecondStrokes: sec,
+		ThirdStrokes:  trd,
+	}
+	tf.DiGe = MakeDiGe(tf)
+	tf.RenGe = MakeRenGe(tf)
+	tf.TianGe = MakeTianGe(tf)
+	tf.WaiGe = MakeWaiGe(tf)
+	tf.ZongGe = MakeZongGe(tf)
+	tf.RenCai = MakeSanCai(tf.RenGe)
+	tf.TianCai = MakeSanCai(tf.TianGe)
+	tf.DiCai = MakeSanCai(tf.DiGe)
+	return tf
+}
+
+func (tf ThreeFive) PrintString() {
+	ps := fmt.Sprintf("总格：%d，天格：%d，人格：%d，地格：%d，外格：%d", tf.ZongGe, tf.TianGe, tf.RenGe, tf.DiGe, tf.WaiGe)
+	log.Println(ps)
 }
 
 func MakeTianGe(five ThreeFive) int {

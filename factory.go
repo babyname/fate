@@ -5,6 +5,8 @@ import (
 
 	"log"
 
+	"strings"
+
 	"github.com/godcong/fate/model"
 )
 
@@ -46,12 +48,13 @@ func (f *factory) LoadThreeFive(isFive int) {
 
 }
 
-func (f *factory) SecondName() {
+func (f *factory) SecondName(zodiac model.Zodiac) {
 	var cs []model.Character
 	var sec map[int]model.Character
+	best := strings.Split(zodiac.Best, ",")
 	for _, value := range f.threeFives {
 		var i int
-		model.FindCharactersByStroke(&cs, value.SecondStrokes)
+		model.FindCharactersByStrokeBest(&cs, value.SecondStrokes, best)
 		sec = make(map[int]model.Character)
 		for idx, c := range cs {
 			sec[idx+1] = c
@@ -67,11 +70,13 @@ func (f *factory) SecondName() {
 		}
 	}
 }
-func (f *factory) ThirdName() {
+func (f *factory) ThirdName(zodiac model.Zodiac) {
 	var i int
 	var cs []model.Character
 	var trd map[int]model.Character
-	model.FindCharactersByStroke(&cs, f.curThreeFive.ThirdStrokes)
+	best := strings.Split(zodiac.Best, ",")
+	//model.FindCharactersByStroke(&cs, f.curThreeFive.ThirdStrokes)
+	model.FindCharactersByStrokeBest(&cs, f.curThreeFive.ThirdStrokes, best)
 	trd = make(map[int]model.Character)
 	for idx, c := range cs {
 		trd[idx+1] = c
@@ -89,12 +94,15 @@ func NameOutput(cs map[int]model.Character) {
 	idx := len(cs)
 	fmt.Println("共计：", idx)
 	for i := 1; i <= idx; i++ {
-		fmt.Print(i, ":", cs[i].NameChar, "  ")
+		fmt.Print(i, ":", cs[i].NameChar, "(", cs[i].NameType, ")", "  ")
 	}
 	fmt.Println()
 }
 
 func (f *factory) GetName() string {
 	log.Println(f.sur.FixStrokes, f.sec.FixStrokes, f.trd.FixStrokes)
+	tf := model.NewThreeFive(f.sur.FixStrokes, f.sec.FixStrokes, f.trd.FixStrokes)
+	tf.PrintString()
+	log.Println(f.sur.Pinyin, f.sec.Pinyin, f.trd.Pinyin)
 	return f.surname + f.second + f.third
 }
