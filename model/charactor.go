@@ -39,6 +39,13 @@ func FindCharactersByStroke(v interface{}, s int) error {
 	return ORM().Where("fix_strokes = ?", s).Find(v).Error
 }
 
+func FindCharactersByStrokeBest(v interface{}, s int, best []string) error {
+	if best != nil {
+		return ORM().Where("fix_strokes = ?", s).Where("radical in (?)", best).Find(v).Error
+	}
+	return FindCharactersByStroke(v, s)
+}
+
 func FindCharactersWithFiveByStrokes(v interface{}, five string, s []int) error {
 	if five == "" {
 		return FindCharactersByStrokes(v, s)
@@ -53,11 +60,20 @@ func UpdateCharacter(ch string, c RadicalChar) error {
 		log.Println(ch, "is null")
 		return nil
 	}
+
+	if chr.Radical != "" {
+		log.Println("updated:", chr)
+		return nil
+	}
 	if chr.FixStrokes == 0 {
 		chr.FixStrokes = chr.Strokes
 	}
+
+	if chr.Strokes != c.Strokes {
+		log.Println("strokes:", chr, c)
+	}
 	chr.Radical = c.Radical
 	chr.Pinyin = c.Pinyin
-	log.Println("updated:", chr.NameChar)
+	log.Println("updating:", chr.NameChar)
 	return ORM().Save(&chr).Error
 }
