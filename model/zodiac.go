@@ -4,6 +4,7 @@ type Zodiac struct {
 	Base
 	ZodiacType ZodiacType
 	Best       string ``
+	Worst      string `gorm:"not null default:"`
 }
 
 type ZodiacType int
