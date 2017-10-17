@@ -51,10 +51,19 @@ func (f *factory) LoadThreeFive(isFive int) {
 func (f *factory) SecondName(zodiac model.Zodiac) {
 	var cs []model.Character
 	var sec map[int]model.Character
+
 	best := strings.Split(zodiac.Best, ",")
 	for _, value := range f.threeFives {
 		var i int
-		model.FindCharactersByStrokeBest(&cs, value.SecondStrokes, best)
+		if value.SecondStrokes == 0 {
+			continue
+		}
+		if zodiac.Best == "" {
+			model.FindCharactersByStrokeBest(&cs, value.SecondStrokes, nil)
+		} else {
+			model.FindCharactersByStrokeBest(&cs, value.SecondStrokes, best)
+		}
+
 		sec = make(map[int]model.Character)
 		for idx, c := range cs {
 			sec[idx+1] = c
@@ -76,6 +85,10 @@ func (f *factory) ThirdName(zodiac model.Zodiac) {
 	var trd map[int]model.Character
 	best := strings.Split(zodiac.Best, ",")
 	//model.FindCharactersByStroke(&cs, f.curThreeFive.ThirdStrokes)
+	if f.curThreeFive.ThirdStrokes == 0 {
+		return
+	}
+
 	model.FindCharactersByStrokeBest(&cs, f.curThreeFive.ThirdStrokes, best)
 	trd = make(map[int]model.Character)
 	for idx, c := range cs {
