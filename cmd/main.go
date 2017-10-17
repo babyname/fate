@@ -22,7 +22,6 @@ func main() {
 	log.Println(five)
 
 	f.LoadThreeFive(five)
-
 	z := model.FindZodiac(model.ZODIAC_JI)
 
 	f.SecondName(*z)

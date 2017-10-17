@@ -53,6 +53,7 @@ func ORM() *DB {
 	if db == nil || db.DB().Ping() != nil {
 		db = CreateDB()
 	}
+	db.LogMode(true)
 	return db
 }
 
