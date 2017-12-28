@@ -5,11 +5,11 @@ import (
 	"log"
 )
 
-type ThreeFive struct {
+type SanCai struct {
 	Base
-	SurStrokes    int
-	SecondStrokes int
-	ThirdStrokes  int
+	//SurStrokes    int
+	//SecondStrokes int
+	//ThirdStrokes  int
 	TianGe        int
 	RenGe         int
 	DiGe          int
