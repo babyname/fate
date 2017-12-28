@@ -37,7 +37,7 @@ func (b *Base) BeforeCreate(scope *gorm.Scope) error {
 
 func connectString() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s%sloc=%s&charset=utf8&parseTime=true",
-		"root", "", "localhost", "4000", "fate", "?", url.QueryEscape("Asia/Shanghai"))
+		"root", "", "localhost", "3306", "fate", "?", url.QueryEscape("Asia/Shanghai"))
 }
 
 func CreateDB() *DB {

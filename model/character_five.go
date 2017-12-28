@@ -1,6 +1,6 @@
 package model
 
-type Five struct {
+type CharacterFive struct {
 	Mass   string `gorm:"size:2"`
 	First  string `gorm:"size:2"`
 	Second string `gorm:"size:2"`
@@ -8,7 +8,7 @@ type Five struct {
 }
 
 func init() {
-	SetMigrate(Five{})
+	SetMigrate(CharacterFive{})
 }
 
 func FindFiveByMass(v interface{}, mass string) error {
@@ -19,6 +19,6 @@ func FindFiveWithFirstByMass(v interface{}, fir string, mass []string) error {
 	return ORM().Where("first = ? and mass in (?)", fir, mass).Find(v).Error
 }
 
-func (f *Five) StringFive() string {
+func (f *CharacterFive) StringFive() string {
 	return f.First + f.Second + f.Third
 }
