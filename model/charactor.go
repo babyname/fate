@@ -1,6 +1,9 @@
 package model
 
-import "log"
+import (
+	"log"
+	"strings"
+)
 
 type Character struct {
 	Base
@@ -61,6 +64,7 @@ func UpdateCharacter(ch string, c RadicalChar) error {
 		log.Println(ch, "is null")
 		return nil
 	}
+
 
 	if chr.Radical != "" {
 		//log.Println("updated:", chr)
