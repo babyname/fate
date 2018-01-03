@@ -27,7 +27,7 @@ var (
 )
 
 func init() {
-	db = CreateDB()
+	//db = CreateDB()
 }
 
 func (b *Base) BeforeCreate(scope *gorm.Scope) error {
