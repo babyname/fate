@@ -1,6 +1,7 @@
 package model
 
-type SanWu struct {
-	SanCai
-	WuGe
-}
+//
+//type SanWu struct {
+//	SanCai
+//	WuGe
+//}

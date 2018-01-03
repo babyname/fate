@@ -2,10 +2,10 @@ package fate
 
 type NameFate struct {
 	FirstName string
-	LastName string
+	LastName  string
 }
 
 //输入姓
 func InsertLastName(name string) NameFate {
-	return
+	return NameFate{}
 }

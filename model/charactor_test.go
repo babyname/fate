@@ -1,17 +1,7 @@
 package model_test
 
 import (
-	"testing"
-
-	"strings"
-
-	"log"
-
 	"sync"
-
-	"strconv"
-
-	"github.com/godcong/fate/model"
 )
 
 type NameChar struct {
@@ -3159,55 +3149,55 @@ var (
 	}
 )
 
-func TestUpdateCharacter(t *testing.T) {
-	max := len(charList)
-	cs := make(chan string, max)
-	for _, list := range charList {
-		go func(cl []NameChar, rdc string, s chan string) {
-
-			for _, v := range cl {
-				model.UpdateCharacter(strings.TrimSpace(v.NameChar), model.RadicalChar{
-					v.Strokes,
-					strings.TrimSpace(v.NameChar),
-					strings.TrimSpace(v.Pinyin),
-					strings.TrimSpace(rdc),
-				})
-
-			}
-			s <- rdc
-		}(list.NameChatList, list.Radical, cs)
-
-	}
-
-	for i := 0; i < max; i++ {
-		log.Println(<-cs, "is done")
-	}
-
-}
+//
+//func TestUpdateCharacter(t *testing.T) {
+//	max := len(charList)
+//	cs := make(chan string, max)
+//	for _, list := range charList {
+//		go func(cl []NameChar, rdc string, s chan string) {
+//
+//			for _, v := range cl {
+//				model.UpdateCharacter(strings.TrimSpace(v.NameChar), model.RadicalChar{
+//					v.Strokes,
+//					strings.TrimSpace(v.NameChar),
+//					strings.TrimSpace(v.Pinyin),
+//					strings.TrimSpace(rdc),
+//				})
+//
+//			}
+//			s <- rdc
+//		}(list.NameChatList, list.Radical, cs)
+//
+//	}
+//
+//	for i := 0; i < max; i++ {
+//		log.Println(<-cs, "is done")
+//	}
+//
+//}
 
 var wg sync.WaitGroup
 
-func TestUpdateCharacter2(t *testing.T) {
-	max := len(fixList)
-	wg.Add(max)
-	for _, list := range fixList {
-		nc := strings.TrimSpace(list.NameChars)
-		nca := strings.Split(nc, " ")
-		go func(cl []string, st string) {
-			defer wg.Done()
-			sti, _ := strconv.ParseUint(st, 10, 32)
-			for _, v := range cl {
-				model.UpdateCharacter(strings.TrimSpace(v), model.RadicalChar{
-					int(sti),
-					strings.TrimSpace(v),
-					strings.TrimSpace(""),
-					strings.TrimSpace(""),
-				})
-			}
-		}(nca, list.Strokes)
-	}
-	wg.Wait()
-	log.Println("Done")
-}
-
-
+//
+//func TestUpdateCharacter2(t *testing.T) {
+//	max := len(fixList)
+//	wg.Add(max)
+//	for _, list := range fixList {
+//		nc := strings.TrimSpace(list.NameChars)
+//		nca := strings.Split(nc, " ")
+//		go func(cl []string, st string) {
+//			defer wg.Done()
+//			sti, _ := strconv.ParseUint(st, 10, 32)
+//			for _, v := range cl {
+//				model.UpdateCharacter(strings.TrimSpace(v), model.RadicalChar{
+//					int(sti),
+//					strings.TrimSpace(v),
+//					strings.TrimSpace(""),
+//					strings.TrimSpace(""),
+//				})
+//			}
+//		}(nca, list.Strokes)
+//	}
+//	wg.Wait()
+//	log.Println("Done")
+//}

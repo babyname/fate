@@ -3,7 +3,7 @@ package fate_test
 import (
 	"testing"
 
-	fate "github.com/godcong/fate1"
+	"github.com/godcong/fate"
 )
 
 var (
