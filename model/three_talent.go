@@ -1,5 +1,23 @@
 package model
 
+type ThreeTalent struct {
+	SkyTalent    string
+	LandTalent   string
+	PersonTalent string
+}
+
+func skyTalent() {
+
+}
+
+func landTalent() {
+
+}
+
+func personTalent() {
+
+}
+
 //
 //type SanCai struct {
 //	Base
