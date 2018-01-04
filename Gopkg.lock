@@ -2,10 +2,22 @@
 
 
 [[projects]]
-  name = "github.com/go-sql-driver/mysql"
+  branch = "master"
+  name = "github.com/go-xorm/builder"
   packages = ["."]
-  revision = "a0583e0143b1624142adab07e0e97fe106d99561"
-  version = "v1.3"
+  revision = "a4a881a4e552fcb5473f39e8b9f7d9f3457a7fb0"
+
+[[projects]]
+  name = "github.com/go-xorm/core"
+  packages = ["."]
+  revision = "da1adaf7a28ca792961721a34e6e04945200c890"
+  version = "v0.5.7"
+
+[[projects]]
+  name = "github.com/go-xorm/xorm"
+  packages = ["."]
+  revision = "1933dd69e294c0a26c0266637067f24dbb25770c"
+  version = "v0.6.4"
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
@@ -20,6 +32,18 @@
   revision = "1c35d901db3da928c72a72d8458480cc9ade058f"
 
 [[projects]]
+  name = "github.com/mattn/go-sqlite3"
+  packages = ["."]
+  revision = "3b3f1d01b2696af5501697c35629048c227586ab"
+  version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/pelletier/go-toml"
+  packages = ["."]
+  revision = "16398bac157da96aa88f98a2df640c7f32af1da2"
+  version = "v1.0.1"
+
+[[projects]]
   name = "github.com/satori/go.uuid"
   packages = ["."]
   revision = "879c5887cd475cd7864858769793b2ceb0d44feb"
@@ -28,6 +52,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2666e7d89149e8eb6aab3bd81f578e0bc83c1ac4a071abcc4d3b45e7f36f6862"
+  inputs-digest = "884934ce88717a18c334f728ed08609a9be046f4ec08a5ea91950bcf2492d9b9"
   solver-name = "gps-cdcl"
   solver-version = 1

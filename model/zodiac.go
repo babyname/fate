@@ -24,25 +24,26 @@ const (
 	ZODIAC_ZHU
 )
 
-func init() {
-	SetMigrate(Zodiac{})
-}
-
-func NewZodiac(zodiacType ZodiacType) *Zodiac {
-	z := new(Zodiac)
-	z.ZodiacType = zodiacType
-	return z
-}
-
-func (z *Zodiac) Create() {
-	ORM().Create(z)
-}
-
-func FindZodiac(zodiacType ZodiacType) *Zodiac {
-	z := new(Zodiac)
-	ORM().Where("zodiac_type = ?", zodiacType).First(z)
-	return z
-}
+//
+//func init() {
+//	SetMigrate(Zodiac{})
+//}
+//
+//func NewZodiac(zodiacType ZodiacType) *Zodiac {
+//	z := new(Zodiac)
+//	z.ZodiacType = zodiacType
+//	return z
+//}
+//
+//func (z *Zodiac) Create() {
+//	ORM().Create(z)
+//}
+//
+//func FindZodiac(zodiacType ZodiacType) *Zodiac {
+//	z := new(Zodiac)
+//	ORM().Where("zodiac_type = ?", zodiacType).First(z)
+//	return z
+//}
 
 func (z ZodiacType) ToString() string {
 	switch z {

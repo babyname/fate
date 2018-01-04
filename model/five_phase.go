@@ -7,18 +7,19 @@ type CharacterFive struct {
 	Third  string `gorm:"size:2"`
 }
 
-func init() {
-	SetMigrate(CharacterFive{})
-}
+//
+//func init() {
+//	SetMigrate(CharacterFive{})
+//}
+//
+//func FindFiveByMass(v interface{}, mass string) error {
+//	return ORM().Where("mass = ?", mass).Find(v).Error
+//}
+//
+//func FindFiveWithFirstByMass(v interface{}, fir string, mass []string) error {
+//	return ORM().Where("first = ? and mass in (?)", fir, mass).Find(v).Error
+//}
 
-func FindFiveByMass(v interface{}, mass string) error {
-	return ORM().Where("mass = ?", mass).Find(v).Error
-}
-
-func FindFiveWithFirstByMass(v interface{}, fir string, mass []string) error {
-	return ORM().Where("first = ? and mass in (?)", fir, mass).Find(v).Error
-}
-
-func (f *CharacterFive) StringFive() string {
-	return f.First + f.Second + f.Third
-}
+//func (f *CharacterFive) StringFive() string {
+//	return f.First + f.Second + f.Third
+//}
