@@ -1,0 +1,13 @@
+[[database]]
+   name = "sqlite3"
+   path = "./fate.db"
+
+[[database]]
+   name = "mysql"
+   username = "root"
+   password = ""
+   addr = "localhost"
+   schema = "fate"
+   local = "Asia/Shanghai"
+
+

@@ -22,35 +22,36 @@ type RadicalChar struct {
 	Radical  string
 }
 
-func init() {
-	SetMigrate(Character{})
-}
-
-func FindByNameChar(v interface{}, nc string) error {
-	return ORM().Where("name_char = ?", nc).First(v).Error
-}
-
-func FindCharactersByStrokes(v interface{}, s []int) error {
-	return ORM().Where("fix_strokes in (?)", s).Find(v).Error
-}
-
-func FindCharactersByStroke(v interface{}, s int) error {
-	return ORM().Where("fix_strokes = ?", s).Find(v).Error
-}
-
-func FindCharactersByStrokeBest(v interface{}, s int, best []string) error {
-	if best != nil {
-		return ORM().Where("fix_strokes = ?", s).Where("radical in (?)", best).Find(v).Error
-	}
-	return FindCharactersByStroke(v, s)
-}
-
-func FindCharactersWithFiveByStrokes(v interface{}, five string, s []int) error {
-	if five == "" {
-		return FindCharactersByStrokes(v, s)
-	}
-	return ORM().Where("fix_strokes in (?) and name_type = ? ", s, five).Find(v).Error
-}
+//
+//func init() {
+//	SetMigrate(Character{})
+//}
+//
+//func FindByNameChar(v interface{}, nc string) error {
+//	return ORM().Where("name_char = ?", nc).First(v).Error
+//}
+//
+//func FindCharactersByStrokes(v interface{}, s []int) error {
+//	return ORM().Where("fix_strokes in (?)", s).Find(v).Error
+//}
+//
+//func FindCharactersByStroke(v interface{}, s int) error {
+//	return ORM().Where("fix_strokes = ?", s).Find(v).Error
+//}
+//
+//func FindCharactersByStrokeBest(v interface{}, s int, best []string) error {
+//	if best != nil {
+//		return ORM().Where("fix_strokes = ?", s).Where("radical in (?)", best).Find(v).Error
+//	}
+//	return FindCharactersByStroke(v, s)
+//}
+//
+//func FindCharactersWithFiveByStrokes(v interface{}, five string, s []int) error {
+//	if five == "" {
+//		return FindCharactersByStrokes(v, s)
+//	}
+//	return ORM().Where("fix_strokes in (?) and name_type = ? ", s, five).Find(v).Error
+//}
 
 //
 //func UpdateCharacter(ch string, c RadicalChar) error {
