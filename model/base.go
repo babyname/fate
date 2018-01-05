@@ -10,6 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
 	"github.com/godcong/fate/config"
+	"github.com/godcong/fate/debug"
 	_ "github.com/mattn/go-sqlite3"
 	uuid "github.com/satori/go.uuid"
 )
@@ -39,7 +40,7 @@ func (b *Base) BeforeInsert() {
 	b.Id = uuid.NewV1().String()
 }
 
-func connectMysql(config config.Config) string {
+func connectMysql(config *config.Config) string {
 	db := config.GetSub("database")
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s%sloc=%s&charset=utf8&parseTime=true",
 		db.GetStringWithDefault("username", "root"),
@@ -51,14 +52,14 @@ func connectMysql(config config.Config) string {
 		url.QueryEscape(db.GetStringWithDefault("local", "Asia/Shanghai")))
 }
 
-func ConnectDB(config config.Config) *xorm.Engine {
+func ConnectDB(config *config.Config) *xorm.Engine {
 	database := config.GetSub("database")
-	driver := database.GetString("name")
+	driver := database.GetStringWithDefault("name", "sqlite3")
 	source := ""
 	if driver == "mysql" {
 		source = connectMysql(config)
 	} else if driver == "sqlite3" {
-		source = database.GetString("path")
+		source = database.GetStringWithDefault("path", "fate")
 	}
 	if NewDatabase(driver, source) != nil {
 		return nil
@@ -68,7 +69,9 @@ func ConnectDB(config config.Config) *xorm.Engine {
 
 func NewDatabase(driver, source string) (err error) {
 	db, err = xorm.NewEngine(driver, source)
-	db.ShowSQL(true)
+	if config.DefaultConfig().GetBool("system.sql") == true {
+		db.ShowSQL(true)
+	}
 	return err
 }
 
@@ -79,6 +82,7 @@ func Register(i interface{}) {
 }
 
 func CreateTables() error {
+	debug.Println("CreateTables")
 	return db.CreateTables(tables...)
 }
 
