@@ -1,31 +1,31 @@
 package model
 
 type Character struct {
-	Base
-	IsSur          bool   `gorm:"not null default:false"`      //姓
-	SimpleChar     string `gorm:"size:2 not null default: "`   //字
-	SimpleStrokes  int    `gorm:"not null default:0"`          //标准笔画数
-	TradChar       string `gorm:"size:2 not null default:"`    //繁体
-	TradStrokes    int    `gorm:"not null default:0"`          //繁体笔画数
-	NameType       string `gorm:"size:2 not null default: "`   //五行
-	NameRoot       string `gorm:"size:128 not null default: "` //字根
-	Radical        string `gorm:"size:16 not null default: "`  //部首
-	ScienceStrokes int    `gorm:"not null default:0"`          //姓名学笔画数
-	Pinyin         string `gorm:"size:128 not null default:"`  //拼音
-	Comment        string `gorm:"size:1024 not null default:"` //备注
+	Base           `xorm:"extends"`
+	IsSur          bool   `xorm:"notnull"`                        //姓
+	SimpleChar     string `xorm:"varchar(2) notnull"`             //字
+	SimpleStrokes  int    `xorm:"notnull default(0)"`             //标准笔画数
+	TradChar       string `xorm:"varchar(2) notnull default()"`   //繁体
+	TradStrokes    int    `xorm:"notnull default(0)"`             //繁体笔画数
+	NameType       string `xorm:"varchar(2) notnull default()"`   //五行
+	NameRoot       string `xorm:"varchar(128) notnull default()"` //字根
+	Radical        string `xorm:"varchar(16) notnull default()"`  //部首
+	ScienceStrokes int    `xorm:"notnull default(0)"`             //姓名学笔画数
+	Pinyin         string `xorm:"varchar(128) notnull"`           //拼音
+	Comment        string `xorm:"text notnull default() "`        //备注
 }
 
-type RadicalChar struct {
-	Strokes  int
-	NameChar string
-	Pinyin   string
-	Radical  string
-}
-
-//
-//func init() {
-//	SetMigrate(Character{})
+//type RadicalChar struct {
+//	Strokes  int
+//	NameChar string
+//	Pinyin   string
+//	Radical  string
 //}
+
+func init() {
+	Register(&Character{})
+}
+
 //
 //func FindByNameChar(v interface{}, nc string) error {
 //	return ORM().Where("name_char = ?", nc).First(v).Error

@@ -1,13 +1,15 @@
-[[database]]
-   name = "sqlite3"
-   path = "./fate.db"
+#[database]
+#   name = "sqlite3"
+#   path = "./fate.db"
 
-[[database]]
+[database]
    name = "mysql"
    username = "root"
-   password = ""
+   password = "123456"
    addr = "localhost"
+   port = "3306"
    schema = "fate"
    local = "Asia/Shanghai"
+   param = "?"
 
 

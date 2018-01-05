@@ -1,5 +1,12 @@
 package model_test
 
+import (
+	"log"
+	"testing"
+
+	"github.com/godcong/fate/model"
+)
+
 var fpList = [][]string{
 	{"木", "木", "木", "大吉"},
 	{"木", "木", "火", "大吉"},
@@ -126,4 +133,13 @@ var fpList = [][]string{
 	{"水", "水", "土", "大凶"},
 	{"水", "水", "金", "大吉"},
 	{"水", "水", "水", "中吉"},
+}
+
+func TestFivePhase_Save(t *testing.T) {
+	for _, v := range fpList {
+		fp := model.NewFivePhase(v[0], v[1], v[2])
+		fp.Fortune = v[3]
+		log.Println(fp.Create())
+	}
+
 }

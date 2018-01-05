@@ -1,10 +1,36 @@
 package model
 
-type CharacterFive struct {
-	Mass   string `gorm:"size:2"`
-	First  string `gorm:"size:2"`
-	Second string `gorm:"size:2"`
-	Third  string `gorm:"size:2"`
+type FivePhase struct {
+	Base    `xorm:"extends"`
+	First   string `xorm:"varchar(2)"`
+	Second  string `xorm:"varchar(2)"`
+	Third   string `xorm:"varchar(2)"`
+	Fortune string `xorm:"varchar(8)"`
+}
+
+func init() {
+	Register(&FivePhase{})
+}
+func NewFivePhase(f, s, t string) FivePhase {
+	return FivePhase{
+		First:  f,
+		Second: s,
+		Third:  t,
+	}
+}
+
+func (fp FivePhase) Create(v ...interface{}) (int64, error) {
+	i, e := db.Count(&fp)
+	if e == nil && i == 0 {
+		return db.InsertOne(&fp)
+	}
+	return 0, e
+}
+
+func (fp FivePhase) CalculateFortune() string {
+	var f FivePhase
+	db.Where(&fp).Get(&f)
+	return f.Fortune
 }
 
 //

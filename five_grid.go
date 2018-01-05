@@ -1,4 +1,4 @@
-package model
+package fate
 
 type FiveGrid struct {
 	SkyGrid    int //天格
