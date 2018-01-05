@@ -1,4 +1,4 @@
-package model_test
+package model
 
 //func TestNewZodiac(t *testing.T) {
 //	z := model.NewZodiac(model.ZODIAC_JI)

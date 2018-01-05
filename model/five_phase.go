@@ -19,19 +19,19 @@ func NewFivePhase(f, s, t string) FivePhase {
 	}
 }
 
-func (fp FivePhase) Create(v ...interface{}) (int64, error) {
-	i, e := db.Count(&fp)
+func (fp *FivePhase) Create(v ...interface{}) (int64, error) {
+	i, e := db.Count(fp)
 	if e == nil && i == 0 {
-		return db.InsertOne(&fp)
+		return db.InsertOne(fp)
 	}
 	return 0, e
 }
 
-func (fp FivePhase) CalculateFortune() string {
-	var f FivePhase
-	db.Where(&fp).Get(&f)
-	return f.Fortune
-}
+//func (fp *FivePhase) CalculateFortune() string {
+//	var f FivePhase
+//	db.Where(fp).Get(&f)
+//	return f.Fortune
+//}
 
 //
 //func init() {
