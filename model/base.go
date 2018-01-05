@@ -5,20 +5,21 @@ import (
 	"net/url"
 	"time"
 
-	//_ "github.com/go-sql-driver/mysql"
 	//"github.com/jinzhu/gorm"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
-	"github.com/jinzhu/gorm"
+	"github.com/godcong/fate/config"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Base struct {
-	ID        uuid.UUID `gorm:"primary_key;type:varchar(36)"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt *time.Time `sql:"index"`
+	Id      string     `xorm:"uuid pk"`
+	Created time.Time  `xorm:"created"`
+	Updated time.Time  `xorm:"updated"`
+	Deleted *time.Time `xorm:"deleted"`
+	Version int        `xorm:"version"`
 }
 
 var (
@@ -27,31 +28,54 @@ var (
 )
 
 func init() {
-	ConnectDB()
+	ConnectDB(config.DefaultConfig())
 }
 
-func (b *Base) BeforeCreate(scope *gorm.Scope) error {
-	scope.SetColumn("ID", uuid.NewV1())
-	return nil
+func (b *Base) BeforeInsert() {
+	b.Id = uuid.NewV1().String()
 }
 
-func ConnectDB() {
-
-}
-
-func NewMySql() (err error) {
-	db, err = xorm.NewEngine("mysql", connectMysql())
-	return err
-}
-
-func NewSqlite3() (err error) {
-	db, err = xorm.NewEngine("sqlite3", "./fate.db")
-	return err
-}
-
-func connectMysql() string {
+func connectMysql(config config.Config) string {
+	db := config.GetSub("database")
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s%sloc=%s&charset=utf8&parseTime=true",
-		"root", "", "localhost", "3306", "fate", "?", url.QueryEscape("Asia/Shanghai"))
+		db.GetStringWithDefault("username", "root"),
+		db.GetStringWithDefault("password", ""),
+		db.GetStringWithDefault("addr", "localhost"),
+		db.GetStringWithDefault("port", "3306"),
+		db.GetStringWithDefault("schema", "default"),
+		db.GetStringWithDefault("param", "?"),
+		url.QueryEscape(db.GetStringWithDefault("local", "Asia/Shanghai")))
+}
+
+func ConnectDB(config config.Config) *xorm.Engine {
+	database := config.GetSub("database")
+	driver := database.GetString("name")
+	source := ""
+	if driver == "mysql" {
+		source = connectMysql(config)
+	} else if driver == "sqlite3" {
+		source = database.GetString("path")
+	}
+	if NewDatabase(driver, source) != nil {
+		return nil
+	}
+	return db
+}
+
+func NewDatabase(driver, source string) (err error) {
+	db, err = xorm.NewEngine(driver, source)
+	db.ShowSQL(true)
+	return err
+}
+
+var tables []interface{}
+
+func Register(i interface{}) {
+	tables = append(tables, i)
+}
+
+func CreateTables() error {
+	return db.CreateTables(tables...)
 }
 
 //func CreateDB() *DB {

@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/go-sql-driver/mysql"
+  packages = ["."]
+  revision = "a0583e0143b1624142adab07e0e97fe106d99561"
+  version = "v1.3"
+
+[[projects]]
   branch = "master"
   name = "github.com/go-xorm/builder"
   packages = ["."]
@@ -52,6 +58,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "884934ce88717a18c334f728ed08609a9be046f4ec08a5ea91950bcf2492d9b9"
+  inputs-digest = "3ac1ae0dd666bb563e3747486f62a22aa03457dbd37512220a760b2300e2cf79"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -1,21 +1,64 @@
-package model
+package fate
+
+type ThreeTalentAttribute string
+type ThreeTalentYinYang string
+
+type ThreeTalentComposite struct {
+	ThreeTalentAttribute
+	ThreeTalentYinYang
+}
 
 type ThreeTalent struct {
-	SkyTalent    string
-	LandTalent   string
-	PersonTalent string
+	SkyTalent    ThreeTalentComposite
+	LandTalent   ThreeTalentComposite
+	PersonTalent ThreeTalentComposite
 }
 
-func skyTalent() {
-
+func NewThreeTalent(st, lt, pt int) ThreeTalent {
+	return ThreeTalent{
+		SkyTalent:    NewThreeTalentComposite(st),
+		LandTalent:   NewThreeTalentComposite(lt),
+		PersonTalent: NewThreeTalentComposite(pt),
+	}
 }
 
-func landTalent() {
-
+func NewThreeTalentComposite(i int) ThreeTalentComposite {
+	return ThreeTalentComposite{
+		ThreeTalentAttribute: GenerateAttribute(i),
+		ThreeTalentYinYang:   GenerateYinYang(i),
+	}
 }
 
-func personTalent() {
+// GenerateThreeTalent 计算字符的三才属性
+// 1-2木：1为阳木，2为阴木   3-4火：3为阳火，4为阴火   5-6土：5为阳土，6为阴土   7-8金：7为阳金，8为阴金   9-10水：9为阳水，10为阴水
+func GenerateAttribute(i int) ThreeTalentAttribute {
+	var attr ThreeTalentAttribute
+	switch i % 10 {
+	case 1, 2:
+		attr = "木"
+	case 3, 4:
+		attr = "火"
+	case 5, 6:
+		attr = "土"
+	case 7, 8:
+		attr = "金"
+	case 9, 0:
+		fallthrough
+	default:
+		attr = "水"
+	}
 
+	return attr
+}
+
+func GenerateYinYang(i int) ThreeTalentYinYang {
+	var yy ThreeTalentYinYang
+	if i%2 == 1 {
+		yy = "阳"
+	} else {
+		yy = "阴"
+	}
+	return yy
 }
 
 //
@@ -86,22 +129,7 @@ func personTalent() {
 //		five.ThirdStrokes
 //}
 //
-////1、2甲乙木，3、4丙丁火，5、6戊己土，7、8庚辛金，9、10壬癸水
-//func MakeSanCai(i int) string {
-//	switch i % 10 {
-//	case 1, 2:
-//		return "木"
-//	case 3, 4:
-//		return "火"
-//	case 5, 6:
-//		return "土"
-//	case 7, 8:
-//		return "金"
-//	case 9, 0:
-//		return "水"
-//	}
-//	return ""
-//}
+
 //
 //func (five ThreeFive) InitSave() {
 //	five.DiGe = MakeDiGe(five)

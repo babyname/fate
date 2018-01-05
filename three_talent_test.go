@@ -1,4 +1,20 @@
-package model_test
+package fate
+
+import (
+	"log"
+	"testing"
+
+	"github.com/godcong/fate/model"
+)
+
+func TestGenerateThreeTalent(t *testing.T) {
+	for i := 1; i < 30; i++ {
+		attr := model.GenerateAttribute(i)
+		yy := model.GenerateYinYang(i)
+		log.Println(i, attr, yy)
+	}
+
+}
 
 //
 //func TestThreeFive_InitSave(t *testing.T) {

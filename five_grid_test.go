@@ -1,4 +1,4 @@
-package model
+package fate
 
 var fgList = [][]int{
 	//卜、丁、刀、七、力、刁
