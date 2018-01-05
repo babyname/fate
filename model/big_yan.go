@@ -13,10 +13,10 @@ func init() {
 	Register(&BigYan{})
 }
 
-func (by BigYan) Create(v ...interface{}) (int64, error) {
-	i, e := db.Count(&by)
+func (by *BigYan) Create(v ...interface{}) (int64, error) {
+	i, e := db.Count(by)
 	if e == nil && i == 0 {
-		return db.InsertOne(&by)
+		return db.InsertOne(by)
 	}
 	return 0, e
 }

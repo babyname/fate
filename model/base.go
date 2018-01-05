@@ -22,6 +22,10 @@ type Base struct {
 	Version int        `xorm:"version"`
 }
 
+type Model interface {
+	Create(v ...interface{}) (int64, error)
+}
+
 var (
 	db      *xorm.Engine
 	mgTable []interface{}

@@ -26,6 +26,10 @@ func init() {
 	Register(&Character{})
 }
 
+func (c *Character) Create(v ...interface{}) (int64, error) {
+	panic("implement me")
+}
+
 //
 //func FindByNameChar(v interface{}, nc string) error {
 //	return ORM().Where("name_char = ?", nc).First(v).Error
