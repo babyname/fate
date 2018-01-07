@@ -26,18 +26,6 @@
   version = "v0.6.4"
 
 [[projects]]
-  name = "github.com/jinzhu/gorm"
-  packages = ["."]
-  revision = "5174cc5c242a728b435ea2be8a2f7f998e15429b"
-  version = "v1.0"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/jinzhu/inflection"
-  packages = ["."]
-  revision = "1c35d901db3da928c72a72d8458480cc9ade058f"
-
-[[projects]]
   name = "github.com/mattn/go-sqlite3"
   packages = ["."]
   revision = "3b3f1d01b2696af5501697c35629048c227586ab"
@@ -58,6 +46,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3ac1ae0dd666bb563e3747486f62a22aa03457dbd37512220a760b2300e2cf79"
+  inputs-digest = "729844a769642715498b136c68058563981ed5834bca8b39458d71e78b31f1be"
   solver-name = "gps-cdcl"
   solver-version = 1

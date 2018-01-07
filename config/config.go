@@ -12,15 +12,17 @@ type Config struct {
 
 var config *Config
 var flags map[string]interface{}
-var l = *flag.String("l", "log.txt", "set log file path")
+var l = flag.String("l", "log.txt", "set log file path")
 var c = flag.String("c", "config.toml", "set toml config file path")
+var d = flag.Bool("d", false, "check debug output")
 
 func init() {
 	//loadConfig()
+	flag.Parse()
 	flags = make(map[string]interface{})
-	flags["l"] = l
-	flags["c"] = c
-	flags["d"] = *flag.Bool("d", false, "check debug output")
+	flags["l"] = *l
+	flags["c"] = *c
+	flags["d"] = *d
 }
 
 func GetFlag(name string) interface{} {
