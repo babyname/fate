@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/godcong/fate/debug"
 	"github.com/godcong/fate/model"
 )
 
@@ -116,4 +117,23 @@ func TestBigYan_Create(t *testing.T) {
 		}
 		v.Create()
 	}
+}
+
+func TestGetAll2(t *testing.T) {
+	var by []model.BigYan
+	model.FindBigYanAll(&by)
+	debug.Println(by)
+}
+
+func TestFind(t *testing.T) {
+	var by []model.BigYan
+	model.FindBigYanByGoil(&by, "吉")
+	debug.Println(by)
+}
+
+func TestGetByIndex(t *testing.T) {
+	for i := 0; i < 100; i++ {
+		model.GetBigYanByIndex(i)
+	}
+
 }

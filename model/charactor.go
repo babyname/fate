@@ -27,7 +27,20 @@ func init() {
 }
 
 func (c *Character) Create(v ...interface{}) (int64, error) {
-	panic("implement me")
+	i, e := db.Count(c)
+	if e == nil && i == 0 {
+		return db.InsertOne(c)
+	}
+	return 0, e
+}
+
+func (c *Character) Get() *Character {
+	db.Get(c)
+	return c
+}
+
+func (c *Character) Update(v ...interface{}) (int64, error) {
+	return db.Update(c)
 }
 
 //
