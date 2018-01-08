@@ -9,8 +9,12 @@ type BigYan struct {
 	Comment string
 }
 
+var inBigYan []BigYan
+
 func init() {
 	Register(&BigYan{})
+	//use buffer
+	FindBigYanAll(&inBigYan)
 }
 
 func (by *BigYan) Create(v ...interface{}) (int64, error) {
@@ -19,4 +23,23 @@ func (by *BigYan) Create(v ...interface{}) (int64, error) {
 		return db.InsertOne(by)
 	}
 	return 0, e
+}
+
+func FindBigYanAll(by *[]BigYan) error {
+	return db.Asc("index").Find(by)
+}
+
+func FindBigYanByGoil(by *[]BigYan, v string) error {
+	return db.Find(by, BigYan{Goil: v})
+}
+
+func FindBigYanByIndex(by *[]BigYan, i int) error {
+	return db.Find(by, BigYan{Index: i})
+}
+
+func GetBigYanByIndex(i int) BigYan {
+	if i == 0 || i >= len(inBigYan) {
+		return BigYan{}
+	}
+	return inBigYan[i-1]
 }

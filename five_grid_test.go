@@ -1,4 +1,11 @@
-package fate
+package fate_test
+
+import (
+	"testing"
+
+	"github.com/godcong/fate"
+	"github.com/godcong/fate/debug"
+)
 
 var fgList = [][]int{
 	//卜、丁、刀、七、力、刁
@@ -311,4 +318,22 @@ var fgList = [][]int{
 	{33, 10, 6},
 	{33, 11, 20},
 	{33, 2, 14},
+}
+
+func TestFiveGrid_PrintBigYan(t *testing.T) {
+	for i, j, k := 18, 1, 1; j < 33 && k < 33; k++ {
+
+		fg := fate.MakeFiveGridFromStrokes(i, 0, j, k)
+		if fg.PrintBigYan(true) {
+
+			debug.Println("笔画:", i, j, k)
+		}
+		if k == 32 {
+			k = 1
+			j++
+		}
+	}
+
+	fg := fate.MakeFiveGridFromStrokes(17, 0, 8, 7)
+	fg.PrintBigYan(false)
 }

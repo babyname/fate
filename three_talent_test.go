@@ -1,16 +1,16 @@
-package fate
+package fate_test
 
 import (
 	"log"
 	"testing"
 
-	"github.com/godcong/fate/model"
+	"github.com/godcong/fate"
 )
 
 func TestGenerateThreeTalent(t *testing.T) {
 	for i := 1; i < 30; i++ {
-		attr := model.GenerateAttribute(i)
-		yy := model.GenerateYinYang(i)
+		attr := fate.GenerateAttribute(i)
+		yy := fate.GenerateYinYang(i)
 		log.Println(i, attr, yy)
 	}
 

@@ -19,6 +19,11 @@ func NewFivePhase(f, s, t string) FivePhase {
 	}
 }
 
+func (fp *FivePhase) GetFortune() string {
+	db.Get(fp)
+	return fp.Fortune
+}
+
 func (fp *FivePhase) Create(v ...interface{}) (int64, error) {
 	i, e := db.Count(fp)
 	if e == nil && i == 0 {

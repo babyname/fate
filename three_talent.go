@@ -1,5 +1,11 @@
 package fate
 
+import (
+	"fmt"
+
+	"github.com/godcong/fate/debug"
+)
+
 type ThreeTalentAttribute string
 type ThreeTalentYinYang string
 
@@ -14,11 +20,12 @@ type ThreeTalent struct {
 	PersonTalent ThreeTalentComposite
 }
 
-func NewThreeTalent(st, lt, pt int) ThreeTalent {
+//天人地格算三才
+func NewThreeTalent(grid FiveGrid) ThreeTalent {
 	return ThreeTalent{
-		SkyTalent:    NewThreeTalentComposite(st),
-		LandTalent:   NewThreeTalentComposite(lt),
-		PersonTalent: NewThreeTalentComposite(pt),
+		SkyTalent:    NewThreeTalentComposite(grid.SkyGrid),
+		LandTalent:   NewThreeTalentComposite(grid.LandGrid),
+		PersonTalent: NewThreeTalentComposite(grid.PersonGrid),
 	}
 }
 
@@ -59,6 +66,15 @@ func GenerateYinYang(i int) ThreeTalentYinYang {
 		yy = "阴"
 	}
 	return yy
+}
+
+func (t *ThreeTalent) PrintThreeTalent() {
+	v := fmt.Sprintf("天才:%s,人才:%s,地才:%s",
+		t.SkyTalent.ThreeTalentAttribute,
+		t.PersonTalent.ThreeTalentAttribute,
+		t.LandTalent.ThreeTalentAttribute,
+	)
+	debug.Println(v)
 }
 
 //
