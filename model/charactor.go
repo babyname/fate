@@ -40,7 +40,7 @@ func (c *Character) Get() *Character {
 }
 
 func (c *Character) Update(v ...interface{}) (int64, error) {
-	return db.Update(c)
+	return db.Id(c.Id).Update(c)
 }
 
 //

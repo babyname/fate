@@ -670,49 +670,6 @@ var (
 		"2|亠|tóu", "3|亡|wáng,wú", "4|亢|kàng", "4|亣|dà", "6|充|chōng ", "6|产|chǎn", "6|亥|hài", "6|交|jiāo", "6|亦|yì", "7|亨|hēng", "7|亩|mǔ", "7|亪|ye", "8|京|jīng", "8|享|xiǎng", "8|兖|yǎn", "9|亮|liàng", "9|亲|qīn,qìng", "9|亭|tíng", "9|亱|yè", "9|亰|jīng", "9|亯|xiǎng", "9|兗|yǎn", "10|亳|bó", "10|亵|xiè", "10|亴|yòu", "10|衰|shuāi", "10|衷|zhōng", "10|亶|dàn,dǎn", "10|亷|lián", "12|裏|lǐ", "16|亸|duǒ", "19|羸|léi", "22|亹|mén,wěi"}
 )
 
-//
-//func TestUpdateCharacter(t *testing.T) {
-// max := len(charList)
-// cs := make(chan string, max)
-// for _, list := range charList {
-//  go func(cl []NameChar, rdc string, s chan string) {
-//
-//   for _, v := range cl {
-//    model.UpdateCharacter(strings.TrimSpace(v.NameChar), model.RadicalChar{
-//     v.Strokes,//     strings.TrimSpace(v.NameChar),//     strings.TrimSpace(v.Pinyin),//     strings.TrimSpace(rdc),//    })
-//
-//   }
-//   s <- rdc
-//  }(list.NameChatList, list.Radical, cs)
-//
-// }
-//
-// for i := 0; i < max; i++ {
-//  log.Println(<-cs, "is done")
-// }
-//
-//}
-
-//
-//func TestUpdateCharacter2(t *testing.T) {
-// max := len(fixList)
-// wg.Add(max)
-// for _, list := range fixList {
-//  nc := strings.TrimSpace(list.NameChars)
-//  nca := strings.Split(nc, " ")
-//  go func(cl  Charset, st string) {
-//   defer wg.Done()
-//   sti, _ := strconv.ParseUint(st, 10, 32)
-//   for _, v := range cl {
-//    model.UpdateCharacter(strings.TrimSpace(v), model.RadicalChar{
-//     int(sti),//     strings.TrimSpace(v),//     strings.TrimSpace(""),//     strings.TrimSpace(""),//    })
-//   }
-//  }(nca, list.Strokes)
-// }
-// wg.Wait()
-// log.Println("Done")
-//}
-
 var scienceFixList = Charset{
 	"",
 	"一 乙",
@@ -748,9 +705,9 @@ var scienceFixList = Charset{
 
 func InitAll() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	initCharFrom5156()
+	//initCharFrom5156()
 	updateStrokes()
-	updateFivePhase()
+	//updateFivePhase()
 }
 
 func initCharFrom5156() {
@@ -828,21 +785,22 @@ func updateStrokes() {
 
 func ScienceUpdate(index int, s string) {
 	debug.Println("science:", index)
-	sa := strings.Split(s, "")
+	sa := strings.Split(s, " ")
 	for _, v := range sa {
 		if v == "" {
 			continue
 		}
 		_ = v
+
 		c := model.Character{SimpleChar: v}
 		c = *c.Get()
 		c.ScienceStrokes = index
 		if uuid.FromStringOrNil(c.Id) == uuid.Nil {
-			debug.Println("notfound: ", c)
+			debug.Println("notfound: ", c, v)
 			c.Create()
 			continue
 		}
-
+		c.Update()
 	}
 
 }
