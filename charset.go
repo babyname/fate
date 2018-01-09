@@ -5,8 +5,8 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"sync"
 
+	"github.com/godcong/excavator"
 	"github.com/godcong/fate/debug"
 	"github.com/godcong/fate/model"
 	"github.com/satori/go.uuid"
@@ -748,17 +748,50 @@ var scienceFixList = Charset{
 
 func InitAll() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	//initChar()
+	initCharFrom5156()
 	updateStrokes()
-	//updateFivePhase()
+	updateFivePhase()
 }
 
-func initChar() {
-	wg := sync.WaitGroup{}
+func initCharFrom5156() {
+	list := excavator.Get("http://xh.5156edu.com")
+	debug.Println("initCharFrom5156 start")
+	log.Println(list)
+	for k, v := range list {
+		insertCharacter(v, k)
+	}
+	debug.Println("initCharFrom5156 end")
+}
+
+func insertCharacter(charset Charset, k string) {
+	debug.Println("start: ", k)
+	for _, v := range charset {
+		s := strings.Split(v, "|")
+
+		s0, _ := strconv.Atoi(s[0])
+		if len(s) != 3 {
+			debug.Println("wrong:", s)
+			continue
+		}
+		c := model.Character{
+			SimpleStrokes: s0,
+			SimpleChar:    s[1],
+			Pinyin:        s[2],
+			Radical:       k,
+		}
+		i, e := c.Create()
+		if e != nil {
+			debug.Println(i, e)
+		}
+	}
+	debug.Println("end", k)
+
+}
+
+func initLocalChar() {
 	debug.Println("initChar start")
 	for _, v := range charList {
-		wg.Add(1)
-		go func(charset Charset) {
+		func(charset Charset) {
 			radical := ""
 			for _, v := range charset {
 				s := strings.Split(v, "|")
@@ -779,45 +812,39 @@ func initChar() {
 				}
 				c.Create()
 			}
-
-			wg.Done()
 			debug.Println("end", radical)
-
 		}(v)
 	}
-	wg.Wait()
 	debug.Println("initChar end")
 }
 
 func updateStrokes() {
-	wg := sync.WaitGroup{}
 	debug.Println("updateStrokes start")
 	for k, v := range scienceFixList {
-		wg.Add(1)
-		go func(index int, s string) {
-			debug.Println("science:", index)
-			sa := strings.Split(s, "")
-			for _, v := range sa {
-				if v == "" {
-					continue
-				}
-				_ = v
-				c := model.Character{SimpleChar: v}
-				c = *c.Get()
-				c.ScienceStrokes = index
-				if uuid.FromStringOrNil(c.Id) == uuid.Nil {
-					debug.Println("notfound: ", c)
-					c.Create()
-					continue
-				}
+		ScienceUpdate(k, v)
+	}
+	debug.Println("updateStrokes end")
+}
 
-			}
-			wg.Done()
-		}(k, v)
+func ScienceUpdate(index int, s string) {
+	debug.Println("science:", index)
+	sa := strings.Split(s, "")
+	for _, v := range sa {
+		if v == "" {
+			continue
+		}
+		_ = v
+		c := model.Character{SimpleChar: v}
+		c = *c.Get()
+		c.ScienceStrokes = index
+		if uuid.FromStringOrNil(c.Id) == uuid.Nil {
+			debug.Println("notfound: ", c)
+			c.Create()
+			continue
+		}
+
 	}
 
-	wg.Wait()
-	debug.Println("updateStrokes end")
 }
 
 func updateFivePhase() {
