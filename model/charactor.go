@@ -3,7 +3,7 @@ package model
 type Character struct {
 	Base           `xorm:"extends"`
 	IsSur          bool   `xorm:"notnull"`                        //姓
-	SimpleChar     string `xorm:"varchar(2) notnull"`             //字
+	SimpleChar     string `xorm:"varchar(2) index notnull"`       //字
 	SimpleStrokes  int    `xorm:"notnull default(0)"`             //标准笔画数
 	TradChar       string `xorm:"varchar(2) notnull default()"`   //繁体
 	TradStrokes    int    `xorm:"notnull default(0)"`             //繁体笔画数
@@ -24,6 +24,10 @@ type Character struct {
 
 func init() {
 	Register(&Character{})
+}
+
+func (c *Character) Sync() error {
+	return db.Sync2(c)
 }
 
 func (c *Character) Create(v ...interface{}) (int64, error) {
