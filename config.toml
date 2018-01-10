@@ -3,20 +3,18 @@
     debug = true
     log = "log.txt"
 
-#[database]
-#   name = "sqlite3"
-#   path = "./fate.db"
-
-
-
 [database]
-   name = "mysql"
-   username = "root"
-   password = "123456"
-   addr = "localhost"
-   port = "3306"
-   schema = "fate"
-   local = "Asia/Shanghai"
-   param = "?"
+   name = "sqlite3"
+   path = "./sql/fate.db"
+
+#[database]
+#   name = "mysql"
+#   username = "root"
+#   password = "123456"
+#   addr = "localhost"
+#   port = "3306"
+#   schema = "fate"
+#   local = "Asia/Shanghai"
+#   param = "?"
 
 
