@@ -6,12 +6,12 @@ import (
 	"github.com/godcong/fate/debug"
 )
 
-type ThreeTalentAttribute string
-type ThreeTalentYinYang string
+//type ThreeTalentAttribute string
+//type ThreeTalentYinYang string
 
 type ThreeTalentComposite struct {
-	ThreeTalentAttribute
-	ThreeTalentYinYang
+	ThreeTalentAttribute string
+	ThreeTalentYinYang   string
 }
 
 type ThreeTalent struct {
@@ -38,8 +38,8 @@ func NewThreeTalentComposite(i int) ThreeTalentComposite {
 
 // GenerateThreeTalent 计算字符的三才属性
 // 1-2木：1为阳木，2为阴木   3-4火：3为阳火，4为阴火   5-6土：5为阳土，6为阴土   7-8金：7为阳金，8为阴金   9-10水：9为阳水，10为阴水
-func GenerateAttribute(i int) ThreeTalentAttribute {
-	var attr ThreeTalentAttribute
+func GenerateAttribute(i int) string {
+	var attr string
 	switch i % 10 {
 	case 1, 2:
 		attr = "木"
@@ -58,8 +58,8 @@ func GenerateAttribute(i int) ThreeTalentAttribute {
 	return attr
 }
 
-func GenerateYinYang(i int) ThreeTalentYinYang {
-	var yy ThreeTalentYinYang
+func GenerateYinYang(i int) string {
+	var yy string
 	if i%2 == 1 {
 		yy = "阳"
 	} else {
