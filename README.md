@@ -24,8 +24,7 @@ github上第一个首个开源的取名项目
 6、小孩取名字时还要结合命主的出生方位、父母资料等因素，以达到事半功倍的效果。  
   其实任何事情道理都是一样的，只有适合自己的才是最好的。
   
-### 一个好名字伴随人的一生 ###
-### FATE让你取一个好名字 ###
+### 一个好名字伴随人的一生，FATE让你取一个好名字 ###
 
 > https://github.com/godcong/excavator 做了字典库更新 done  
 > https://github.com/godcong/lunar 进行八字计算 doing  
