@@ -1,10 +1,8 @@
 package fate
 
-type NameFate struct {
+type NameData struct {
 	FirstName string
 	LastName  string
-	FiveGrid
-	ThreeTalent
 }
 
 //输入姓
@@ -16,3 +14,4 @@ func InsertLastName(name string) NameFate {
 func InsertFirstName(name string) NameFate {
 	return NameFate{}
 }
+

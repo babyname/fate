@@ -1,6 +1,6 @@
 package fate
 
-type NameProperty interface {
+type Property interface {
 
 }
 
