@@ -5,8 +5,6 @@ import (
 	"net/url"
 	"time"
 
-	//"github.com/jinzhu/gorm"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
 	"github.com/godcong/fate/config"

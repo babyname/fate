@@ -15,9 +15,7 @@ func Start(last string) stdFate{
 	}
 }
 
-func (s* stdFate)loadProperty() *stdFate {
-	return s
-}
+
 
 func (s* stdFate)OneFirstName() *stdFate{
 	return s
