@@ -26,6 +26,12 @@
   version = "v0.6.4"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/godcong/excavator"
+  packages = ["."]
+  revision = "6078be052883801b89f5eb945cb71701c0d0bc97"
+
+[[projects]]
   name = "github.com/mattn/go-sqlite3"
   packages = ["."]
   revision = "3b3f1d01b2696af5501697c35629048c227586ab"
@@ -43,9 +49,24 @@
   revision = "879c5887cd475cd7864858769793b2ceb0d44feb"
   version = "v1.1.0"
 
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/text"
+  packages = [
+    "encoding",
+    "encoding/internal",
+    "encoding/internal/identifier",
+    "encoding/simplifiedchinese",
+    "internal/gen",
+    "transform",
+    "unicode/cldr"
+  ]
+  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
+  source = "github.com/golang/text"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "729844a769642715498b136c68058563981ed5834bca8b39458d71e78b31f1be"
+  inputs-digest = "1ef216e6d00962ac5ebdc9078e5a3b2eb04ed0a050536b1602b128080ff7e256"
   solver-name = "gps-cdcl"
   solver-version = 1
