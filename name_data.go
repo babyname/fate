@@ -1,17 +1,18 @@
 package fate
 
-type NameData struct {
-	FirstName string
-	LastName  string
+import "strings"
+
+type Name struct {
+	FirstName []string
+	LastName  []string
 }
 
-//输入姓
-func InsertLastName(name string) NameFate {
-	return NameFate{}
+func NewName(last string) Name {
+	name := Name{}
+	if len(last)>1{
+		name.LastName = strings.Split(last,"")
+		return name
+	}
+	name.LastName[0] = last
+	return name
 }
-
-//输入名
-func InsertFirstName(name string) NameFate {
-	return NameFate{}
-}
-

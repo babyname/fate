@@ -4,14 +4,21 @@ type Fate interface{
 
 }
 
-
-type defaultFate struct{
-	data NameData
+type stdFate struct{
+	name Name
 }
 
 //Start the fate main entrance
-func Start(last string) Fate{
-	return defaultFate{
-		data: NameData{LastName:last},
+func Start(last string) stdFate{
+	return stdFate{
+		name: NewName(last),
 	}
+}
+
+func (s* stdFate)loadProperty() *stdFate {
+	return s
+}
+
+func (s* stdFate)OneFirstName() *stdFate{
+	return s
 }
