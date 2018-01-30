@@ -1,7 +1,10 @@
 package fate
 
 type Property interface {
-
+	UseThreeTalent() bool
+	UseFiveGrid() bool
+	UseFivePhase() bool
+	UseZodiac() bool
 }
 
 type stdProperty struct {
@@ -11,7 +14,23 @@ type stdProperty struct {
 	useZodiac bool //生肖
 }
 
+func (s *stdProperty) UseThreeTalent() bool {
+	panic("implement me")
+}
+
+func (s *stdProperty) UseFiveGrid() bool {
+	panic("implement me")
+}
+
+func (s *stdProperty) UseFivePhase() bool {
+	panic("implement me")
+}
+
+func (s *stdProperty) UseZodiac() bool {
+	panic("implement me")
+}
+
 func loadProperty() Property {
-	property := stdProperty{}
+	property := &stdProperty{}
 	return property
 }
