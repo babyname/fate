@@ -17,6 +17,8 @@ func Start(last string) stdFate{
 
 
 
-func (s* stdFate)OneFirstName() *stdFate{
+func (s* stdFate)GenerateOne() *stdFate{
 	return s
 }
+
+
