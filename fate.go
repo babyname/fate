@@ -18,6 +18,7 @@ func Start(last string) stdFate{
 
 
 func (s* stdFate)GenerateOne() *stdFate{
+	//先套三才五格，再找字
 	return s
 }
 
