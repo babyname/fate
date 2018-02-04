@@ -123,3 +123,7 @@ func (fg *FiveGrid) PrintBigYan(filter bool) bool {
 	}
 	return false
 }
+
+//func BestFiveGrid(n *Name) []FiveGrid {
+//	n.FirstName
+//}
