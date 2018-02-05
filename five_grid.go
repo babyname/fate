@@ -113,12 +113,12 @@ func (fg *FiveGrid) PrintBigYan(filter bool) bool {
 			(pg.Goil == "吉" || pg.Goil == "半吉") &&
 			(og.Goil == "吉" || og.Goil == "半吉") &&
 			(ag.Goil == "吉" || ag.Goil == "半吉") {
-			debug.Println(v)
+			debug.Print(v)
 			return true
 		}
 
 	} else {
-		debug.Println(v)
+		debug.Print(v)
 		return true
 	}
 	return false
