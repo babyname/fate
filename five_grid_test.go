@@ -324,12 +324,10 @@ var fgList = [][]int{
 }
 
 func TestFiveGrid_PrintBigYan(t *testing.T) {
-	for i, j, k := 18, 1, 1; j < 33 && k < 33; k++ {
-
+	for i, j, k := 7, 1, 1; j < 33 && k < 33; k++ {
 		fg := fate.MakeFiveGridFromStrokes(i, 0, j, k)
 		if fg.PrintBigYan(true) {
-
-			debug.Println("笔画:", i, j, k)
+			debug.Print("笔画:", i, j, k)
 		}
 		if k == 32 {
 			k = 1
@@ -337,6 +335,6 @@ func TestFiveGrid_PrintBigYan(t *testing.T) {
 		}
 	}
 
-	fg := fate.MakeFiveGridFromStrokes(17, 0, 8, 7)
-	fg.PrintBigYan(false)
+	//fg := fate.MakeFiveGridFromStrokes(17, 0, 8, 7)
+	//fg.PrintBigYan(false)
 }
