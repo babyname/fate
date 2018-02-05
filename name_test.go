@@ -38,3 +38,7 @@ func TestNewThreeTalent(t *testing.T) {
 	//f := fp.GetFortune()
 	//debug.Println(f)
 }
+
+func TestNewName(t *testing.T) {
+	fate.NewName("诸葛")
+}
