@@ -32,6 +32,11 @@ func (fp *FivePhase) Create(v ...interface{}) (int64, error) {
 	return 0, e
 }
 
+func (fp *FivePhase) Get() *FivePhase {
+	db.Get(fp)
+	return fp
+}
+
 //func (fp *FivePhase) CalculateFortune() string {
 //	var f FivePhase
 //	db.Where(fp).Get(&f)

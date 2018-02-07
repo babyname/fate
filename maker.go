@@ -89,3 +89,9 @@ package fate
 //		model.FindCharactersWithFiveByStrokes(&cs, "", []int{c.Strokes})
 //	}
 //}
+
+
+//
+//func TurnIntoFiveGrid(s int) string {
+//
+//}
