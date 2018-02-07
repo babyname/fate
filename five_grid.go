@@ -113,17 +113,49 @@ func (fg *FiveGrid) PrintBigYan(filter bool) bool {
 			(pg.Goil == "吉" || pg.Goil == "半吉") &&
 			(og.Goil == "吉" || og.Goil == "半吉") &&
 			(ag.Goil == "吉" || ag.Goil == "半吉") {
-			debug.Print(v)
+			debug.Println(v)
 			return true
 		}
 
 	} else {
-		debug.Print(v)
+		debug.Println(v)
 		return true
 	}
 	return false
 }
 
-//func BestFiveGrid(n *Name) []FiveGrid {
-//	n.FirstName
-//}
+func (fg *FiveGrid) ContainBest(rule ...string) bool {
+	b := true
+
+	validate := []model.BigYan{
+		model.GetBigYanByIndex(fg.LandGrid),
+		model.GetBigYanByIndex(fg.PersonGrid),
+		model.GetBigYanByIndex(fg.OutGrid),
+		model.GetBigYanByIndex(fg.AllGrid),
+	}
+
+	switch len(rule) {
+	case 0:
+	case 1:
+		for _, v := range validate {
+			if v.Goil != rule[0] {
+				b = false
+			}
+		}
+	case 2:
+		for _, v := range validate {
+			if v.Goil != rule[0] && v.Goil != rule[1] {
+				b = false
+			}
+		}
+	case 3:
+		for _, v := range validate {
+			if v.Goil != rule[0] && v.Goil != rule[1] && v.Goil != rule[2] {
+				b = false
+			}
+		}
+	default:
+		b = false
+	}
+	return b
+}

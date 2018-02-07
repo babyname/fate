@@ -5,6 +5,7 @@ import (
 
 	"github.com/godcong/fate"
 	"github.com/godcong/fate/debug"
+	"github.com/godcong/fate/model"
 )
 
 var fgList = [][]int{
@@ -326,8 +327,19 @@ var fgList = [][]int{
 func TestFiveGrid_PrintBigYan(t *testing.T) {
 	for i, j, k := 7, 1, 1; j < 33 && k < 33; k++ {
 		fg := fate.MakeFiveGridFromStrokes(i, 0, j, k)
-		if fg.PrintBigYan(true) {
-			debug.Print("笔画:", i, j, k)
+		if fg.ContainBest("吉", "半吉") {
+			tt := fate.NewThreeTalent(fg)
+
+			fp := model.FivePhase{
+				First:  tt.SkyTalent.ThreeTalentAttribute,
+				Second: tt.PersonTalent.ThreeTalentAttribute,
+				Third:  tt.LandTalent.ThreeTalentAttribute,
+			}
+			if fp.Get().Fortune == "大吉" {
+				debug.Println(tt)
+				debug.Print(fp.Get().Fortune, " 笔画:", i, j, k)
+			}
+
 		}
 		if k == 32 {
 			k = 1
