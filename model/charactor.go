@@ -47,6 +47,10 @@ func (c *Character) Update(v ...interface{}) (int64, error) {
 	return db.Id(c.Id).Update(c)
 }
 
+func CharacterList(t string, i int, v interface{}) error {
+	return db.Where("name_type = ?", t).And("science_strokes = ?", i).Find(v)
+}
+
 //
 //func FindByNameChar(v interface{}, nc string) error {
 //	return ORM().Where("name_char = ?", nc).First(v).Error
