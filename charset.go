@@ -646,8 +646,7 @@ var nameList = Charset{
 
 func InitAll() {
 	initCharFrom5156()
-	updateStrokes()
-	updateFivePhase()
+	//updateStrokes()
 	fixNameStrokes()
 }
 
@@ -686,6 +685,7 @@ func insertCharacter(charset Charset, k string) {
 
 }
 
+//delete because use kangxi dict
 func updateStrokes() {
 	debug.Println("updateStrokes start")
 	for k, v := range scienceFixList {
@@ -716,18 +716,18 @@ func ScienceUpdate(index int, s string) {
 
 }
 
-func updateFivePhase() {
-	log.Println("555")
-}
-
 func fixNameStrokes() {
-	for k, v := range nameList {
-		v := strings.Split(v, "")
-		for _, value := range v {
-			c := &model.Character{SimpleChar: value}
-			c = c.Get()
-			c.ScienceStrokes = k
-			c.Update()
+	excavator.UpdateKangXi("http://tool.httpcn.com", func(detail excavator.CharDetail) {
+		log.Println(detail.Char)
+		c := model.Character{
+			SimpleChar: detail.Char,
 		}
-	}
+		c.Get()
+		c.NameType = detail.NameType
+		c.NameRoot = detail.NameRoot
+		c.ScienceStrokes = detail.ScienceStrokes
+		c.Update()
+
+	})
+
 }
