@@ -1,5 +1,7 @@
 package model
 
+import "errors"
+
 type Character struct {
 	Base           `xorm:"extends"`
 	IsSur          bool   `xorm:"notnull"`                        //姓
@@ -48,6 +50,16 @@ func (c *Character) Update(v ...interface{}) (int64, error) {
 }
 
 func CharacterList(t string, i int, v interface{}) error {
+	if t == "" && i == 0 {
+		return errors.New("wrong input")
+	}
+
+	if t == "" {
+		return db.Where("science_strokes = ?", i).Find(v)
+	}
+	if i == 0 {
+		return db.Where("name_type = ?", t).Find(v)
+	}
 	return db.Where("name_type = ?", t).And("science_strokes = ?", i).Find(v)
 }
 

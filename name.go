@@ -1,9 +1,9 @@
 package fate
 
 import (
+	"fmt"
 	"strings"
 
-	"github.com/godcong/fate/debug"
 	"github.com/godcong/fate/model"
 )
 
@@ -19,14 +19,15 @@ func NewName(last string) Name {
 	if len(last) > 1 {
 		name.LastName = strings.Split(last, "")
 		for _, v := range name.LastName {
-			name.cFirst = append(name.cFirst, CharacterFromName(v))
+			name.cLast = append(name.cLast, CharacterFromName(v))
 		}
 		return name
 	}
 	name.LastName[0] = last
 	for i, v := range name.LastName {
-		name.cFirst[i] = CharacterFromName(v)
+		name.cLast[i] = CharacterFromName(v)
 	}
+
 	return name
 }
 
@@ -50,6 +51,7 @@ func CharacterFromName(s string) *model.Character {
 func FilterBest(name Name) {
 	var fg FiveGrid
 	for fmax, smax := 1, 1; fmax < 33; smax++ {
+
 		if len(name.cLast) > 1 {
 			fg = MakeFiveGridFromStrokes(name.cLast[0].ScienceStrokes, name.cLast[1].ScienceStrokes, fmax, smax)
 		} else {
@@ -57,13 +59,34 @@ func FilterBest(name Name) {
 		}
 		tt := NewThreeTalent(fg)
 
+		if GetProperty().UseFivePhase() {
+
+		}
 		fp := model.NewFivePhase(string(tt.SkyTalent.ThreeTalentAttribute), string(tt.PersonTalent.ThreeTalentAttribute), string(tt.LandTalent.ThreeTalentAttribute))
 		f := fp.GetFortune()
+		//if f == "大吉" || f == "中吉" || f == "吉" {
 		if f == "大吉" {
-			if fg.ContainBest("大吉", "半吉") {
-
+			if fg.ContainBest("吉", "半吉") {
+				//if fg.ContainBest("吉") {
 				tt.PrintThreeTalent()
-				debug.Println(f)
+				var sec []model.Character
+				var trd []model.Character
+				model.CharacterList("水", fmax, &sec)
+				model.CharacterList("", smax, &trd)
+				if sec == nil || trd == nil {
+					continue
+				}
+				fmt.Println("第二字：", fmax)
+				for _, v := range sec {
+					fmt.Print(v.SimpleChar, v.Pinyin)
+				}
+				fmt.Println()
+				fmt.Println("第三字：", smax)
+				for _, v := range trd {
+					fmt.Print(v.SimpleChar, v.Pinyin)
+				}
+				fmt.Println()
+
 			}
 
 		}
@@ -74,26 +97,4 @@ func FilterBest(name Name) {
 		}
 
 	}
-
-	//for i, j, k := 17, 1, 1; j < 33 && k < 33; k++ {
-	//
-	//	fg := fate.MakeFiveGridFromStrokes(i, 0, j, k)
-	//
-	//	tt := fate.NewThreeTalent(fg)
-	//	fp := model.NewFivePhase(string(tt.SkyTalent.ThreeTalentAttribute), string(tt.PersonTalent.ThreeTalentAttribute), string(tt.LandTalent.ThreeTalentAttribute))
-	//	f := fp.GetFortune()
-	//	if f == "大吉" {
-	//		if fg.PrintBigYan(true) {
-	//			debug.Println("笔画:", i, j, k)
-	//			tt.PrintThreeTalent()
-	//			debug.Println(f)
-	//		}
-	//
-	//	}
-	//
-	//	if k == 32 {
-	//		k = 1
-	//		j++
-	//	}
-	//}
 }
