@@ -40,9 +40,9 @@ func TestNewThreeTalent(t *testing.T) {
 }
 
 func TestNewName(t *testing.T) {
-	fate.NewName("李四")
+	fate.NewName("李")
 }
 
 func TestFilterBest(t *testing.T) {
-	fate.FilterBest(fate.NewName("诸葛"))
+	fate.FilterBest(fate.NewName("蒋"))
 }
