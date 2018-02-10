@@ -645,8 +645,8 @@ var nameList = Charset{
 }
 
 func InitAll() {
+	model.CreateTables()
 	initCharFrom5156()
-	//updateStrokes()
 	fixNameStrokes()
 }
 
