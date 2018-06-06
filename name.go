@@ -48,7 +48,7 @@ func CharacterFromName(s string) *model.Character {
 	return c.Get()
 }
 
-func FilterBest(name Name) {
+func FilterBest(name Name, secAttr, trdAttr string) {
 	var fg FiveGrid
 	for fmax, smax := 1, 1; fmax < 33; smax++ {
 
@@ -66,19 +66,21 @@ func FilterBest(name Name) {
 		f := fp.GetFortune()
 		//if f == "大吉" || f == "中吉" || f == "吉" {
 		if f == "大吉" {
-			if fg.ContainBest("吉", "半吉") {
+			if fg.ContainBest("吉") {
 				//if fg.ContainBest("吉") {
 				tt.PrintThreeTalent()
 				var sec []model.Character
 				var trd []model.Character
-				model.CharacterList("水", fmax, &sec)
-				model.CharacterList("", smax, &trd)
+				model.CharacterList(secAttr, fmax, &sec)
+				model.CharacterList(trdAttr, smax, &trd)
 				if sec == nil || trd == nil {
 					continue
 				}
 				fmt.Println("第二字：", fmax)
+
 				for _, v := range sec {
 					fmt.Print(v.SimpleChar, v.Pinyin)
+
 				}
 				fmt.Println()
 				fmt.Println("第三字：", smax)
@@ -86,7 +88,6 @@ func FilterBest(name Name) {
 					fmt.Print(v.SimpleChar, v.Pinyin)
 				}
 				fmt.Println()
-
 			}
 
 		}
