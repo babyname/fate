@@ -6,6 +6,7 @@ type FivePhase struct {
 	Second  string `xorm:"varchar(2)"` //第二字
 	Third   string `xorm:"varchar(2)"` //第三字
 	Fortune string `xorm:"varchar(8)"` //吉凶
+	Comment string `xorm:"text"`       //说明
 }
 
 func init() {
@@ -37,25 +38,6 @@ func (fp *FivePhase) Get() *FivePhase {
 	return fp
 }
 
-//func (fp *FivePhase) CalculateFortune() string {
-//	var f FivePhase
-//	db.Where(fp).Get(&f)
-//	return f.Fortune
-//}
+func (fp *FivePhase) UpdateOnly(cols ...string) {
 
-//
-//func init() {
-//	SetMigrate(CharacterFive{})
-//}
-//
-//func FindFiveByMass(v interface{}, mass string) error {
-//	return ORM().Where("mass = ?", mass).Find(v).Error
-//}
-//
-//func FindFiveWithFirstByMass(v interface{}, fir string, mass []string) error {
-//	return ORM().Where("first = ? and mass in (?)", fir, mass).Find(v).Error
-//}
-
-//func (f *CharacterFive) StringFive() string {
-//	return f.First + f.Second + f.Third
-//}
+}

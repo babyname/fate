@@ -1,4 +1,4 @@
-package model
+package fate
 
 type LikeUseGod struct {
 	LikeGod string //喜神
