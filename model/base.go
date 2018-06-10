@@ -10,7 +10,7 @@ import (
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/debug"
 	_ "github.com/mattn/go-sqlite3"
-	uuid "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 )
 
 type Base struct {
