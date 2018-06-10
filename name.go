@@ -14,36 +14,26 @@ type Name struct {
 	cLast     []*model.Character
 }
 
-func NewName(last string) Name {
+func newName(last string) *Name {
 	name := Name{}
 	if len(last) > 1 {
 		name.LastName = strings.Split(last, "")
 		for _, v := range name.LastName {
-			name.cLast = append(name.cLast, CharacterFromName(v))
+			name.cLast = append(name.cLast, characterFromName(v))
 		}
-		return name
-	}
-	name.LastName[0] = last
-	for i, v := range name.LastName {
-		name.cLast[i] = CharacterFromName(v)
+	} else {
+		name.LastName[0] = last
+		for i, v := range name.LastName {
+			name.cLast[i] = characterFromName(v)
+		}
 	}
 
-	return name
+	return &name
 }
 
-func CharacterFromName(s string) *model.Character {
+func characterFromName(s string) *model.Character {
 	c := &model.Character{
-		IsSur:          false,
-		SimpleChar:     s,
-		SimpleStrokes:  0,
-		TradChar:       "",
-		TradStrokes:    0,
-		NameType:       "",
-		NameRoot:       "",
-		Radical:        "",
-		ScienceStrokes: 0,
-		Pinyin:         "",
-		Comment:        "",
+		SimpleChar: s,
 	}
 	return c.Get()
 }

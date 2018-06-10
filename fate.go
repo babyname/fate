@@ -1,29 +1,23 @@
 package fate
 
-type Fate interface{
+type fate struct {
+	name     *Name
+	property *Property
+}
+
+func NewFate(lastName string) *fate {
+	name := newName(lastName)
+	return &fate{name: name}
+}
+
+func (f *fate) SetLastName(lastName string) {
+	f.name = newName(lastName)
+}
+
+func (f *fate) SetProperty(p *Property) {
 
 }
 
-type stdFate struct{
-	name Name
+func (f *fate) FirstName() {
+
 }
-
-//Start the fate main entrance
-func Start(last string) stdFate{
-	return stdFate{
-		name: NewName(last),
-	}
-}
-
-
-
-func (s* stdFate)GenerateOne() *stdFate{
-	//先套三才五格，再找字
-
-
-
-
-	return s
-}
-
-

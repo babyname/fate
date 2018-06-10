@@ -2,10 +2,10 @@ package model
 
 type FivePhase struct {
 	Base    `xorm:"extends"`
-	First   string `xorm:"varchar(2)"`
-	Second  string `xorm:"varchar(2)"`
-	Third   string `xorm:"varchar(2)"`
-	Fortune string `xorm:"varchar(8)"`
+	First   string `xorm:"varchar(2)"` //第一字
+	Second  string `xorm:"varchar(2)"` //第二字
+	Third   string `xorm:"varchar(2)"` //第三字
+	Fortune string `xorm:"varchar(8)"` //吉凶
 }
 
 func init() {
