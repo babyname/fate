@@ -13,6 +13,10 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+type SyncAble interface {
+	Sync() error
+}
+
 type Base struct {
 	Id      string     `xorm:"uuid pk"`
 	Created time.Time  `xorm:"created"`
@@ -62,6 +66,7 @@ func ConnectDB(config *config.Config) *xorm.Engine {
 	if NewDatabase(driver, source) != nil {
 		return nil
 	}
+	db.ShowSQL(true)
 	return db
 }
 
@@ -82,6 +87,10 @@ func Register(i interface{}) {
 func CreateTables() error {
 	debug.Println("CreateTables")
 	return db.CreateTables(tables...)
+}
+
+func Sync(v interface{}) error {
+	return db.Sync2(v)
 }
 
 //func CreateDB() *DB {

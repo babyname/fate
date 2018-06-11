@@ -33,11 +33,13 @@ func (fp *FivePhase) Create(v ...interface{}) (int64, error) {
 	return 0, e
 }
 
-func (fp *FivePhase) Get() *FivePhase {
-	db.Get(fp)
-	return fp
+func (fp *FivePhase) Get() (bool, error) {
+	return db.Get(fp)
 }
 
-func (fp *FivePhase) UpdateOnly(cols ...string) {
-
+func (fp *FivePhase) UpdateOnly(cols ...string) (int64, error) {
+	return db.ID(fp.Id).Cols(cols...).Update(fp)
+}
+func (fp *FivePhase) Sync() error {
+	return Sync(fp)
 }

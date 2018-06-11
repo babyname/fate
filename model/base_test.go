@@ -17,3 +17,14 @@ func TestConnectDB(t *testing.T) {
 func TestCreateTables(t *testing.T) {
 	model.CreateTables()
 }
+
+func TestSync(t *testing.T) {
+	list := []model.SyncAble{
+		new(model.FivePhase),
+	}
+
+	for _, l := range list {
+		err := l.Sync()
+		log.Println(err)
+	}
+}
