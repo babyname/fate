@@ -14,10 +14,15 @@ func (f *fate) SetLastName(lastName string) {
 	f.name = newName(lastName)
 }
 
-func (f *fate) SetProperty(p *Property) {
+func (f *fate) SetLunarData() {
 
 }
 
-func (f *fate) FirstName() {
+func (f *fate) SetProperty(p *Property) {
+	//TODO
+}
 
+func (f *fate) MakeFirstName() *Name {
+
+	return f.name
 }
