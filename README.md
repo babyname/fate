@@ -28,5 +28,10 @@
 > https://github.com/godcong/excavator 做了字典库更新 done  
 > https://github.com/godcong/chronos 万年历 农历 公历 八字计算 doing
 
-TODO：
-姓名学笔画更新
+版本履历:
+第一版:
+    大部分是手动工作,现已废弃
+第二版:
+    可自动生成名字字符
+第三版(开发中):
+    每次生成一个名字,并目标喜用神,生肖喜忌,月历转换,生成八字等功能
