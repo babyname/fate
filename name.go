@@ -49,9 +49,6 @@ func FilterBest(name Name, secAttr, trdAttr string) {
 		}
 		tt := NewThreeTalent(fg)
 
-		if GetProperty().UseFivePhase() {
-
-		}
 		fp := model.NewFivePhase(string(tt.SkyTalent.ThreeTalentAttribute), string(tt.PersonTalent.ThreeTalentAttribute), string(tt.LandTalent.ThreeTalentAttribute))
 		f := fp.GetFortune()
 		//if f == "大吉" || f == "中吉" || f == "吉" {
