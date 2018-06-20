@@ -1,7 +1,14 @@
 package fate
 
+import (
+	"time"
+
+	"github.com/godcong/chronos"
+)
+
 type fate struct {
 	name     *Name
+	calendar chronos.Calendar
 	property *Property
 }
 
@@ -14,12 +21,12 @@ func (f *fate) SetLastName(lastName string) {
 	f.name = newName(lastName)
 }
 
-func (f *fate) SetLunarData() {
-
+func (f *fate) SetLunarData(t time.Time) {
+	f.calendar = chronos.New(t)
 }
 
 func (f *fate) SetProperty(p *Property) {
-	//TODO
+	f.property = p
 }
 
 func (f *fate) MakeFirstName() *Name {
