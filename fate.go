@@ -33,3 +33,8 @@ func (f *fate) MakeFirstName() *Name {
 
 	return f.name
 }
+
+//EightCharacter 计算生辰八字
+func (f *fate) EightCharacter() (string, string, string, string) {
+	return f.calendar.Lunar().EightCharacter()
+}
