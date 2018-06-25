@@ -335,9 +335,10 @@ func TestFiveGrid_PrintBigYan(t *testing.T) {
 				Second: tt.PersonTalent.ThreeTalentAttribute,
 				Third:  tt.LandTalent.ThreeTalentAttribute,
 			}
-			if fp.Get().Fortune == "大吉" {
+			fp.Get()
+			if fp.Fortune == "大吉" {
 				debug.Println(tt)
-				debug.Print(fp.Get().Fortune, " 笔画:", i, j, k)
+				debug.Print(fp.Fortune, " 笔画:", i, j, k)
 			}
 
 		}
