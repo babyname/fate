@@ -10,6 +10,8 @@ type fate struct {
 	name     *Name
 	calendar chronos.Calendar
 	property *Property
+	fn1      int
+	fn2      int
 }
 
 func NewFate(lastName string) *fate {
@@ -41,4 +43,35 @@ func (f *fate) EightCharacter() (string, string, string, string) {
 		return f.calendar.Lunar().EightCharacter()
 	}
 	return "", "", "", ""
+}
+
+func (f *fate) ThreeTalent() {
+
+	//tt := NewThreeTalent(fg)
+}
+
+func (f *fate) FiveGrid() *FiveGrid {
+	var fg *FiveGrid
+	if len(f.name.cLast) > 1 {
+		fg = MakeFiveGridFromStrokes(f.name.cLast[0].ScienceStrokes, f.name.cLast[1].ScienceStrokes, f.fn1, f.fn2)
+	} else {
+		fg = MakeFiveGridFromStrokes(f.name.cLast[0].ScienceStrokes, 0, f.fn1, f.fn2)
+	}
+	return fg
+}
+
+func (f *fate) IteratorFiveGrid() *FiveGrid {
+	var fg *FiveGrid
+	if len(f.name.cLast) > 1 {
+		fg = MakeFiveGridFromStrokes(f.name.cLast[0].ScienceStrokes, f.name.cLast[1].ScienceStrokes, f.fn1, f.fn2)
+	} else {
+		fg = MakeFiveGridFromStrokes(f.name.cLast[0].ScienceStrokes, 0, f.fn1, f.fn2)
+	}
+	if f.fn2 > LenMax {
+		f.fn2 = 0
+		f.fn1++
+		return fg
+	}
+	f.fn2++
+	return fg
 }

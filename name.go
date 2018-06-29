@@ -7,6 +7,8 @@ import (
 	"github.com/godcong/fate/model"
 )
 
+const LenMax = 32
+
 type Name struct {
 	FirstName []string
 	cFirst    []*model.Character
