@@ -9,7 +9,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/debug"
-	_ "github.com/mattn/go-sqlite3"
+	//_ "github.com/mattn/go-sqlite3"
 	"github.com/satori/go.uuid"
 )
 

@@ -17,8 +17,8 @@ type FiveGrid struct {
 
 // MakeFiveGridFromStrokes 按照姓名笔画创建一个五格属性
 // 五格是进行大衍计算的基础
-func MakeFiveGridFromStrokes(l1, l2, f1, f2 int) FiveGrid {
-	return FiveGrid{
+func MakeFiveGridFromStrokes(l1, l2, f1, f2 int) *FiveGrid {
+	return &FiveGrid{
 		SkyGrid:    skyGrid(l1, l2, f1, f2),
 		LandGrid:   landGrid(l1, l2, f1, f2),
 		PersonGrid: personGrid(l1, l2, f1, f2),
