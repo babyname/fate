@@ -21,8 +21,8 @@ type ThreeTalent struct {
 }
 
 //天人地格算三才
-func NewThreeTalent(grid FiveGrid) ThreeTalent {
-	return ThreeTalent{
+func NewThreeTalent(grid *FiveGrid) *ThreeTalent {
+	return &ThreeTalent{
 		SkyTalent:    NewThreeTalentComposite(grid.SkyGrid),
 		LandTalent:   NewThreeTalentComposite(grid.LandGrid),
 		PersonTalent: NewThreeTalentComposite(grid.PersonGrid),

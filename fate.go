@@ -7,11 +7,13 @@ import (
 )
 
 type fate struct {
-	name     *Name
-	calendar chronos.Calendar
-	property *Property
-	fn1      int
-	fn2      int
+	name        *Name
+	fiveGrid    *FiveGrid
+	threeTalent *ThreeTalent
+	calendar    chronos.Calendar
+	property    *Property
+	fn1         int
+	fn2         int
 }
 
 func NewFate(lastName string) *fate {
@@ -45,33 +47,27 @@ func (f *fate) EightCharacter() (string, string, string, string) {
 	return "", "", "", ""
 }
 
-func (f *fate) ThreeTalent() {
+//GenerateName 通过规则生成姓名
+func (f *fate) GenerateName() {
 
-	//tt := NewThreeTalent(fg)
+}
+
+func (f *fate) ThreeTalent() *ThreeTalent {
+	f.threeTalent = NewThreeTalent(f.fiveGrid)
+	return f.threeTalent
 }
 
 func (f *fate) FiveGrid() *FiveGrid {
-	var fg *FiveGrid
-	if len(f.name.cLast) > 1 {
-		fg = MakeFiveGridFromStrokes(f.name.cLast[0].ScienceStrokes, f.name.cLast[1].ScienceStrokes, f.fn1, f.fn2)
-	} else {
-		fg = MakeFiveGridFromStrokes(f.name.cLast[0].ScienceStrokes, 0, f.fn1, f.fn2)
-	}
-	return fg
+	f.fiveGrid = currentFiveGrid(f.name, f.fn1, f.fn2)
+	return f.fiveGrid
 }
 
-func (f *fate) IteratorFiveGrid() *FiveGrid {
+func currentFiveGrid(name *Name, fn1, fn2 int) *FiveGrid {
 	var fg *FiveGrid
-	if len(f.name.cLast) > 1 {
-		fg = MakeFiveGridFromStrokes(f.name.cLast[0].ScienceStrokes, f.name.cLast[1].ScienceStrokes, f.fn1, f.fn2)
+	if len(name.cLast) > 1 {
+		fg = MakeFiveGridFromStrokes(name.cLast[0].ScienceStrokes, name.cLast[1].ScienceStrokes, fn1, fn2)
 	} else {
-		fg = MakeFiveGridFromStrokes(f.name.cLast[0].ScienceStrokes, 0, f.fn1, f.fn2)
+		fg = MakeFiveGridFromStrokes(name.cLast[0].ScienceStrokes, 0, fn1, fn2)
 	}
-	if f.fn2 > LenMax {
-		f.fn2 = 0
-		f.fn1++
-		return fg
-	}
-	f.fn2++
 	return fg
 }
