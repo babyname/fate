@@ -46,17 +46,17 @@ func connectMysql(config *config.Config) string {
 	db := config.GetSub("database")
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s%sloc=%s&charset=utf8&parseTime=true",
 		db.GetStringWithDefault("username", "root"),
-		db.GetStringWithDefault("password", ""),
+		db.GetStringWithDefault("password", "111111"),
 		db.GetStringWithDefault("addr", "localhost"),
 		db.GetStringWithDefault("port", "3306"),
-		db.GetStringWithDefault("schema", "default"),
+		db.GetStringWithDefault("schema", "fate"),
 		db.GetStringWithDefault("param", "?"),
 		url.QueryEscape(db.GetStringWithDefault("local", "Asia/Shanghai")))
 }
 
 func ConnectDB(config *config.Config) *xorm.Engine {
 	database := config.GetSub("database")
-	driver := database.GetStringWithDefault("name", "sqlite3")
+	driver := database.GetStringWithDefault("name", "mysql")
 	source := ""
 	if driver == "mysql" {
 		source = connectMysql(config)
@@ -102,13 +102,12 @@ func Sync(v interface{}) error {
 //
 //}
 
-//func ORM() *DB {
-//	if db == nil || db.DB().Ping() != nil {
-//		db = CreateDB()
-//	}
-//	db.LogMode(true)
-//	return db
-//}
+func DB() *xorm.Engine {
+	if db == nil || db.DB().Ping() != nil {
+		db = ConnectDB(config.DefaultConfig())
+	}
+	return db
+}
 
 //func SetMigrate(table interface{}) {
 //	migrate = append(migrate, table)
