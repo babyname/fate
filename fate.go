@@ -39,7 +39,7 @@ func (f *fate) MakeFirstName() *Name {
 	return f.name
 }
 
-//EightCharacter 计算生辰八字(需先设定生日),按年柱,月柱,日柱,时柱 输出
+//EightCharacter 计算生辰八字(需要SetLunarData),按年柱,月柱,日柱,时柱 输出
 func (f *fate) EightCharacter() (string, string, string, string) {
 	if f.calendar != nil {
 		return f.calendar.Lunar().EightCharacter()
