@@ -38,8 +38,7 @@ func FindBigYanByIndex(by *[]BigYan, i int) error {
 }
 
 func GetBigYanByIndex(i int) BigYan {
-	lsize := len(inBigYan)
-	if lsize == 0 {
+	if len(inBigYan) == 0 {
 		err := FindBigYanAll(&inBigYan)
 		if err != nil {
 			log.Println(err)
@@ -47,7 +46,7 @@ func GetBigYanByIndex(i int) BigYan {
 		}
 	}
 
-	if i == 0 || i >= lsize {
+	if i == 0 || i >= len(inBigYan) {
 		return BigYan{}
 	}
 
