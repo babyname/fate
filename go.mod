@@ -8,7 +8,7 @@ require (
 	github.com/go-xorm/builder v0.0.0-20171030021429-a4a881a4e552
 	github.com/go-xorm/core v0.5.7
 	github.com/go-xorm/xorm v0.6.4
-	github.com/godcong/chronos v0.0.0-20180620091934-6bd6ffcbb46e
+	github.com/godcong/chronos v0.0.0-20180701100517-26c8d9186264
 	github.com/godcong/excavator v0.0.0-20180110075026-6078be052883
 	github.com/google/go-cmp v0.2.0
 	github.com/mattn/go-sqlite3 v1.1.0
