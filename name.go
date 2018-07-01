@@ -41,7 +41,7 @@ func characterFromName(s string) *model.Character {
 }
 
 func FilterBest(name Name, secAttr, trdAttr string) {
-	var fg FiveGrid
+	var fg *FiveGrid
 	for fmax, smax := 1, 1; fmax < 33; smax++ {
 
 		if len(name.cLast) > 1 {
