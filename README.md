@@ -25,8 +25,27 @@
   
 ### 一个好名字伴随人的一生，FATE让你取一个好名字 ###
 
-> https://github.com/godcong/excavator 做了字典库更新 done  
-> https://github.com/godcong/chronos 万年历 农历 公历 八字计算 doing
+获取项目：
+    vgo get github.com/godcong/fate@v2.0.0
 
-TODO：
-姓名学笔画更新
+
+ 更新数据库：
+    导入sql目录下的各个sql文件
+
+ 将config.toml配置文件放入项目根目录下并配置如下：
+    [database]
+       name = "mysql"
+       username = "root"
+       password = "123456"
+       addr = "localhost"
+       port = "3306"
+       schema = "fate"
+    #   local = "Asia/Shanghai"
+    #   param = "?"
+    如使用sqlite库则配置:
+    [database]
+       name = "sqlite3"
+       path = "./sql/fate.db"   //fate.db对应目录
+
+  运行项目：
+    fate.FilterBest(fate.NewName("毛"), "水", "金")
