@@ -46,7 +46,9 @@
        schema = "fate"
     #   local = "Asia/Shanghai"
     #   param = "?"
-    如使用sqlite库则配置:
+    
+ 如使用sqlite库则配置:
+    
     [database]
        name = "sqlite3"
        path = "./sql/fate.db"   //fate.db对应目录
