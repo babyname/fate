@@ -1,5 +1,37 @@
 package model
 
+type ZodiacType string
+
+const (
+	ZodiacTypeMouse   ZodiacType = "鼠"
+	ZodiacTypeCow     ZodiacType = "牛"
+	ZodiacTypeTiger   ZodiacType = "虎"
+	ZodiacTypeRabbit  ZodiacType = "兔"
+	ZodiacTypeDragon  ZodiacType = "龙"
+	ZodiacTypeSnake   ZodiacType = "蛇"
+	ZodiacTypeHourse  ZodiacType = "马"
+	ZodiacTypeSheep   ZodiacType = "羊"
+	ZodiacTypeMonkey  ZodiacType = "猴"
+	ZodiacTypeChicken ZodiacType = "鸡"
+	ZodiacTypeDog     ZodiacType = "狗"
+	ZodiacTypePig     ZodiacType = "猪"
+)
+
+var ZodiacTypes = []ZodiacType{
+	ZodiacTypeMouse,
+	ZodiacTypeCow,
+	ZodiacTypeTiger,
+	ZodiacTypeRabbit,
+	ZodiacTypeDragon,
+	ZodiacTypeSnake,
+	ZodiacTypeHourse,
+	ZodiacTypeSheep,
+	ZodiacTypeMonkey,
+	ZodiacTypeChicken,
+	ZodiacTypeDog,
+	ZodiacTypePig,
+}
+
 type Zodiac struct {
 	Base       `xorm:"extends"`
 	ZodiacType string
@@ -18,42 +50,13 @@ type Zodiac struct {
 //	return z
 //}
 //
-//func (z *Zodiac) Create() {
-//	ORM().Create(z)
-//}
+func (z *Zodiac) Create() {
+	DB().InsertOne(z)
+}
+
 //
 //func FindZodiac(zodiacType ZodiacType) *Zodiac {
 //	z := new(Zodiac)
 //	ORM().Where("zodiac_type = ?", zodiacType).First(z)
 //	return z
-//}
-
-//func (z ZodiacType) ToString() string {
-//	switch z {
-//	case ZODIAC_SHU:
-//		return "鼠"
-//	case ZODIAC_NIU:
-//		return "牛"
-//	case ZODIAC_HU:
-//		return "虎"
-//	case ZODIAC_TU:
-//		return "兔"
-//	case ZODIAC_LONG:
-//		return "龙"
-//	case ZODIAC_SHE:
-//		return "蛇"
-//	case ZODIAC_MA:
-//		return "马"
-//	case ZODIAC_YANG:
-//		return "羊"
-//	case ZODIAC_HOU:
-//		return "猴"
-//	case ZODIAC_JI:
-//		return "鸡"
-//	case ZODIAC_GOU:
-//		return "狗"
-//	case ZODIAC_ZHU:
-//		return "猪"
-//	}
-//	return ""
 //}

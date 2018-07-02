@@ -9,7 +9,6 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/debug"
-	//_ "github.com/mattn/go-sqlite3"
 	"github.com/satori/go.uuid"
 )
 
@@ -60,8 +59,8 @@ func ConnectDB(config *config.Config) *xorm.Engine {
 	source := ""
 	if driver == "mysql" {
 		source = connectMysql(config)
-	} else if driver == "sqlite3" {
-		source = database.GetStringWithDefault("path", "fate")
+	} else {
+		panic("no sql server")
 	}
 	if NewDatabase(driver, source) != nil {
 		return nil
@@ -93,33 +92,9 @@ func Sync(v interface{}) error {
 	return db.Sync2(v)
 }
 
-//func CreateDB() *DB {
-//	db, e := gorm.Open("mysql", connectString())
-//	if e != nil {
-//		panic(e)
-//	}
-//	return db
-//
-//}
-
 func DB() *xorm.Engine {
 	if db == nil || db.DB().Ping() != nil {
 		db = ConnectDB(config.DefaultConfig())
 	}
 	return db
 }
-
-//func SetMigrate(table interface{}) {
-//	migrate = append(migrate, table)
-//
-//}
-
-//func RunMigrate() {
-//	for _, v := range migrate {
-//		ORM().AutoMigrate(v)
-//	}
-//}
-
-//func (b Base) IsNil() bool {
-//	return uuid.Equal(b.ID, uuid.Nil)
-//}
