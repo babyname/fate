@@ -26,13 +26,17 @@
 ### 一个好名字伴随人的一生，FATE让你取一个好名字 ###
 
 获取项目：
+
     vgo get github.com/godcong/fate@v2.0.0
 
 
  更新数据库：
+ 
     导入sql目录下的各个sql文件
+    
 
  将config.toml配置文件放入项目根目录下并配置如下：
+ 
     [database]
        name = "mysql"
        username = "root"
@@ -48,4 +52,5 @@
        path = "./sql/fate.db"   //fate.db对应目录
 
   运行项目：
-    fate.FilterBest(fate.NewName("毛"), "水", "金")
+  
+      fate.FilterBest(fate.NewName("毛"), "水", "金")
