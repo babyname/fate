@@ -35,8 +35,10 @@ var ZodiacTypes = []ZodiacType{
 type Zodiac struct {
 	Base       `xorm:"extends"`
 	ZodiacType string
-	Best       string ``
-	Worst      string `xorm:"notnull default()"`
+	Best       string   `xorm:"notnull default('')"`      //最佳部首
+	Worst      string   `xorm:"notnull default('')"`      //禁用部首
+	Suitable   []string `xorm:"json notnull default('')"` //宜用字
+	Noes       []string `xorm:"json notnull default('')"` //忌用字
 }
 
 //
