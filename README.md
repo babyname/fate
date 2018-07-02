@@ -32,7 +32,7 @@
 
  更新数据库：
  
-    导入sql目录下的各个sql文件
+    创建fate库，并导入sql目录下的各个sql文件到mysql
     
 
  将config.toml配置文件放入项目根目录下并配置如下：
