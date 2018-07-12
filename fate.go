@@ -16,6 +16,9 @@ type fate struct {
 	fn2         int
 }
 
+//MaxStokers 超过32划的字不易书写,过滤
+const MaxStokers = 32
+
 func NewFate(lastName string) *fate {
 	name := newName(lastName)
 	return &fate{name: name}
