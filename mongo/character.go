@@ -1,4 +1,4 @@
-package mgo
+package mongo
 
 //Character 字符
 type Character struct {
