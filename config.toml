@@ -1,5 +1,5 @@
 [system]
-    sql = false
+    show_sql = false
     debug = true
     log = "log.txt"
 
@@ -17,4 +17,6 @@
    local = "Asia/Shanghai"
    param = "?"
 
-
+[mongodb]
+    username: "root",
+    password: "v2RgzSuIaBlx",
