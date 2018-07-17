@@ -38,7 +38,6 @@ func (f *fate) SetProperty(p *Property) {
 }
 
 func (f *fate) MakeFirstName() *Name {
-
 	return f.name
 }
 

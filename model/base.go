@@ -44,18 +44,18 @@ func (b *Base) BeforeInsert() {
 func connectMysql(config *config.Config) string {
 	db := config.GetSub("database")
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s%sloc=%s&charset=utf8&parseTime=true",
-		db.GetStringWithDefault("username", "root"),
-		db.GetStringWithDefault("password", "111111"),
-		db.GetStringWithDefault("addr", "localhost"),
-		db.GetStringWithDefault("port", "3306"),
-		db.GetStringWithDefault("schema", "fate"),
-		db.GetStringWithDefault("param", "?"),
-		url.QueryEscape(db.GetStringWithDefault("local", "Asia/Shanghai")))
+		db.GetStringD("username", "root"),
+		db.GetStringD("password", "111111"),
+		db.GetStringD("addr", "localhost"),
+		db.GetStringD("port", "3306"),
+		db.GetStringD("schema", "fate"),
+		db.GetStringD("param", "?"),
+		url.QueryEscape(db.GetStringD("local", "Asia/Shanghai")))
 }
 
 func ConnectDB(config *config.Config) *xorm.Engine {
 	database := config.GetSub("database")
-	driver := database.GetStringWithDefault("name", "mysql")
+	driver := database.GetStringD("name", "mysql")
 	source := ""
 	if driver == "mysql" {
 		source = connectMysql(config)
@@ -71,7 +71,7 @@ func ConnectDB(config *config.Config) *xorm.Engine {
 
 func NewDatabase(driver, source string) (err error) {
 	db, err = xorm.NewEngine(driver, source)
-	if config.DefaultConfig().GetBool("system.sql") == true {
+	if config.DefaultConfig().GetBool("system.show_sql") == true {
 		db.ShowSQL(true)
 	}
 	return err
