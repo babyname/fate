@@ -2,25 +2,27 @@
 package mongo
 
 type WuGe struct {
-	TianGe int
-	RenGe  int
-	DiGe   int
-	WaiGe  int
-	ZongGe int
+	TianGe int `json:"tian_ge"`
+	RenGe  int `json:"ren_ge"`
+	DiGe   int `json:"di_ge"`
+	WaiGe  int `json:"wai_ge"`
+	ZongGe int `json:"zong_ge"`
 }
 
 type SanCai struct {
-	TianCai        string
-	TianCaiYinYang string
-	RenCai         string
-	RenCaiYinYang  string
-	DiCai          string
-	DiCaiYingYang  string
+	TianCai        string `json:"tian_cai"`
+	TianCaiYinYang string `json:"tian_cai_yin_yang"`
+	RenCai         string `json:"ren_cai"`
+	RenCaiYinYang  string `json:"ren_cai_yin_yang"`
+	DiCai          string `json:"di_cai"`
+	DiCaiYingYang  string `json:"di_cai_ying_yang"`
 }
 
 type SanCaiWuGe struct {
 	*WuGe
 	*SanCai
+	Fortune string `json:"fortune"` //吉凶
+	Comment string `json:"comment"` //说明
 }
 
 func MakeSanCaiWuGe(l1, l2, f1, f2 int) *SanCaiWuGe {

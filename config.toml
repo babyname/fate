@@ -18,5 +18,5 @@
    param = "?"
 
 [mongodb]
-    username: "root",
-    password: "v2RgzSuIaBlx",
+    username = "root"
+    password = "v2RgzSuIaBlx"
