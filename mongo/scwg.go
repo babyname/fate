@@ -16,36 +16,26 @@ type SanCai struct {
 	RenCaiYinYang  string `json:"ren_cai_yin_yang"`
 	DiCai          string `json:"di_cai"`
 	DiCaiYingYang  string `json:"di_cai_ying_yang"`
+	Fortune        string `json:"fortune"` //吉凶
+	Comment        string `json:"comment"` //说明
 }
 
-type SanCaiWuGe struct {
-	*WuGe
-	*SanCai
-	Fortune string `json:"fortune"` //吉凶
-	Comment string `json:"comment"` //说明
-}
-
-func MakeSanCaiWuGe(l1, l2, f1, f2 int) *SanCaiWuGe {
+func MakeSanCai(l1, l2, f1, f2 int) *SanCai {
 	wuGe := WuGe{
 		TianGe: tianGe(l1, l2, f1, f2),
 		RenGe:  renGe(l1, l2, f1, f2),
 		DiGe:   diGe(l1, l2, f1, f2),
-		WaiGe:  waiGe(l1, l2, f1, f2),
-		ZongGe: zongGe(l1, l2, f1, f2),
+		//WaiGe:  waiGe(l1, l2, f1, f2),
+		//ZongGe: zongGe(l1, l2, f1, f2),
 	}
 
-	sanCai := SanCai{
+	return &SanCai{
 		TianCai:        sanCaiAttr(wuGe.TianGe),
 		TianCaiYinYang: sanCaiYinYang(wuGe.TianGe),
 		RenCai:         sanCaiAttr(wuGe.RenGe),
 		RenCaiYinYang:  sanCaiYinYang(wuGe.RenGe),
 		DiCai:          sanCaiAttr(wuGe.DiGe),
 		DiCaiYingYang:  sanCaiYinYang(wuGe.DiGe),
-	}
-
-	return &SanCaiWuGe{
-		WuGe:   &wuGe,
-		SanCai: &sanCai,
 	}
 }
 

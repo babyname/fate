@@ -18,6 +18,10 @@ func init() {
 	config = DefaultConfig()
 }
 
+func CFG() *Config {
+	return config
+}
+
 func NewConfig(name string) *Config {
 	file, err := os.OpenFile(name, os.O_RDONLY, os.ModePerm)
 	if err != nil {
