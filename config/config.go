@@ -15,28 +15,33 @@ const DefaultFileName = "config.toml"
 var config *Config
 
 func init() {
-	config = DefaultConfig()
+	config = defaultConfig()
 }
 
-func CFG() *Config {
+func Default() *Config {
 	return config
 }
 
+//NewConfig panic prevent do not return nil
 func NewConfig(name string) *Config {
 	file, err := os.OpenFile(name, os.O_RDONLY, os.ModePerm)
 	if err != nil {
-		return nil
+		return &Config{
+			Tree: &toml.Tree{},
+		}
 	}
 	tree, err := toml.LoadReader(file)
 	if err != nil {
-		return nil
+		return &Config{
+			Tree: &toml.Tree{},
+		}
 	}
 	return &Config{
 		Tree: tree,
 	}
 }
 
-func DefaultConfig() *Config {
+func defaultConfig() *Config {
 	return NewConfig(DefaultFileName)
 }
 
