@@ -27,10 +27,10 @@ func initSCWG() {
 	max := runtime.NumCPU() * 2
 	runtime.GOMAXPROCS(max)
 	l1, l2, f1, f2 := 1, 0, 1, 0
-	mongo.Dial(config.CFG().GetStringD("mongodb.url", "localhost"),
+	mongo.Dial(config.Default().GetStringD("mongodb.url", "localhost"),
 		&mgo.Credential{
-			Username: config.CFG().GetStringD("mongodb.username", "root"),
-			Password: config.CFG().GetStringD("mongodb.password", "root"),
+			Username: config.Default().GetStringD("mongodb.username", "root"),
+			Password: config.Default().GetStringD("mongodb.password", "root"),
 		})
 
 	ch := make(chan bool, max)

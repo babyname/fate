@@ -9,7 +9,7 @@ import (
 )
 
 func TestConnectDB(t *testing.T) {
-	config := config.DefaultConfig()
+	config := config.Default()
 	log.Println(config.GetSub("database"))
 	//log.Println(model.ConnectDB(config))
 }
