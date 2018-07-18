@@ -7,34 +7,32 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-const LenMax = 32
-
 type Name struct {
 	FirstName []string
-	cFirst    []*mongo.Character
+	firstChar []*mongo.Character
 	LastName  []string
-	cLast     []*mongo.Character
+	lastChar  []*mongo.Character
 }
 
 func newName(last string) *Name {
 	name := Name{}
-	if len(last) > 1 {
+	if len(last) == 2 {
 		name.LastName = strings.Split(last, "")
 		for _, v := range name.LastName {
-			name.cLast = append(name.cLast, characterFromName(v))
+			name.lastChar = append(name.lastChar, nameCharacter(v))
 		}
 	} else {
 		name.LastName[0] = last
 		for i, v := range name.LastName {
-			name.cLast[i] = characterFromName(v)
+			name.lastChar[i] = nameCharacter(v)
 		}
 	}
 
 	return &name
 }
 
-func characterFromName(s string) *mongo.Character {
-	var c mongo.Character
+func nameCharacter(s string) *mongo.Character {
+	c := mongo.Character{}
 	err := mongo.C("character").Find(bson.M{
 		"character": s,
 	}).One(&c)
