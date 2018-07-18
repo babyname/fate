@@ -1,23 +1,27 @@
 //三才五格
 package mongo
 
+import "gopkg.in/mgo.v2/bson"
+
 type WuGe struct {
-	TianGe int `json:"tian_ge"`
-	RenGe  int `json:"ren_ge"`
-	DiGe   int `json:"di_ge"`
-	WaiGe  int `json:"wai_ge"`
-	ZongGe int `json:"zong_ge"`
+	ID     bson.ObjectId `bson:"_id,omitempty"`
+	TianGe int           `bson:"tian_ge"`
+	RenGe  int           `bson:"ren_ge"`
+	DiGe   int           `bson:"di_ge"`
+	WaiGe  int           `bson:"wai_ge"`
+	ZongGe int           `bson:"zong_ge"`
 }
 
 type SanCai struct {
-	TianCai        string `json:"tian_cai"`
-	TianCaiYinYang string `json:"tian_cai_yin_yang"`
-	RenCai         string `json:"ren_cai"`
-	RenCaiYinYang  string `json:"ren_cai_yin_yang"`
-	DiCai          string `json:"di_cai"`
-	DiCaiYingYang  string `json:"di_cai_ying_yang"`
-	Fortune        string `json:"fortune"` //吉凶
-	Comment        string `json:"comment"` //说明
+	ID             bson.ObjectId `bson:"_id,omitempty"`
+	TianCai        string        `bson:"tian_cai"`
+	TianCaiYinYang string        `bson:"tian_cai_yin_yang"`
+	RenCai         string        `bson:"ren_cai"`
+	RenCaiYinYang  string        `bson:"ren_cai_yin_yang"`
+	DiCai          string        `bson:"di_cai"`
+	DiCaiYingYang  string        `bson:"di_cai_ying_yang"`
+	Fortune        string        `bson:"fortune"` //吉凶
+	Comment        string        `bson:"comment"` //说明
 }
 
 func MakeSanCai(l1, l2, f1, f2 int) *SanCai {
@@ -25,8 +29,8 @@ func MakeSanCai(l1, l2, f1, f2 int) *SanCai {
 		TianGe: tianGe(l1, l2, f1, f2),
 		RenGe:  renGe(l1, l2, f1, f2),
 		DiGe:   diGe(l1, l2, f1, f2),
-		//WaiGe:  waiGe(l1, l2, f1, f2),
-		//ZongGe: zongGe(l1, l2, f1, f2),
+		WaiGe:  waiGe(l1, l2, f1, f2),
+		ZongGe: zongGe(l1, l2, f1, f2),
 	}
 
 	return &SanCai{

@@ -41,8 +41,13 @@ func DefaultConfig() *Config {
 }
 
 func (c *Config) GetTree(name string) *toml.Tree {
-	if v, b := c.Get(name).(*toml.Tree); b {
-		return v
+	if c == nil {
+		return nil
+	}
+	if v := c.Get(name); v != nil {
+		if tree, b := v.(*toml.Tree); b {
+			return tree
+		}
 	}
 	return nil
 }
@@ -53,7 +58,7 @@ func (c *Config) GetSub(name string) *Config {
 			Tree: v,
 		}
 	}
-	return nil
+	return (*Config)(nil)
 }
 
 func (c *Config) GetString(name string) string {
@@ -66,6 +71,9 @@ func (c *Config) GetString(name string) string {
 }
 
 func (c *Config) GetStringD(name string, def string) string {
+	if c == nil {
+		return def
+	}
 	if v := c.Get(name); v != nil {
 		if v1, b := v.(string); b {
 			return v1
@@ -75,6 +83,9 @@ func (c *Config) GetStringD(name string, def string) string {
 }
 
 func (c *Config) GetBool(name string) bool {
+	if c == nil {
+		return false
+	}
 	if v := c.Get(name); v != nil {
 		if v1, b := v.(bool); b {
 			return v1

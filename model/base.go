@@ -65,7 +65,6 @@ func ConnectDB(config *config.Config) *xorm.Engine {
 	if NewDatabase(driver, source) != nil {
 		return nil
 	}
-	db.ShowSQL(true)
 	return db
 }
 
