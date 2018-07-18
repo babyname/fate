@@ -8,7 +8,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
 	"github.com/godcong/fate/config"
-	"github.com/godcong/fate/debug"
 	"github.com/satori/go.uuid"
 )
 
@@ -34,7 +33,7 @@ var (
 )
 
 func init() {
-	ConnectDB(config.DefaultConfig())
+	ConnectDB(config.Default())
 }
 
 func (b *Base) BeforeInsert() {
@@ -70,7 +69,7 @@ func ConnectDB(config *config.Config) *xorm.Engine {
 
 func NewDatabase(driver, source string) (err error) {
 	db, err = xorm.NewEngine(driver, source)
-	if config.DefaultConfig().GetBool("system.show_sql") == true {
+	if config.Default().GetBool("system.show_sql") == true {
 		db.ShowSQL(true)
 	}
 	return err
@@ -83,7 +82,7 @@ func Register(i interface{}) {
 }
 
 func CreateTables() error {
-	debug.Println("CreateTables")
+
 	return db.CreateTables(tables...)
 }
 
@@ -93,7 +92,7 @@ func Sync(v interface{}) error {
 
 func DB() *xorm.Engine {
 	if db == nil || db.DB().Ping() != nil {
-		db = ConnectDB(config.DefaultConfig())
+		db = ConnectDB(config.Default())
 	}
 	return db
 }
