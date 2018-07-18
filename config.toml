@@ -10,7 +10,7 @@
 [database]
    name = "mysql"
    username = "root"
-   password = "111111"
+   password = "2rXfzaNKqX1b"
    addr = "localhost"
    port = "3306"
    schema = "fate"
