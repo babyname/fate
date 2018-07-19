@@ -4,11 +4,29 @@ import (
 	"time"
 
 	"github.com/godcong/chronos"
+	"github.com/godcong/fate/config"
+	"github.com/godcong/fate/mongo"
+	"gopkg.in/mgo.v2"
 )
 
 type fate struct {
 	name     *Name
 	calendar chronos.Calendar
+}
+
+func init() {
+	initDial()
+}
+
+func initDial() {
+	mongo.Dial(config.Default().GetString("mongodb.url"), &mgo.Credential{
+		Username:    config.Default().GetString("mongodb.username"),
+		Password:    config.Default().GetString("mongodb.password"),
+		Source:      "",
+		Service:     "",
+		ServiceHost: "",
+		Mechanism:   "",
+	})
 }
 
 //MaxStokers 超过32划的字不易书写,过滤
@@ -34,4 +52,9 @@ func (f *fate) EightCharacter() (string, string, string, string) {
 		return f.calendar.Lunar().EightCharacter()
 	}
 	return "", "", "", ""
+}
+
+func (f *fate) BestStrokes() []*Stroke {
+	s, _ := calculatorBestStroke(f.name.lastChar)
+	return s
 }
