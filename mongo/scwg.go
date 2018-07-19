@@ -24,15 +24,17 @@ type SanCai struct {
 	Comment        string        `bson:"comment"` //说明
 }
 
-func MakeSanCai(l1, l2, f1, f2 int) *SanCai {
-	wuGe := WuGe{
+func MakeWuGe(l1, l2, f1, f2 int) *WuGe {
+	return &WuGe{
 		TianGe: tianGe(l1, l2, f1, f2),
 		RenGe:  renGe(l1, l2, f1, f2),
 		DiGe:   diGe(l1, l2, f1, f2),
 		WaiGe:  waiGe(l1, l2, f1, f2),
 		ZongGe: zongGe(l1, l2, f1, f2),
 	}
+}
 
+func MakeSanCai(wuGe *WuGe) *SanCai {
 	return &SanCai{
 		TianCai:        sanCaiAttr(wuGe.TianGe),
 		TianCaiYinYang: sanCaiYinYang(wuGe.TianGe),

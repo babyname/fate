@@ -59,7 +59,8 @@ func initSCWG() {
 }
 
 func runtineProcess(b chan<- bool, l1, l2, f1, f2 int) {
-	sanCai := mongo.MakeSanCai(l1, l2, f1, f2)
+	wuGe := mongo.MakeWuGe(l1, l2, f1, f2)
+	sanCai := mongo.MakeSanCai(wuGe)
 	mongo.InsertIfNotExist(mongo.C("sancai"), sanCai)
 	b <- true
 }

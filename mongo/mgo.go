@@ -39,7 +39,6 @@ func Redial() {
 	s.Login(mgoConfig.Credential)
 	// Optional. Switch the session to a monotonic behavior.
 	s.SetMode(mgo.Monotonic, true)
-
 	session = s
 }
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/godcong/fate/mongo"
 	"gopkg.in/mgo.v2/bson"
+	"log"
 )
 
 type Name struct {
@@ -22,9 +23,9 @@ func newName(last string) *Name {
 			name.lastChar = append(name.lastChar, nameCharacter(v))
 		}
 	} else {
-		name.LastName[0] = last
-		for i, v := range name.LastName {
-			name.lastChar[i] = nameCharacter(v)
+		name.LastName = []string{last}
+		for _, v := range name.LastName {
+			name.lastChar = []*mongo.Character{nameCharacter(v)}
 		}
 	}
 
@@ -33,10 +34,12 @@ func newName(last string) *Name {
 
 func nameCharacter(s string) *mongo.Character {
 	c := mongo.Character{}
-	err := mongo.C("character").Find(bson.M{
+	i, err := mongo.C("character").Find(bson.M{
 		"character": s,
-	}).One(&c)
+	}).Count()
+	log.Println(i, s)
 	if err != nil {
+		log.Println(err)
 		return nil
 	}
 	return &c

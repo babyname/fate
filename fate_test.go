@@ -16,6 +16,7 @@ func TestFate_EightCharacter(t *testing.T) {
 	fate.SetLunarData(time.Now())
 	log.Println(fate.EightCharacter())
 }
+
 func TestTime(t *testing.T) {
 	tt, err := time.Parse("2006-01-02T15:04", "2017-11-14T08:17")
 	if err != nil {
@@ -25,4 +26,10 @@ func TestTime(t *testing.T) {
 	fmt.Println(rand.New(sour).Uint64())
 	fmt.Println(rand.New(sour).Uint64())
 	//10547234835636046708
+}
+
+func TestFate_BestStrokes(t *testing.T) {
+	fate := fate.NewFate("毛")
+	fate.SetLunarData(time.Now())
+	fate.BestStrokes()
 }
