@@ -19,15 +19,14 @@ func calculatorBestStroke(character []*mongo.Character) ([]*Stroke, error) {
 		return nil, errors.New("CalculatorBestStroke: check character error")
 	}
 
-	l1, _ := strconv.Atoi(character[0].KangxiStrokes)
+	l1, _ := strconv.Atoi(character[0].TotalStrokes)
 
 	l2 := 0
 	if len(character) == 2 {
-		l2, _ = strconv.Atoi(character[1].KangxiStrokes)
+		l2, _ = strconv.Atoi(character[1].TotalStrokes)
 	}
 	var wuXing mongo.WuXing
 	f1, f2 := 1, 1
-	l1 = 15
 	for ; f1 < 32; f2++ {
 		if f2 > 32 {
 			f2 = 1
@@ -35,12 +34,12 @@ func calculatorBestStroke(character []*mongo.Character) ([]*Stroke, error) {
 		}
 
 		wuGe := mongo.MakeWuGe(l1, l2, f1, f2)
-		tg := checkWuGe(wuGe.TianGe)
+		_ = checkWuGe(wuGe.TianGe)
 		rg := checkWuGe(wuGe.RenGe)
 		dg := checkWuGe(wuGe.DiGe)
 		wg := checkWuGe(wuGe.WaiGe)
 		zg := checkWuGe(wuGe.ZongGe)
-		if !(tg && rg && dg && wg && zg) {
+		if !( rg && dg && wg && zg) {
 			//log.Print(l1, l2, f1, f2, ":")
 			//log.Println(tg, rg, dg, wg, zg)
 			continue
