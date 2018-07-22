@@ -1,11 +1,11 @@
 package fate
 
 import (
+	"log"
 	"strings"
 
 	"github.com/godcong/fate/mongo"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 )
 
 type Name struct {
@@ -34,10 +34,10 @@ func newName(last string) *Name {
 
 func nameCharacter(s string) *mongo.Character {
 	c := mongo.Character{}
-	i, err := mongo.C("character").Find(bson.M{
+	err := mongo.C("character").Find(bson.M{
 		"character": s,
-	}).Count()
-	log.Println(i, s)
+	}).One(&c)
+	log.Printf("%+v", c)
 	if err != nil {
 		log.Println(err)
 		return nil
