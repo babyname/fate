@@ -1,6 +1,6 @@
 package fate
 
-import "gopkg.in/mgo.v2/bson"
+import "github.com/globalsign/mgo/bson"
 
 //WuGe
 type WuGe struct {

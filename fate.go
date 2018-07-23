@@ -1,15 +1,15 @@
 package fate
 
 import (
+	"log"
+	"strconv"
 	"time"
 
+	"github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/mongo"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
-	"log"
-	"strconv"
 )
 
 type fate struct {
@@ -82,14 +82,20 @@ func (f *fate) BestCharacters() []*mongo.Character {
 	var cs []*mongo.Character
 
 	strokes := f.BestStrokes()
-	var firsts []string
+	firsts := make(map[int][]byte)
 	for idx := range strokes {
-		firsts = append(firsts, strconv.Itoa(strokes[idx].FirstStroke[0]))
+		firsts[strokes[idx].FirstStroke[0]] = nil
+		//firsts = append(firsts, strconv.Itoa(strokes[idx].FirstStroke[0]))
+	}
+
+	var charStroke []string
+	for i := range firsts {
+		charStroke = append(charStroke, strconv.Itoa(i))
 	}
 
 	err := mongo.C("character").Find(bson.M{
-		"total_trokes": bson.M{"$in": firsts},
+		"totaltrokes": bson.M{"$in": charStroke},
 	}).All(&cs)
-	log.Println(err)
+	log.Println(err, cs)
 	return cs
 }

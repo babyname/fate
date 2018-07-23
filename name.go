@@ -4,8 +4,8 @@ import (
 	"log"
 	"strings"
 
+	"github.com/globalsign/mgo/bson"
 	"github.com/godcong/fate/mongo"
-	"gopkg.in/mgo.v2/bson"
 )
 
 type Name struct {

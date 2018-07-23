@@ -1,9 +1,9 @@
 package mongo_test
 
 import (
+	"github.com/globalsign/mgo"
 	"github.com/godcong/fate/model"
 	"github.com/godcong/fate/mongo"
-	"gopkg.in/mgo.v2"
 	"log"
 	"testing"
 )
