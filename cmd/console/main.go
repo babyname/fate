@@ -9,6 +9,7 @@ import (
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/mongo"
 	"gopkg.in/mgo.v2"
+	"github.com/godcong/fate"
 )
 
 func main() {
@@ -59,8 +60,8 @@ func initSCWG() {
 }
 
 func runtineProcess(b chan<- bool, l1, l2, f1, f2 int) {
-	wuGe := mongo.MakeWuGe(l1, l2, f1, f2)
-	sanCai := mongo.MakeSanCai(wuGe)
+	wuGe := fate.MakeWuGe(l1, l2, f1, f2)
+	sanCai := fate.MakeSanCai(wuGe)
 	mongo.InsertIfNotExist(mongo.C("sancai"), sanCai)
 	b <- true
 }

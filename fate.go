@@ -7,10 +7,14 @@ import (
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/mongo"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+	"log"
+	"strconv"
 )
 
 type fate struct {
 	name     *Name
+	martial  *Martial
 	calendar chronos.Calendar
 }
 
@@ -41,6 +45,21 @@ func (f *fate) SetLastName(lastName string) {
 	f.name = newName(lastName)
 }
 
+func (f *fate) GetName() *Name {
+	return f.name
+}
+
+func (f *fate) SetMartial(martial *Martial) {
+	f.martial = martial
+}
+
+func (f *fate) GetMartial() *Martial {
+	if f.martial == nil {
+		return &Martial{}
+	}
+	return f.martial
+}
+
 //SetLunarData 设定生日
 func (f *fate) SetLunarData(t time.Time) {
 	f.calendar = chronos.New(t)
@@ -55,6 +74,22 @@ func (f *fate) EightCharacter() (string, string, string, string) {
 }
 
 func (f *fate) BestStrokes() []*Stroke {
-	s, _ := calculatorBestStroke(f.name.lastChar)
+	s, _ := calculatorBestStroke(f, f.name.lastChar)
 	return s
+}
+
+func (f *fate) BestCharacters() []*mongo.Character {
+	var cs []*mongo.Character
+
+	strokes := f.BestStrokes()
+	var firsts []string
+	for idx := range strokes {
+		firsts = append(firsts, strconv.Itoa(strokes[idx].FirstStroke[0]))
+	}
+
+	err := mongo.C("character").Find(bson.M{
+		"total_trokes": bson.M{"$in": firsts},
+	}).All(&cs)
+	log.Println(err)
+	return cs
 }

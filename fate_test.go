@@ -29,7 +29,18 @@ func TestTime(t *testing.T) {
 }
 
 func TestFate_BestStrokes(t *testing.T) {
-	fate := fate.NewFate("毛")
-	fate.SetLunarData(time.Now())
-	fate.BestStrokes()
+	f := fate.NewFate("毛")
+	//fate.SetMartial()
+	m := &fate.Martial{
+		BiHua:     true,
+		SanCai:    true,
+		BaZi:      false,
+		GuaXiang:  false,
+		TianYun:   false,
+		ShengXiao: false,
+	}
+	f.SetMartial(m)
+	f.SetLunarData(time.Now())
+	strokes := f.BestCharacters()
+	log.Printf("%+v", strokes)
 }
