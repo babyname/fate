@@ -2,10 +2,11 @@ package fate
 
 import (
 	"errors"
-	"github.com/godcong/fate/mongo"
-	"gopkg.in/mgo.v2/bson"
-	"strconv"
 	"log"
+	"strconv"
+
+	"github.com/globalsign/mgo/bson"
+	"github.com/godcong/fate/mongo"
 )
 
 type Stroke struct {

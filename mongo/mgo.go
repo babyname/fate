@@ -1,6 +1,6 @@
 package mongo
 
-import "gopkg.in/mgo.v2"
+import "github.com/globalsign/mgo"
 
 var session *mgo.Session
 var mgoConfig = defaultConfig()
