@@ -1,5 +1,6 @@
 package fate
 
+//Martial six martials
 type Martial struct {
 	BiHua     bool `bson:"bi_hua"json:"bi_hua"`         //笔画
 	SanCai    bool `bson:"san_cai"json:"san_cai"`       //三才
