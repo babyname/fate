@@ -8,7 +8,7 @@ import (
 
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/mongo"
-	"gopkg.in/mgo.v2"
+	"github.com/globalsign/mgo"
 	"github.com/godcong/fate"
 )
 
