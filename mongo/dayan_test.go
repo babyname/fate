@@ -3,7 +3,7 @@ package mongo_test
 import (
 	"github.com/godcong/fate/model"
 	"github.com/godcong/fate/mongo"
-	"gopkg.in/mgo.v2"
+	"github.com/globalsign/mgo"
 	"log"
 	"testing"
 )

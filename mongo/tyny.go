@@ -1,7 +1,7 @@
 //天运纳音
 package mongo
 
-import "gopkg.in/mgo.v2/bson"
+import "github.com/globalsign/mgo/bson"
 
 type TianYunNaYin struct {
 	ID             bson.ObjectId `bson:"_id,omitempty"`
