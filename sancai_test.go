@@ -1,6 +1,7 @@
-package mongo_test
+package fate_test
 
 import (
+	"github.com/godcong/fate"
 	"github.com/godcong/fate/mongo"
 	"gopkg.in/mgo.v2"
 	"log"
@@ -47,7 +48,7 @@ func TestMakeSanCaiWuGe(t *testing.T) {
 func ProcessOne(b chan<- int, l1, l2, f1, f2 int) {
 	log.Println(l1, l2, f1, f2)
 
-	ge := mongo.MakeSanCai(mongo.MakeWuGe(l1, l2, f1, f2))
+	ge := fate.MakeSanCai(fate.MakeWuGe(l1, l2, f1, f2))
 	err := mongo.InsertIfNotExist(mongo.C("sc"), ge)
 	log.Println(err)
 	b <- l1 * l2 * f1 * f2
