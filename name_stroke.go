@@ -1,13 +1,11 @@
-package mongo
-
-import "gopkg.in/mgo.v2/bson"
+package fate
 
 type NameStroke struct {
-	ID     bson.ObjectId `bson:"_id,omitempty"`
-	Last1  int           `bson:"last_1"`
-	Last2  int           `bson:"last_2"`
-	First1 int           `bson:"first_1"`
-	First2 int           `bson:"first_2"`
+	//ID     bson.ObjectId `bson:"_id,omitempty"`
+	Last1  int `bson:"last_1"`
+	Last2  int `bson:"last_2"`
+	First1 int `bson:"first_1"`
+	First2 int `bson:"first_2"`
 }
 
 type nameStroke struct {

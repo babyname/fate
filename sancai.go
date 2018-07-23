@@ -1,8 +1,7 @@
 //三才五格
-package mongo
+package fate
 
 import "gopkg.in/mgo.v2/bson"
-
 
 type SanCai struct {
 	ID             bson.ObjectId `bson:"_id,omitempty"`
@@ -15,7 +14,6 @@ type SanCai struct {
 	Fortune        string        `bson:"fortune"` //吉凶
 	Comment        string        `bson:"comment"` //说明
 }
-
 
 func MakeSanCai(wuGe *WuGe) *SanCai {
 	return &SanCai{
