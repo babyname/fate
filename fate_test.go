@@ -42,5 +42,6 @@ func TestFate_BestStrokes(t *testing.T) {
 	f.SetMartial(m)
 	f.SetLunarData(time.Now())
 	strokes := f.BestFirstOne()
+	//TODO; make name with steps
 	log.Printf("%+v", strokes)
 }
