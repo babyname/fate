@@ -41,6 +41,6 @@ func TestFate_BestStrokes(t *testing.T) {
 	}
 	f.SetMartial(m)
 	f.SetLunarData(time.Now())
-	strokes := f.BestCharacters()
+	strokes := f.BestFirstOne()
 	log.Printf("%+v", strokes)
 }

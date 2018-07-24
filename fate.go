@@ -78,7 +78,7 @@ func (f *fate) BestStrokes() []*Stroke {
 	return s
 }
 
-func (f *fate) BestCharacters() []*mongo.Character {
+func (f *fate) BestFirstOne() []*mongo.Character {
 	var cs []*mongo.Character
 
 	strokes := f.BestStrokes()
@@ -94,8 +94,44 @@ func (f *fate) BestCharacters() []*mongo.Character {
 	}
 
 	err := mongo.C("character").Find(bson.M{
-		"totaltrokes": bson.M{"$in": charStroke},
+		"totalstrokes": bson.M{"$in": charStroke},
 	}).All(&cs)
-	log.Println(err, cs)
+	if err != nil {
+		return nil
+	}
+	var chars []string
+	for idx := range cs {
+		chars = append(chars, cs[idx].Character)
+	}
+	log.Println(chars)
+	return cs
+}
+
+func (f *fate) BestFirstTwo(*mongo.Character) []*mongo.Character {
+	var cs []*mongo.Character
+
+	strokes := f.BestStrokes()
+	firsts := make(map[int][]byte)
+	for idx := range strokes {
+		firsts[strokes[idx].FirstStroke[0]] = nil
+		//firsts = append(firsts, strconv.Itoa(strokes[idx].FirstStroke[0]))
+	}
+
+	var charStroke []string
+	for i := range firsts {
+		charStroke = append(charStroke, strconv.Itoa(i))
+	}
+
+	err := mongo.C("character").Find(bson.M{
+		"totalstrokes": bson.M{"$in": charStroke},
+	}).All(&cs)
+	if err != nil {
+		return nil
+	}
+	var chars []string
+	for idx := range cs {
+		chars = append(chars, cs[idx].Character)
+	}
+	log.Println(chars)
 	return cs
 }
