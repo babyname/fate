@@ -96,8 +96,8 @@ func (f *fate) BestFirstOne() *mongo.Character {
 	}
 
 	err := mongo.C("character").Find(bson.M{
-		"total_strokes":       bson.M{"$in": charStroke},
-		//"commonly_characters": bson.M{"$in": []string{"是", ""}},
+		"total_strokes":            bson.M{"$in": charStroke},
+		"folk.commonly_characters": bson.M{"$in": []string{"是", ""}},
 	}).All(&cs)
 	if err != nil {
 		return nil
@@ -135,8 +135,8 @@ func (f *fate) BestFirstTwo(c *mongo.Character) *mongo.Character {
 	}
 
 	err := mongo.C("character").Find(bson.M{
-		"total_strokes":       bson.M{"$in": charStroke},
-		//"commonly_characters": bson.M{"$in": []string{"是", ""}},
+		"total_strokes":            bson.M{"$in": charStroke},
+		"folk.commonly_characters": bson.M{"$in": []string{"是", ""}},
 	}).All(&cs)
 	if err != nil {
 		return nil
