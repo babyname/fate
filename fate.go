@@ -96,7 +96,8 @@ func (f *fate) BestFirstOne() *mongo.Character {
 	}
 
 	err := mongo.C("character").Find(bson.M{
-		"total_strokes": bson.M{"$in": charStroke},
+		"total_strokes":       bson.M{"$in": charStroke},
+		//"commonly_characters": bson.M{"$in": []string{"是", ""}},
 	}).All(&cs)
 	if err != nil {
 		return nil
@@ -112,33 +113,43 @@ func (f *fate) BestFirstOne() *mongo.Character {
 	return cs[randomInt32(int32(len(cs)), f.calendar.Lunar().Time)]
 }
 
-func (f *fate) BestFirstTwo(c *mongo.Character) []*mongo.Character {
+func (f *fate) BestFirstTwo(c *mongo.Character) *mongo.Character {
 	var cs []*mongo.Character
 
-	strokes := f.BestStrokes()
-	firsts := make(map[int][]byte)
-	for idx := range strokes {
-		firsts[strokes[idx].FirstStroke[0]] = nil
-		//firsts = append(firsts, strconv.Itoa(strokes[idx].FirstStroke[0]))
+	if f.strokes == nil || c == nil {
+		return nil
+	}
+	st, _ := strconv.Atoi(c.TotalStrokes)
+	seconds := make(map[int][]byte)
+	for idx := range f.strokes {
+		log.Println(f.strokes [idx].FirstStroke[0] == st)
+		if f.strokes [idx].FirstStroke[0] == st {
+			log.Println(f.strokes[idx].FirstStroke[1])
+			seconds[f.strokes[idx].FirstStroke[1]] = nil
+		}
 	}
 
 	var charStroke []string
-	for i := range firsts {
+	for i := range seconds {
 		charStroke = append(charStroke, strconv.Itoa(i))
 	}
 
 	err := mongo.C("character").Find(bson.M{
-		"totalstrokes": bson.M{"$in": charStroke},
+		"total_strokes":       bson.M{"$in": charStroke},
+		//"commonly_characters": bson.M{"$in": []string{"是", ""}},
 	}).All(&cs)
 	if err != nil {
 		return nil
 	}
-	var chars []string
-	for idx := range cs {
-		chars = append(chars, cs[idx].Character)
+	//var chars []string
+	//for idx := range cs {
+	//	chars = append(chars, cs[idx].Character)
+	//}
+	if int32(len(cs)) <= 0 {
+		return nil
 	}
-	log.Println(chars)
-	return cs
+	log.Println("num:", int32(len(cs)))
+	return cs[randomInt32(int32(len(cs)), f.calendar.Lunar().Time)]
 }
 
 func randomInt32(max int32, t time.Time) int32 {

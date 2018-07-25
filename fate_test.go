@@ -41,8 +41,8 @@ func TestFate_BestStrokes(t *testing.T) {
 	}
 	f.SetMartial(m)
 	f.SetLunarData(time.Now())
-	chars := f.BestFirstOne()
-	f.BestFirstTwo(chars)
+	char1 := f.BestFirstOne()
+	char2 := f.BestFirstTwo(char1)
 	//TODO; make name with steps
-	log.Printf("%+v", chars)
+	log.Printf("%+v,%+v", char1, char2)
 }
