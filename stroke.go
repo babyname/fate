@@ -53,9 +53,9 @@ func calculatorBestStroke(f *fate, character []*mongo.Character) ([]*Stroke, err
 		mongo.C("wuxing").Find(bson.M{
 			"wu_xing": []string{sanCai.TianCai, sanCai.RenCai, sanCai.DiCai},
 		}).One(&wuXing)
-
+		//|| wuXing.Fortune == "中吉"
 		if martial.SanCai {
-			if wuXing.Fortune == "大吉" || wuXing.Fortune == "中吉" || wuXing.Fortune == "吉" {
+			if wuXing.Fortune == "大吉"  || wuXing.Fortune == "吉" {
 				strokes = append(strokes, &Stroke{
 					LastStroke:  []int{l1, l2},
 					FirstStroke: []int{f1, f2},
