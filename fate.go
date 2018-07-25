@@ -2,6 +2,7 @@ package fate
 
 import (
 	"log"
+	"math/rand"
 	"strconv"
 	"time"
 
@@ -15,6 +16,8 @@ import (
 type fate struct {
 	name     *Name
 	martial  *Martial
+	strokes  []*Stroke
+	firstOne []*mongo.Character
 	calendar chronos.Calendar
 }
 
@@ -78,7 +81,38 @@ func (f *fate) BestStrokes() []*Stroke {
 	return s
 }
 
-func (f *fate) BestFirstOne() []*mongo.Character {
+func (f *fate) BestFirstOne() *mongo.Character {
+	var cs []*mongo.Character
+
+	f.strokes = f.BestStrokes()
+	firsts := make(map[int][]byte)
+	for idx := range f.strokes {
+		firsts[f.strokes[idx].FirstStroke[0]] = nil
+	}
+
+	var charStroke []string
+	for i := range firsts {
+		charStroke = append(charStroke, strconv.Itoa(i))
+	}
+
+	err := mongo.C("character").Find(bson.M{
+		"total_strokes": bson.M{"$in": charStroke},
+	}).All(&cs)
+	if err != nil {
+		return nil
+	}
+	//var chars []string
+	//for idx := range cs {
+	//	chars = append(chars, cs[idx].Character)
+	//}
+	if int32(len(cs)) <= 0 {
+		return nil
+	}
+	log.Println("num:", int32(len(cs)))
+	return cs[randomInt32(int32(len(cs)), f.calendar.Lunar().Time)]
+}
+
+func (f *fate) BestFirstTwo(c *mongo.Character) []*mongo.Character {
 	var cs []*mongo.Character
 
 	strokes := f.BestStrokes()
@@ -107,31 +141,7 @@ func (f *fate) BestFirstOne() []*mongo.Character {
 	return cs
 }
 
-func (f *fate) BestFirstTwo(*mongo.Character) []*mongo.Character {
-	var cs []*mongo.Character
-
-	strokes := f.BestStrokes()
-	firsts := make(map[int][]byte)
-	for idx := range strokes {
-		firsts[strokes[idx].FirstStroke[0]] = nil
-		//firsts = append(firsts, strconv.Itoa(strokes[idx].FirstStroke[0]))
-	}
-
-	var charStroke []string
-	for i := range firsts {
-		charStroke = append(charStroke, strconv.Itoa(i))
-	}
-
-	err := mongo.C("character").Find(bson.M{
-		"totalstrokes": bson.M{"$in": charStroke},
-	}).All(&cs)
-	if err != nil {
-		return nil
-	}
-	var chars []string
-	for idx := range cs {
-		chars = append(chars, cs[idx].Character)
-	}
-	log.Println(chars)
-	return cs
+func randomInt32(max int32, t time.Time) int32 {
+	r := rand.NewSource(t.UnixNano())
+	return rand.New(r).Int31n(max)
 }
