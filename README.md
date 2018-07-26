@@ -25,8 +25,6 @@
   
 ### 一个好名字伴随人的一生，FATE让你取一个好名字 ###
 
-> https://github.com/godcong/excavator 做了字典库更新 done  
-> https://github.com/godcong/chronos 万年历 农历 公历 八字计算 doing
 
 版本履历:
 
@@ -41,5 +39,13 @@
 第三版(开发中):
 
     每次生成一个名字,并目标喜用神,生肖喜忌,月历转换,生成八字等功能
-
-
+    八字计算: https://github.com/godcong/chronos
+    字典数据: https://github.com/godcong/excavator
+    
+    起名六大派进度:
+    五格(50%) 缺: 字库更新
+    三才(50%) 缺: 字库更新
+    八字(50%) 缺: 补八字,喜用神
+    卦象(TODO)
+    天运(TODO)
+    生肖(TODO)
