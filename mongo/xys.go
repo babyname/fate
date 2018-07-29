@@ -1,5 +1,6 @@
 package mongo
 
+//XiYongShen 喜用神
 type XiYongShen struct {
 	XiShen   string `json:"xi_shen"`   //喜神
 	YongShen string `json:"yong_shen"` //用神
