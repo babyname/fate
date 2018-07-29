@@ -1,8 +1,8 @@
-//天运纳音
 package mongo
 
 import "github.com/globalsign/mgo/bson"
 
+//TianYunNaYin 天运纳音
 type TianYunNaYin struct {
 	ID             bson.ObjectId `bson:"_id,omitempty"`
 	GanZhi         string        `bson:"gan_zhi"`
