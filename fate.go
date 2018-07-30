@@ -1,9 +1,6 @@
 package fate
 
 import (
-	"log"
-	"math/rand"
-	"strconv"
 	"time"
 
 	"github.com/globalsign/mgo"
@@ -11,6 +8,10 @@ import (
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/mongo"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+	"log"
+	"strconv"
 )
 
 type fate struct {
@@ -155,4 +156,41 @@ func (f *fate) BestFirstTwo(c *mongo.Character) *mongo.Character {
 func randomInt32(max int32, t time.Time) int32 {
 	r := rand.NewSource(t.UnixNano())
 	return rand.New(r).Int31n(max)
+}
+
+
+func (f *fate) Generate(numbers int) []*Name {
+	var names []*Name
+	//获取笔画列表
+
+	//过滤五格
+	if f.martial.BiHua {
+
+	}
+	//过滤三才
+	if f.martial.SanCai {
+
+	}
+
+	//过滤生肖
+	if f.martial.ShengXiao {
+
+	}
+
+	//过滤八字
+	if f.martial.BaZi {
+
+	}
+
+	//过滤天运
+	if f.martial.TianYun {
+
+	}
+
+	//过滤卦象
+	if f.martial.GuaXiang {
+
+	}
+
+	return names
 }
