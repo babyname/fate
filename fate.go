@@ -19,6 +19,14 @@ type fate struct {
 	calendar chronos.Calendar
 }
 
+type Generating struct {
+	current interface{} //当前对象
+	step    int         //当前
+	number  int         //生成数
+	fate    *fate
+	wuge    *WuGe
+}
+
 func init() {
 	initDial()
 }
@@ -34,8 +42,8 @@ func initDial() {
 	})
 }
 
-//MaxStokers 超过32划的字不易书写,过滤
-const MaxStokers = 32
+//MaxStokers 超过30划的字不易书写,过滤
+const MaxStokers = 30
 
 func NewFate(lastName string) *fate {
 	name := newName(lastName)
@@ -66,107 +74,42 @@ func (f *fate) SetLunarData(t time.Time) {
 	f.calendar = chronos.New(t)
 }
 
-////EightCharacter 计算生辰八字(需要SetLunarData),按年柱,月柱,日柱,时柱 输出
-//func (f *fate) EightCharacter() (string, string, string, string) {
-//	if f.calendar != nil {
-//		return f.calendar.Lunar().EightCharacter()
-//	}
-//	return "", "", "", ""
-//}
-//
-//func (f *fate) BestStrokes() []*Stroke {
-//	s, _ := calculatorBestStroke(f, f.name.lastChar)
-//	return s
-//}
-//
-//func (f *fate) BestFirstOne() *mongo.Character {
-//	var cs []*mongo.Character
-//
-//	f.strokes = f.BestStrokes()
-//	firsts := make(map[int][]byte)
-//	for idx := range f.strokes {
-//		firsts[f.strokes[idx].FirstStroke[0]] = nil
-//	}
-//
-//	var charStroke []string
-//	for i := range firsts {
-//		charStroke = append(charStroke, strconv.Itoa(i))
-//	}
-//
-//	err := mongo.C("character").Find(bson.M{
-//		"total_strokes":            bson.M{"$in": charStroke},
-//		"folk.commonly_characters": bson.M{"$in": []string{"是", ""}},
-//	}).All(&cs)
-//	if err != nil {
-//		return nil
-//	}
-//	//var chars []string
-//	//for idx := range cs {
-//	//	chars = append(chars, cs[idx].Character)
-//	//}
-//	if int32(len(cs)) <= 0 {
-//		return nil
-//	}
-//	log.Println("num:", int32(len(cs)))
-//	return cs[randomInt32(int32(len(cs)), f.calendar.Lunar().Time)]
-//}
-//
-//func (f *fate) BestFirstTwo(c *mongo.Character) *mongo.Character {
-//	var cs []*mongo.Character
-//
-//	if f.strokes == nil || c == nil {
-//		return nil
-//	}
-//	st, _ := strconv.Atoi(c.TotalStrokes)
-//	seconds := make(map[int][]byte)
-//	for idx := range f.strokes {
-//		log.Println(f.strokes [idx].FirstStroke[0] == st)
-//		if f.strokes [idx].FirstStroke[0] == st {
-//			log.Println(f.strokes[idx].FirstStroke[1])
-//			seconds[f.strokes[idx].FirstStroke[1]] = nil
-//		}
-//	}
-//
-//	var charStroke []string
-//	for i := range seconds {
-//		charStroke = append(charStroke, strconv.Itoa(i))
-//	}
-//
-//	err := mongo.C("character").Find(bson.M{
-//		"total_strokes":            bson.M{"$in": charStroke},
-//		"folk.commonly_characters": bson.M{"$in": []string{"是", ""}},
-//	}).All(&cs)
-//	if err != nil {
-//		return nil
-//	}
-//	//var chars []string
-//	//for idx := range cs {
-//	//	chars = append(chars, cs[idx].Character)
-//	//}
-//	if int32(len(cs)) <= 0 {
-//		return nil
-//	}
-//	log.Println("num:", int32(len(cs)))
-//	return cs[randomInt32(int32(len(cs)), f.calendar.Lunar().Time)]
-//}
-
 func randomInt32(max uint32, t time.Time) uint32 {
 	r := rand.NewSource(t.UnixNano())
 	return rand.New(r).Uint32()
 }
 
-func (f *fate) Generate(numbers int) []*Name {
+func (f *fate) Generate(number int) *Generating {
+	g := &Generating{
+		step:   0,
+		number: number,
+		fate:   f,
+	}
+	return g
+
+}
+
+func filterWuGe(wg *WuGe) bool {
+	return false
+}
+
+func (g *Generating) Continue() *Generating {
+	f := g.fate
+	if g.step == 0 && f.martial.BiHua {
+		fc1, _ := strconv.Atoi(f.name.firstChar[0].KangxiStrokes)
+		fc2 := 0
+		if len(f.name.firstChar) == 2 {
+			fc2, _ = strconv.Atoi(f.name.firstChar[1].KangxiStrokes)
+		}
+		MakeWuGe(fc1, fc2, 1, 1)
+	}
 	var names []*Name
 	//获取笔画列表
 	//var strokes []*Stroke
-	fc1, _ := strconv.Atoi(f.name.firstChar[0].KangxiStrokes)
-	fc2 := 0
-	if len(f.name.firstChar) == 2 {
-		fc2, _ = strconv.Atoi(f.name.firstChar[1].KangxiStrokes)
-	}
+
 	//过滤五格
 	if f.martial.BiHua {
-		 MakeWuGe(fc1, fc2, 0, 0)
+
 	}
 	//过滤三才
 	if f.martial.SanCai {
