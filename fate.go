@@ -1,13 +1,14 @@
 package fate
 
 import (
+	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/globalsign/mgo"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/mongo"
-	"math/rand"
 )
 
 type fate struct {
@@ -149,18 +150,23 @@ func (f *fate) SetLunarData(t time.Time) {
 //	return cs[randomInt32(int32(len(cs)), f.calendar.Lunar().Time)]
 //}
 
-func randomInt32(max int32, t time.Time) int32 {
+func randomInt32(max uint32, t time.Time) uint32 {
 	r := rand.NewSource(t.UnixNano())
-	return rand.New(r).Int31n(max)
+	return rand.New(r).Uint32()
 }
 
 func (f *fate) Generate(numbers int) []*Name {
 	var names []*Name
 	//获取笔画列表
-
+	//var strokes []*Stroke
+	fc1, _ := strconv.Atoi(f.name.firstChar[0].KangxiStrokes)
+	fc2 := 0
+	if len(f.name.firstChar) == 2 {
+		fc2, _ = strconv.Atoi(f.name.firstChar[1].KangxiStrokes)
+	}
 	//过滤五格
 	if f.martial.BiHua {
-
+		 MakeWuGe(fc1, fc2, 0, 0)
 	}
 	//过滤三才
 	if f.martial.SanCai {
