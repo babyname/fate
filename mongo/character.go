@@ -1,6 +1,9 @@
 package mongo
 
-import "github.com/globalsign/mgo/bson"
+import (
+	"github.com/globalsign/mgo/bson"
+	"strconv"
+)
 
 //Character 字符
 type Character struct {
@@ -20,4 +23,28 @@ type Character struct {
 	DecompositionSearch  string        `bson:"decomposition_search"`   //首尾分解查字
 	StrokeNumber         string        `bson:"stroke_number"`          //笔顺编号
 	StrokeReadWrite      string        `bson:"stroke_read_write"`      //笔顺读写
+}
+
+const (
+	KangXi = iota
+	Simplified
+	Traditional
+	Total
+	Radical
+)
+
+func (c *Character) GetStrokeByType(tp int) int {
+	switch tp {
+	case KangXi:
+		i, _ := strconv.Atoi(c.KangxiStrokes)
+		return i
+	case Simplified, Total:
+		i, _ := strconv.Atoi(c.TotalStrokes)
+		return i
+	case Traditional: //do nothing
+	case Radical:
+		i, _ := strconv.Atoi(c.RadicalStrokes)
+		return i
+	}
+	return 0
 }
