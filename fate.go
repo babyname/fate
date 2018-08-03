@@ -9,6 +9,7 @@ import (
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/mongo"
+	"log"
 )
 
 type fate struct {
@@ -26,8 +27,7 @@ type Generating struct {
 	step    int         //当前
 	number  int         //生成数
 	fate    *fate
-	wuge    []*WuGe
-	sancai  []*SanCai
+	stroke  []*Stroke
 }
 
 func init() {
@@ -95,8 +95,8 @@ func (f *fate) Generate(number int) *Generating {
 
 }
 
-func filterWuGe(f *fate) []*WuGe {
-	var rltWuge []*WuGe
+func filterWuGe(f *fate) []*Stroke {
+	var rltS []*Stroke
 	l1 := f.name.lastChar[0].GetStrokeByType(f.nameType)
 	l2 := 0
 	if len(f.name.firstChar) == 2 {
@@ -107,13 +107,17 @@ func filterWuGe(f *fate) []*WuGe {
 	mongo.C("dayan").Find(nil).Sort("index").All(&dy)
 	for f1, f2 := 1, 1; 30 >= f1; f2++ {
 		wuge := MakeWuGe(l1, l2, f1, f2)
-
 		zg := checkWuGe(dy, wuge.ZongGe)
 		wg := checkWuGe(dy, wuge.WaiGe)
 		rg := checkWuGe(dy, wuge.RenGe)
 		dg := checkWuGe(dy, wuge.DiGe)
 		if zg && wg && rg && dg {
-			rltWuge = append(rltWuge, wuge)
+			rltS = append(rltS, &Stroke{
+				LastStroke:  []int{l1, l2},
+				FirstStroke: []int{f1, f2},
+				wuge:        wuge,
+				sancai:      nil,
+			})
 		}
 
 		if f2 >= 30 {
@@ -122,21 +126,26 @@ func filterWuGe(f *fate) []*WuGe {
 		}
 	}
 
-	return rltWuge
+	return rltS
 }
 
-func filterSanCai(wuge []*WuGe) []*SanCai {
-	var scs []*mongo.WuXing
-	if wuge == nil {
+func filterSanCai(s []*Stroke) []*Stroke {
+	var strokes []*Stroke
+	var wx mongo.WuXing
+	if s == nil {
 		return nil
 	}
-	for idx := range wuge {
-		sc := MakeSanCai(wuge[idx])
+	for idx := range s {
+		sc := MakeSanCai(s[idx].wuge)
 		mongo.C("wuxing").Find(bson.M{
 			"wu_xing": []string{sc.TianCai, sc.RenCai, sc.DiCai},
-		}).One(&scs)
+		}).One(&wx)
+		switch wx.Fortune {
+		case "吉", "中吉", "大吉", "吉多于凶":
+			strokes = append(strokes, s[idx])
+		}
 	}
-	return nil
+	return strokes
 }
 
 func (g *Generating) CurrentStep() int {
@@ -148,16 +157,20 @@ func (g *Generating) Continue() *Generating {
 	//过滤五格
 	if g.step == 0 {
 		if f.martial.BiHua {
-			g.wuge = filterWuGe(g.fate)
+			g.stroke = filterWuGe(g.fate)
 		}
 	}
 
 	//过滤三才
 	if g.step == 1 {
 		if f.martial.SanCai {
-			g.sancai = filterSanCai(g.wuge)
+			g.stroke = filterSanCai(g.stroke)
 		}
 	}
+
+	log.Printf("stroke %+v", g.stroke)
+	//按照过滤的笔画取得字符1:
+	//选字:
 
 	//过滤生肖
 	if f.martial.ShengXiao {
