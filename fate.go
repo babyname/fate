@@ -27,6 +27,7 @@ type Generating struct {
 	number  int         //生成数
 	fate    *fate
 	wuge    []*WuGe
+	sancai  []*SanCai
 }
 
 func init() {
@@ -128,6 +129,10 @@ func filterWuGe(f *fate) []*WuGe {
 	return rltWuge
 }
 
+func filterSanCai(f *fate) []*SanCai {
+	return nil
+}
+
 func (g *Generating) CurrentStep() int {
 	return g.step
 }
@@ -137,15 +142,12 @@ func (g *Generating) Continue() *Generating {
 	if g.step == 0 {
 		if f.martial.BiHua {
 			g.wuge = filterWuGe(g.fate)
-			g.step++
-			return g
 		}
-		g.step++
 	}
 	//过滤五格
 	if g.step == 1 {
 		if f.martial.BiHua {
-
+			g.sancai = filterSanCai(g.fate)
 		}
 	}
 	//过滤三才
