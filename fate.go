@@ -2,17 +2,19 @@ package fate
 
 import (
 	"math/rand"
-	"strconv"
 	"time"
 
 	"github.com/globalsign/mgo"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/mongo"
+	"log"
 )
 
 type fate struct {
+	nameType int
 	name     *Name
+	sex      string
 	martial  *Martial
 	strokes  []*Stroke
 	firstOne []*mongo.Character
@@ -24,7 +26,7 @@ type Generating struct {
 	step    int         //当前
 	number  int         //生成数
 	fate    *fate
-	wuge    *WuGe
+	wuge    []*WuGe
 }
 
 func init() {
@@ -47,7 +49,10 @@ const MaxStokers = 30
 
 func NewFate(lastName string) *fate {
 	name := newName(lastName)
-	return &fate{name: name}
+	return &fate{
+		nameType: mongo.KangXi,
+		name:     name,
+	}
 }
 
 func (f *fate) SetLastName(lastName string) {
@@ -89,27 +94,59 @@ func (f *fate) Generate(number int) *Generating {
 
 }
 
-func filterWuGe(wg *WuGe) bool {
-	return false
+func filterWuGe(f *fate) []*WuGe {
+	var rltWuge []*WuGe
+	l1 := f.name.lastChar[0].GetStrokeByType(f.nameType)
+	l2 := 0
+	if len(f.name.firstChar) == 2 {
+		l2 = f.name.lastChar[1].GetStrokeByType(f.nameType)
+	}
+
+	var dy []*mongo.DaYan
+	mongo.C("dayan").Find(nil).Sort("index").All(&dy)
+	//for idx := range dy {
+	//	log.Printf("%+v", dy[idx])
+	//}
+	for f1, f2 := 1, 1; 30 >= f1; f2++ {
+		wuge := MakeWuGe(l1, l2, f1, f2)
+
+		zg := checkWuGe(dy, wuge.ZongGe)
+		wg := checkWuGe(dy, wuge.WaiGe)
+		rg := checkWuGe(dy, wuge.RenGe)
+		dg := checkWuGe(dy, wuge.DiGe)
+		log.Println(zg, wg, rg, dg)
+		if zg && wg && rg && dg {
+			rltWuge = append(rltWuge, wuge)
+		}
+
+		if f2 >= 30 {
+			f2 = 0
+			f1++
+		}
+	}
+
+	return rltWuge
+}
+
+func (g *Generating) CurrentStep() int {
+	return g.step
 }
 
 func (g *Generating) Continue() *Generating {
 	f := g.fate
-	if g.step == 0 && f.martial.BiHua {
-		fc1, _ := strconv.Atoi(f.name.firstChar[0].KangxiStrokes)
-		fc2 := 0
-		if len(f.name.firstChar) == 2 {
-			fc2, _ = strconv.Atoi(f.name.firstChar[1].KangxiStrokes)
+	if g.step == 0 {
+		if f.martial.BiHua {
+			g.wuge = filterWuGe(g.fate)
+			g.step++
+			return g
 		}
-		MakeWuGe(fc1, fc2, 1, 1)
+		g.step++
 	}
-	var names []*Name
-	//获取笔画列表
-	//var strokes []*Stroke
-
 	//过滤五格
-	if f.martial.BiHua {
+	if g.step == 1 {
+		if f.martial.BiHua {
 
+		}
 	}
 	//过滤三才
 	if f.martial.SanCai {
@@ -135,6 +172,6 @@ func (g *Generating) Continue() *Generating {
 	if f.martial.GuaXiang {
 
 	}
-
-	return names
+	g.step++
+	return g
 }
