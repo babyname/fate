@@ -14,7 +14,7 @@ func TestFate_EightCharacter(t *testing.T) {
 	log.SetFlags(log.Llongfile)
 	fate := fate.NewFate("毛")
 	fate.SetLunarData(time.Now())
-	log.Println(fate.EightCharacter())
+	//log.Println(fate.EightCharacter())
 }
 
 func TestTime(t *testing.T) {
@@ -41,8 +41,6 @@ func TestFate_BestStrokes(t *testing.T) {
 	}
 	f.SetMartial(m)
 	f.SetLunarData(time.Now())
-	char1 := f.BestFirstOne()
-	char2 := f.BestFirstTwo(char1)
-	//TODO; make name with steps
-	log.Printf("%+v,%+v", char1, char2)
+	g := f.Generate(6)
+	g.Continue()
 }
