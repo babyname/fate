@@ -1,6 +1,7 @@
 package fate
 
 import (
+	"log"
 	"math/rand"
 	"time"
 
@@ -9,25 +10,24 @@ import (
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/mongo"
-	"log"
 )
 
 type fate struct {
 	nameType int
 	name     *Name
 	sex      string
-	martial  *Martial
-	strokes  []*Stroke
 	firstOne []*mongo.Character
 	calendar chronos.Calendar
 }
 
 type Generating struct {
-	current interface{} //当前对象
-	step    int         //当前
-	number  int         //生成数
-	fate    *fate
-	stroke  []*Stroke
+	martial   *Martial
+	current   interface{} //当前对象
+	step      int         //当前
+	number    int         //生成数
+	fate      *fate
+	stroke    []*Stroke
+	character []*mongo.Character
 }
 
 func init() {
@@ -62,17 +62,6 @@ func (f *fate) SetLastName(lastName string) {
 
 func (f *fate) GetName() *Name {
 	return f.name
-}
-
-func (f *fate) SetMartial(martial *Martial) {
-	f.martial = martial
-}
-
-func (f *fate) GetMartial() *Martial {
-	if f.martial == nil {
-		return &Martial{}
-	}
-	return f.martial
 }
 
 //SetLunarData 设定生日
@@ -152,43 +141,63 @@ func (g *Generating) CurrentStep() int {
 	return g.step
 }
 
+func (g *Generating) SetMartial(martial *Martial) {
+	g.martial = martial
+}
+
+func (g *Generating) GetMartial() *Martial {
+	if g.martial == nil {
+		return &Martial{}
+	}
+	return g.martial
+}
+
+func (g *Generating) Strokes() []*Stroke {
+	return g.stroke
+}
+
+func (g *Generating) Character() []*mongo.Character {
+
+}
+
 func (g *Generating) Continue() *Generating {
-	f := g.fate
 	//过滤五格
 	if g.step == 0 {
-		if f.martial.BiHua {
+		if g.martial.BiHua {
 			g.stroke = filterWuGe(g.fate)
 		}
 	}
 
 	//过滤三才
 	if g.step == 1 {
-		if f.martial.SanCai {
+		if g.martial.SanCai {
 			g.stroke = filterSanCai(g.stroke)
 		}
+	}
+
+
+
+	//过滤生肖
+	if g.martial.ShengXiao {
+
 	}
 
 	log.Printf("stroke %+v", g.stroke)
 	//按照过滤的笔画取得字符1:
 	//选字:
 
-	//过滤生肖
-	if f.martial.ShengXiao {
-
-	}
-
 	//过滤八字
-	if f.martial.BaZi {
+	if g.martial.BaZi {
 
 	}
 
 	//过滤天运
-	if f.martial.TianYun {
+	if g.martial.TianYun {
 
 	}
 
 	//过滤卦象
-	if f.martial.GuaXiang {
+	if g.martial.GuaXiang {
 
 	}
 	g.step++
