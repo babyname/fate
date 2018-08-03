@@ -43,4 +43,5 @@ func TestFate_BestStrokes(t *testing.T) {
 	f.SetLunarData(time.Now())
 	g := f.Generate(6)
 	g.Continue()
+	g.Continue()
 }
