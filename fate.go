@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/mongo"
-	"log"
 )
 
 type fate struct {
@@ -105,9 +105,6 @@ func filterWuGe(f *fate) []*WuGe {
 
 	var dy []*mongo.DaYan
 	mongo.C("dayan").Find(nil).Sort("index").All(&dy)
-	//for idx := range dy {
-	//	log.Printf("%+v", dy[idx])
-	//}
 	for f1, f2 := 1, 1; 30 >= f1; f2++ {
 		wuge := MakeWuGe(l1, l2, f1, f2)
 
@@ -115,7 +112,6 @@ func filterWuGe(f *fate) []*WuGe {
 		wg := checkWuGe(dy, wuge.WaiGe)
 		rg := checkWuGe(dy, wuge.RenGe)
 		dg := checkWuGe(dy, wuge.DiGe)
-		log.Println(zg, wg, rg, dg)
 		if zg && wg && rg && dg {
 			rltWuge = append(rltWuge, wuge)
 		}
@@ -129,7 +125,17 @@ func filterWuGe(f *fate) []*WuGe {
 	return rltWuge
 }
 
-func filterSanCai(f *fate) []*SanCai {
+func filterSanCai(wuge []*WuGe) []*SanCai {
+	var scs []*mongo.WuXing
+	if wuge == nil {
+		return nil
+	}
+	for idx := range wuge {
+		sc := MakeSanCai(wuge[idx])
+		mongo.C("wuxing").Find(bson.M{
+			"wu_xing": []string{sc.TianCai, sc.RenCai, sc.DiCai},
+		}).One(&scs)
+	}
 	return nil
 }
 
@@ -139,20 +145,18 @@ func (g *Generating) CurrentStep() int {
 
 func (g *Generating) Continue() *Generating {
 	f := g.fate
+	//过滤五格
 	if g.step == 0 {
 		if f.martial.BiHua {
 			g.wuge = filterWuGe(g.fate)
 		}
 	}
-	//过滤五格
-	if g.step == 1 {
-		if f.martial.BiHua {
-			g.sancai = filterSanCai(g.fate)
-		}
-	}
-	//过滤三才
-	if f.martial.SanCai {
 
+	//过滤三才
+	if g.step == 1 {
+		if f.martial.SanCai {
+			g.sancai = filterSanCai(g.wuge)
+		}
 	}
 
 	//过滤生肖
