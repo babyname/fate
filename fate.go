@@ -157,10 +157,10 @@ func (g *Generating) Strokes() []*Stroke {
 }
 
 func (g *Generating) Character() []*mongo.Character {
-
+	return nil
 }
 
-func (g *Generating) Continue() *Generating {
+func (g *Generating) PreStroke() *Generating {
 	//过滤五格
 	if g.step == 0 {
 		if g.martial.BiHua {
@@ -174,12 +174,13 @@ func (g *Generating) Continue() *Generating {
 			g.stroke = filterSanCai(g.stroke)
 		}
 	}
+}
 
-
+func (g *Generating) Continue() *Generating {
 
 	//过滤生肖
 	if g.martial.ShengXiao {
-
+		g.stroke = filterSanCai(g.stroke)
 	}
 
 	log.Printf("stroke %+v", g.stroke)
