@@ -174,18 +174,17 @@ func (g *Generating) PreStroke() *Generating {
 			g.stroke = filterSanCai(g.stroke)
 		}
 	}
+	return g
 }
 
 func (g *Generating) Continue() *Generating {
 
 	//过滤生肖
 	if g.martial.ShengXiao {
-		g.stroke = filterSanCai(g.stroke)
+		g.character = filterShengXiao(g.stroke)
 	}
 
 	log.Printf("stroke %+v", g.stroke)
-	//按照过滤的笔画取得字符1:
-	//选字:
 
 	//过滤八字
 	if g.martial.BaZi {
@@ -203,4 +202,8 @@ func (g *Generating) Continue() *Generating {
 	}
 	g.step++
 	return g
+}
+
+func filterShengXiao(strokes []*Stroke) []*mongo.Character {
+	return nil
 }
