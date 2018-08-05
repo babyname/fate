@@ -84,6 +84,74 @@ func (f *fate) Generate(number int) *Generating {
 
 }
 
+func (g *Generating) CurrentStep() int {
+	return g.step
+}
+
+func (g *Generating) SetMartial(martial *Martial) {
+	g.martial = martial
+}
+
+func (g *Generating) GetMartial() *Martial {
+	if g.martial == nil {
+		return &Martial{}
+	}
+	return g.martial
+}
+
+func (g *Generating) Strokes() []*Stroke {
+	return g.stroke
+}
+
+func (g *Generating) Character() []*mongo.Character {
+	return nil
+}
+
+func (g *Generating) PreStroke() *Generating {
+	//过滤五格
+	if g.step == 0 {
+		if g.martial.BiHua {
+			g.stroke = filterWuGe(g.fate)
+		}
+
+		//过滤三才
+		if g.martial.SanCai {
+			g.stroke = filterSanCai(g.stroke)
+		}
+	}
+	g.step++
+	return g
+}
+
+func (g *Generating) Continue() *Generating {
+	g.PreStroke()
+
+	if g.step == 1 || g.step == 2 {
+		//过滤生肖
+		if g.martial.ShengXiao {
+			g.character = filterShengXiao(g.stroke)
+		}
+		log.Printf("stroke %+v", g.stroke)
+		//过滤八字
+		if g.martial.BaZi {
+			g.character = filterBaZi(g.character)
+		}
+
+		//过滤天运
+		if g.martial.TianYun {
+			g.character = filterTianYun(g.character)
+		}
+
+		//过滤卦象
+		if g.martial.GuaXiang {
+			g.character = filterGuaXiang(g.character)
+		}
+		g.step++
+		return g
+	}
+	return nil
+}
+
 func filterWuGe(f *fate) []*Stroke {
 	var rltS []*Stroke
 	l1 := f.name.lastChar[0].GetStrokeByType(f.nameType)
@@ -93,7 +161,10 @@ func filterWuGe(f *fate) []*Stroke {
 	}
 
 	var dy []*mongo.DaYan
-	mongo.C("dayan").Find(nil).Sort("index").All(&dy)
+	err := mongo.C("dayan").Find(nil).Sort("index").All(&dy)
+	if err != nil {
+		return nil
+	}
 	for f1, f2 := 1, 1; 30 >= f1; f2++ {
 		wuge := MakeWuGe(l1, l2, f1, f2)
 		zg := checkWuGe(dy, wuge.ZongGe)
@@ -137,73 +208,6 @@ func filterSanCai(s []*Stroke) []*Stroke {
 	return strokes
 }
 
-func (g *Generating) CurrentStep() int {
-	return g.step
-}
-
-func (g *Generating) SetMartial(martial *Martial) {
-	g.martial = martial
-}
-
-func (g *Generating) GetMartial() *Martial {
-	if g.martial == nil {
-		return &Martial{}
-	}
-	return g.martial
-}
-
-func (g *Generating) Strokes() []*Stroke {
-	return g.stroke
-}
-
-func (g *Generating) Character() []*mongo.Character {
-	return nil
-}
-
-func (g *Generating) PreStroke() *Generating {
-	//过滤五格
-	if g.step == 0 {
-		if g.martial.BiHua {
-			g.stroke = filterWuGe(g.fate)
-		}
-	}
-
-	//过滤三才
-	if g.step == 1 {
-		if g.martial.SanCai {
-			g.stroke = filterSanCai(g.stroke)
-		}
-	}
-	return g
-}
-
-func (g *Generating) Continue() *Generating {
-
-	//过滤生肖
-	if g.martial.ShengXiao {
-		g.character = filterShengXiao(g.stroke)
-	}
-
-	log.Printf("stroke %+v", g.stroke)
-
-	//过滤八字
-	if g.martial.BaZi {
-		g.character = filterBaZi(g.character)
-	}
-
-	//过滤天运
-	if g.martial.TianYun {
-		g.character = filterTianYun(g.character)
-	}
-
-	//过滤卦象
-	if g.martial.GuaXiang {
-		g.character = filterGuaXiang(g.character)
-	}
-	g.step++
-	return g
-}
-
 func filterGuaXiang(characters []*mongo.Character) []*mongo.Character {
 	return nil
 }
@@ -216,6 +220,18 @@ func filterBaZi(characters []*mongo.Character) []*mongo.Character {
 	return nil
 }
 
-func filterShengXiao(strokes []*Stroke) []*mongo.Character {
-	return nil
+func filterShengXiao(strokes []*Stroke) []*mongo.ShengXiao {
+	var sx []*mongo.ShengXiao
+	err := mongo.C("shengxiao").Find(bson.M{
+		"stroker": Last(strokes, 0),
+	}).All(&sx)
+	if err != nil {
+		return nil
+	}
+	//TODO: trans sx to character
+	for idx := range sx {
+		_ = sx[idx]
+	}
+
+	return sx
 }
