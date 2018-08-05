@@ -188,20 +188,32 @@ func (g *Generating) Continue() *Generating {
 
 	//过滤八字
 	if g.martial.BaZi {
-
+		g.character = filterBaZi(g.character)
 	}
 
 	//过滤天运
 	if g.martial.TianYun {
-
+		g.character = filterTianYun(g.character)
 	}
 
 	//过滤卦象
 	if g.martial.GuaXiang {
-
+		g.character = filterGuaXiang(g.character)
 	}
 	g.step++
 	return g
+}
+
+func filterGuaXiang(characters []*mongo.Character) []*mongo.Character {
+	return nil
+}
+
+func filterTianYun(characters []*mongo.Character) []*mongo.Character {
+	return nil
+}
+
+func filterBaZi(characters []*mongo.Character) []*mongo.Character {
+	return nil
 }
 
 func filterShengXiao(strokes []*Stroke) []*mongo.Character {
