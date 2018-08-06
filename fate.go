@@ -134,18 +134,21 @@ func (g *Generating) Continue() *Generating {
 		log.Printf("stroke %+v", g.stroke)
 		//过滤八字
 		if g.martial.BaZi {
-			g.character = filterBaZi([]string{"金"})
+			g.character = filterBaZi(g.character, []string{"金"})
 		}
 
-		//过滤天运
-		if g.martial.TianYun {
-			g.character = filterTianYun()
+		if g.step == 2 {
+			//过滤天运
+			if g.martial.TianYun {
+				g.character = filterTianYun()
+			}
+
+			//过滤卦象
+			if g.martial.GuaXiang {
+				g.character = filterGuaXiang(g.character)
+			}
 		}
 
-		//过滤卦象
-		if g.martial.GuaXiang {
-			g.character = filterGuaXiang(g.character)
-		}
 		g.step++
 		return g
 	}
@@ -218,8 +221,9 @@ func filterTianYun() []*mongo.Character {
 	return nil
 }
 
-func filterBaZi(wuxing []string) []*mongo.Character {
+func filterBaZi(character []*mongo.Character, wuxing []string) []*mongo.Character {
 	//TODO:
+	//计算平衡用神
 	return nil
 }
 
@@ -227,6 +231,7 @@ func filterShengXiao(strokes []*Stroke, tp string) []*mongo.Character {
 	var sxs []string
 	var sx []*mongo.ShengXiao
 	var ch []*mongo.Character
+	//TODO:update shengxiao table
 	err := mongo.C("shengxiao").Find(bson.M{
 		"stroker": Last(strokes, 0),
 	}).All(&sx)
@@ -243,6 +248,5 @@ func filterShengXiao(strokes []*Stroke, tp string) []*mongo.Character {
 	if err != nil {
 		return nil
 	}
-
 	return ch
 }
