@@ -129,7 +129,7 @@ func (g *Generating) Continue() *Generating {
 	if g.step == 1 || g.step == 2 {
 		//过滤生肖
 		if g.martial.ShengXiao {
-			g.character = filterShengXiao(g.stroke)
+			g.character = filterShengXiao(g.stroke, mongo.GetStrokeType(g.fate.nameType))
 		}
 		log.Printf("stroke %+v", g.stroke)
 		//过滤八字
@@ -223,7 +223,8 @@ func filterBaZi(wuxing []string) []*mongo.Character {
 	return nil
 }
 
-func filterShengXiao(strokes []*Stroke) []*mongo.Character {
+func filterShengXiao(strokes []*Stroke, tp string) []*mongo.Character {
+	var sxs []string
 	var sx []*mongo.ShengXiao
 	var ch []*mongo.Character
 	err := mongo.C("shengxiao").Find(bson.M{
@@ -232,9 +233,15 @@ func filterShengXiao(strokes []*Stroke) []*mongo.Character {
 	if err != nil {
 		return nil
 	}
-	//TODO: trans sx to character
+
 	for idx := range sx {
-		_ = sx[idx]
+		sxs = append(sxs, sx[idx].Character)
+	}
+	err = mongo.C("character").Find(bson.M{
+		tp: Last(strokes, 0),
+	}).All(&ch)
+	if err != nil {
+		return nil
 	}
 
 	return ch

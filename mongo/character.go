@@ -33,6 +33,19 @@ const (
 	Radical
 )
 
+func GetStrokeType(tp int) string {
+	switch tp {
+	case KangXi:
+		return "kangxi_strokes"
+	case Simplified, Total:
+		return "total_strokes"
+	case Traditional: //do nothing
+	case Radical:
+		return "radical_strokes"
+	}
+	return ""
+}
+
 func (c *Character) GetStrokeByType(tp int) int {
 	switch tp {
 	case KangXi:
