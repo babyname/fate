@@ -39,9 +39,10 @@ func TestFate_BestStrokes(t *testing.T) {
 		TianYun:   false,
 		ShengXiao: false,
 	}
-	f.SetMartial(m)
+
 	f.SetLunarData(time.Now())
 	g := f.Generate(6)
+	g.SetMartial(m)
 	g.Continue()
 	g.Continue()
 }
