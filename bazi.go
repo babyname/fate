@@ -108,6 +108,9 @@ var wuXingDiZhi = map[string]string{
 	"亥": "水",
 }
 
+var sheng = []string{"木", "火", "土", "金", "水"}
+var ke = []string{"木", "土", "水", "火", "金"}
+
 func WuXingTianGan(s string) string {
 	return wuXingTianGan[s]
 }
@@ -143,6 +146,15 @@ type BaZi struct {
 	BaZi      []string
 	WuXing    []string
 	WuXingFen *WuXingFen
+}
+
+type XiYong struct {
+	XiShen     string
+	YongShen   string
+	TongLei    []string
+	TongLeiFen int
+	YiLei      []string
+	YiLeiFen   int
 }
 
 func NewBazi(calendar chronos.Calendar) *BaZi {
