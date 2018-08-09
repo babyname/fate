@@ -2,7 +2,6 @@ package fate
 
 import (
 	"github.com/godcong/chronos"
-	"log"
 )
 
 var diIndex = map[string]int{
@@ -140,20 +139,43 @@ func (fen *WuXingFen) Add(s string, point int) {
 	}
 }
 
-func Point(calendar chronos.Calendar) *WuXingFen {
+type BaZi struct {
+	BaZi      []string
+	WuXing    []string
+	WuXingFen *WuXingFen
+}
+
+func NewBazi(calendar chronos.Calendar) *BaZi {
 	ec := calendar.Lunar().EightCharacter()
-	di := diIndex[ec[3]]
+	return &BaZi{
+		BaZi:      ec,
+		WuXing:    baziToWuXing(ec),
+		WuXingFen: point(ec),
+	}
+}
+
+func baziToWuXing(bazi []string) []string {
+	var wx []string
+	for idx, v := range bazi {
+		if idx%2 == 0 {
+			wx = append(wx, WuXingTianGan(v))
+		} else {
+			wx = append(wx, WuXingDiZhi(v))
+		}
+	}
+	return wx
+}
+
+func point(bazi []string) *WuXingFen {
+	di := diIndex[bazi[3]]
 	var wxf WuXingFen
-	for idx, v := range ec {
-		log.Println(idx, v, wxf)
+	for idx, v := range bazi {
 		if idx%2 == 0 {
 			wxf.Add(WuXingTianGan(v), tiangan[di][tianIndex[v]])
 		} else {
 			dz := dizhi[diIndex[v]]
-			log.Println("dizhi", dz)
-			for k, v1 := range dz {
-				log.Println(k, v1, di)
-				wxf.Add(WuXingTianGan(k), v1[di])
+			for k := range dz {
+				wxf.Add(WuXingTianGan(k), dz[k][di])
 			}
 		}
 	}
