@@ -127,6 +127,15 @@ type WuXingFen struct {
 	Tu   int
 }
 
+type XiYong struct {
+	XiShen     string
+	YongShen   string
+	TongLei    []string
+	TongLeiFen int
+	YiLei      []string
+	YiLeiFen   int
+}
+
 func (fen *WuXingFen) Add(s string, point int) {
 	switch s {
 	case "金":
@@ -142,28 +151,78 @@ func (fen *WuXingFen) Add(s string, point int) {
 	}
 }
 
-type BaZi struct {
-	BaZi      []string
-	WuXing    []string
-	WuXingFen *WuXingFen
+func (fen *WuXingFen) Get(s string) (point int) {
+	switch s {
+	case "金":
+		point = fen.Jin
+	case "木":
+		point = fen.Mu
+	case "水":
+		point = fen.Shui
+	case "火":
+		point = fen.Huo
+	case "土":
+		point = fen.Tu
+	}
+	return point
 }
 
-type XiYong struct {
-	XiShen     string
-	YongShen   string
-	TongLei    []string
-	TongLeiFen int
-	YiLei      []string
-	YiLeiFen   int
+type BaZi struct {
+	baZi      []string
+	wuXing    []string
+	wuXingFen *WuXingFen
+	xiyong    *XiYong
 }
 
 func NewBazi(calendar chronos.Calendar) *BaZi {
 	ec := calendar.Lunar().EightCharacter()
 	return &BaZi{
-		BaZi:      ec,
-		WuXing:    baziToWuXing(ec),
-		WuXingFen: point(ec),
+		baZi:      ec,
+		wuXing:    baziToWuXing(ec),
+		wuXingFen: point(ec),
+		xiyong:    &XiYong{},
 	}
+}
+
+func (z *BaZi) RiGan() string {
+	return z.baZi[4]
+}
+
+func (z *BaZi) XiYong() *XiYong {
+	z.xiyong = tong(z)
+	z.xiyong = yi(z)
+	z.xiyong = yongShen(z)
+	z.xiyong = xiShen(z)
+	return z.xiyong
+}
+
+func yongShen(z *BaZi) *XiYong {
+	z.xiyong.YongShen = z.xiyong.TongLei[0]
+	return z.xiyong
+}
+
+func (z *BaZi) QiangRuo() bool {
+	if z.xiyong.TongLeiFen > z.xiyong.YiLeiFen {
+		return true
+	}
+	return false
+}
+
+func xiShen(z *BaZi) (*XiYong) {
+	rt := sheng
+	if z.QiangRuo() {
+		rt = ke
+	}
+	for i := range rt {
+		if rt[i] == z.xiyong.YongShen {
+			if i == len(rt)-1 {
+				i = -1
+			}
+			z.xiyong.XiShen = rt[i+1]
+			break
+		}
+	}
+	return z.xiyong
 }
 
 func baziToWuXing(bazi []string) []string {
@@ -192,4 +251,39 @@ func point(bazi []string) *WuXingFen {
 		}
 	}
 	return &wxf
+}
+
+func tong(z *BaZi) *XiYong {
+	for i := range sheng {
+		if wuXingTianGan[z.RiGan()] == sheng[i] {
+			z.xiyong.TongLei = append(z.xiyong.TongLei, sheng[i])
+			z.xiyong.TongLeiFen = z.wuXingFen.Get(sheng[i])
+			if i == 0 {
+				i = len(sheng) - 1
+				z.xiyong.TongLei = append(z.xiyong.TongLei, sheng[i])
+				z.xiyong.TongLeiFen += z.wuXingFen.Get(sheng[i])
+			} else {
+				z.xiyong.TongLei = append(z.xiyong.TongLei, sheng[i-1])
+				z.xiyong.TongLeiFen += z.wuXingFen.Get(sheng[i-1])
+			}
+			break
+		}
+	}
+	return z.xiyong
+}
+
+func yi(z *BaZi) *XiYong {
+	for i := range sheng {
+		for ti := range z.xiyong.TongLei {
+			if z.xiyong.TongLei[ti] == sheng[i] {
+				goto end
+			}
+		}
+		z.xiyong.YiLei = append(z.xiyong.YiLei, sheng[i])
+		z.xiyong.YiLeiFen += z.wuXingFen.Get(sheng[i])
+	end:
+		continue
+
+	}
+	return z.xiyong
 }
