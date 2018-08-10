@@ -12,6 +12,7 @@ type WuGe struct {
 	ZongGe int           `bson:"zong_ge"`
 }
 
+//MakeWuGe 计算五格
 func MakeWuGe(l1, l2, f1, f2 int) *WuGe {
 	return &WuGe{
 		TianGe: tianGe(l1, l2, f1, f2),
