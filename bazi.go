@@ -157,6 +157,7 @@ type BaZi struct {
 	xiyong *XiYong
 }
 
+//NewBazi 创建八字
 func NewBazi(calendar chronos.Calendar) *BaZi {
 	ec := calendar.Lunar().EightCharacter()
 	return &BaZi{
@@ -167,10 +168,12 @@ func NewBazi(calendar chronos.Calendar) *BaZi {
 	}
 }
 
+//RiGan 日干
 func (z *BaZi) RiGan() string {
 	return z.baZi[4]
 }
 
+//XiYong 喜用神
 func (z *BaZi) XiYong() *XiYong {
 	z.xiyong = point(z)
 	z.xiyong = tong(z)
@@ -185,6 +188,7 @@ func yongShen(z *BaZi) *XiYong {
 	return z.xiyong
 }
 
+//QiangRuo 八字偏强:true,八字偏弱:false.
 func (z *BaZi) QiangRuo() bool {
 	if z.xiyong.TongLeiFen > z.xiyong.YiLeiFen {
 		return true
