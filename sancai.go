@@ -1,7 +1,10 @@
 //三才五格
 package fate
 
-import "github.com/globalsign/mgo/bson"
+import (
+	"github.com/globalsign/mgo/bson"
+	"github.com/godcong/fate/mongo"
+)
 
 type SanCai struct {
 	ID             bson.ObjectId `bson:"_id,omitempty"`
@@ -15,7 +18,7 @@ type SanCai struct {
 	Comment        string        `bson:"comment"` //说明
 }
 
-func MakeSanCai(wuGe *WuGe) *SanCai {
+func NewSanCai(wuGe *WuGe) *SanCai {
 	return &SanCai{
 		TianCai:        sanCaiAttr(wuGe.TianGe),
 		TianCaiYinYang: sanCaiYinYang(wuGe.TianGe),
@@ -23,6 +26,16 @@ func MakeSanCai(wuGe *WuGe) *SanCai {
 		RenCaiYinYang:  sanCaiYinYang(wuGe.RenGe),
 		DiCai:          sanCaiAttr(wuGe.DiGe),
 		DiCaiYingYang:  sanCaiYinYang(wuGe.DiGe),
+	}
+}
+
+func (cai *SanCai) Check() bool {
+	mongo.C("wuxing").Find(bson.M{
+		"wu_xing": []string{sc.TianCai, sc.RenCai, sc.DiCai},
+	}).One(&wx)
+	switch wx.Fortune {
+	case "吉", "中吉", "大吉", "吉多于凶":
+		strokes = append(strokes, s[idx])
 	}
 }
 
@@ -40,8 +53,6 @@ func sanCaiAttr(i int) string {
 	case 7, 8:
 		attr = "金"
 	case 9, 0:
-		fallthrough
-	default:
 		attr = "水"
 	}
 
