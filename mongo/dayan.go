@@ -10,3 +10,24 @@ type DaYan struct {
 	TianJiu string        `bson:"tian_jiu"`      //天九(天九地十取天九)
 	Comment string        `bson:"comment"`
 }
+
+var dayan []*DaYan
+
+func init() {
+	dayan = getDaYan()
+}
+
+func GetDaYan() []*DaYan {
+	return getDaYan()
+}
+
+func getDaYan() []*DaYan {
+	var dy []*DaYan
+	if dayan == nil {
+		err := C("dayan").Find(nil).Sort("index").All(&dy)
+		if err != nil {
+			panic(err)
+		}
+	}
+	return dy
+}
