@@ -163,11 +163,8 @@ func filterWuGe(f *fate) []*Stroke {
 		l2 = f.name.lastChar[1].GetStrokeByType(f.nameType)
 	}
 
-	var dy []*mongo.DaYan
-	err := mongo.C("dayan").Find(nil).Sort("index").All(&dy)
-	if err != nil {
-		return nil
-	}
+	dy := mongo.GetDaYan()
+
 	for f1, f2 := 1, 1; 30 >= f1; f2++ {
 		wuge := MakeWuGe(l1, l2, f1, f2)
 		zg := checkWuGe(dy, wuge.ZongGe)
