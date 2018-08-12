@@ -1,6 +1,9 @@
 package fate
 
-import "github.com/globalsign/mgo/bson"
+import (
+	"github.com/globalsign/mgo/bson"
+	"github.com/godcong/fate/mongo"
+)
 
 //WuGe
 type WuGe struct {
@@ -12,8 +15,8 @@ type WuGe struct {
 	ZongGe int           `bson:"zong_ge"`
 }
 
-//MakeWuGe 计算五格
-func MakeWuGe(l1, l2, f1, f2 int) *WuGe {
+//NewWuGe 计算五格
+func NewWuGe(l1, l2, f1, f2 int) *WuGe {
 	return &WuGe{
 		TianGe: tianGe(l1, l2, f1, f2),
 		RenGe:  renGe(l1, l2, f1, f2),
@@ -87,4 +90,27 @@ func waiGe(l1, l2, f1, f2 int) (n int) {
 //总格，姓加名的笔画总数  数理五行分类
 func zongGe(l1, l2, f1, f2 int) int {
 	return l1 + l2 + f1 + f2
+}
+
+func check(dy []*mongo.DaYan, idx int) bool {
+	switch dy[idx-1].Fortune {
+	case "吉", "半吉":
+		return true
+	}
+	return false
+}
+
+//Check
+func (ge *WuGe) Check() bool {
+	dy := mongo.GetDaYan()
+	if dy == nil {
+		return false
+	}
+
+	for _, v := range []int{ge.DiGe, ge.RenGe, ge.WaiGe, ge.ZongGe} {
+		if len(dy) < v || !check(dy, v) {
+			return false
+		}
+	}
+	return true
 }
