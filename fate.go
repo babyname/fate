@@ -163,15 +163,9 @@ func filterWuGe(f *fate) []*Stroke {
 		l2 = f.name.lastChar[1].GetStrokeByType(f.nameType)
 	}
 
-	dy := mongo.GetDaYan()
-
 	for f1, f2 := 1, 1; 30 >= f1; f2++ {
-		wuge := MakeWuGe(l1, l2, f1, f2)
-		zg := checkWuGe(dy, wuge.ZongGe)
-		wg := checkWuGe(dy, wuge.WaiGe)
-		rg := checkWuGe(dy, wuge.RenGe)
-		dg := checkWuGe(dy, wuge.DiGe)
-		if zg && wg && rg && dg {
+		wuge := NewWuGe(l1, l2, f1, f2)
+		if wuge.Check() {
 			rltS = append(rltS, &Stroke{
 				LastStroke:  []int{l1, l2},
 				FirstStroke: []int{f1, f2},
@@ -196,7 +190,7 @@ func filterSanCai(s []*Stroke) []*Stroke {
 		return nil
 	}
 	for idx := range s {
-		sc := MakeSanCai(s[idx].wuge)
+		sc := NewSanCai(s[idx].wuge)
 		mongo.C("wuxing").Find(bson.M{
 			"wu_xing": []string{sc.TianCai, sc.RenCai, sc.DiCai},
 		}).One(&wx)
