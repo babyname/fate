@@ -168,8 +168,8 @@ func NewBazi(calendar chronos.Calendar) *BaZi {
 	}
 }
 
-//RiGan 日干
-func (z *BaZi) RiGan() string {
+//RiZhu 日主
+func (z *BaZi) RiZhu() string {
 	return z.baZi[4]
 }
 
@@ -242,7 +242,7 @@ func point(zi *BaZi) *XiYong {
 
 func tong(z *BaZi) *XiYong {
 	for i := range sheng {
-		if wuXingTianGan[z.RiGan()] == sheng[i] {
+		if wuXingTianGan[z.RiZhu()] == sheng[i] {
 			z.xiyong.TongLei = append(z.xiyong.TongLei, sheng[i])
 			z.xiyong.TongLeiFen = z.xiyong.GetFen(sheng[i])
 			if i == 0 {

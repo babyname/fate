@@ -13,10 +13,6 @@ type DaYan struct {
 
 var dayan []*DaYan
 
-func init() {
-	dayan = getDaYan()
-}
-
 func GetDaYan() []*DaYan {
 	return getDaYan()
 }
@@ -28,6 +24,7 @@ func getDaYan() []*DaYan {
 		if err != nil {
 			panic(err)
 		}
+		dayan = dy
 	}
-	return dy
+	return dayan
 }
