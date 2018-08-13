@@ -30,13 +30,12 @@ func NewSanCai(wuGe *WuGe) *SanCai {
 }
 
 func (cai *SanCai) Check() bool {
-	mongo.C("wuxing").Find(bson.M{
-		"wu_xing": []string{sc.TianCai, sc.RenCai, sc.DiCai},
-	}).One(&wx)
+	wx := mongo.FindWuXingBy(cai.TianCai, cai.RenCai, cai.DiCai)
 	switch wx.Fortune {
 	case "吉", "中吉", "大吉", "吉多于凶":
-		strokes = append(strokes, s[idx])
+		return true
 	}
+	return false
 }
 
 // GenerateThreeTalent 计算字符的三才属性

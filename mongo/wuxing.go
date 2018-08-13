@@ -1,7 +1,6 @@
 package mongo
 
 import (
-	"log"
 	"strings"
 
 	"github.com/globalsign/mgo/bson"
@@ -16,6 +15,15 @@ type WuXing struct {
 }
 
 var wuxing map[string]*WuXing
+
+func FindWuXingBy(s ...string) *WuXing {
+	key := strings.Join(s, "")
+	wx := GetWuXing()
+	if v, b := wx[key]; b {
+		return v
+	}
+	return nil
+}
 
 func GetWuXing() map[string]*WuXing {
 	return getWuXing()
@@ -34,7 +42,6 @@ func getWuXing() map[string]*WuXing {
 		}
 
 		key := strings.Join(mwx.WuXing, "")
-		log.Println(mwx)
 		wuxing[key] = &mwx
 	}
 	return wuxing
