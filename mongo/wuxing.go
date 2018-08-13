@@ -31,18 +31,20 @@ func GetWuXing() map[string]*WuXing {
 
 func getWuXing() map[string]*WuXing {
 	var wx WuXing
-	wuxing = make(map[string]*WuXing)
-	iter := C("wuxing").Find(nil).Iter()
-	for iter.Next(&wx) {
-		mwx := WuXing{
-			ID:      wx.ID,
-			WuXing:  wx.WuXing,
-			Fortune: wx.Fortune,
-			Comment: wx.Comment,
-		}
+	if wuxing == nil{
+		wuxing = make(map[string]*WuXing)
+		iter := C("wuxing").Find(nil).Iter()
+		for iter.Next(&wx) {
+			mwx := WuXing{
+				ID:      wx.ID,
+				WuXing:  wx.WuXing,
+				Fortune: wx.Fortune,
+				Comment: wx.Comment,
+			}
 
-		key := strings.Join(mwx.WuXing, "")
-		wuxing[key] = &mwx
+			key := strings.Join(mwx.WuXing, "")
+			wuxing[key] = &mwx
+		}
 	}
 	return wuxing
 }
