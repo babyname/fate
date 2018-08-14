@@ -30,3 +30,27 @@ func TestWuXing(t *testing.T) {
 	wx := mongo.GetWuXing()
 	log.Printf("%+v", wx)
 }
+
+func TestZhouYi(t *testing.T) {
+	mongo.Dial("localhost", &mgo.Credential{
+		Username: "root",
+		Password: "v2RgzSuIaBlx",
+	})
+
+	//insert
+	//zy := mongo.ZhouYi{
+	//	ShangGua: "乾",
+	//	XiaGua:   "乾",
+	//	GuaXiang: "乾",
+	//	GuaMing:  "乾为天",
+	//	GuaYi:    "自强不息",
+	//	GuaYun:   "上上卦",
+	//	XiangYue: "困龙得水好运交，不由喜气上眉梢，一切谋望皆如意，向后时运渐渐高。这个卦是同卦（下乾上乾）相叠。象征天，喻龙（德才的君子），又象征纯粹的阳和健，表明兴盛强健。乾卦是根据万物变通的道理，以“元、亨、利、贞”为卦辞，示吉祥如意，教导人遵守天道的德行。",
+	//}
+	//mongo.C("zhouyi").Insert(&zy)
+
+	//get
+	//zy := mongo.GetZhouYi()
+	//log.Printf("%+v", zy)
+
+}
