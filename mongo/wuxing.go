@@ -30,9 +30,9 @@ func GetWuXing() map[string]*WuXing {
 }
 
 func getWuXing() map[string]*WuXing {
-	var wx WuXing
 	if wuxing == nil{
 		wuxing = make(map[string]*WuXing)
+		var wx WuXing
 		iter := C("wuxing").Find(nil).Iter()
 		for iter.Next(&wx) {
 			mwx := WuXing{
