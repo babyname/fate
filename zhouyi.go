@@ -1,10 +1,23 @@
 package fate
 
-import "github.com/godcong/chronos"
+import (
+	"github.com/godcong/chronos"
+	"github.com/godcong/fate/mongo"
+)
+
+const (
+	BenGua = iota
+	BianGua
+	HuGua
+)
+
+type ZhouYi struct {
+	gua [3]mongo.GuaXiang
+}
 
 //QiGua 起卦
-func QiGua(name *Name, c chronos.Calendar) {
-
+func QiGua(name *Name, c chronos.Calendar) *ZhouYi {
+	panic("//TODO")
 }
 
 const (
