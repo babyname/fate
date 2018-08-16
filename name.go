@@ -2,6 +2,7 @@ package fate
 
 import (
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/globalsign/mgo/bson"
@@ -9,9 +10,9 @@ import (
 )
 
 type Name struct {
-	FirstName []string
+	FirstName []string //名
 	firstChar []*mongo.Character
-	LastName  []string
+	LastName  []string //姓
 	lastChar  []*mongo.Character
 }
 
@@ -43,4 +44,16 @@ func nameCharacter(s string) *mongo.Character {
 		return nil
 	}
 	return &c
+}
+
+func CountStroke(chars ...*mongo.Character) int {
+	i := 0
+	if chars == nil {
+		return i
+	}
+	for k := range chars {
+		t, _ := strconv.Atoi(chars[k].KangxiStrokes)
+		i += t
+	}
+	return i
 }
