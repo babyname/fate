@@ -1,7 +1,6 @@
 package fate
 
 import (
-	"github.com/godcong/chronos"
 	"github.com/godcong/fate/mongo"
 )
 
@@ -16,8 +15,16 @@ type ZhouYi struct {
 }
 
 //QiGua 起卦
-func QiGua(name *Name, c chronos.Calendar) *ZhouYi {
-	panic("//TODO")
+func QiGua(name *Name) *ZhouYi {
+	x := CountStroke(name.lastChar...)
+	m := CountStroke(name.firstChar...)
+	getGua(x)
+	getGua(m)
+	return nil
+}
+
+func getGua(i int) {
+	panic("")
 }
 
 const (
