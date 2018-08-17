@@ -10,23 +10,6 @@ const (
 	HuGua
 )
 
-type ZhouYi struct {
-	gua [3]mongo.GuaXiang
-}
-
-//QiGua 起卦
-func QiGua(name *Name) *ZhouYi {
-	x := CountStroke(name.lastChar...)
-	m := CountStroke(name.firstChar...)
-	getGua(x)
-	getGua(m)
-	return nil
-}
-
-func getGua(i int) {
-	panic("")
-}
-
 const (
 	ShangQian = 0x00
 	ShangDui  = 0x01
@@ -45,3 +28,28 @@ const (
 	XiaGen    = 0x60
 	XiaKun    = 0x70
 )
+
+type ZhouYi struct {
+	gua [3]mongo.GuaXiang
+}
+
+//QiGua 起卦
+func QiGua(name *Name) *ZhouYi {
+	x := CountStroke(name.lastChar...)
+	m := CountStroke(name.firstChar...)
+	getGua(x)
+	getGua(m)
+	return nil
+}
+
+func getGua(i int) {
+	panic("")
+}
+
+func ShangGua(){
+	panic("")
+}
+
+func XiaGua()  {
+	panic("")
+}
