@@ -38,7 +38,7 @@ func TestZhouYi(t *testing.T) {
 	})
 
 	//insert
-	//zy := mongo.ZhouYi{
+	//zy := mongo.GuaXiang{
 	//	ShangGua: "乾",
 	//	XiaGua:   "乾",
 	//	GuaXiang: "乾",
