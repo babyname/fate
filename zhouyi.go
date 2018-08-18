@@ -61,7 +61,6 @@ func QiGua(name *Name) *ZhouYi {
 	b := CountStroke(append(name.lastChar, name.firstChar...)...)
 	ben := benGua(x, m)
 	bian := bianGua(ben, b)
-	//hu := huGua(ben)
 	return &ZhouYi{
 		gua: [3]*mongo.GuaXiang{
 			BenGua:  ben,
@@ -84,7 +83,10 @@ func getGua(i int) string {
 }
 
 func getZhou(i int) int {
-	panic("")
+	if i = i % 6; i != 0 {
+		return i - 1
+	}
+	return 5
 }
 
 func benGua(x, m int) *mongo.GuaXiang {
@@ -96,8 +98,28 @@ func benGua(x, m int) *mongo.GuaXiang {
 	return nil
 }
 
-func bianGua(ben *mongo.GuaXiang, bian int) *mongo.GuaXiang {
-	panic("")
+func bianGua(ben *mongo.GuaXiang, b int) *mongo.GuaXiang {
+	gx := mongo.GetGuaXiang()
+	bz := getZhou(b)
+	sg := ben.ShangGua
+	xg := ben.XiaGua
+	if b > 2 {
+		sg = gua[bian(ben.ShangShu, bz-3)]
+	} else {
+		xg = gua[bian(ben.XiaShu, bz-3)]
+	}
+	gua := strings.Join([]string{sg, xg}, "")
+	return gx[gua]
+}
+
+func bian(gua, bian int) int {
+	idx := 1 << uint(bian)
+	if gua&idx == 0 {
+		gua = gua | idx
+	} else {
+		gua = gua ^ idx
+	}
+	return gua
 }
 
 func huGua(ben *mongo.GuaXiang, ) {
