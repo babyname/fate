@@ -9,9 +9,9 @@ import (
 type GuaXiang struct {
 	ID       bson.ObjectId `bson:"_id,omitempty"`
 	ShangGua string        `bson:"shang_gua"`
-	ShangShu string        `bson:"shang_shu"`
+	ShangShu int           `bson:"shang_shu"`
 	XiaGua   string        `bson:"xia_gua"`
-	XiaShu   string        `bson:"xia_shu"`
+	XiaShu   int           `bson:"xia_shu"`
 	GuaXiang string        `bson:"gua_xiang"`
 	GuaMing  string        `bson:"gua_ming"`
 	GuaYi    string        `bson:"gua_yi"`
