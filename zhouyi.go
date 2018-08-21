@@ -39,6 +39,8 @@ const (
 	//XiaKun    = 0x70
 )
 
+var fu = []string{"☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"}
+
 var gua = []string{
 	GuaXiangKun:  "坤",
 	GuaXiangGen:  "艮",
@@ -61,10 +63,17 @@ func QiGua(name *Name) *ZhouYi {
 	b := CountStroke(append(name.lastChar, name.firstChar...)...)
 	ben := benGua(x, m)
 	bian := bianGua(ben, b)
+	hu := ben
+	if ben.ShangShu == GuaXiangKun && ben.XiaShu == GuaXiangKun ||
+		ben.ShangShu == GuaXiangQian && ben.XiaShu == GuaXiangQian {
+		hu = bian
+	}
+	hu = huGua(hu)
 	return &ZhouYi{
 		gua: [3]*mongo.GuaXiang{
 			BenGua:  ben,
 			BianGua: bian,
+			HuGua:   hu,
 		},
 	}
 
@@ -123,9 +132,52 @@ func bian(gua, bian int) int {
 }
 
 func hu(shang, xia int) int {
-	return 0
+	huXia := 0
+	er := 1 << 1
+	san := 1 << 0
+	si := 1 << 2
+	if xia&er > 0 {
+		huXia |= 1 << 2
+	}
+	if xia&san > 0 {
+		huXia |= 1 << 1
+	}
+	if shang&si > 0 {
+		huXia |= 1 << 0
+	}
+	return huXia
+}
+
+func jiao(shang, xia int) int {
+	jiaoShang := 0
+	san := 1 << 0
+	si := 1 << 2
+	wu := 1 << 1
+	if xia&san > 0 {
+		jiaoShang |= 1 << 2
+	}
+	if shang&si > 0 {
+		jiaoShang |= 1 << 1
+	}
+	if shang&wu > 0 {
+		jiaoShang |= 1 << 0
+	}
+	return jiaoShang
+}
+
+func cuo(gua int) int {
+	panic("")
+}
+
+func zong(gua int) int {
+	panic("")
 }
 
 func huGua(ben *mongo.GuaXiang) *mongo.GuaXiang {
+	bg := strings.Join([]string{getGua(jiao(ben.ShangShu, ben.XiaShu)), getGua(hu(ben.ShangShu, ben.XiaShu))}, "")
+	gx := mongo.GetGuaXiang()
+	if v, b := gx[bg]; b {
+		return v
+	}
 	return nil
 }
