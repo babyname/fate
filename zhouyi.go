@@ -122,6 +122,10 @@ func bian(gua, bian int) int {
 	return gua
 }
 
+func hu(shang, xia int) int {
+	return 0
+}
+
 func huGua(ben *mongo.GuaXiang) *mongo.GuaXiang {
-	panic("")
+	return nil
 }
