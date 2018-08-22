@@ -121,6 +121,7 @@ func bianGua(ben *mongo.GuaXiang, b int) *mongo.GuaXiang {
 	return gx[gua]
 }
 
+//变
 func bian(gua, bian int) int {
 	idx := 1 << uint(bian)
 	if gua&idx == 0 {
@@ -131,6 +132,7 @@ func bian(gua, bian int) int {
 	return gua
 }
 
+//互
 func hu(shang, xia int) int {
 	huXia := 0
 	er := 1 << 1
@@ -148,27 +150,34 @@ func hu(shang, xia int) int {
 	return huXia
 }
 
+//交
 func jiao(shang, xia int) int {
 	jiaoShang := 0
 	san := 1 << 0
 	si := 1 << 2
 	wu := 1 << 1
 	if xia&san > 0 {
+		//位移2
 		jiaoShang |= 1 << 2
 	}
 	if shang&si > 0 {
+		//位移1
 		jiaoShang |= 1 << 1
 	}
 	if shang&wu > 0 {
+		//位不动
 		jiaoShang |= 1 << 0
 	}
 	return jiaoShang
 }
 
+//错
 func cuo(gua int) int {
-	panic("")
+	gua ^= 0x7
+	return gua
 }
 
+//综
 func zong(gua int) int {
 	panic("")
 }
