@@ -41,7 +41,7 @@ const (
 
 var fu = []string{"☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"}
 
-var gua = []string{
+var gua = [...]string{
 	GuaXiangKun:  "坤",
 	GuaXiangGen:  "艮",
 	GuaXiangKan:  "坎",
@@ -178,8 +178,28 @@ func cuo(gua int) int {
 }
 
 //综
-func zong(gua int) int {
-	panic("")
+func zong(shang, xia int) (int, int) {
+	zShang := 0
+	zXia := 0
+	if (shang & (1 << 2)) > 0 {
+		zXia |= 1 << 0
+	}
+	if (shang & (1 << 1)) > 0 {
+		zXia |= 1 << 1
+	}
+	if (shang & (1 << 0)) > 0 {
+		zXia |= 1 << 2
+	}
+	if (xia & (1 << 2)) > 0 {
+		zShang |= 1 << 0
+	}
+	if (xia & (1 << 1)) > 0 {
+		zShang |= 1 << 1
+	}
+	if (xia & (1 << 0)) > 0 {
+		zShang |= 1 << 2
+	}
+	return zShang, zXia
 }
 
 func huGua(ben *mongo.GuaXiang) *mongo.GuaXiang {
