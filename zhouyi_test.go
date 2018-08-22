@@ -22,3 +22,15 @@ func TestCuo(t *testing.T) {
 
 	}
 }
+
+func TestZong(t *testing.T) {
+	for i, j := 0, 0; i <= 7; j++ {
+		shang,xia:=zong(i, j)
+		t.Log(fu[i], fu[j], fu[shang],fu[xia])
+		if j == 7 {
+			i++
+			j = 0
+		}
+	}
+
+}
