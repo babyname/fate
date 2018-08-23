@@ -79,7 +79,7 @@ func QiGua(name *Name) *ZhouYi {
 
 	return nil
 }
-
+//Set 设定卦象
 func (y *ZhouYi) Set(idx int, xiang *mongo.GuaXiang) {
 	y.gua[idx] = xiang
 }
@@ -90,14 +90,15 @@ func getGua(i int) string {
 	}
 	return gua[7]
 }
-
-func getZhou(i int) int {
+//取爻
+func getYao(i int) int {
 	if i = i % 6; i != 0 {
 		return i - 1
 	}
 	return 5
 }
 
+//本卦
 func benGua(x, m int) *mongo.GuaXiang {
 	bg := strings.Join([]string{getGua(x), getGua(m)}, "")
 	gx := mongo.GetGuaXiang()
@@ -106,10 +107,10 @@ func benGua(x, m int) *mongo.GuaXiang {
 	}
 	return nil
 }
-
+//变卦
 func bianGua(ben *mongo.GuaXiang, b int) *mongo.GuaXiang {
 	gx := mongo.GetGuaXiang()
-	bz := getZhou(b)
+	bz := getYao(b)
 	sg := ben.ShangGua
 	xg := ben.XiaGua
 	if b > 2 {
@@ -201,7 +202,7 @@ func zong(shang, xia int) (int, int) {
 	}
 	return zShang, zXia
 }
-
+//互卦
 func huGua(ben *mongo.GuaXiang) *mongo.GuaXiang {
 	bg := strings.Join([]string{getGua(jiao(ben.ShangShu, ben.XiaShu)), getGua(hu(ben.ShangShu, ben.XiaShu))}, "")
 	gx := mongo.GetGuaXiang()

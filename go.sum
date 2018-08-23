@@ -7,7 +7,7 @@ github.com/go-xorm/builder v0.0.0-20180322150003-a9b7ffcca3f0/go.mod h1:v8mE3MFB
 github.com/go-xorm/core v0.0.0-20180322150003-0177c08cee88/go.mod h1:d8FJ9Br8OGyQl12MCclmYBuBqqxsyeedpXciV5Myih8=
 github.com/go-xorm/core v0.6.0/go.mod h1:d8FJ9Br8OGyQl12MCclmYBuBqqxsyeedpXciV5Myih8=
 github.com/go-xorm/xorm v0.7.0/go.mod h1:xkHEPeHG0ckC95t/J9vR4tr4gE4944G/kGnDCGLAxlA=
-github.com/godcong/chronos v0.0.0-20180808065415-490973394097 h1:vxbj8YlkHeWI2z3AcK6PW0W4HFqQtBy1OfmcJmfMhHk=
+github.com/godcong/chronos v0.0.0-20180808065415-490973394097 h1:Ua+nuPh8oDVVksSU4q2mHzS92sVkzSMGzbBNX7V3HPQ=
 github.com/godcong/chronos v0.0.0-20180808065415-490973394097/go.mod h1:N/sMefX6MAdcscHmtsfXq4VMPJBqQ3x4U5LOIZ6CA5Q=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
