@@ -7,29 +7,29 @@ import (
 //ShengXiao 生肖喜忌
 type ShengXiao struct {
 	ID        bson.ObjectId `bson:"_id,omitempty"` //id
-	Character string
-	XiShu     bool
-	XiNiu     bool
-	XiHu      bool
-	XiTu      bool
-	XiLong    bool
-	XiShe     bool
-	XiMa      bool
-	XiYang    bool
-	XiHou     bool
-	XiJi      bool
-	XiGou     bool
-	XiZhu     bool
-	JiShu     bool
-	JiNiu     bool
-	JiHu      bool
-	JiTu      bool
-	JiLong    bool
-	JiShe     bool
-	JiMa      bool
-	JiYang    bool
-	JiHou     bool
-	JiJi      bool
-	JiGou     bool
-	JiZhu     bool
+	Character string        `bson:"character"`
+	XiShu     bool          `bson:"xi_shu"`
+	XiNiu     bool          `bson:"xi_niu"`
+	XiHu      bool          `bson:"xi_hu"`
+	XiTu      bool          `bson:"xi_tu"`
+	XiLong    bool          `bson:"xi_long"`
+	XiShe     bool          `bson:"xi_she"`
+	XiMa      bool          `bson:"xi_ma"`
+	XiYang    bool          `bson:"xi_yang"`
+	XiHou     bool          `bson:"xi_hou"`
+	XiJi      bool          `bson:"xi_ji"`
+	XiGou     bool          `bson:"xi_gou"`
+	XiZhu     bool          `bson:"xi_zhu"`
+	JiShu     bool          `bson:"ji_shu"`
+	JiNiu     bool          `bson:"ji_niu"`
+	JiHu      bool          `bson:"ji_hu"`
+	JiTu      bool          `bson:"ji_tu"`
+	JiLong    bool          `bson:"ji_long"`
+	JiShe     bool          `bson:"ji_she"`
+	JiMa      bool          `bson:"ji_ma"`
+	JiYang    bool          `bson:"ji_yang"`
+	JiHou     bool          `bson:"ji_hou"`
+	JiJi      bool          `bson:"ji_ji"`
+	JiGou     bool          `bson:"ji_gou"`
+	JiZhu     bool          `bson:"ji_zhu"`
 }
