@@ -45,9 +45,6 @@ func initDial() {
 	})
 }
 
-//MaxStokers 超过30划的字不易书写,过滤
-const MaxStokers = 30
-
 func NewFate(lastName string) *fate {
 	name := newName(lastName)
 	return &fate{
