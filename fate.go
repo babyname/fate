@@ -54,10 +54,12 @@ func NewFate(lastName string) *fate {
 	}
 }
 
+//SetLastName 设定姓
 func (f *fate) SetLastName(lastName string) {
 	f.name = newName(lastName)
 }
 
+//GetName 取得姓名
 func (f *fate) GetName() *Name {
 	return f.name
 }
@@ -72,6 +74,7 @@ func randomInt32(max uint32, t time.Time) uint32 {
 	return rand.New(r).Uint32()
 }
 
+//Generate 生成(待处理)
 func (f *fate) Generate(number int) *Generating {
 	g := &Generating{
 		step:   0,

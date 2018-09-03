@@ -111,14 +111,17 @@ var wuXingDiZhi = map[string]string{
 var sheng = []string{"木", "火", "土", "金", "水"}
 var ke = []string{"木", "土", "水", "火", "金"}
 
+//WuXingTianGan 五行天干
 func WuXingTianGan(s string) string {
 	return wuXingTianGan[s]
 }
 
+//WuXingDiZhi 五行地支
 func WuXingDiZhi(s string) string {
 	return wuXingDiZhi[s]
 }
 
+//XiYong 喜用神
 type XiYong struct {
 	WuXingFen  map[string]int
 	XiShen     string
@@ -129,6 +132,7 @@ type XiYong struct {
 	YiLeiFen   int
 }
 
+//AddFen 五行分
 func (xy *XiYong) AddFen(s string, point int) {
 	if xy.WuXingFen == nil {
 		xy.WuXingFen = make(map[string]int)
