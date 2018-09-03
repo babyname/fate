@@ -9,6 +9,7 @@ import (
 	"github.com/godcong/fate/mongo"
 )
 
+//Name 姓名
 type Name struct {
 	FirstName []string //名
 	firstChar []*mongo.Character

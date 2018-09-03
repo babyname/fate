@@ -45,6 +45,7 @@ func initDial() {
 	})
 }
 
+//NewFate 所有的入口,新建一个fate对象
 func NewFate(lastName string) *fate {
 	name := newName(lastName)
 	return &fate{
