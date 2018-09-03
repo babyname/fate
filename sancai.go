@@ -18,6 +18,7 @@ type SanCai struct {
 	Comment        string        `bson:"comment"` //说明
 }
 
+//NewSanCai 新建一个三才对象
 func NewSanCai(wuGe *WuGe) *SanCai {
 	return &SanCai{
 		TianCai:        sanCaiAttr(wuGe.TianGe),
@@ -29,6 +30,7 @@ func NewSanCai(wuGe *WuGe) *SanCai {
 	}
 }
 
+//Check 检查三才属性
 func (cai *SanCai) Check() bool {
 	wx := mongo.FindWuXingBy(cai.TianCai, cai.RenCai, cai.DiCai)
 	switch wx.Fortune {

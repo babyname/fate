@@ -145,6 +145,7 @@ func (xy *XiYong) AddFen(s string, point int) {
 	}
 }
 
+//GetFen 取得分
 func (xy *XiYong) GetFen(s string) (point int) {
 	if xy.WuXingFen == nil {
 		return 0
