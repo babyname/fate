@@ -52,6 +52,7 @@ var gua = [...]string{
 	GuaXiangQian: "乾",
 }
 
+//ZhouYi 周易卦象
 type ZhouYi struct {
 	gua [3]*mongo.GuaXiang
 }

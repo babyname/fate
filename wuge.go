@@ -100,7 +100,7 @@ func check(dy []*mongo.DaYan, idx int) bool {
 	return false
 }
 
-//Check
+//Check 格检查
 func (ge *WuGe) Check() bool {
 	dy := mongo.GetDaYan()
 	if dy == nil {
