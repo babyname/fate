@@ -7,6 +7,7 @@ type Stroke struct {
 	sancai      *SanCai
 }
 
+//First 名字笔画
 func First(s []*Stroke, i int) []int {
 	var rlt []int
 	for idx := range s {
@@ -18,6 +19,7 @@ func First(s []*Stroke, i int) []int {
 	return rlt
 }
 
+//Last 姓氏笔画
 func Last(s []*Stroke, i int) []int {
 	var rlt []int
 	for idx := range s {
