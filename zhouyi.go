@@ -7,8 +7,11 @@ import (
 )
 
 const (
+	//本卦
 	BenGua = iota
+	//变卦
 	BianGua
+	//互卦
 	HuGua
 )
 
