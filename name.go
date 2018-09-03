@@ -47,6 +47,7 @@ func nameCharacter(s string) *mongo.Character {
 	return &c
 }
 
+//CountStroke 统计笔画
 func CountStroke(chars ...*mongo.Character) int {
 	i := 0
 	if chars == nil {

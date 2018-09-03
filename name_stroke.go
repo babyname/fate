@@ -14,6 +14,7 @@ type nameStroke struct {
 	*WuGe
 }
 
+//SanCaiWuGe 三才五格
 func (s *NameStroke) SanCaiWuGe() *nameStroke {
 	l1, l2, f1, f2 := s.Last1, s.Last2, s.First1, s.First2
 	wuGe := &WuGe{
