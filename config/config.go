@@ -45,6 +45,7 @@ func defaultConfig() *Config {
 	return NewConfig(DefaultFileName)
 }
 
+//GetTree  GetTree
 func (c *Config) GetTree(name string) *toml.Tree {
 	if c == nil {
 		return nil
@@ -57,6 +58,7 @@ func (c *Config) GetTree(name string) *toml.Tree {
 	return nil
 }
 
+//GetSub GetSub
 func (c *Config) GetSub(name string) *Config {
 	if v := c.GetTree(name); v != nil {
 		return &Config{
@@ -66,6 +68,7 @@ func (c *Config) GetSub(name string) *Config {
 	return (*Config)(nil)
 }
 
+//GetString GetString
 func (c *Config) GetString(name string) string {
 	if v := c.Get(name); v != nil {
 		if v1, b := v.(string); b {
@@ -75,6 +78,7 @@ func (c *Config) GetString(name string) string {
 	return ""
 }
 
+//GetStringD GetStringD
 func (c *Config) GetStringD(name string, def string) string {
 	if c == nil {
 		return def
@@ -87,6 +91,7 @@ func (c *Config) GetStringD(name string, def string) string {
 	return def
 }
 
+//GetBool GetBool
 func (c *Config) GetBool(name string) bool {
 	if c == nil {
 		return false
@@ -99,6 +104,7 @@ func (c *Config) GetBool(name string) bool {
 	return false
 }
 
+//GetBoolD GetBoolD
 func (c *Config) GetBoolD(name string, def bool) bool {
 	if v := c.Get(name); v != nil {
 		if v1, b := v.(bool); b {
