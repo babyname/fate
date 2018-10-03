@@ -10,6 +10,7 @@ import (
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/mongo"
+	"github.com/godcong/yi"
 )
 
 type fate struct {
@@ -204,7 +205,8 @@ func filterSanCai(s []*Stroke) []*Stroke {
 }
 
 func filterGuaXiang(characters []*mongo.Character) []*mongo.Character {
-	//TODO:
+	gua := yi.NumberQiGua(0, 0, 0)
+	log.Println(gua)
 	return nil
 }
 
