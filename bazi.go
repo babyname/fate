@@ -181,8 +181,8 @@ func (z *BaZi) RiZhu() string {
 //XiYong 喜用神
 func (z *BaZi) XiYong() *XiYong {
 	z.xiyong = point(z)
-	z.xiyong = tong(z)
-	z.xiyong = yi(z)
+	z.xiyong = tongl(z)
+	z.xiyong = yil(z)
 	z.xiyong = yongShen(z)
 	z.xiyong = xiShen(z)
 	return z.xiyong
@@ -245,7 +245,7 @@ func point(zi *BaZi) *XiYong {
 	return zi.xiyong
 }
 
-func tong(z *BaZi) *XiYong {
+func tongl(z *BaZi) *XiYong {
 	for i := range sheng {
 		if wuXingTianGan[z.RiZhu()] == sheng[i] {
 			z.xiyong.TongLei = append(z.xiyong.TongLei, sheng[i])
@@ -264,7 +264,7 @@ func tong(z *BaZi) *XiYong {
 	return z.xiyong
 }
 
-func yi(z *BaZi) *XiYong {
+func yil(z *BaZi) *XiYong {
 	for i := range sheng {
 		for ti := range z.xiyong.TongLei {
 			if z.xiyong.TongLei[ti] == sheng[i] {
