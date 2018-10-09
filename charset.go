@@ -1,16 +1,5 @@
 package fate
 
-import (
-	"log"
-	"strconv"
-	"strings"
-
-	"github.com/godcong/excavator"
-	"github.com/godcong/fate/debug"
-	"github.com/godcong/fate/model"
-	"github.com/satori/go.uuid"
-)
-
 type Charset []string
 
 var (
@@ -645,89 +634,89 @@ var nameList = Charset{
 }
 
 func InitAll() {
-	model.CreateTables()
-	initCharFrom5156()
-	fixNameStrokes()
+	//model.CreateTables()
+	//initCharFrom5156()
+	//fixNameStrokes()
 }
 
 func initCharFrom5156() {
-	list := excavator.Get("http://xh.5156edu.com")
-	debug.Println("initCharFrom5156 start")
-	log.Println(list)
-	for k, v := range list {
-		insertCharacter(v, k)
-	}
-	debug.Println("initCharFrom5156 end")
+	//list := excavator.Get("http://xh.5156edu.com")
+	//debug.Println("initCharFrom5156 start")
+	//log.Println(list)
+	//for k, v := range list {
+	//	insertCharacter(v, k)
+	//}
+	//debug.Println("initCharFrom5156 end")
 }
 
 func insertCharacter(charset Charset, k string) {
-	debug.Println("start: ", k)
-	for _, v := range charset {
-		s := strings.Split(v, "|")
-
-		s0, _ := strconv.Atoi(s[0])
-		if len(s) != 3 {
-			debug.Println("wrong:", s)
-			continue
-		}
-		c := model.Character{
-			SimpleStrokes: s0,
-			SimpleChar:    s[1],
-			Pinyin:        s[2],
-			Radical:       k,
-		}
-		i, e := c.Create()
-		if e != nil {
-			debug.Println(i, e)
-		}
-	}
-	debug.Println("end", k)
+	//debug.Println("start: ", k)
+	//for _, v := range charset {
+	//	s := strings.Split(v, "|")
+	//
+	//	s0, _ := strconv.Atoi(s[0])
+	//	if len(s) != 3 {
+	//		debug.Println("wrong:", s)
+	//		continue
+	//	}
+	//	c := model.Character{
+	//		SimpleStrokes: s0,
+	//		SimpleChar:    s[1],
+	//		Pinyin:        s[2],
+	//		Radical:       k,
+	//	}
+	//	i, e := c.Create()
+	//	if e != nil {
+	//		debug.Println(i, e)
+	//	}
+	//}
+	//debug.Println("end", k)
 
 }
 
 //delete because use kangxi dict
 func updateStrokes() {
-	debug.Println("updateStrokes start")
-	for k, v := range scienceFixList {
-		ScienceUpdate(k, v)
-	}
-	debug.Println("updateStrokes end")
+	//debug.Println("updateStrokes start")
+	//for k, v := range scienceFixList {
+	//	ScienceUpdate(k, v)
+	//}
+	//debug.Println("updateStrokes end")
 }
 
 func ScienceUpdate(index int, s string) {
-	debug.Println("science:", index)
-	sa := strings.Split(s, " ")
-	for _, v := range sa {
-		if v == "" {
-			continue
-		}
-		_ = v
-
-		c := model.Character{SimpleChar: v}
-		c = *c.Get()
-		c.ScienceStrokes = index
-		if uuid.FromStringOrNil(c.Id) == uuid.Nil {
-			debug.Println("notfound: ", c, v)
-			c.Create()
-			continue
-		}
-		c.Update()
-	}
+	//debug.Println("science:", index)
+	//sa := strings.Split(s, " ")
+	//for _, v := range sa {
+	//	if v == "" {
+	//		continue
+	//	}
+	//	_ = v
+	//
+	//	c := model.Character{SimpleChar: v}
+	//	c = *c.Get()
+	//	c.ScienceStrokes = index
+	//	if uuid.FromStringOrNil(c.Id) == uuid.Nil {
+	//		debug.Println("notfound: ", c, v)
+	//		c.Create()
+	//		continue
+	//	}
+	//	c.Update()
+	//}
 
 }
 
 func fixNameStrokes() {
-	excavator.UpdateKangXi("http://tool.httpcn.com", func(detail excavator.CharDetail) {
-		log.Println(detail.Char)
-		c := model.Character{
-			SimpleChar: detail.Char,
-		}
-		c.Get()
-		c.NameType = detail.NameType
-		c.NameRoot = detail.NameRoot
-		c.ScienceStrokes = detail.ScienceStrokes
-		c.Update()
-
-	})
+	//excavator.UpdateKangXi("http://tool.httpcn.com", func(detail excavator.CharDetail) {
+	//	log.Println(detail.Char)
+	//	c := model.Character{
+	//		SimpleChar: detail.Char,
+	//	}
+	//	c.Get()
+	//	c.NameType = detail.NameType
+	//	c.NameRoot = detail.NameRoot
+	//	c.ScienceStrokes = detail.ScienceStrokes
+	//	c.Update()
+	//
+	//})
 
 }
