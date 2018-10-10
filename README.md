@@ -54,5 +54,11 @@
        path = "./sql/fate.db"   //fate.db对应目录
 
   运行项目：
-  
-      fate.FilterBest(fate.NewName("毛"), "水", "金")
+      name:=fate.NewName("毛")
+      参数1:姓名的姓
+      fate.FilterBest(name, "水", "金")
+      参数1:姓
+      参数2:第一字五行(选填,可传"")
+      参数3:第二字五行(选填,可传"")
+      
+      
