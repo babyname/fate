@@ -5,5 +5,6 @@ import (
 )
 
 func main() {
-	fate.FilterBest(fate.NewName("曹"))
+	name := fate.NewName("曹")
+	fate.FilterBest(name)
 }

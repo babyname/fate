@@ -34,14 +34,26 @@ func NewName(last string) Name {
 
 func CharacterFromName(s string) *model.Character {
 	c := &model.Character{
-		Base:          model.Base{},
-		CharacterInfo: model.CharacterInfo{},
+		Base: model.Base{},
+		CharacterInfo: model.CharacterInfo{
+			IsSur:          false,
+			SimpleChar:     s,
+			SimpleStrokes:  0,
+			TradChar:       "",
+			TradStrokes:    0,
+			NameType:       "",
+			NameRoot:       "",
+			Radical:        "",
+			ScienceStrokes: 0,
+			Pinyin:         "",
+			Comment:        "",
+		},
 	}
 	return c.Get()
 }
 
 func FilterBest(name Name) {
-	file, err := os.OpenFile("output.txt", os.O_CREATE|os.O_APPEND|os.O_SYNC, os.ModePerm)
+	file, err := os.OpenFile("output.txt", os.O_CREATE|os.O_SYNC, os.ModePerm)
 	if err != nil {
 		return
 	}
@@ -50,7 +62,6 @@ func FilterBest(name Name) {
 
 	var fg FiveGrid
 	for fmax, smax := 3, 1; fmax < 33; smax++ {
-
 		if len(name.cLast) > 1 {
 			fg = MakeFiveGridFromStrokes(name.cLast[0].ScienceStrokes, name.cLast[1].ScienceStrokes, fmax, smax)
 		} else {
@@ -70,8 +81,8 @@ func FilterBest(name Name) {
 				tt.PrintThreeTalent()
 				var sec []model.Character
 				var trd []model.Character
-				model.CharacterList("", fmax, &sec)
-				model.CharacterList("", smax, &trd)
+				_ = model.CharacterList(model.DB().Where("simple_strokes < ?", 16), fmax, &sec, "火", "木")
+				_ = model.CharacterList(model.DB().Where("simple_strokes < ?", 16), smax, &trd, "火", "木")
 				if sec == nil || trd == nil {
 					continue
 				}

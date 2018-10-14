@@ -93,13 +93,12 @@ func CreateTables() error {
 //
 //}
 
-//func ORM() *DB {
-//	if db == nil || db.DB().Ping() != nil {
-//		db = CreateDB()
-//	}
-//	db.LogMode(true)
-//	return db
-//}
+func DB() *xorm.Engine {
+	if db == nil || db.Ping() != nil {
+		ConnectDB(config.DefaultConfig())
+	}
+	return db
+}
 
 //func SetMigrate(table interface{}) {
 //	migrate = append(migrate, table)

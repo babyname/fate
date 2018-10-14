@@ -1,6 +1,10 @@
 package model
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/go-xorm/xorm"
+)
 
 type Character struct {
 	Base          `xorm:"extends"`
@@ -53,18 +57,21 @@ func (c *Character) Update(v ...interface{}) (int64, error) {
 	return db.Id(c.Id).Update(c)
 }
 
-func CharacterList(t string, i int, v interface{}) error {
-	if t == "" && i == 0 {
+func CharacterList(sess *xorm.Session, i int, v interface{}, t ...string) error {
+	if sess == nil {
+		sess = db.NewSession()
+	}
+	if t != nil && i == 0 {
 		return errors.New("wrong input")
 	}
 
-	if t == "" {
-		return db.Where("science_strokes = ?", i).Find(v)
+	if t == nil {
+		return sess.Where("science_strokes = ?", i).Find(v)
 	}
 	if i == 0 {
-		return db.Where("name_type = ?", t).Find(v)
+		return sess.In("name_type", t).Find(v)
 	}
-	return db.Where("name_type = ?", t).And("science_strokes = ?", i).Find(v)
+	return sess.In("name_type", t).And("science_strokes = ?", i).Find(v)
 }
 
 //
