@@ -3,7 +3,11 @@ package model
 import "errors"
 
 type Character struct {
-	Base           `xorm:"extends"`
+	Base          `xorm:"extends"`
+	CharacterInfo `xorm:"extends"`
+}
+
+type CharacterInfo struct {
 	IsSur          bool   `xorm:"notnull"`                        //姓
 	SimpleChar     string `xorm:"varchar(2) index notnull"`       //字
 	SimpleStrokes  int    `xorm:"notnull default(0)"`             //标准笔画数

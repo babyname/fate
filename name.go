@@ -1,7 +1,8 @@
 package fate
 
 import (
-	"fmt"
+	"log"
+	"os"
 	"strings"
 
 	"github.com/godcong/fate/model"
@@ -33,24 +34,22 @@ func NewName(last string) Name {
 
 func CharacterFromName(s string) *model.Character {
 	c := &model.Character{
-		IsSur:          false,
-		SimpleChar:     s,
-		SimpleStrokes:  0,
-		TradChar:       "",
-		TradStrokes:    0,
-		NameType:       "",
-		NameRoot:       "",
-		Radical:        "",
-		ScienceStrokes: 0,
-		Pinyin:         "",
-		Comment:        "",
+		Base:          model.Base{},
+		CharacterInfo: model.CharacterInfo{},
 	}
 	return c.Get()
 }
 
 func FilterBest(name Name) {
+	file, err := os.OpenFile("output.txt", os.O_CREATE|os.O_APPEND|os.O_SYNC, os.ModePerm)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	log.SetOutput(file)
+
 	var fg FiveGrid
-	for fmax, smax := 1, 1; fmax < 33; smax++ {
+	for fmax, smax := 3, 1; fmax < 33; smax++ {
 
 		if len(name.cLast) > 1 {
 			fg = MakeFiveGridFromStrokes(name.cLast[0].ScienceStrokes, name.cLast[1].ScienceStrokes, fmax, smax)
@@ -71,22 +70,17 @@ func FilterBest(name Name) {
 				tt.PrintThreeTalent()
 				var sec []model.Character
 				var trd []model.Character
-				model.CharacterList("水", fmax, &sec)
+				model.CharacterList("", fmax, &sec)
 				model.CharacterList("", smax, &trd)
 				if sec == nil || trd == nil {
 					continue
 				}
-				fmt.Println("第二字：", fmax)
 				for _, v := range sec {
-					fmt.Print(v.SimpleChar, v.Pinyin)
+					log.Printf("二:%+v\n", v.CharacterInfo)
 				}
-				fmt.Println()
-				fmt.Println("第三字：", smax)
 				for _, v := range trd {
-					fmt.Print(v.SimpleChar, v.Pinyin)
+					log.Printf("三:%+v\n", v.CharacterInfo)
 				}
-				fmt.Println()
-
 			}
 
 		}
