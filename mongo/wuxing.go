@@ -6,7 +6,7 @@ import (
 	"github.com/globalsign/mgo/bson"
 )
 
-//WuXing 五行八字
+//WuXing 五行：five elements of metal,wood,water,fire and earth
 type WuXing struct {
 	ID      bson.ObjectId `bson:"_id,omitempty"`
 	WuXing  []string      `bson:"wu_xing"`
@@ -30,7 +30,7 @@ func GetWuXing() map[string]*WuXing {
 }
 
 func getWuXing() map[string]*WuXing {
-	if wuxing == nil{
+	if wuxing == nil {
 		wuxing = make(map[string]*WuXing)
 		var wx WuXing
 		iter := C("wuxing").Find(nil).Iter()
