@@ -3,7 +3,7 @@ package mongo
 import "github.com/globalsign/mgo"
 
 var session *mgo.Session
-var mgoConfig = defaultConfig()
+var mgoConfig *config
 
 type config struct {
 	IsInit bool

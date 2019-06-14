@@ -27,11 +27,11 @@ func (s *NameStroke) SanCaiWuGe() *nameStroke {
 
 	sanCai := &SanCai{
 		TianCai:        sanCaiAttr(wuGe.TianGe),
-		TianCaiYinYang: sanCaiYinYang(wuGe.TianGe),
+		TianCaiYinYang: yinYangAttr(wuGe.TianGe),
 		RenCai:         sanCaiAttr(wuGe.RenGe),
-		RenCaiYinYang:  sanCaiYinYang(wuGe.RenGe),
+		RenCaiYinYang:  yinYangAttr(wuGe.RenGe),
 		DiCai:          sanCaiAttr(wuGe.DiGe),
-		DiCaiYingYang:  sanCaiYinYang(wuGe.DiGe),
+		DiCaiYingYang:  yinYangAttr(wuGe.DiGe),
 	}
 
 	return &nameStroke{

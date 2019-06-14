@@ -32,7 +32,7 @@ type Generating struct {
 }
 
 func init() {
-	initDial()
+	//initDial()
 }
 
 func initDial() {
@@ -192,7 +192,7 @@ func filterSanCai(s []*Stroke) []*Stroke {
 		return nil
 	}
 	for idx := range s {
-		sc := NewSanCai(s[idx].wuge)
+		sc := NewSanCai(s[idx].wuge.TianGe, s[idx].wuge.RenGe, s[idx].wuge.DiGe)
 		mongo.C("wuxing").Find(bson.M{
 			"wu_xing": []string{sc.TianCai, sc.RenCai, sc.DiCai},
 		}).One(&wx)
