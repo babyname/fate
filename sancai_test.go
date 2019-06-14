@@ -1,4 +1,4 @@
-package fate_test
+package fate
 
 import (
 	"log"
@@ -7,9 +7,15 @@ import (
 	"time"
 
 	"github.com/globalsign/mgo"
-	"github.com/godcong/fate"
 	"github.com/godcong/fate/mongo"
 )
+
+func TestSanCaiAttr(t *testing.T) {
+	for i := 0; i < 100; i++ {
+		s := sanCaiAttr(i)
+		t.Log(s)
+	}
+}
 
 func TestMakeSanCaiWuGe(t *testing.T) {
 	mongo.Dial("localhost", &mgo.Credential{
@@ -48,8 +54,8 @@ func TestMakeSanCaiWuGe(t *testing.T) {
 
 func ProcessOne(b chan<- int, l1, l2, f1, f2 int) {
 	log.Println(l1, l2, f1, f2)
-	wg := fate.NewWuGe(l1, l2, f1, f2)
-	ge := fate.NewSanCai(wg.TianGe, wg.RenGe, wg.DiGe)
+	wg := NewWuGe(l1, l2, f1, f2)
+	ge := NewSanCai(wg.TianGe, wg.RenGe, wg.DiGe)
 	err := mongo.InsertIfNotExist(mongo.C("sc"), ge)
 	log.Println(err)
 	b <- l1 * l2 * f1 * f2
