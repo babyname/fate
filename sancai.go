@@ -19,14 +19,14 @@ type SanCai struct {
 }
 
 //NewSanCai 新建一个三才对象
-func NewSanCai(wuGe *WuGe) *SanCai {
+func NewSanCai(tian, ren, di int) *SanCai {
 	return &SanCai{
-		TianCai:        sanCaiAttr(wuGe.TianGe),
-		TianCaiYinYang: sanCaiYinYang(wuGe.TianGe),
-		RenCai:         sanCaiAttr(wuGe.RenGe),
-		RenCaiYinYang:  sanCaiYinYang(wuGe.RenGe),
-		DiCai:          sanCaiAttr(wuGe.DiGe),
-		DiCaiYingYang:  sanCaiYinYang(wuGe.DiGe),
+		TianCai:        sanCaiAttr(tian),
+		TianCaiYinYang: sanCaiYinYang(tian),
+		RenCai:         sanCaiAttr(ren),
+		RenCaiYinYang:  sanCaiYinYang(ren),
+		DiCai:          sanCaiAttr(di),
+		DiCaiYingYang:  sanCaiYinYang(di),
 	}
 }
 
