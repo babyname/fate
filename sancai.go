@@ -6,6 +6,9 @@ import (
 	"github.com/godcong/fate/mongo"
 )
 
+const sanCai = "水木木火火土土金金水"
+const yinYang = "阴阳"
+
 type SanCai struct {
 	ID             bson.ObjectId `bson:"_id,omitempty"`
 	TianCai        string        `bson:"tian_cai"`
@@ -22,11 +25,11 @@ type SanCai struct {
 func NewSanCai(tian, ren, di int) *SanCai {
 	return &SanCai{
 		TianCai:        sanCaiAttr(tian),
-		TianCaiYinYang: sanCaiYinYang(tian),
+		TianCaiYinYang: yinYangAttr(tian),
 		RenCai:         sanCaiAttr(ren),
-		RenCaiYinYang:  sanCaiYinYang(ren),
+		RenCaiYinYang:  yinYangAttr(ren),
 		DiCai:          sanCaiAttr(di),
-		DiCaiYingYang:  sanCaiYinYang(di),
+		DiCaiYingYang:  yinYangAttr(di),
 	}
 }
 
@@ -43,29 +46,9 @@ func (cai *SanCai) Check() bool {
 // GenerateThreeTalent 计算字符的三才属性
 // 1-2木：1为阳木，2为阴木   3-4火：3为阳火，4为阴火   5-6土：5为阳土，6为阴土   7-8金：7为阳金，8为阴金   9-10水：9为阳水，10为阴水
 func sanCaiAttr(i int) string {
-	var attr string
-	switch i % 10 {
-	case 1, 2:
-		attr = "木"
-	case 3, 4:
-		attr = "火"
-	case 5, 6:
-		attr = "土"
-	case 7, 8:
-		attr = "金"
-	case 9, 0:
-		attr = "水"
-	}
-
-	return attr
+	return string([]rune(sanCai)[i%10])
 }
 
-func sanCaiYinYang(i int) string {
-	var yy string
-	if i%2 == 1 {
-		yy = "阳"
-	} else {
-		yy = "阴"
-	}
-	return yy
+func yinYangAttr(i int) string {
+	return string([]rune(yinYang)[i%2])
 }
