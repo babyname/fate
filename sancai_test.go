@@ -1,13 +1,14 @@
 package fate_test
 
 import (
-	"github.com/globalsign/mgo"
-	"github.com/godcong/fate"
-	"github.com/godcong/fate/mongo"
 	"log"
 	"runtime"
 	"testing"
 	"time"
+
+	"github.com/globalsign/mgo"
+	"github.com/godcong/fate"
+	"github.com/godcong/fate/mongo"
 )
 
 func TestMakeSanCaiWuGe(t *testing.T) {
@@ -47,8 +48,8 @@ func TestMakeSanCaiWuGe(t *testing.T) {
 
 func ProcessOne(b chan<- int, l1, l2, f1, f2 int) {
 	log.Println(l1, l2, f1, f2)
-
-	ge := fate.NewSanCai(fate.NewWuGe(l1, l2, f1, f2))
+	wg := fate.NewWuGe(l1, l2, f1, f2)
+	ge := fate.NewSanCai(wg.TianGe, wg.RenGe, wg.DiGe)
 	err := mongo.InsertIfNotExist(mongo.C("sc"), ge)
 	log.Println(err)
 	b <- l1 * l2 * f1 * f2
