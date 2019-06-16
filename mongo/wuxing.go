@@ -9,7 +9,7 @@ import (
 //WuXing 五行：five elements of metal,wood,water,fire and earth
 type WuXing struct {
 	ID      bson.ObjectId `bson:"_id,omitempty"`
-	WuXing  []string      `bson:"wu_xing"`
+	WuXing  string        `bson:"wu_xing"`
 	Fortune string        `bson:"fortune"`
 	Comment string        `bson:"comment"`
 }
