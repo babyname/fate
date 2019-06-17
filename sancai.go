@@ -3,7 +3,6 @@ package fate
 
 import (
 	"github.com/globalsign/mgo/bson"
-	"github.com/godcong/fate/mongo"
 )
 
 const sanCai = "水木木火火土土金金水"
@@ -34,10 +33,9 @@ func NewSanCai(tian, ren, di int) *SanCai {
 }
 
 //Check 检查三才属性
-func (cai *SanCai) Check() bool {
-	wx := mongo.FindWuXingBy(cai.TianCai, cai.RenCai, cai.DiCai)
-	switch wx.Fortune {
-	case "吉", "中吉", "大吉", "吉多于凶":
+func (cai *SanCai) Check(point int) bool {
+	wx := FindWuXing(cai.TianCai + cai.RenCai + cai.DiCai)
+	if wx.Luck.Point() >= point {
 		return true
 	}
 	return false
