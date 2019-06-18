@@ -1,23 +1,18 @@
 //三才五格
 package fate
 
-import (
-	"github.com/globalsign/mgo/bson"
-)
-
 const sanCai = "水木木火火土土金金水"
 const yinYang = "阴阳"
 
 type SanCai struct {
-	ID             bson.ObjectId `bson:"_id,omitempty"`
-	TianCai        string        `bson:"tian_cai"`
-	TianCaiYinYang string        `bson:"tian_cai_yin_yang"`
-	RenCai         string        `bson:"ren_cai"`
-	RenCaiYinYang  string        `bson:"ren_cai_yin_yang"`
-	DiCai          string        `bson:"di_cai"`
-	DiCaiYingYang  string        `bson:"di_cai_ying_yang"`
-	Fortune        string        `bson:"fortune"` //吉凶
-	Comment        string        `bson:"comment"` //说明
+	TianCai        string `bson:"tian_cai"`
+	TianCaiYinYang string `bson:"tian_cai_yin_yang"`
+	RenCai         string `bson:"ren_cai"`
+	RenCaiYinYang  string `bson:"ren_cai_yin_yang"`
+	DiCai          string `bson:"di_cai"`
+	DiCaiYingYang  string `bson:"di_cai_ying_yang"`
+	Fortune        string `bson:"fortune"` //吉凶
+	Comment        string `bson:"comment"` //说明
 }
 
 //NewSanCai 新建一个三才对象
