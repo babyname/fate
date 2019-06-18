@@ -187,19 +187,17 @@ func filterWuGe(f *fate) []*Stroke {
 
 func filterSanCai(s []*Stroke) []*Stroke {
 	var strokes []*Stroke
-	var wx mongo.WuXing
+
 	if s == nil {
 		return nil
 	}
 	for idx := range s {
 		sc := NewSanCai(s[idx].wuge.TianGe, s[idx].wuge.RenGe, s[idx].wuge.DiGe)
-		mongo.C("wuxing").Find(bson.M{
-			"wu_xing": []string{sc.TianCai, sc.RenCai, sc.DiCai},
-		}).One(&wx)
-		switch wx.Fortune {
-		case "吉", "中吉", "大吉", "吉多于凶":
+		wx := FindWuXing(sc.TianCai + sc.RenCai + sc.DiCai)
+		if wx.Luck.Point() > 4 {
 			strokes = append(strokes, s[idx])
 		}
+
 	}
 	return strokes
 }
