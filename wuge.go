@@ -1,18 +1,16 @@
 package fate
 
 import (
-	"github.com/globalsign/mgo/bson"
 	"github.com/godcong/fate/mongo"
 )
 
 //WuGe
 type WuGe struct {
-	ID     bson.ObjectId `bson:"_id,omitempty"`
-	TianGe int           `bson:"tian_ge"`
-	RenGe  int           `bson:"ren_ge"`
-	DiGe   int           `bson:"di_ge"`
-	WaiGe  int           `bson:"wai_ge"`
-	ZongGe int           `bson:"zong_ge"`
+	TianGe int `bson:"tian_ge"`
+	RenGe  int `bson:"ren_ge"`
+	DiGe   int `bson:"di_ge"`
+	WaiGe  int `bson:"wai_ge"`
+	ZongGe int `bson:"zong_ge"`
 }
 
 //NewWuGe 计算五格
