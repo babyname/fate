@@ -1,9 +1,28 @@
 package fate
 
 //Stroke 推荐笔画数
-type Stroke struct {
+type Strokes struct {
 	SimplifiedChinese  int //简体中文
 	TraditionalChinese int //繁体中文
 	KangxiDictionary   int //康熙字典
 	GodBook            int //神册
+}
+
+//通过
+func FindCharacterStrokes(char string) int {
+	//TODO:find
+	s := &Strokes{}
+	if s.GodBook > 0 {
+		return s.GodBook
+	}
+	if s.KangxiDictionary > 0 {
+		return s.KangxiDictionary
+	}
+	if s.TraditionalChinese > 0 {
+		return s.TraditionalChinese
+	}
+	if s.SimplifiedChinese > 0 {
+		return s.SimplifiedChinese
+	}
+	return 0
 }
