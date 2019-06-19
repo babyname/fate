@@ -8,7 +8,7 @@ type Strokes struct {
 	GodBook            int //神册
 }
 
-//通过
+//FindCharacterStrokes 通过文字查询推荐笔画数
 func FindCharacterStrokes(char string) int {
 	//TODO:find
 	s := &Strokes{}
