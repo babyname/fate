@@ -3,7 +3,6 @@ package fate
 import (
 	"log"
 	"strconv"
-	"strings"
 
 	"github.com/globalsign/mgo/bson"
 	"github.com/godcong/fate/mongo"
@@ -11,27 +10,8 @@ import (
 
 //Name 姓名
 type Name struct {
-	FirstName []string //名
-	firstChar []*mongo.Character
-	LastName  []string //姓
-	lastChar  []*mongo.Character
-}
-
-func newName(last string) *Name {
-	name := Name{}
-	if len(last) == 2 {
-		name.LastName = strings.Split(last, "")
-		for _, v := range name.LastName {
-			name.lastChar = append(name.lastChar, nameCharacter(v))
-		}
-	} else {
-		name.LastName = []string{last}
-		for _, v := range name.LastName {
-			name.lastChar = []*mongo.Character{nameCharacter(v)}
-		}
-	}
-
-	return &name
+	FirstName string //名
+	LastName  string //姓
 }
 
 func nameCharacter(s string) *mongo.Character {
