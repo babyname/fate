@@ -14,6 +14,11 @@ type Name struct {
 	LastName  string //姓
 }
 
+//MakeName input the lastname to make a name
+func MakeName(last string) *Name {
+	return &Name{}
+}
+
 func nameCharacter(s string) *mongo.Character {
 	c := mongo.Character{}
 	err := mongo.C("character").Find(bson.M{
