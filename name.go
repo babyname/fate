@@ -15,8 +15,13 @@ type Name struct {
 	baGua     *yi.Yi   //八卦
 }
 
+func MakeNames(last string) []*Name {
+	//todo:make name generate list
+	return nil
+}
+
 //MakeName input the lastname to make a name
-func MakeName(last string) *Name {
+func FilterName(names []*Name) *Name {
 	//todo:make name generate list
 
 	return &Name{}
