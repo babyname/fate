@@ -6,12 +6,13 @@ import (
 
 	"github.com/globalsign/mgo/bson"
 	"github.com/godcong/fate/mongo"
+	"github.com/godcong/yi"
 )
 
 //Name 姓名
 type Name struct {
-	FirstName string //名
-	LastName  string //姓
+	FirstName []string //名姓
+	BaGua     *yi.Yi   //八卦
 }
 
 //MakeName input the lastname to make a name
