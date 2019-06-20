@@ -17,6 +17,8 @@ type Name struct {
 
 //MakeName input the lastname to make a name
 func MakeName(last string) *Name {
+	//todo:make name generate list
+
 	return &Name{}
 }
 
