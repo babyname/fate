@@ -12,12 +12,17 @@ import (
 //Name 姓名
 type Name struct {
 	FirstName []string //名姓
-	BaGua     *yi.Yi   //八卦
+	baGua     *yi.Yi   //八卦
 }
 
 //MakeName input the lastname to make a name
 func MakeName(last string) *Name {
 	return &Name{}
+}
+
+//BaGua
+func (n *Name) BaGua() *yi.Yi {
+	return n.baGua
 }
 
 func nameCharacter(s string) *mongo.Character {
