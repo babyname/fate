@@ -18,20 +18,20 @@ type nameStroke struct {
 func (s *NameStroke) SanCaiWuGe() *nameStroke {
 	l1, l2, f1, f2 := s.Last1, s.Last2, s.First1, s.First2
 	wuGe := &WuGe{
-		TianGe: tianGe(l1, l2, f1, f2),
-		RenGe:  renGe(l1, l2, f1, f2),
-		DiGe:   diGe(l1, l2, f1, f2),
-		WaiGe:  waiGe(l1, l2, f1, f2),
-		ZongGe: zongGe(l1, l2, f1, f2),
+		tianGe: tianGe(l1, l2, f1, f2),
+		renGe:  renGe(l1, l2, f1, f2),
+		diGe:   diGe(l1, l2, f1, f2),
+		waiGe:  waiGe(l1, l2, f1, f2),
+		zongGe: zongGe(l1, l2, f1, f2),
 	}
 
 	sanCai := &SanCai{
-		TianCai:        sanCaiAttr(wuGe.TianGe),
-		TianCaiYinYang: yinYangAttr(wuGe.TianGe),
-		RenCai:         sanCaiAttr(wuGe.RenGe),
-		RenCaiYinYang:  yinYangAttr(wuGe.RenGe),
-		DiCai:          sanCaiAttr(wuGe.DiGe),
-		DiCaiYingYang:  yinYangAttr(wuGe.DiGe),
+		tianCai:        sanCaiAttr(wuGe.TianGe()),
+		tianCaiYinYang: yinYangAttr(wuGe.TianGe()),
+		renCai:         sanCaiAttr(wuGe.RenGe()),
+		renCaiYinYang:  yinYangAttr(wuGe.RenGe()),
+		diCai:          sanCaiAttr(wuGe.DiGe()),
+		diCaiYingYang:  yinYangAttr(wuGe.DiGe()),
 	}
 
 	return &nameStroke{
