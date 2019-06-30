@@ -6,21 +6,41 @@ import (
 
 //WuGe
 type WuGe struct {
-	TianGe int `bson:"tian_ge"`
-	RenGe  int `bson:"ren_ge"`
-	DiGe   int `bson:"di_ge"`
-	WaiGe  int `bson:"wai_ge"`
-	ZongGe int `bson:"zong_ge"`
+	tianGe int
+	renGe  int
+	diGe   int
+	waiGe  int
+	zongGe int
+}
+
+func (wuGe *WuGe) ZongGe() int {
+	return wuGe.zongGe
+}
+
+func (wuGe *WuGe) WaiGe() int {
+	return wuGe.waiGe
+}
+
+func (wuGe *WuGe) DiGe() int {
+	return wuGe.diGe
+}
+
+func (wuGe *WuGe) RenGe() int {
+	return wuGe.renGe
+}
+
+func (wuGe *WuGe) TianGe() int {
+	return wuGe.tianGe
 }
 
 //NewWuGe 计算五格
 func NewWuGe(l1, l2, f1, f2 int) *WuGe {
 	return &WuGe{
-		TianGe: tianGe(l1, l2, f1, f2),
-		RenGe:  renGe(l1, l2, f1, f2),
-		DiGe:   diGe(l1, l2, f1, f2),
-		WaiGe:  waiGe(l1, l2, f1, f2),
-		ZongGe: zongGe(l1, l2, f1, f2),
+		tianGe: tianGe(l1, l2, f1, f2),
+		renGe:  renGe(l1, l2, f1, f2),
+		diGe:   diGe(l1, l2, f1, f2),
+		waiGe:  waiGe(l1, l2, f1, f2),
+		zongGe: zongGe(l1, l2, f1, f2),
 	}
 }
 
