@@ -3,6 +3,7 @@ package fate
 import (
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/globalsign/mgo/bson"
 	"github.com/godcong/fate/mongo"
@@ -12,12 +13,16 @@ import (
 //Name 姓名
 type Name struct {
 	FirstName []string //名姓
-	baGua     *yi.Yi   //八卦
+	LastName  []string
+	baGua     *yi.Yi //八卦
 }
 
-func MakeNames(last string) []*Name {
-	//todo:make name generate list
-	return nil
+func MakeName(last string) *Name {
+	return &Name{
+		FirstName: nil,
+		LastName:  strings.Split(last, ""),
+		baGua:     nil,
+	}
 }
 
 //MakeName input the lastname to make a name
