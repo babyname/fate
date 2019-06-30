@@ -5,31 +5,31 @@ const sanCai = "水木木火火土土金金水"
 const yinYang = "阴阳"
 
 type SanCai struct {
-	TianCai        string `bson:"tian_cai"`
-	TianCaiYinYang string `bson:"tian_cai_yin_yang"`
-	RenCai         string `bson:"ren_cai"`
-	RenCaiYinYang  string `bson:"ren_cai_yin_yang"`
-	DiCai          string `bson:"di_cai"`
-	DiCaiYingYang  string `bson:"di_cai_ying_yang"`
-	Fortune        string `bson:"fortune"` //吉凶
-	Comment        string `bson:"comment"` //说明
+	tianCai        string `bson:"tian_cai"`
+	tianCaiYinYang string `bson:"tian_cai_yin_yang"`
+	renCai         string `bson:"ren_cai"`
+	renCaiYinYang  string `bson:"ren_cai_yin_yang"`
+	diCai          string `bson:"di_cai"`
+	diCaiYingYang  string `bson:"di_cai_ying_yang"`
+	fortune        string `bson:"fortune"` //吉凶
+	comment        string `bson:"comment"` //说明
 }
 
 //NewSanCai 新建一个三才对象
 func NewSanCai(tian, ren, di int) *SanCai {
 	return &SanCai{
-		TianCai:        sanCaiAttr(tian),
-		TianCaiYinYang: yinYangAttr(tian),
-		RenCai:         sanCaiAttr(ren),
-		RenCaiYinYang:  yinYangAttr(ren),
-		DiCai:          sanCaiAttr(di),
-		DiCaiYingYang:  yinYangAttr(di),
+		tianCai:        sanCaiAttr(tian),
+		tianCaiYinYang: yinYangAttr(tian),
+		renCai:         sanCaiAttr(ren),
+		renCaiYinYang:  yinYangAttr(ren),
+		diCai:          sanCaiAttr(di),
+		diCaiYingYang:  yinYangAttr(di),
 	}
 }
 
 //Check 检查三才属性
 func (cai *SanCai) Check(point int) bool {
-	wx := FindWuXing(cai.TianCai + cai.RenCai + cai.DiCai)
+	wx := FindWuXing(cai.tianCai + cai.renCai + cai.diCai)
 	if wx.Luck.Point() >= point {
 		return true
 	}
