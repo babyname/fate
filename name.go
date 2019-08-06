@@ -14,7 +14,7 @@ import (
 type Name struct {
 	FirstName []string //名姓
 	LastName  []string
-	baGua     *yi.Yi //八卦
+	baGua     *yi.Yi //周易八卦
 }
 
 func MakeName(last string) *Name {
