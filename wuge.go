@@ -1,6 +1,7 @@
 package fate
 
 import (
+	"github.com/godcong/fate/data"
 	"github.com/godcong/fate/mongo"
 )
 
@@ -110,8 +111,8 @@ func zongGe(l1, l2, f1, f2 int) int {
 	return l1 + l2 + f1 + f2
 }
 
-func check(dy []*mongo.DaYan, idx int) bool {
-	switch dy[idx-1].Fortune {
+func checkDaYan(idx int) bool {
+	switch data.DaYanList[idx-1].Lucky {
 	case "吉", "半吉":
 		return true
 	}
@@ -126,7 +127,7 @@ func (ge *WuGe) Check() bool {
 	}
 
 	for _, v := range []int{ge.diGe, ge.renGe, ge.waiGe, ge.zongGe} {
-		if len(dy) < v || !check(dy, v) {
+		if !checkDaYan(v) {
 			return false
 		}
 	}
