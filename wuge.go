@@ -125,7 +125,7 @@ func (ge *WuGe) Check() bool {
 		return false
 	}
 
-	for _, v := range []int{ge.DiGe, ge.RenGe, ge.WaiGe, ge.ZongGe} {
+	for _, v := range []int{ge.diGe, ge.renGe, ge.waiGe, ge.zongGe} {
 		if len(dy) < v || !check(dy, v) {
 			return false
 		}
