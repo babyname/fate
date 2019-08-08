@@ -118,6 +118,13 @@ func checkDaYan(idx int) bool {
 	return false
 }
 
+func getDaYanLucky(idx int) string {
+	if idx > 1 && idx < 81 {
+		return data.DaYanList[idx-1].Lucky
+	}
+	return ""
+}
+
 //Check 格检查
 func (ge *WuGe) Check() bool {
 	//ignore:tianGe
@@ -129,6 +136,7 @@ func (ge *WuGe) Check() bool {
 	return true
 }
 
+//WuGeLucky ...
 type WuGeLucky struct {
 	TianGe    int    `xorm:"tian_ge"`
 	TianDaYan string `xorm:"tian_da_yan"`
@@ -141,4 +149,34 @@ type WuGeLucky struct {
 	ZongGe    int    `xorm:"zong_ge"`
 	ZongDaYan string `xorm:"zong_da_yan"`
 	ZongLucky bool   `xorm:"zong_lucky"`
+}
+
+const WuGeMax = 31
+
+func InitWuGe() <-chan *WuGeLucky {
+	var wuge *WuGe
+	lucky := make(chan *WuGeLucky)
+	l1, l2, f1, f2 := 1, 1, 1, 1
+	for ; l1 < WuGeMax; l1++ {
+		for ; l2 < WuGeMax; l2++ {
+			for ; f1 < WuGeMax; f1++ {
+				for ; f2 < WuGeMax; f2++ {
+					wuge = NewWuGe(l1, l2, f1, f2)
+					lucky <- &WuGeLucky{
+						TianGe:    wuge.tianGe,
+						TianDaYan: getDaYanLucky(wuge.tianGe),
+						RenGe:     wuge.renGe,
+						RenDaYan:  getDaYanLucky(wuge.renGe),
+						DiGe:      wuge.diGe,
+						DiDaYan:   getDaYanLucky(wuge.diGe),
+						WaiGe:     wuge.waiGe,
+						WaiDaYan:  getDaYanLucky(wuge.waiGe),
+						ZongGe:    wuge.zongGe,
+						ZongDaYan: getDaYanLucky(wuge.zongGe),
+						ZongLucky: wuge.Check(),
+					}
+				}
+			}
+		}
+	}
 }
