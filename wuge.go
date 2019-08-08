@@ -2,7 +2,6 @@ package fate
 
 import (
 	"github.com/godcong/fate/data"
-	"github.com/godcong/fate/mongo"
 )
 
 //WuGe
@@ -121,15 +120,25 @@ func checkDaYan(idx int) bool {
 
 //Check 格检查
 func (ge *WuGe) Check() bool {
-	dy := mongo.GetDaYan()
-	if dy == nil {
-		return false
-	}
-
+	//ignore:tianGe
 	for _, v := range []int{ge.diGe, ge.renGe, ge.waiGe, ge.zongGe} {
 		if !checkDaYan(v) {
 			return false
 		}
 	}
 	return true
+}
+
+type WuGeLucky struct {
+	TianGe    int    `xorm:"tian_ge"`
+	TianDaYan string `xorm:"tian_da_yan"`
+	RenGe     int    `xorm:"ren_ge"`
+	RenDaYan  string `xorm:"ren_da_yan"`
+	DiGe      int    `xorm:"di_ge"`
+	DiDaYan   string `xorm:"di_da_yan"`
+	WaiGe     int    `xorm:"wai_ge"`
+	WaiDaYan  string `xorm:"wai_da_yan"`
+	ZongGe    int    `xorm:"zong_ge"`
+	ZongDaYan string `xorm:"zong_da_yan"`
+	ZongLucky bool   `xorm:"zong_lucky"`
 }
