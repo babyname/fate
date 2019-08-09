@@ -157,26 +157,31 @@ func InitWuGe() <-chan *WuGeLucky {
 	var wuge *WuGe
 	lucky := make(chan *WuGeLucky)
 	l1, l2, f1, f2 := 1, 1, 1, 1
-	for ; l1 < WuGeMax; l1++ {
-		for ; l2 < WuGeMax; l2++ {
-			for ; f1 < WuGeMax; f1++ {
-				for ; f2 < WuGeMax; f2++ {
-					wuge = NewWuGe(l1, l2, f1, f2)
-					lucky <- &WuGeLucky{
-						TianGe:    wuge.tianGe,
-						TianDaYan: getDaYanLucky(wuge.tianGe),
-						RenGe:     wuge.renGe,
-						RenDaYan:  getDaYanLucky(wuge.renGe),
-						DiGe:      wuge.diGe,
-						DiDaYan:   getDaYanLucky(wuge.diGe),
-						WaiGe:     wuge.waiGe,
-						WaiDaYan:  getDaYanLucky(wuge.waiGe),
-						ZongGe:    wuge.zongGe,
-						ZongDaYan: getDaYanLucky(wuge.zongGe),
-						ZongLucky: wuge.Check(),
+	go func() {
+		for ; l1 < WuGeMax; l1++ {
+			for ; l2 < WuGeMax; l2++ {
+				for ; f1 < WuGeMax; f1++ {
+					for ; f2 < WuGeMax; f2++ {
+						wuge = NewWuGe(l1, l2, f1, f2)
+						lucky <- &WuGeLucky{
+							TianGe:    wuge.tianGe,
+							TianDaYan: getDaYanLucky(wuge.tianGe),
+							RenGe:     wuge.renGe,
+							RenDaYan:  getDaYanLucky(wuge.renGe),
+							DiGe:      wuge.diGe,
+							DiDaYan:   getDaYanLucky(wuge.diGe),
+							WaiGe:     wuge.waiGe,
+							WaiDaYan:  getDaYanLucky(wuge.waiGe),
+							ZongGe:    wuge.zongGe,
+							ZongDaYan: getDaYanLucky(wuge.zongGe),
+							ZongLucky: wuge.Check(),
+						}
 					}
 				}
 			}
 		}
-	}
+		lucky <- nil
+	}()
+
+	return lucky
 }
