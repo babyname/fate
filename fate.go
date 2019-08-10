@@ -54,6 +54,23 @@ func (f *fate) MakeName() {
 
 }
 
+func (f *fate) FirstRunInit() {
+	ge := initWuGe()
+init:
+	for {
+		select {
+		case lu := <-ge:
+			if lu == nil {
+				break init
+			}
+			_, e := InsertOrUpdate(f.db.NewSession(), lu)
+			if e != nil {
+				panic(e)
+			}
+		}
+	}
+}
+
 func (f *fate) preInit() {
 	var e error
 	if f.db == nil {
