@@ -152,8 +152,17 @@ type WuGeLucky struct {
 	ZongLucky bool   `xorm:"zong_lucky"`
 }
 
-func InsertOrUpdate(session *xorm.Session, lucky *WuGeLucky) (e error) {
-
+func InsertOrUpdate(session *xorm.Session, lucky *WuGeLucky) (n int64, e error) {
+	s := session.Clone()
+	n, e = s.Table(&WuGeLucky{}).Where("tian_ge", lucky.TianGe).Where("ren_ge", lucky.RenGe).Where("di_ge", lucky.DiGe).Count()
+	if e != nil {
+		return n, e
+	}
+	if n == 0 {
+		n, e = session.InsertOne(lucky)
+		return
+	}
+	return session.Where("tian_ge", lucky.TianGe).Where("ren_ge", lucky.RenGe).Where("di_ge", lucky.DiGe).Update(lucky)
 }
 
 const WuGeMax = 31
@@ -189,14 +198,4 @@ func initWuGe() <-chan *WuGeLucky {
 	}()
 
 	return lucky
-}
-
-func RunWuGeInit() {
-	l := initWuGe()
-	for {
-		select {
-		case lu := <-l:
-
-		}
-	}
 }
