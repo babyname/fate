@@ -3,17 +3,21 @@ package fate
 import (
 	"fmt"
 	"github.com/go-xorm/xorm"
-	"log"
-	"math/rand"
-	"strings"
-	"time"
 
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/mongo"
+	"github.com/godcong/go-trait"
 	"github.com/godcong/yi"
+	"math/rand"
+	"strings"
+	"time"
 )
 
+var log = trait.NewZapSugar()
+
 type Fate interface {
+	FirstRunInit()
+	SetDB(engine *xorm.Engine)
 }
 
 type fate struct {
@@ -67,6 +71,7 @@ init:
 			if lu == nil {
 				break init
 			}
+			log.With("wuge", lu).Info("insert")
 			_, e = InsertOrUpdate(f.db.NewSession(), lu)
 			if e != nil {
 				panic(e)
@@ -101,7 +106,7 @@ func (g *Generating) Character() []*mongo.Character {
 
 func filterGuaXiang(characters []*mongo.Character) []*mongo.Character {
 	gua := yi.NumberQiGua(0, 0, 0)
-	log.Println(gua)
+	log.Info(gua)
 	return nil
 }
 
