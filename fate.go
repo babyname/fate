@@ -75,7 +75,7 @@ init:
 				break init
 			}
 			log.With("wuge", lu).Info("insert")
-			_, e = InsertOrUpdate(f.db.NewSession(), lu)
+			_, e = InsertOrUpdate(f.db, lu)
 			if e != nil {
 				panic(e)
 			}
@@ -131,7 +131,7 @@ func sqlite3DB(name string) string {
 
 // InitSQLite3 ...
 func InitSQLite3(name string) (engine *xorm.Engine, e error) {
-	engine, e = xorm.NewEngine("sqlite3", sqlite3DB(name))
+	engine, e = xorm.NewEngine("sqlite3", name)
 	if e != nil {
 		return nil, e
 	}
