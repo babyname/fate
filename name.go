@@ -1,7 +1,6 @@
 package fate
 
 import (
-	"log"
 	"strconv"
 	"strings"
 
@@ -42,9 +41,8 @@ func nameCharacter(s string) *mongo.Character {
 	err := mongo.C("character").Find(bson.M{
 		"character": s,
 	}).One(&c)
-	log.Printf("%+v", c)
+	log.Infof("%+v", c)
 	if err != nil {
-		log.Println(err)
 		return nil
 	}
 	return &c
