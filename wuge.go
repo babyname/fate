@@ -1,6 +1,7 @@
 package fate
 
 import (
+	"github.com/go-xorm/xorm"
 	"github.com/godcong/fate/data"
 )
 
@@ -151,9 +152,13 @@ type WuGeLucky struct {
 	ZongLucky bool   `xorm:"zong_lucky"`
 }
 
+func InsertOrUpdate(session *xorm.Session, lucky *WuGeLucky) (e error) {
+
+}
+
 const WuGeMax = 31
 
-func InitWuGe() <-chan *WuGeLucky {
+func initWuGe() <-chan *WuGeLucky {
 	var wuge *WuGe
 	lucky := make(chan *WuGeLucky)
 	l1, l2, f1, f2 := 1, 1, 1, 1
@@ -184,4 +189,14 @@ func InitWuGe() <-chan *WuGeLucky {
 	}()
 
 	return lucky
+}
+
+func RunWuGeInit() {
+	l := initWuGe()
+	for {
+		select {
+		case lu := <-l:
+
+		}
+	}
 }
