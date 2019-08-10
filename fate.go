@@ -55,6 +55,10 @@ func (f *fate) MakeName() {
 }
 
 func (f *fate) FirstRunInit() {
+	e := f.db.Sync2(WuGeLucky{})
+	if e != nil {
+		return
+	}
 	ge := initWuGe()
 init:
 	for {
@@ -63,7 +67,7 @@ init:
 			if lu == nil {
 				break init
 			}
-			_, e := InsertOrUpdate(f.db.NewSession(), lu)
+			_, e = InsertOrUpdate(f.db.NewSession(), lu)
 			if e != nil {
 				panic(e)
 			}
