@@ -43,11 +43,14 @@ type Generating struct {
 
 //NewFate 所有的入口,新建一个fate对象
 func NewFate(lastName string, born time.Time) Fate {
-	return &fate{
+	f := &fate{
 		last:     strings.Split(lastName, ""),
 		born:     chronos.New(born),
 		nameType: mongo.KangXi,
 	}
+	f.preInit()
+
+	return f
 }
 
 func (f *fate) SetDB(engine *xorm.Engine) {
