@@ -3,11 +3,11 @@ package fate
 import (
 	"fmt"
 	"github.com/go-xorm/xorm"
-
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/mongo"
 	"github.com/godcong/go-trait"
 	"github.com/godcong/yi"
+	_ "github.com/mattn/go-sqlite3"
 	"math/rand"
 	"strings"
 	"time"
