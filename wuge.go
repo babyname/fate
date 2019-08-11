@@ -144,17 +144,21 @@ func (ge *WuGe) Check() bool {
 
 //WuGeLucky ...
 type WuGeLucky struct {
-	TianGe    int    `xorm:"tian_ge"`
-	TianDaYan string `xorm:"tian_da_yan"`
-	RenGe     int    `xorm:"ren_ge"`
-	RenDaYan  string `xorm:"ren_da_yan"`
-	DiGe      int    `xorm:"di_ge"`
-	DiDaYan   string `xorm:"di_da_yan"`
-	WaiGe     int    `xorm:"wai_ge"`
-	WaiDaYan  string `xorm:"wai_da_yan"`
-	ZongGe    int    `xorm:"zong_ge"`
-	ZongDaYan string `xorm:"zong_da_yan"`
-	ZongLucky bool   `xorm:"zong_lucky"`
+	LastStroke1  int    `xorm:"last_stroke_1"`
+	LastStroke2  int    `xorm:"last_stroke_2"`
+	FirstStroke1 int    `json:"first_stroke_1"`
+	FirstStroke2 int    `json:"first_stroke_2"`
+	TianGe       int    `xorm:"tian_ge"`
+	TianDaYan    string `xorm:"tian_da_yan"`
+	RenGe        int    `xorm:"ren_ge"`
+	RenDaYan     string `xorm:"ren_da_yan"`
+	DiGe         int    `xorm:"di_ge"`
+	DiDaYan      string `xorm:"di_da_yan"`
+	WaiGe        int    `xorm:"wai_ge"`
+	WaiDaYan     string `xorm:"wai_da_yan"`
+	ZongGe       int    `xorm:"zong_ge"`
+	ZongDaYan    string `xorm:"zong_da_yan"`
+	ZongLucky    bool   `xorm:"zong_lucky"`
 }
 
 func InsertOrUpdate(session *xorm.Session, lucky *WuGeLucky) (n int64, e error) {
@@ -183,17 +187,21 @@ func initWuGe() <-chan *WuGeLucky {
 					for ; f2 < WuGeMax; f2++ {
 						wuge = NewWuGe(l1, l2, f1, f2)
 						lucky <- &WuGeLucky{
-							TianGe:    wuge.tianGe,
-							TianDaYan: getDaYanLucky(wuge.tianGe),
-							RenGe:     wuge.renGe,
-							RenDaYan:  getDaYanLucky(wuge.renGe),
-							DiGe:      wuge.diGe,
-							DiDaYan:   getDaYanLucky(wuge.diGe),
-							WaiGe:     wuge.waiGe,
-							WaiDaYan:  getDaYanLucky(wuge.waiGe),
-							ZongGe:    wuge.zongGe,
-							ZongDaYan: getDaYanLucky(wuge.zongGe),
-							ZongLucky: wuge.Check(),
+							LastStroke1:  l1,
+							LastStroke2:  l2,
+							FirstStroke1: f1,
+							FirstStroke2: f2,
+							TianGe:       wuge.tianGe,
+							TianDaYan:    getDaYanLucky(wuge.tianGe),
+							RenGe:        wuge.renGe,
+							RenDaYan:     getDaYanLucky(wuge.renGe),
+							DiGe:         wuge.diGe,
+							DiDaYan:      getDaYanLucky(wuge.diGe),
+							WaiGe:        wuge.waiGe,
+							WaiDaYan:     getDaYanLucky(wuge.waiGe),
+							ZongGe:       wuge.zongGe,
+							ZongDaYan:    getDaYanLucky(wuge.zongGe),
+							ZongLucky:    wuge.Check(),
 						}
 					}
 					f2 = 1
@@ -209,5 +217,9 @@ func initWuGe() <-chan *WuGeLucky {
 }
 
 func filterWuGe(engine *xorm.Engine, last ...string) []*WuGeLucky {
+	size := len(last)
+	if size == 1 {
+		engine.Where("")
+	}
 	return nil
 }
