@@ -207,3 +207,7 @@ func initWuGe() <-chan *WuGeLucky {
 
 	return lucky
 }
+
+func filterWuGe(engine *xorm.Engine, last ...string) []*WuGeLucky {
+	return nil
+}
