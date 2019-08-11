@@ -57,8 +57,12 @@ func (f *fate) SetDB(engine *xorm.Engine) {
 	f.db = engine
 }
 
-func (f *fate) MakeName() {
+func (f *fate) RandomName() {
+	f.filterWuGe(f.last...)
+}
 
+func (f *fate) filterWuGe(last ...string) []*WuGeLucky {
+	return nil
 }
 
 func (f *fate) FirstRunInit() {
