@@ -216,10 +216,15 @@ func initWuGe() <-chan *WuGeLucky {
 	return lucky
 }
 
-func filterWuGe(engine *xorm.Engine, last ...string) []*WuGeLucky {
+func filterWuGe(engine *xorm.Engine, last ...int) []*WuGeLucky {
+	s := engine.NewSession()
 	size := len(last)
 	if size == 1 {
-		engine.Where("")
+		s = s.Where("last_stroke_1", last[0])
+	} else if size == 2 {
+		s = s.Where("last_stroke_1", last[0]).Where("last_stroke_2", last[1])
+	} else {
+		//nothing
 	}
 	return nil
 }
