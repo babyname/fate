@@ -74,7 +74,6 @@ init:
 			if lu == nil {
 				break init
 			}
-			log.With("wuge", lu).Info("insert")
 			_, e = InsertOrUpdate(f.db.NewSession(), lu)
 			if e != nil {
 				panic(e)
