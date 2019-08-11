@@ -108,7 +108,12 @@ func waiGe(l1, l2, _, f2 int) (n int) {
 //zongGe input the ScienceStrokes with name
 //总格，姓加名的笔画总数  数理五行分类
 func zongGe(l1, l2, f1, f2 int) int {
-	return l1 + l2 + f1 + f2
+	//归1
+	zg := (l1 + l2 + f1 + f2) - 1
+	if zg < 0 {
+		zg = zg + 81
+	}
+	return zg%81 + 1
 }
 
 func checkDaYan(idx int) bool {
