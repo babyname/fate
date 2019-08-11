@@ -57,6 +57,11 @@ func (f *fate) SetDB(engine *xorm.Engine) {
 	f.db = engine
 }
 
+//TODO:character undefined
+func getCharacter() {
+
+}
+
 func (f *fate) RandomName() {
 	filterWuGe(f.db, f.last...)
 }
