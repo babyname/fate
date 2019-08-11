@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestDayan(t *testing.T) {
+func TestCompress(t *testing.T) {
 	bytes, e := json.Marshal(DaYanList)
 	if e != nil {
 		panic(e)
