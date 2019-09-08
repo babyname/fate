@@ -90,7 +90,7 @@ init:
 func (f *fate) preInit() {
 	var e error
 	if f.db == nil {
-		f.db, e = InitSQLite3("fate.db")
+		f.db, e = NewSQLite3("fate.db")
 		if e != nil {
 			panic(e)
 		}
@@ -126,18 +126,4 @@ func filterBaZi(character []*mongo.Character, wuxing []string) []*mongo.Characte
 	//TODO:
 	//计算平衡用神
 	return nil
-}
-
-// sqlite3DB ...
-func sqlite3DB(name string) string {
-	return fmt.Sprintf("file:%s?cache=shared&mode=rwc&_journal_mode=WAL", name)
-}
-
-// InitSQLite3 ...
-func InitSQLite3(name string) (engine *xorm.Engine, e error) {
-	engine, e = xorm.NewEngine("sqlite3", name)
-	if e != nil {
-		return nil, e
-	}
-	return engine, nil
 }
