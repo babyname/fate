@@ -21,6 +21,11 @@ type luckyFilter struct {
 	start int
 }
 
-func AllLucy(session *xorm.Session) {
-	session.Where("")
+func AllLucy(session *xorm.Session, l1, l2 int) ([]*WuGeLucky, error) {
+	llist := new([]*WuGeLucky)
+	e := session.Where("last_stroke_1 = ?", l1).And("last_stroke_2 = ?", l2).Find(llist)
+	if e != nil {
+		return nil, e
+	}
+	return *llist, nil
 }
