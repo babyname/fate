@@ -14,3 +14,7 @@ func NewSQLite3(name string) (eng *xorm.Engine, e error) {
 	}
 	return eng, nil
 }
+
+func AllLucy(session *xorm.Session, limit int, start ...int) {
+	session.Where("")
+}
