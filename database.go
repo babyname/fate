@@ -15,6 +15,12 @@ func NewSQLite3(name string) (eng *xorm.Engine, e error) {
 	return eng, nil
 }
 
-func AllLucy(session *xorm.Session, limit int, start ...int) {
+type luckyFilter struct {
+	fate  *fate
+	limit int
+	start int
+}
+
+func AllLucy(session *xorm.Session) {
 	session.Where("")
 }
