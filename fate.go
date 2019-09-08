@@ -1,7 +1,6 @@
 package fate
 
 import (
-	"fmt"
 	"github.com/go-xorm/xorm"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/mongo"
@@ -63,7 +62,7 @@ func getCharacter() {
 }
 
 func (f *fate) RandomName() {
-	filterWuGe(f.db, f.last...)
+	//filterWuGe(f.db, f.last...)
 }
 
 func (f *fate) FirstRunInit() {
@@ -72,12 +71,12 @@ func (f *fate) FirstRunInit() {
 		return
 	}
 	ge := initWuGe()
-init:
+INIT:
 	for {
 		select {
 		case lu := <-ge:
 			if lu == nil {
-				break init
+				break INIT
 			}
 			_, e = InsertOrUpdate(f.db.NewSession(), lu)
 			if e != nil {
