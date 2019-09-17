@@ -40,16 +40,29 @@ type Generating struct {
 	character []*mongo.Character
 }
 
+type Options func(f *fate)
+
 //NewFate 所有的入口,新建一个fate对象
-func NewFate(lastName string, born time.Time) Fate {
+func NewFate(lastName string, born time.Time, options ...Options) Fate {
 	f := &fate{
 		last:     strings.Split(lastName, ""),
 		born:     chronos.New(born),
 		nameType: mongo.KangXi,
 	}
-	f.preInit()
+
+	for _, op := range options {
+		op(f)
+	}
+
+	f.init()
 
 	return f
+}
+
+func Database(engine *xorm.Engine) Options {
+	return func(f *fate) {
+		f.db = engine
+	}
 }
 
 func (f *fate) SetDB(engine *xorm.Engine) {
@@ -86,7 +99,7 @@ INIT:
 	}
 }
 
-func (f *fate) preInit() {
+func (f *fate) init() {
 	var e error
 	if f.db == nil {
 		f.db, e = NewSQLite3("fate.db")
