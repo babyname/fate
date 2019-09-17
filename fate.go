@@ -22,6 +22,7 @@ type Fate interface {
 }
 
 type fate struct {
+	chardb   *xorm.Engine
 	db       *xorm.Engine
 	born     chronos.Calendar
 	last     []string
@@ -64,6 +65,12 @@ func NewFate(lastName string, born time.Time, options ...Options) Fate {
 func Database(engine *xorm.Engine) Options {
 	return func(f *fate) {
 		f.db = engine
+	}
+}
+
+func CharacterDatabase(engine *xorm.Engine) Options {
+	return func(f *fate) {
+		f.chardb = engine
 	}
 }
 
