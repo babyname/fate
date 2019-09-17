@@ -15,17 +15,10 @@ func NewSQLite3(name string) (eng *xorm.Engine, e error) {
 	return eng, nil
 }
 
-type luckyFilter struct {
-	fate  *fate
-	limit int
-	start int
-}
-
-func AllLucy(session *xorm.Session, l1, l2 int) ([]*WuGeLucky, error) {
-	llist := new([]*WuGeLucky)
-	e := session.Where("last_stroke_1 = ?", l1).And("last_stroke_2 = ?", l2).Find(llist)
+func LoadCharacter(path string) (eng *xorm.Engine, e error) {
+	eng, e = xorm.NewEngine("sqlite3", fmt.Sprintf(SQLite3Source, path))
 	if e != nil {
 		return nil, e
 	}
-	return *llist, nil
+	return eng, nil
 }
