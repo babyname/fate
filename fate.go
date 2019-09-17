@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+const DefaultDatabase = "fate.db"
+
 var log = trait.NewZapSugar()
 
 type Fate interface {
@@ -102,7 +104,7 @@ INIT:
 func (f *fate) init() {
 	var e error
 	if f.db == nil {
-		f.db, e = NewSQLite3("fate.db")
+		f.db, e = NewSQLite3(DefaultDatabase)
 		if e != nil {
 			panic(e)
 		}
