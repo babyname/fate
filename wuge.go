@@ -179,7 +179,7 @@ const WuGeMax = 31
 func initWuGe() <-chan *WuGeLucky {
 	var wuge *WuGe
 	lucky := make(chan *WuGeLucky)
-	l1, l2, f1, f2 := 1, 1, 1, 1
+	l1, l2, f1, f2 := 1, 0, 1, 1
 	go func() {
 		for ; l1 < WuGeMax; l1++ {
 			for ; l2 < WuGeMax; l2++ {
@@ -208,7 +208,7 @@ func initWuGe() <-chan *WuGeLucky {
 				}
 				f1 = 1
 			}
-			l2 = 1
+			l2 = 0
 		}
 		lucky <- nil
 	}()
