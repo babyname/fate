@@ -1,5 +1,10 @@
 package fate
 
+import (
+	"fmt"
+	"github.com/go-xorm/xorm"
+)
+
 //Character 字符
 type Character struct {
 	PinYin                   []string `xorm:"default() notnull pin_yin"`                     //拼音
@@ -22,4 +27,14 @@ type Character struct {
 	TraditionalCharacter     []string `xorm:"default() notnull traditional_character"`       //繁体字
 	VariantCharacter         []string `xorm:"default() notnull variant_character"`           //异体字
 	Comment                  []string `xorm:"default() notnull comment"`                     //解释
+}
+
+func getCharacter(f *fate, fn func(engine *xorm.Engine) *xorm.Session) (*Character, error) {
+	s := fn(f.chardb)
+	c := new(Character)
+	b, e := s.Get(c)
+	if b {
+		return c, nil
+	}
+	return nil, fmt.Errorf("character get error: %v", e)
 }
