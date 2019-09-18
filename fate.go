@@ -26,11 +26,11 @@ type fate struct {
 	db       *xorm.Engine
 	born     chronos.Calendar
 	last     []string
+	lastChar []*Character
 	names    []*Name
 	nameType int
-
 	sex      string
-	firstOne []*mongo.Character
+	Limit    int
 }
 
 type Generating struct {
@@ -52,7 +52,7 @@ func NewFate(lastName string, born time.Time, options ...Options) Fate {
 		born:     chronos.New(born),
 		nameType: mongo.KangXi,
 	}
-
+	f.lastChar = make([]*Character, len(f.last))
 	for _, op := range options {
 		op(f)
 	}
@@ -80,6 +80,16 @@ func (f *fate) SetDB(engine *xorm.Engine) {
 
 func (f *fate) RandomName() {
 	//filterWuGe(f.db, f.last...)
+}
+
+func (f *fate) getLastCharacter() error {
+	for i, c := range f.last {
+		character, e := getCharacter(f, Char(c))
+		if e != nil {
+			return e
+		}
+		f.lastChar[i] = character
+	}
 }
 
 func (f *fate) FirstRunInit() {
