@@ -33,7 +33,7 @@ func getCharacter(f *fate, fn func(engine *xorm.Engine) *xorm.Session) (*Charact
 	s := fn(f.chardb)
 	c := new(Character)
 	b, e := s.Get(c)
-	if b {
+	if e == nil && b {
 		return c, nil
 	}
 	return nil, fmt.Errorf("character get error: %v", e)
@@ -41,6 +41,8 @@ func getCharacter(f *fate, fn func(engine *xorm.Engine) *xorm.Session) (*Charact
 
 func Char(name string) func(engine *xorm.Engine) *xorm.Session {
 	return func(engine *xorm.Engine) *xorm.Session {
-		return engine.Where("character = ?", name)
+		return engine.Where("character = ?", name).
+			Or("kang_xi = ?", name).
+			Or("traditional_character = ?", name)
 	}
 }
