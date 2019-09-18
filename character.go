@@ -38,3 +38,9 @@ func getCharacter(f *fate, fn func(engine *xorm.Engine) *xorm.Session) (*Charact
 	}
 	return nil, fmt.Errorf("character get error: %v", e)
 }
+
+func Char(name string) func(engine *xorm.Engine) *xorm.Session {
+	return func(engine *xorm.Engine) *xorm.Session {
+		return engine.Where("character = ?", name)
+	}
+}
