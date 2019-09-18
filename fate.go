@@ -19,6 +19,8 @@ var log = trait.NewZapSugar()
 type Fate interface {
 	FirstRunInit()
 	SetDB(engine *xorm.Engine)
+	SetCharDB(engine *xorm.Engine)
+	GetLastCharacter() error
 }
 
 type fate struct {
@@ -74,6 +76,10 @@ func CharacterDatabase(engine *xorm.Engine) Options {
 	}
 }
 
+func (f *fate) SetCharDB(engine *xorm.Engine) {
+	f.chardb = engine
+}
+
 func (f *fate) SetDB(engine *xorm.Engine) {
 	f.db = engine
 }
@@ -82,14 +88,16 @@ func (f *fate) RandomName() {
 	//filterWuGe(f.db, f.last...)
 }
 
-func (f *fate) getLastCharacter() error {
+func (f *fate) GetLastCharacter() error {
 	for i, c := range f.last {
 		character, e := getCharacter(f, Char(c))
 		if e != nil {
 			return e
 		}
+		log.With("index", i, "char", c).Info("last")
 		f.lastChar[i] = character
 	}
+	return nil
 }
 
 func (f *fate) FirstRunInit() {
