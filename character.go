@@ -7,10 +7,12 @@ import (
 
 //Character 字符
 type Character struct {
+	Hash                     string   `xorm:"pk hash"`
 	PinYin                   []string `xorm:"default() notnull pin_yin"`                     //拼音
-	Character                string   `xorm:"default() notnull character"`                   //字符
+	Ch                       string   `xorm:"default() notnull ch"`                          //字符
 	Radical                  string   `xorm:"default() notnull radical"`                     //部首
 	RadicalStroke            int      `xorm:"default(0) notnull radical_stroke"`             //部首笔画
+	Stroke                   int      `xorm:"default() notnull stroke"`                      //总笔画数
 	IsKangXi                 bool     `xorm:"default(0) notnull is_kang_xi"`                 //是否康熙字典
 	KangXi                   string   `xorm:"default() notnull kang_xi"`                     //康熙
 	KangXiStroke             int      `xorm:"default(0) notnull kang_xi_stroke"`             //康熙笔画
