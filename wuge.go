@@ -161,7 +161,7 @@ type WuGeLucky struct {
 	ZongLucky    bool   `xorm:"zong_lucky"`
 }
 
-func InsertOrUpdate(session *xorm.Session, lucky *WuGeLucky) (n int64, e error) {
+func InsertOrUpdateWuGeLucky(session *xorm.Session, lucky *WuGeLucky) (n int64, e error) {
 	n, e = session.Where("tian_ge = ?", lucky.TianGe).Where("ren_ge = ?", lucky.RenGe).Where("di_ge = ?", lucky.DiGe).Count(&WuGeLucky{})
 	if e != nil {
 		return n, e
