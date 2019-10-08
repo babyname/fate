@@ -113,7 +113,7 @@ INIT:
 			if lu == nil {
 				break INIT
 			}
-			_, e = InsertOrUpdate(f.db.NewSession(), lu)
+			_, e = InsertOrUpdateWuGeLucky(f.db.Where(""), lu)
 			if e != nil {
 				panic(e)
 			}
