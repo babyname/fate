@@ -161,59 +161,56 @@ type WuGeLucky struct {
 	ZongLucky    bool   `xorm:"zong_lucky"`
 }
 
-func InsertOrUpdateWuGeLucky(session *xorm.Session, lucky *WuGeLucky) (n int64, e error) {
-	n, e = session.Where("tian_ge = ?", lucky.TianGe).Where("ren_ge = ?", lucky.RenGe).Where("di_ge = ?", lucky.DiGe).Count(&WuGeLucky{})
+func InsertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e error) {
+	n, e = engine.Where("tian_ge = ?", lucky.TianGe).Where("ren_ge = ?", lucky.RenGe).Where("di_ge = ?", lucky.DiGe).Count(&WuGeLucky{})
 	if e != nil {
 		return n, e
 	}
 	log.With("lucky", lucky).Info("count:", n)
 	if n == 0 {
-		n, e = session.InsertOne(lucky)
+		n, e = engine.InsertOne(lucky)
 		return
 	}
-	return session.Where("tian_ge = ?", lucky.TianGe).Where("ren_ge = ?", lucky.RenGe).Where("di_ge = ?", lucky.DiGe).Update(lucky)
+	return engine.Where("tian_ge = ?", lucky.TianGe).Where("ren_ge = ?", lucky.RenGe).Where("di_ge = ?", lucky.DiGe).Update(lucky)
 }
 
 const WuGeMax = 31
 
-func initWuGe() <-chan *WuGeLucky {
-	var wuge *WuGe
-	lucky := make(chan *WuGeLucky)
-	l1, l2, f1, f2 := 1, 0, 1, 1
-	go func() {
-		for ; l1 < WuGeMax; l1++ {
-			for ; l2 < WuGeMax; l2++ {
-				for ; f1 < WuGeMax; f1++ {
-					for ; f2 < WuGeMax; f2++ {
-						wuge = NewWuGe(l1, l2, f1, f2)
-						lucky <- &WuGeLucky{
-							LastStroke1:  l1,
-							LastStroke2:  l2,
-							FirstStroke1: f1,
-							FirstStroke2: f2,
-							TianGe:       wuge.tianGe,
-							TianDaYan:    getDaYanLucky(wuge.tianGe),
-							RenGe:        wuge.renGe,
-							RenDaYan:     getDaYanLucky(wuge.renGe),
-							DiGe:         wuge.diGe,
-							DiDaYan:      getDaYanLucky(wuge.diGe),
-							WaiGe:        wuge.waiGe,
-							WaiDaYan:     getDaYanLucky(wuge.waiGe),
-							ZongGe:       wuge.zongGe,
-							ZongDaYan:    getDaYanLucky(wuge.zongGe),
-							ZongLucky:    wuge.Check(),
-						}
-					}
-					f2 = 1
-				}
-				f1 = 1
-			}
-			l2 = 0
-		}
-		lucky <- nil
+func initWuGe(lucky chan<- *WuGeLucky) {
+	defer func() {
+		close(lucky)
 	}()
-
-	return lucky
+	var wuge *WuGe
+	l1, l2, f1, f2 := 1, 0, 1, 1
+	for ; l1 < WuGeMax; l1++ {
+		for ; l2 < WuGeMax; l2++ {
+			for ; f1 < WuGeMax; f1++ {
+				for ; f2 < WuGeMax; f2++ {
+					wuge = NewWuGe(l1, l2, f1, f2)
+					lucky <- &WuGeLucky{
+						LastStroke1:  l1,
+						LastStroke2:  l2,
+						FirstStroke1: f1,
+						FirstStroke2: f2,
+						TianGe:       wuge.tianGe,
+						TianDaYan:    getDaYanLucky(wuge.tianGe),
+						RenGe:        wuge.renGe,
+						RenDaYan:     getDaYanLucky(wuge.renGe),
+						DiGe:         wuge.diGe,
+						DiDaYan:      getDaYanLucky(wuge.diGe),
+						WaiGe:        wuge.waiGe,
+						WaiDaYan:     getDaYanLucky(wuge.waiGe),
+						ZongGe:       wuge.zongGe,
+						ZongDaYan:    getDaYanLucky(wuge.zongGe),
+						ZongLucky:    wuge.Check(),
+					}
+				}
+				f2 = 1
+			}
+			f1 = 1
+		}
+		l2 = 0
+	}
 }
 
 func filterWuGe(wg chan<- *WuGeLucky, f *fate) error {
