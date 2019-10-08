@@ -105,18 +105,12 @@ func (f *fate) FirstRunInit() {
 	if e != nil {
 		return
 	}
-	ge := initWuGe()
-INIT:
-	for {
-		select {
-		case lu := <-ge:
-			if lu == nil {
-				break INIT
-			}
-			_, e = InsertOrUpdateWuGeLucky(f.db.Where(""), lu)
-			if e != nil {
-				panic(e)
-			}
+	lucky := make(chan *WuGeLucky)
+	go initWuGe(lucky)
+	for la := range lucky {
+		_, e = InsertOrUpdateWuGeLucky(f.db, la)
+		if e != nil {
+			panic(e)
 		}
 	}
 }
