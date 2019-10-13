@@ -2,6 +2,7 @@ module github.com/godcong/fate
 
 require (
 	github.com/globalsign/mgo v0.0.0-20180615134936-113d3961e731
+	github.com/go-sql-driver/mysql v1.4.1
 	github.com/go-xorm/xorm v0.7.6
 	github.com/godcong/chronos v0.0.0-20190608094636-9b77899de7d7
 	github.com/godcong/go-trait v0.0.0-20190811170548-84a6704da927
