@@ -2,9 +2,14 @@ package fate
 
 import (
 	"fmt"
+	"github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
+	"github.com/mattn/go-sqlite3"
 	"net/url"
 )
+
+var _ = mysql.Config{}
+var _ = sqlite3.SQLiteDriver{}
 
 const SQLite3Source = "file:%s?cache=shared&mode=rwc&_journal_mode=WAL"
 
