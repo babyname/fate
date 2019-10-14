@@ -18,8 +18,8 @@ var log = trait.NewZapSugar()
 
 type Fate interface {
 	MakeName() (e error)
-	SetDB(engine *xorm.Engine)
-	SetCharDB(engine *xorm.Engine)
+	//SetDB(engine *xorm.Engine)
+	//SetCharDB(engine *xorm.Engine)
 	//GetLastCharacter() error
 }
 
@@ -77,13 +77,13 @@ func CharacterDatabase(engine *xorm.Engine) Options {
 	}
 }
 
-func (f *fate) SetCharDB(engine *xorm.Engine) {
-	f.chardb = engine
-}
-
-func (f *fate) SetDB(engine *xorm.Engine) {
-	f.db = engine
-}
+//func (f *fate) SetCharDB(engine *xorm.Engine) {
+//	f.chardb = engine
+//}
+//
+//func (f *fate) SetDB(engine *xorm.Engine) {
+//	f.db = engine
+//}
 
 func (f *fate) RandomName() {
 	//filterWuGe(f.db, f.last...)
@@ -105,9 +105,6 @@ func (f *fate) MakeName() (e error) {
 	e = f.db.Sync2(WuGeLucky{})
 	if e != nil {
 		return e
-	}
-	if f.chardb == nil {
-		f.chardb = f.db
 	}
 
 	n, e := CountWuGeLucky(f.db)
@@ -136,6 +133,11 @@ func (f *fate) init() {
 		if e != nil {
 			panic(e)
 		}
+	}
+
+	//use the same db when char db not set
+	if f.chardb == nil {
+		f.chardb = f.db
 	}
 }
 
