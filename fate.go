@@ -17,10 +17,10 @@ const DefaultDatabase = "fate.db"
 var log = trait.NewZapSugar()
 
 type Fate interface {
-	FirstRunInit()
+	MakeName() (e error)
 	SetDB(engine *xorm.Engine)
 	SetCharDB(engine *xorm.Engine)
-	GetLastCharacter() error
+	//GetLastCharacter() error
 }
 
 type fate struct {
@@ -32,6 +32,7 @@ type fate struct {
 	names    []*Name
 	nameType int
 	sex      string
+	isFirst  bool
 	Limit    int
 }
 
@@ -88,7 +89,7 @@ func (f *fate) RandomName() {
 	//filterWuGe(f.db, f.last...)
 }
 
-func (f *fate) GetLastCharacter() error {
+func (f *fate) getLastCharacter() error {
 	for i, c := range f.last {
 		character, e := getCharacter(f, Char(c))
 		if e != nil {
@@ -100,19 +101,32 @@ func (f *fate) GetLastCharacter() error {
 	return nil
 }
 
-func (f *fate) FirstRunInit() {
-	e := f.db.Sync2(WuGeLucky{})
+func (f *fate) MakeName() (e error) {
+	e = f.db.Sync2(WuGeLucky{})
 	if e != nil {
-		return
+		return e
 	}
-	lucky := make(chan *WuGeLucky)
-	go initWuGe(lucky)
-	for la := range lucky {
-		_, e = InsertOrUpdateWuGeLucky(f.db, la)
-		if e != nil {
-			panic(e)
+	if f.chardb == nil {
+		f.chardb = f.db
+	}
+
+	n, e := CountWuGeLucky(f.db)
+	if e != nil {
+		return e
+	}
+	f.isFirst = n == 0
+	if f.isFirst {
+		lucky := make(chan *WuGeLucky)
+		go initWuGe(lucky)
+		for la := range lucky {
+			_, e = InsertOrUpdateWuGeLucky(f.db, la)
+			if e != nil {
+				return e
+			}
 		}
 	}
+
+	return f.getLastCharacter()
 }
 
 func (f *fate) init() {
