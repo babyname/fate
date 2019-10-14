@@ -161,6 +161,10 @@ type WuGeLucky struct {
 	ZongLucky    bool   `xorm:"zong_lucky"`
 }
 
+func CountWuGeLucky(engine *xorm.Engine) (n int64, e error) {
+	return engine.Table(&WuGeLucky{}).Count()
+}
+
 func InsertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e error) {
 	n, e = engine.Where("tian_ge = ?", lucky.TianGe).Where("ren_ge = ?", lucky.RenGe).Where("di_ge = ?", lucky.DiGe).Count(&WuGeLucky{})
 	if e != nil {

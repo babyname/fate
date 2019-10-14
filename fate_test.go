@@ -11,8 +11,7 @@ func TestFate_FirstRunInit(t *testing.T) {
 	eng := fate.InitMysql("localhost:3306", "root", "111111")
 
 	f.SetDB(eng)
-	f.FirstRunInit()
-	e := f.GetLastCharacter()
+	e := f.MakeName()
 	if e != nil {
 		t.Fatal(e)
 	}
