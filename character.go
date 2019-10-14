@@ -43,7 +43,7 @@ func getCharacter(f *fate, fn func(engine *xorm.Engine) *xorm.Session) (*Charact
 
 func Char(name string) func(engine *xorm.Engine) *xorm.Session {
 	return func(engine *xorm.Engine) *xorm.Session {
-		return engine.Where("character = ?", name).
+		return engine.Where("ch = ?", name).
 			Or("kang_xi = ?", name).
 			Or("traditional_character = ?", name)
 	}
