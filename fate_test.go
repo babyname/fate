@@ -7,10 +7,10 @@ import (
 )
 
 func TestFate_FirstRunInit(t *testing.T) {
-	f := fate.NewFate("张", time.Now())
 	eng := fate.InitMysql("localhost:3306", "root", "111111")
+	f := fate.NewFate("张周李", time.Now(), fate.Database(eng))
 
-	f.SetDB(eng)
+	//f.SetDB(eng)
 	e := f.MakeName()
 	if e != nil {
 		t.Fatal(e)

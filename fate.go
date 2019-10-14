@@ -56,6 +56,10 @@ func NewFate(lastName string, born time.Time, options ...Options) Fate {
 		nameType: mongo.KangXi,
 	}
 	f.lastChar = make([]*Character, len(f.last))
+	if len(f.last) > 2 {
+		panic("last name could not bigger than 2 characters")
+	}
+
 	for _, op := range options {
 		op(f)
 	}
@@ -95,7 +99,7 @@ func (f *fate) getLastCharacter() error {
 		if e != nil {
 			return e
 		}
-		log.With("index", i, "char", c).Info("last")
+		log.With("index", i, "char", c, "character", character).Info("last name")
 		f.lastChar[i] = character
 	}
 	return nil
