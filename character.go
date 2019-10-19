@@ -31,7 +31,7 @@ type Character struct {
 	Comment                  []string `xorm:"default() notnull comment"`                     //解释
 }
 
-func getCharacter(f *fate, fn func(engine *xorm.Engine) *xorm.Session) (*Character, error) {
+func getCharacter(f *fateImpl, fn func(engine *xorm.Engine) *xorm.Session) (*Character, error) {
 	s := fn(f.chardb)
 	c := new(Character)
 	b, e := s.Get(c)
