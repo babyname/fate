@@ -217,7 +217,7 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 	}
 }
 
-func filterWuGe(wg chan<- *WuGeLucky, f *fate) error {
+func filterWuGe(wg chan<- *WuGeLucky, f *fateImpl) error {
 	defer func() {
 		wg <- nil
 	}()
