@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+var DefaultDatabase = "fate.db"
+
 type Fate interface {
 	MakeName() (e error)
 	//SetDB(engine *xorm.Engine)
