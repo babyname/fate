@@ -103,10 +103,6 @@ func (f *fateImpl) getLastCharacter() error {
 }
 
 func (f *fateImpl) MakeName() (e error) {
-	e = f.db.Sync2(WuGeLucky{})
-	if e != nil {
-		return e
-	}
 
 	n, e := CountWuGeLucky(f.db)
 	if e != nil {
@@ -139,6 +135,11 @@ func (f *fateImpl) init() {
 	//use the same db when char db not set
 	if f.chardb == nil {
 		f.chardb = f.db
+	}
+
+	e = f.db.Sync2(WuGeLucky{})
+	if e != nil {
+		panic(e)
 	}
 }
 
