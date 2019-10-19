@@ -4,17 +4,12 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/mongo"
-	"github.com/godcong/go-trait"
 	"github.com/godcong/yi"
 	_ "github.com/mattn/go-sqlite3"
 	"math/rand"
 	"strings"
 	"time"
 )
-
-const DefaultDatabase = "fate.db"
-
-var log = trait.NewZapSugar()
 
 type Fate interface {
 	MakeName() (e error)
@@ -23,7 +18,7 @@ type Fate interface {
 	//GetLastCharacter() error
 }
 
-type fate struct {
+type fateImpl struct {
 	chardb   *xorm.Engine
 	db       *xorm.Engine
 	born     chronos.Calendar
@@ -41,16 +36,16 @@ type Generating struct {
 	current interface{} //当前对象
 	step    int         //当前
 	number  int         //生成数
-	fate    *fate
+	fate    *fateImpl
 	//stroke    []*Stroke
 	character []*mongo.Character
 }
 
-type Options func(f *fate)
+type Options func(f *fateImpl)
 
 //NewFate 所有的入口,新建一个fate对象
 func NewFate(lastName string, born time.Time, options ...Options) Fate {
-	f := &fate{
+	f := &fateImpl{
 		last:     strings.Split(lastName, ""),
 		born:     chronos.New(born),
 		nameType: mongo.KangXi,
@@ -70,30 +65,30 @@ func NewFate(lastName string, born time.Time, options ...Options) Fate {
 }
 
 func Database(engine *xorm.Engine) Options {
-	return func(f *fate) {
+	return func(f *fateImpl) {
 		f.db = engine
 	}
 }
 
 func CharacterDatabase(engine *xorm.Engine) Options {
-	return func(f *fate) {
+	return func(f *fateImpl) {
 		f.chardb = engine
 	}
 }
 
-//func (f *fate) SetCharDB(engine *xorm.Engine) {
+//func (f *fateImpl) SetCharDB(engine *xorm.Engine) {
 //	f.chardb = engine
 //}
 //
-//func (f *fate) SetDB(engine *xorm.Engine) {
+//func (f *fateImpl) SetDB(engine *xorm.Engine) {
 //	f.db = engine
 //}
 
-func (f *fate) RandomName() {
+func (f *fateImpl) RandomName() {
 	//filterWuGe(f.db, f.last...)
 }
 
-func (f *fate) getLastCharacter() error {
+func (f *fateImpl) getLastCharacter() error {
 	for i, c := range f.last {
 		character, e := getCharacter(f, Char(c))
 		if e != nil {
@@ -105,7 +100,7 @@ func (f *fate) getLastCharacter() error {
 	return nil
 }
 
-func (f *fate) MakeName() (e error) {
+func (f *fateImpl) MakeName() (e error) {
 	e = f.db.Sync2(WuGeLucky{})
 	if e != nil {
 		return e
@@ -130,7 +125,7 @@ func (f *fate) MakeName() (e error) {
 	return f.getLastCharacter()
 }
 
-func (f *fate) init() {
+func (f *fateImpl) init() {
 	var e error
 	if f.db == nil {
 		f.db, e = NewSQLite3(DefaultDatabase)
@@ -146,7 +141,7 @@ func (f *fate) init() {
 }
 
 //SetBornData 设定生日
-func (f *fate) SetBornData(t time.Time) {
+func (f *fateImpl) SetBornData(t time.Time) {
 	f.born = chronos.New(t)
 }
 
