@@ -31,14 +31,33 @@ type Character struct {
 	Comment                  []string `xorm:"default() notnull comment"`                     //解释
 }
 
+func getCharacters(f *fateImpl, fn func(engine *xorm.Engine) *xorm.Session) ([]*Character, error) {
+	s := fn(f.chardb)
+	var c []*Character
+	e := s.Find(&c)
+	if e != nil {
+		return nil, fmt.Errorf("%w", e)
+	}
+	return c, nil
+}
+
 func getCharacter(f *fateImpl, fn func(engine *xorm.Engine) *xorm.Session) (*Character, error) {
 	s := fn(f.chardb)
-	c := new(Character)
-	b, e := s.Get(c)
+	var c Character
+	b, e := s.Get(&c)
 	if e == nil && b {
-		return c, nil
+		return &c, nil
 	}
-	return nil, fmt.Errorf("character get error: %v", e)
+	return nil, fmt.Errorf("%w", e)
+}
+
+func Stoker(s int) func(engine *xorm.Engine) *xorm.Session {
+	return func(engine *xorm.Engine) *xorm.Session {
+		return engine.Where("stroke = ?", s).And("stroke <> 0").
+			Or("kang_xi_stroke = ?", s).And("kang_xi_stroke <> 0").
+			Or("simple_total_stroke = ?", s).And("simple_total_stroke <> 0").
+			Or("traditional_total_stroke = ?", s).And("traditional_total_stroke <> 0")
+	}
 }
 
 func Char(name string) func(engine *xorm.Engine) *xorm.Session {
