@@ -53,10 +53,11 @@ func getCharacter(f *fateImpl, fn func(engine *xorm.Engine) *xorm.Session) (*Cha
 
 func Stoker(s int) func(engine *xorm.Engine) *xorm.Session {
 	return func(engine *xorm.Engine) *xorm.Session {
-		return engine.Where("stroke = ?", s).And("stroke <> 0").
-			Or("kang_xi_stroke = ?", s).And("kang_xi_stroke <> 0").
-			Or("simple_total_stroke = ?", s).And("simple_total_stroke <> 0").
-			Or("traditional_total_stroke = ?", s).And("traditional_total_stroke <> 0")
+		return engine.Where("regular = ?", 1).
+			Where("stroke = ? and stroke <> 0", s).
+			Or("kang_xi_stroke = ? and kang_xi_stroke <> 0", s).
+			Or("simple_total_stroke = ? and simple_total_stroke <> 0", s).
+			Or("traditional_total_stroke = ? and traditional_total_stroke <> 0", s)
 	}
 }
 
