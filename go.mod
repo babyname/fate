@@ -11,3 +11,5 @@ require (
 	github.com/pelletier/go-toml v1.2.0
 	github.com/rakyll/statik v0.1.6
 )
+
+go 1.13

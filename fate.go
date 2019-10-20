@@ -1,6 +1,7 @@
 package fate
 
 import (
+	"fmt"
 	"github.com/go-xorm/xorm"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/mongo"
@@ -120,7 +121,13 @@ func (f *fateImpl) MakeName() (e error) {
 		}
 	}
 
-	return f.getLastCharacter()
+	e = f.getLastCharacter()
+	if e != nil {
+		return e
+	}
+
+	f.getCharacterWugeLucky()
+
 }
 
 func (f *fateImpl) init() {
@@ -146,6 +153,33 @@ func (f *fateImpl) init() {
 //SetBornData 设定生日
 func (f *fateImpl) SetBornData(t time.Time) {
 	f.born = chronos.New(t)
+}
+
+func (f *fateImpl) getCharacterWugeLucky() (e error) {
+	lucky := make(chan *WuGeLucky)
+	e = filterWuGe(lucky, f)
+	if e != nil {
+		return
+	}
+	var f1s []*Character
+	var f2s []*Character
+	for l := range lucky {
+		f1s, e = getCharacters(f, Stoker(l.FirstStroke1))
+		if e != nil {
+			return
+		}
+		f2s, e = getCharacters(f, Stoker(l.FirstStroke2))
+		if e != nil {
+			return
+		}
+
+		for _, f1 := range f1s {
+			for _, f2 := range f2s {
+				name := createName(f, f1, f2)
+				fmt.Println("name:", name)
+			}
+		}
+	}
 }
 
 func randomInt32(max uint32, t time.Time) uint32 {

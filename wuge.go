@@ -219,7 +219,7 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 
 func filterWuGe(wg chan<- *WuGeLucky, f *fateImpl) error {
 	defer func() {
-		wg <- nil
+		close(wg)
 	}()
 	s := f.db.Where("last_stroke_1 = ?", f.last[0])
 	size := len(f.last)
@@ -241,5 +241,6 @@ func filterWuGe(wg chan<- *WuGeLucky, f *fateImpl) error {
 		}
 		wg <- tmp
 	}
+
 	return nil
 }
