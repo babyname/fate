@@ -1,25 +1,39 @@
 package fate
 
 import (
-	"strconv"
-	"strings"
-
 	"github.com/globalsign/mgo/bson"
 	"github.com/godcong/fate/mongo"
 	"github.com/godcong/yi"
+	"strconv"
 )
 
 //Name 姓名
 type Name struct {
-	FirstName []string //名姓
-	LastName  []string
+	FirstName []*Character //名姓
+	LastName  []*Character
 	baGua     *yi.Yi //周易八卦
 }
 
-func MakeName(last string) *Name {
+func (n Name) String() string {
+	var s string
+	for _, l := range n.LastName {
+		s += l.Ch
+	}
+	for _, f := range n.FirstName {
+		s += f.Ch
+	}
+	return s
+}
+
+func createName(impl *fateImpl, f1 *Character, f2 *Character) *Name {
+	last := make([]*Character, len(impl.lastChar))
+	copy(last, impl.lastChar)
+	ff1 := *f1
+	ff2 := *f2
+	first := []*Character{&ff1, &ff2}
 	return &Name{
-		FirstName: nil,
-		LastName:  strings.Split(last, ""),
+		FirstName: first,
+		LastName:  impl.lastChar,
 		baGua:     nil,
 	}
 }
