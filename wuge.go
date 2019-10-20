@@ -221,25 +221,29 @@ func filterWuGe(wg chan<- *WuGeLucky, f *fateImpl) error {
 	defer func() {
 		close(wg)
 	}()
-	s := f.db.Where("last_stroke_1 = ?", f.last[0])
-	size := len(f.last)
-	if size == 2 {
-		s = s.And("last_stroke_2 = ?", f.last[1])
-	} else {
-		s = s.And("last_stroke_2 = ?", 0)
+	l1 := f.lastChar[0].KangXiStroke
+	if l1 == 0 {
+		l1 = f.lastChar[0].Stroke
 	}
-
+	l2 := 0
+	if len(f.last) == 2 {
+		l2 = f.lastChar[1].KangXiStroke
+		if l2 == 0 {
+			l2 = f.lastChar[1].Stroke
+		}
+	}
+	s := f.db.Where("last_stroke_1 =?", l1).And("last_stroke_2 =?", l2)
 	rows, e := s.Rows(&WuGeLucky{})
 	if e != nil {
 		return e
 	}
 	for rows.Next() {
-		tmp := new(WuGeLucky)
-		e := rows.Scan(tmp)
+		var tmp WuGeLucky
+		e := rows.Scan(&tmp)
 		if e != nil {
 			return e
 		}
-		wg <- tmp
+		wg <- &tmp
 	}
 
 	return nil
