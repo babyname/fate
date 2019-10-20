@@ -166,7 +166,12 @@ func CountWuGeLucky(engine *xorm.Engine) (n int64, e error) {
 }
 
 func InsertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e error) {
-	n, e = engine.Where("tian_ge = ?", lucky.TianGe).Where("ren_ge = ?", lucky.RenGe).Where("di_ge = ?", lucky.DiGe).Count(&WuGeLucky{})
+	session := engine.Where("last_stroke_1 = ?", lucky.LastStroke1).
+		Where("last_stroke_2 = ?", lucky.LastStroke2).
+		Where("first_stroke_1 = ?", lucky.FirstStroke1).
+		Where("first_stroke_2 = ?", lucky.FirstStroke2)
+
+	n, e = session.Clone().Count(&WuGeLucky{})
 	if e != nil {
 		return n, e
 	}
@@ -175,21 +180,20 @@ func InsertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e 
 		n, e = engine.InsertOne(lucky)
 		return
 	}
-	return engine.Where("tian_ge = ?", lucky.TianGe).Where("ren_ge = ?", lucky.RenGe).Where("di_ge = ?", lucky.DiGe).Update(lucky)
+	return session.Clone().Update(lucky)
 }
 
-const WuGeMax = 31
+const WuGeMax = 32
 
 func initWuGe(lucky chan<- *WuGeLucky) {
 	defer func() {
 		close(lucky)
 	}()
 	var wuge *WuGe
-	l1, l2, f1, f2 := 1, 0, 1, 1
-	for ; l1 < WuGeMax; l1++ {
-		for ; l2 < WuGeMax; l2++ {
-			for ; f1 < WuGeMax; f1++ {
-				for ; f2 < WuGeMax; f2++ {
+	for l1 := 1; l1 <= WuGeMax; l1++ {
+		for l2 := 0; l2 <= WuGeMax; l2++ {
+			for f1 := 1; f1 <= WuGeMax; f1++ {
+				for f2 := 1; f2 <= WuGeMax; f2++ {
 					wuge = NewWuGe(l1, l2, f1, f2)
 					lucky <- &WuGeLucky{
 						LastStroke1:  l1,
@@ -209,11 +213,8 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 						ZongLucky:    wuge.Check(),
 					}
 				}
-				f2 = 1
 			}
-			f1 = 1
 		}
-		l2 = 0
 	}
 }
 
