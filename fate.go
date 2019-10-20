@@ -1,7 +1,6 @@
 package fate
 
 import (
-	"fmt"
 	"github.com/go-xorm/xorm"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/mongo"
@@ -104,7 +103,6 @@ func (f *fateImpl) getLastCharacter() error {
 }
 
 func (f *fateImpl) MakeName() (e error) {
-
 	n, e := CountWuGeLucky(f.db)
 	if e != nil {
 		return e
@@ -125,8 +123,7 @@ func (f *fateImpl) MakeName() (e error) {
 	if e != nil {
 		return e
 	}
-
-	f.getCharacterWugeLucky()
+	return f.getCharacterWugeLucky()
 
 }
 
@@ -157,29 +154,34 @@ func (f *fateImpl) SetBornData(t time.Time) {
 
 func (f *fateImpl) getCharacterWugeLucky() (e error) {
 	lucky := make(chan *WuGeLucky)
-	e = filterWuGe(lucky, f)
-	if e != nil {
-		return
-	}
+	go func() {
+		e = filterWuGe(lucky, f)
+		if e != nil {
+			log.Error(e)
+			return
+		}
+	}()
 	var f1s []*Character
 	var f2s []*Character
 	for l := range lucky {
+		log.With("first1", l.FirstStroke1, "first2", l.FirstStroke2).Info("lucky")
 		f1s, e = getCharacters(f, Stoker(l.FirstStroke1))
 		if e != nil {
-			return
+			return e
 		}
 		f2s, e = getCharacters(f, Stoker(l.FirstStroke2))
 		if e != nil {
-			return
+			return e
 		}
 
 		for _, f1 := range f1s {
 			for _, f2 := range f2s {
 				name := createName(f, f1, f2)
-				fmt.Println("name:", name)
+				log.Info(name)
 			}
 		}
 	}
+	return nil
 }
 
 func randomInt32(max uint32, t time.Time) uint32 {
