@@ -21,7 +21,7 @@ func TestWuGe_WaiGe(t *testing.T) {
 			l1++
 			l2 = 1
 		}
-		wg := fate.NewWuGe(l1, l2, f1, f2)
+		wg := fate.CalcWuGe(l1, l2, f1, f2)
 		sum := l1 + l2 + f1 + f2
 		if wg.ZongGe() != sum {
 			log.Println(wg.ZongGe() == sum, l1, l2, f1, f2, wg.ZongGe())
