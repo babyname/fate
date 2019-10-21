@@ -3,6 +3,7 @@ package fate
 import (
 	"github.com/go-xorm/xorm"
 	"github.com/godcong/fate/data"
+	uuid "github.com/satori/go.uuid"
 )
 
 //WuGe
@@ -34,8 +35,8 @@ func (wuGe *WuGe) TianGe() int {
 	return wuGe.tianGe
 }
 
-//NewWuGe 计算五格
-func NewWuGe(l1, l2, f1, f2 int) *WuGe {
+//CalcWuGe 计算五格
+func CalcWuGe(l1, l2, f1, f2 int) *WuGe {
 	return &WuGe{
 		tianGe: tianGe(l1, l2, f1, f2),
 		renGe:  renGe(l1, l2, f1, f2),
@@ -144,6 +145,7 @@ func (ge *WuGe) Check() bool {
 
 //WuGeLucky ...
 type WuGeLucky struct {
+	ID           string `xorm:"id pk"`
 	LastStroke1  int    `xorm:"last_stroke_1"`
 	LastStroke2  int    `xorm:"last_stroke_2"`
 	FirstStroke1 int    `json:"first_stroke_1"`
@@ -159,6 +161,10 @@ type WuGeLucky struct {
 	ZongGe       int    `xorm:"zong_ge"`
 	ZongDaYan    string `xorm:"zong_da_yan"`
 	ZongLucky    bool   `xorm:"zong_lucky"`
+}
+
+func (w *WuGeLucky) BeforeInsert() {
+	w.ID = uuid.NewV1().String()
 }
 
 func CountWuGeLucky(engine *xorm.Engine) (n int64, e error) {
@@ -194,7 +200,7 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 		for l2 := 0; l2 <= WuGeMax; l2++ {
 			for f1 := 1; f1 <= WuGeMax; f1++ {
 				for f2 := 1; f2 <= WuGeMax; f2++ {
-					wuge = NewWuGe(l1, l2, f1, f2)
+					wuge = CalcWuGe(l1, l2, f1, f2)
 					lucky <- &WuGeLucky{
 						LastStroke1:  l1,
 						LastStroke2:  l2,
