@@ -3,7 +3,7 @@ package fate
 import (
 	"github.com/go-xorm/xorm"
 	"github.com/godcong/fate/data"
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 )
 
 //WuGe
@@ -164,7 +164,7 @@ type WuGeLucky struct {
 }
 
 func (w *WuGeLucky) BeforeInsert() {
-	w.ID = uuid.NewV1().String()
+	w.ID = uuid.Must(uuid.NewUUID()).String()
 }
 
 func CountWuGeLucky(engine *xorm.Engine) (n int64, e error) {
