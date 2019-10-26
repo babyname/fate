@@ -180,17 +180,28 @@ func (z *BaZi) RiZhu() string {
 
 //XiYong 喜用神
 func (z *BaZi) XiYong() *XiYong {
-	z.xiyong = point(z)
-	z.xiyong = sameCategory(z)
-	z.xiyong = yil(z)
-	z.xiyong = yongShen(z)
-	z.xiyong = xiShen(z)
-	return z.xiyong
+	return z.point().sameCategory().heterogeneous().yongShen().xiShen().xiyong
+
 }
 
-func yongShen(z *BaZi) *XiYong {
+func (z *BaZi) yongShen() *BaZi {
 	z.xiyong.YongShen = z.xiyong.Similar[0]
-	return z.xiyong
+	return z
+}
+
+func (z *BaZi) point() *BaZi {
+	di := diIndex[z.baZi[3]]
+	for idx, v := range z.baZi {
+		if idx%2 == 0 {
+			z.xiyong.AddFen(WuXingTianGan(v), tiangan[di][tianIndex[v]])
+		} else {
+			dz := dizhi[diIndex[v]]
+			for k := range dz {
+				z.xiyong.AddFen(WuXingTianGan(k), dz[k][di])
+			}
+		}
+	}
+	return z
 }
 
 //QiangRuo 八字偏强（true)弱（false）
@@ -198,7 +209,7 @@ func (z *BaZi) QiangRuo() bool {
 	return z.xiyong.SimilarPoint > z.xiyong.HeterogeneousPoint
 }
 
-func xiShen(z *BaZi) *XiYong {
+func (z *BaZi) xiShen() *BaZi {
 	rt := sheng
 	if z.QiangRuo() {
 		rt = ke
@@ -212,7 +223,7 @@ func xiShen(z *BaZi) *XiYong {
 			break
 		}
 	}
-	return z.xiyong
+	return z
 }
 
 func baziToWuXing(bazi []string) []string {
@@ -227,22 +238,7 @@ func baziToWuXing(bazi []string) []string {
 	return wx
 }
 
-func point(zi *BaZi) *XiYong {
-	di := diIndex[zi.baZi[3]]
-	for idx, v := range zi.baZi {
-		if idx%2 == 0 {
-			zi.xiyong.AddFen(WuXingTianGan(v), tiangan[di][tianIndex[v]])
-		} else {
-			dz := dizhi[diIndex[v]]
-			for k := range dz {
-				zi.xiyong.AddFen(WuXingTianGan(k), dz[k][di])
-			}
-		}
-	}
-	return zi.xiyong
-}
-
-func sameCategory(z *BaZi) *XiYong {
+func (z *BaZi) sameCategory() *BaZi {
 	for i := range sheng {
 		if wuXingTianGan[z.RiZhu()] == sheng[i] {
 			z.xiyong.Similar = append(z.xiyong.Similar, sheng[i])
@@ -258,10 +254,10 @@ func sameCategory(z *BaZi) *XiYong {
 			break
 		}
 	}
-	return z.xiyong
+	return z
 }
 
-func yil(z *BaZi) *XiYong {
+func (z *BaZi) heterogeneous() *BaZi {
 	for i := range sheng {
 		for ti := range z.xiyong.Similar {
 			if z.xiyong.Similar[ti] == sheng[i] {
@@ -274,5 +270,5 @@ func yil(z *BaZi) *XiYong {
 		continue
 
 	}
-	return z.xiyong
+	return z
 }
