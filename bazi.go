@@ -123,13 +123,13 @@ func WuXingDiZhi(s string) string {
 
 //XiYong 喜用神
 type XiYong struct {
-	WuXingFen  map[string]int
-	XiShen     string
-	YongShen   string
-	TongLei    []string
-	TongLeiFen int
-	YiLei      []string
-	YiLeiFen   int
+	WuXingFen          map[string]int
+	XiShen             string
+	YongShen           string
+	Similar            []string //同类
+	SimilarPoint       int
+	Heterogeneous      []string //异类
+	HeterogeneousPoint int
 }
 
 //AddFen 五行分
@@ -181,7 +181,7 @@ func (z *BaZi) RiZhu() string {
 //XiYong 喜用神
 func (z *BaZi) XiYong() *XiYong {
 	z.xiyong = point(z)
-	z.xiyong = tongl(z)
+	z.xiyong = sameCategory(z)
 	z.xiyong = yil(z)
 	z.xiyong = yongShen(z)
 	z.xiyong = xiShen(z)
@@ -189,13 +189,13 @@ func (z *BaZi) XiYong() *XiYong {
 }
 
 func yongShen(z *BaZi) *XiYong {
-	z.xiyong.YongShen = z.xiyong.TongLei[0]
+	z.xiyong.YongShen = z.xiyong.Similar[0]
 	return z.xiyong
 }
 
 //QiangRuo 八字偏强（true)弱（false）
 func (z *BaZi) QiangRuo() bool {
-	return z.xiyong.TongLeiFen > z.xiyong.YiLeiFen
+	return z.xiyong.SimilarPoint > z.xiyong.HeterogeneousPoint
 }
 
 func xiShen(z *BaZi) *XiYong {
@@ -242,18 +242,18 @@ func point(zi *BaZi) *XiYong {
 	return zi.xiyong
 }
 
-func tongl(z *BaZi) *XiYong {
+func sameCategory(z *BaZi) *XiYong {
 	for i := range sheng {
 		if wuXingTianGan[z.RiZhu()] == sheng[i] {
-			z.xiyong.TongLei = append(z.xiyong.TongLei, sheng[i])
-			z.xiyong.TongLeiFen = z.xiyong.GetFen(sheng[i])
+			z.xiyong.Similar = append(z.xiyong.Similar, sheng[i])
+			z.xiyong.SimilarPoint = z.xiyong.GetFen(sheng[i])
 			if i == 0 {
 				i = len(sheng) - 1
-				z.xiyong.TongLei = append(z.xiyong.TongLei, sheng[i])
-				z.xiyong.TongLeiFen += z.xiyong.GetFen(sheng[i])
+				z.xiyong.Similar = append(z.xiyong.Similar, sheng[i])
+				z.xiyong.SimilarPoint += z.xiyong.GetFen(sheng[i])
 			} else {
-				z.xiyong.TongLei = append(z.xiyong.TongLei, sheng[i-1])
-				z.xiyong.TongLeiFen += z.xiyong.GetFen(sheng[i-1])
+				z.xiyong.Similar = append(z.xiyong.Similar, sheng[i-1])
+				z.xiyong.SimilarPoint += z.xiyong.GetFen(sheng[i-1])
 			}
 			break
 		}
@@ -263,14 +263,14 @@ func tongl(z *BaZi) *XiYong {
 
 func yil(z *BaZi) *XiYong {
 	for i := range sheng {
-		for ti := range z.xiyong.TongLei {
-			if z.xiyong.TongLei[ti] == sheng[i] {
-				goto end
+		for ti := range z.xiyong.Similar {
+			if z.xiyong.Similar[ti] == sheng[i] {
+				goto EndSimilar
 			}
 		}
-		z.xiyong.YiLei = append(z.xiyong.YiLei, sheng[i])
-		z.xiyong.YiLeiFen += z.xiyong.GetFen(sheng[i])
-	end:
+		z.xiyong.Heterogeneous = append(z.xiyong.Heterogeneous, sheng[i])
+		z.xiyong.HeterogeneousPoint += z.xiyong.GetFen(sheng[i])
+	EndSimilar:
 		continue
 
 	}
