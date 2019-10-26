@@ -1,21 +1,22 @@
 package fate
 
 import (
+	"math/rand"
+	"strings"
+	"time"
+
 	"github.com/go-xorm/xorm"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/mongo"
 	"github.com/godcong/yi"
 	_ "github.com/mattn/go-sqlite3"
-	"math/rand"
-	"strings"
-	"time"
 )
 
 var DefaultDatabase = "fate.db"
 
 type Fate interface {
 	MakeName() (e error)
-	//SetDB(engine *xorm.Engine)
+	XiYong() *XiYong
 	//SetCharDB(engine *xorm.Engine)
 	//GetLastCharacter() error
 }
@@ -31,6 +32,7 @@ type fateImpl struct {
 	sex      string
 	isFirst  bool
 	Limit    int
+	baZi     *BaZi
 }
 
 type Generating struct {
@@ -47,9 +49,11 @@ type Options func(f *fateImpl)
 
 //NewFate 所有的入口,新建一个fate对象
 func NewFate(lastName string, born time.Time, options ...Options) Fate {
+	b := chronos.New(born)
 	f := &fateImpl{
 		last:     strings.Split(lastName, ""),
-		born:     chronos.New(born),
+		born:     b,
+		baZi:     NewBazi(b),
 		nameType: mongo.KangXi,
 	}
 	f.lastChar = make([]*Character, len(f.last))
@@ -125,6 +129,10 @@ func (f *fateImpl) MakeName() (e error) {
 	}
 	return f.getCharacterWugeLucky()
 
+}
+
+func (f *fateImpl) XiYong() *XiYong {
+	return f.baZi.XiYong()
 }
 
 func (f *fateImpl) init() {
