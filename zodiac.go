@@ -10,6 +10,7 @@ var ZodiacList = []Zodiac{}
 
 //Zodiac 生肖
 type Zodiac struct {
+	Name      string
 	Xi        string //喜
 	XiRadical string
 	Ji        string //忌
