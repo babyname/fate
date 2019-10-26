@@ -193,15 +193,12 @@ func yongShen(z *BaZi) *XiYong {
 	return z.xiyong
 }
 
-//QiangRuo 八字偏强:true,八字偏弱:false.
+//QiangRuo 八字偏强（true)弱（false）
 func (z *BaZi) QiangRuo() bool {
-	if z.xiyong.TongLeiFen > z.xiyong.YiLeiFen {
-		return true
-	}
-	return false
+	return z.xiyong.TongLeiFen > z.xiyong.YiLeiFen
 }
 
-func xiShen(z *BaZi) (*XiYong) {
+func xiShen(z *BaZi) *XiYong {
 	rt := sheng
 	if z.QiangRuo() {
 		rt = ke
