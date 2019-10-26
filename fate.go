@@ -49,11 +49,9 @@ type Options func(f *fateImpl)
 
 //NewFate 所有的入口,新建一个fate对象
 func NewFate(lastName string, born time.Time, options ...Options) Fate {
-	b := chronos.New(born)
 	f := &fateImpl{
 		last:     strings.Split(lastName, ""),
-		born:     b,
-		baZi:     NewBazi(b),
+		born:     chronos.New(born),
 		nameType: mongo.KangXi,
 	}
 	f.lastChar = make([]*Character, len(f.last))
@@ -132,7 +130,12 @@ func (f *fateImpl) MakeName() (e error) {
 }
 
 func (f *fateImpl) XiYong() *XiYong {
-	return f.baZi.XiYong()
+	if f.baZi == nil {
+		b := NewBazi(f.born)
+		b.XiYong()
+		f.baZi = b
+	}
+	return f.baZi.xiyong
 }
 
 func (f *fateImpl) init() {
