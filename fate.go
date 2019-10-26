@@ -33,6 +33,7 @@ type fateImpl struct {
 	isFirst  bool
 	Limit    int
 	baZi     *BaZi
+	zodiac   *Zodiac
 }
 
 type Generating struct {
