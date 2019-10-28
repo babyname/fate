@@ -108,7 +108,7 @@ func (f *fateImpl) getLastCharacter() error {
 func (f *fateImpl) MakeName() (e error) {
 	n, e := CountWuGeLucky(f.db)
 	if e != nil {
-		return e
+		return Wrap(e, "count total error")
 	}
 	f.isFirst = n == 0
 	if f.isFirst {
@@ -117,14 +117,14 @@ func (f *fateImpl) MakeName() (e error) {
 		for la := range lucky {
 			_, e = InsertOrUpdateWuGeLucky(f.db, la)
 			if e != nil {
-				return e
+				return Wrap(e, "insert failed")
 			}
 		}
 	}
 
 	e = f.getLastCharacter()
 	if e != nil {
-		return e
+		return Wrap(e, "get char faile")
 	}
 	return f.getCharacterWugeLucky()
 
