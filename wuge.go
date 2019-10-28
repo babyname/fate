@@ -148,8 +148,8 @@ type WuGeLucky struct {
 	ID           string `xorm:"id pk"`
 	LastStroke1  int    `xorm:"last_stroke_1"`
 	LastStroke2  int    `xorm:"last_stroke_2"`
-	FirstStroke1 int    `json:"first_stroke_1"`
-	FirstStroke2 int    `json:"first_stroke_2"`
+	FirstStroke1 int    `xorm:"first_stroke_1"`
+	FirstStroke2 int    `xorm:"first_stroke_2"`
 	TianGe       int    `xorm:"tian_ge"`
 	TianDaYan    string `xorm:"tian_da_yan"`
 	RenGe        int    `xorm:"ren_ge"`
