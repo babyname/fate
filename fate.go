@@ -5,11 +5,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-xorm/xorm"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/mongo"
 	"github.com/godcong/yi"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/xormsharp/xorm"
 )
 
 var DefaultDatabase = "fate.db"

@@ -1,9 +1,9 @@
 package fate
 
 import (
-	"github.com/go-xorm/xorm"
 	"github.com/godcong/fate/data"
 	"github.com/google/uuid"
+	"github.com/xormsharp/xorm"
 )
 
 //WuGe

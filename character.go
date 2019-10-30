@@ -2,8 +2,8 @@ package fate
 
 import (
 	"fmt"
-	"github.com/go-xorm/xorm"
-	"xorm.io/builder"
+	"github.com/xormsharp/builder"
+	"github.com/xormsharp/xorm"
 )
 
 //Character 字符
