@@ -12,6 +12,7 @@ require (
 	github.com/olivere/elastic v6.2.23+incompatible // indirect
 	github.com/pelletier/go-toml v1.2.0
 	github.com/rakyll/statik v0.1.6
+	xorm.io/builder v0.3.5
 )
 
 go 1.13
