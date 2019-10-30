@@ -121,7 +121,7 @@ func WuXingDiZhi(s string) string {
 	return wuXingDiZhi[s]
 }
 
-//XiYong 喜用神
+//CalcXiYong 喜用神
 type XiYong struct {
 	WuXingFen          map[string]int
 	XiShen             string
@@ -168,8 +168,6 @@ func NewBazi(calendar chronos.Calendar) *BaZi {
 	return &BaZi{
 		baZi:   ec,
 		wuXing: baziToWuXing(ec),
-
-		xiyong: &XiYong{},
 	}
 }
 
@@ -178,10 +176,17 @@ func (z *BaZi) RiZhu() string {
 	return z.baZi[4]
 }
 
+func (z *BaZi) calcXiYong() {
+	z.xiyong = &XiYong{}
+	z.point().sameCategory().heterogeneous().yongShen().xiShen()
+}
+
 //XiYong 喜用神
 func (z *BaZi) XiYong() *XiYong {
-	return z.point().sameCategory().heterogeneous().yongShen().xiShen().xiyong
-
+	if z.xiyong == nil {
+		z.calcXiYong()
+	}
+	return z.xiyong
 }
 
 func (z *BaZi) yongShen() *BaZi {
