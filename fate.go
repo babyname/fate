@@ -134,8 +134,13 @@ func (f *fateImpl) MakeName() (e error) {
 		}
 	}()
 
+	var tmpChar []*Character
 	for n := range name {
-		log.With("wuxing", n.WuXing()).Info(n)
+		tmpChar = n.FirstName
+		tmpChar = append(tmpChar, n.LastName...)
+		if filterXiYong(f.XiYong().XiShen, tmpChar...) {
+			log.With("wuxing", n.WuXing(), "xi", f.XiYong()).Info(n)
+		}
 	}
 	return nil
 }
