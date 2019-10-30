@@ -80,8 +80,8 @@ Fate的本意是让起名变得简单,且能取到一个好的名字.
     
 第三版(开发中):
     每次生成一个名字,并目标喜用神,生肖喜忌,月历转换,生成八字等功能
-    八字计算: https://github.com/godcong/chronos
-    字典数据: https://github.com/godcong/excavator
+    八字计算: https://github.com/godcong/chronos  
+    字典数据: https://github.com/godcong/excavator  
     
     起名六大派进度:
     五格(95%) 暂用字库已补全
