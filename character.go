@@ -62,8 +62,8 @@ func Regular() CharacterOptions {
 
 func Stoker(s int, options ...CharacterOptions) func(engine *xorm.Engine) *xorm.Session {
 	return func(engine *xorm.Engine) *xorm.Session {
-		session := engine.
-			Where(builder.Eq{"stroke": s}.
+		session := engine.Where("pin_yin is not null").
+			And(builder.Eq{"stroke": s}.
 				Or(builder.Eq{"kang_xi_stroke": s}).
 				Or(builder.Eq{"simple_total_stroke": s}).
 				Or(builder.Eq{"traditional_total_stroke": s}))
