@@ -52,14 +52,27 @@ func getCharacter(f *fateImpl, fn func(engine *xorm.Engine) *xorm.Session) (*Cha
 	return nil, fmt.Errorf("%w", e)
 }
 
-func Stoker(s int) func(engine *xorm.Engine) *xorm.Session {
+type CharacterOptions func(session *xorm.Session) *xorm.Session
+
+func Regular() CharacterOptions {
+	return func(session *xorm.Session) *xorm.Session {
+		return session.And("regular = ?", 1)
+	}
+}
+
+func Stoker(s int, options ...CharacterOptions) func(engine *xorm.Engine) *xorm.Session {
 	return func(engine *xorm.Engine) *xorm.Session {
-		return engine.Where("regular = ?", 1).
-			And(builder.Eq{"stroke": s}.
+		session := engine.
+			Where(builder.Eq{"stroke": s}.
 				Or(builder.Eq{"kang_xi_stroke": s}).
 				Or(builder.Eq{"simple_total_stroke": s}).
 				Or(builder.Eq{"traditional_total_stroke": s}))
+		for _, option := range options {
+			session = option(session)
+		}
+		return session
 	}
+
 }
 
 func Char(name string) func(engine *xorm.Engine) *xorm.Session {
