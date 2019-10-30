@@ -3,6 +3,7 @@ package fate
 import (
 	"fmt"
 	"github.com/go-xorm/xorm"
+	"xorm.io/builder"
 )
 
 //Character 字符
@@ -54,17 +55,17 @@ func getCharacter(f *fateImpl, fn func(engine *xorm.Engine) *xorm.Session) (*Cha
 func Stoker(s int) func(engine *xorm.Engine) *xorm.Session {
 	return func(engine *xorm.Engine) *xorm.Session {
 		return engine.Where("regular = ?", 1).
-			Where("stroke = ? and stroke <> 0", s).
-			Or("kang_xi_stroke = ? and kang_xi_stroke <> 0", s).
-			Or("simple_total_stroke = ? and simple_total_stroke <> 0", s).
-			Or("traditional_total_stroke = ? and traditional_total_stroke <> 0", s)
+			And(builder.Eq{"stroke": s}.
+				Or(builder.Eq{"kang_xi_stroke": s}).
+				Or(builder.Eq{"simple_total_stroke": s}).
+				Or(builder.Eq{"traditional_total_stroke": s}))
 	}
 }
 
 func Char(name string) func(engine *xorm.Engine) *xorm.Session {
 	return func(engine *xorm.Engine) *xorm.Session {
-		return engine.Where("ch = ?", name).
-			Or("kang_xi = ?", name).
-			Or("traditional_character = ?", name)
+		return engine.Where(builder.Eq{"ch": name}.
+			Or(builder.Eq{"kang_xi": name}).
+			Or(builder.Eq{"traditional_character": name}))
 	}
 }
