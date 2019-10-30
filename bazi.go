@@ -178,6 +178,7 @@ func (z *BaZi) RiZhu() string {
 
 func (z *BaZi) calcXiYong() {
 	z.xiyong = &XiYong{}
+	//TODO:need fix
 	z.point().sameCategory().heterogeneous().yongShen().xiShen()
 }
 
@@ -221,10 +222,10 @@ func (z *BaZi) xiShen() *BaZi {
 	}
 	for i := range rt {
 		if rt[i] == z.xiyong.YongShen {
-			if i == len(rt)-1 {
-				i = -1
+			if i == 0 {
+				i = 5
 			}
-			z.xiyong.XiShen = rt[i+1]
+			z.xiyong.XiShen = rt[i-1]
 			break
 		}
 	}
