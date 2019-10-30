@@ -25,6 +25,17 @@ func (n Name) String() string {
 	return s
 }
 
+func (n Name) WuXing() string {
+	var s string
+	for _, l := range n.LastName {
+		s += l.WuXing
+	}
+	for _, f := range n.FirstName {
+		s += f.WuXing
+	}
+	return s
+}
+
 func createName(impl *fateImpl, f1 *Character, f2 *Character) *Name {
 	last := make([]*Character, len(impl.lastChar))
 	copy(last, impl.lastChar)
