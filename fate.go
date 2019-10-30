@@ -126,8 +126,18 @@ func (f *fateImpl) MakeName() (e error) {
 	if e != nil {
 		return Wrap(e, "get char failed")
 	}
-	return f.getCharacterWugeLucky()
+	name := make(chan *Name)
+	go func() {
+		e := f.getCharacterWugeLucky(name)
+		if e != nil {
+			log.Error(e)
+		}
+	}()
 
+	for n := range name {
+		log.With("wuxing", n.WuXing()).Info(n)
+	}
+	return nil
 }
 
 func (f *fateImpl) XiYong() *XiYong {
@@ -162,7 +172,10 @@ func (f *fateImpl) SetBornData(t time.Time) {
 	f.born = chronos.New(t)
 }
 
-func (f *fateImpl) getCharacterWugeLucky() (e error) {
+func (f *fateImpl) getCharacterWugeLucky(name chan<- *Name) (e error) {
+	defer func() {
+		close(name)
+	}()
 	lucky := make(chan *WuGeLucky)
 	go func() {
 		e = filterWuGe(lucky, f)
@@ -186,8 +199,8 @@ func (f *fateImpl) getCharacterWugeLucky() (e error) {
 
 		for _, f1 := range f1s {
 			for _, f2 := range f2s {
-				name := createName(f, f1, f2)
-				log.With("wuxing", name.WuXing()).Info(name)
+				n := createName(f, f1, f2)
+				name <- n
 			}
 		}
 	}

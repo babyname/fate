@@ -224,20 +224,27 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 	}
 }
 
+func getStroke(character *Character) int {
+	if character.KangXiStroke != 0 {
+		return character.KangXiStroke
+	} else if character.Stroke != 0 {
+		return character.Stroke
+	} else if character.SimpleTotalStroke != 0 {
+		return character.SimpleTotalStroke
+	} else if character.TraditionalTotalStroke != 0 {
+		return character.TraditionalTotalStroke
+	}
+	return 0
+}
+
 func filterWuGe(wg chan<- *WuGeLucky, f *fateImpl) error {
 	defer func() {
 		close(wg)
 	}()
-	l1 := f.lastChar[0].KangXiStroke
-	if l1 == 0 {
-		l1 = f.lastChar[0].Stroke
-	}
+	l1 := getStroke(f.lastChar[0])
 	l2 := 0
 	if len(f.last) == 2 {
-		l2 = f.lastChar[1].KangXiStroke
-		if l2 == 0 {
-			l2 = f.lastChar[1].Stroke
-		}
+		l2 = getStroke(f.lastChar[1])
 	}
 	s := f.db.Where("last_stroke_1 =?", l1).And("last_stroke_2 =?", l2)
 	rows, e := s.Rows(&WuGeLucky{})
