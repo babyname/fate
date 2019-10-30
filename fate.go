@@ -176,20 +176,20 @@ func (f *fateImpl) getCharacterWugeLucky() (e error) {
 	var f1s []*Character
 	var f2s []*Character
 	for l := range lucky {
-		log.With("first1", l.FirstStroke1, "first2", l.FirstStroke2).Info("lucky")
+		log.With("l1", l.LastStroke1, "l2", l.LastStroke2, "f1", l.FirstStroke1, "f2", l.FirstStroke2).Info("lucky")
 		f1s, e = getCharacters(f, Stoker(l.FirstStroke1))
 		if e != nil {
-			return e
+			return Wrap(e, "first stroke1 error")
 		}
 		f2s, e = getCharacters(f, Stoker(l.FirstStroke2))
 		if e != nil {
-			return e
+			return Wrap(e, "first stoke2 error")
 		}
 
 		for _, f1 := range f1s {
 			for _, f2 := range f2s {
 				name := createName(f, f1, f2)
-				log.Info(name)
+				log.With("wuxing", name.WuXing()).Info(name)
 			}
 		}
 	}
