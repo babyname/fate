@@ -132,11 +132,9 @@ func (f *fateImpl) MakeName() (e error) {
 
 func (f *fateImpl) XiYong() *XiYong {
 	if f.baZi == nil {
-		b := NewBazi(f.born)
-		b.XiYong()
-		f.baZi = b
+		f.baZi = NewBazi(f.born)
 	}
-	return f.baZi.xiyong
+	return f.baZi.XiYong()
 }
 
 func (f *fateImpl) init() {
