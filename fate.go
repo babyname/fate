@@ -124,7 +124,7 @@ func (f *fateImpl) MakeName() (e error) {
 
 	e = f.getLastCharacter()
 	if e != nil {
-		return Wrap(e, "get char faile")
+		return Wrap(e, "get char failed")
 	}
 	return f.getCharacterWugeLucky()
 
