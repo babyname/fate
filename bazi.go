@@ -9,16 +9,7 @@ var diIndex = map[string]int{
 }
 
 var tianIndex = map[string]int{
-	"甲": 0,
-	"乙": 1,
-	"丙": 2,
-	"丁": 3,
-	"戊": 4,
-	"己": 5,
-	"庚": 6,
-	"辛": 7,
-	"壬": 8,
-	"癸": 9,
+	"甲": 0, "乙": 1, "丙": 2, "丁": 3, "戊": 4, "己": 5, "庚": 6, "辛": 7, "壬": 8, "癸": 9,
 }
 
 var tiangan = [][]int{
@@ -35,10 +26,6 @@ var tiangan = [][]int{
 	{1000, 1000, 1040, 1040, 1140, 1140, 1160, 1160, 1060, 1060},
 	{1200, 1200, 1000, 1000, 1000, 1000, 1000, 1000, 1140, 1140},
 }
-
-//var zhizang = map[string]int{
-//
-//}
 
 var dizhi = []map[string][]int{
 	{
@@ -179,7 +166,7 @@ func (z *BaZi) RiZhu() string {
 func (z *BaZi) calcXiYong() {
 	z.xiyong = &XiYong{}
 	//TODO:need fix
-	z.point().sameCategory().heterogeneous().yongShen().xiShen()
+	z.point().calcSimilar().calcHeterogeneous().yongShen().xiShen()
 }
 
 //XiYong 喜用神
@@ -244,7 +231,8 @@ func baziToWuXing(bazi []string) []string {
 	return wx
 }
 
-func (z *BaZi) sameCategory() *BaZi {
+//计算同类
+func (z *BaZi) calcSimilar() *BaZi {
 	for i := range sheng {
 		if wuXingTianGan[z.RiZhu()] == sheng[i] {
 			z.xiyong.Similar = append(z.xiyong.Similar, sheng[i])
@@ -263,7 +251,8 @@ func (z *BaZi) sameCategory() *BaZi {
 	return z
 }
 
-func (z *BaZi) heterogeneous() *BaZi {
+//计算异类
+func (z *BaZi) calcHeterogeneous() *BaZi {
 	for i := range sheng {
 		for ti := range z.xiyong.Similar {
 			if z.xiyong.Similar[ti] == sheng[i] {
