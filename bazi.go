@@ -185,6 +185,8 @@ func (xy *XiYong) minFenWuXing(ss ...string) (wx string) {
 		if xy.WuXingFen[s] < min {
 			min = xy.WuXingFen[s]
 			wx = s
+		} else if xy.WuXingFen[s] == min {
+			wx += s
 		}
 	}
 	return
