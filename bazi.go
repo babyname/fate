@@ -179,7 +179,7 @@ func (z *BaZi) XiYong() *XiYong {
 	return z.xiyong
 }
 
-func (xy *XiYong) maxFenWuXing(ss ...string) (wx string) {
+func (xy *XiYong) minFenWuXing(ss ...string) (wx string) {
 	min := 9999
 	for _, s := range ss {
 		if xy.WuXingFen[s] < min {
@@ -197,9 +197,9 @@ func (z *BaZi) XiYongShen() string {
 
 func (xy *XiYong) Shen() string {
 	if !xy.QiangRuo() {
-		return xy.maxFenWuXing(xy.Similar...)
+		return xy.minFenWuXing(xy.Similar...)
 	}
-	return xy.maxFenWuXing(xy.Heterogeneous...)
+	return xy.minFenWuXing(xy.Heterogeneous...)
 }
 
 //func (z *BaZi) yongShen() *BaZi {
