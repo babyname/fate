@@ -8,10 +8,10 @@ import (
 )
 
 func TestPoint(t *testing.T) {
-	t1 := chronos.New("2019/11/1 01:30")
+	t1 := chronos.New("2020/01/24 15:30")
 	log.Println(t1.Lunar().EightCharacter())
+
 	bz := fate.NewBazi(t1)
 	t.Log(bz.XiYong())
-	t.Log(bz.XiYong().YongShen)
-	t.Log(bz.XiYong().XiShen)
+	t.Log(bz.XiYongShen())
 }
