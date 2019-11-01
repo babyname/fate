@@ -135,11 +135,13 @@ func (f *fateImpl) MakeName() (e error) {
 	}()
 
 	var tmpChar []*Character
+	//supply := false
 	for n := range name {
 		tmpChar = n.FirstName
 		tmpChar = append(tmpChar, n.LastName...)
 		if filterXiYong(f.XiYong().Shen(), tmpChar...) {
 			log.With("wuxing", n.WuXing(), "xi", f.XiYong()).Info(n)
+			//supply = true
 		}
 	}
 	return nil
