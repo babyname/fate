@@ -2,6 +2,7 @@ package fate
 
 import (
 	"github.com/globalsign/mgo/bson"
+	"github.com/godcong/chronos"
 	"github.com/godcong/fate/mongo"
 	"github.com/godcong/yi"
 	"strconv"
@@ -9,9 +10,12 @@ import (
 
 //Name 姓名
 type Name struct {
-	FirstName []*Character //名姓
-	LastName  []*Character
-	baGua     *yi.Yi //周易八卦
+	FirstName   []*Character //名姓
+	LastName    []*Character
+	born        *chronos.Calendar
+	baGua       *yi.Yi //周易八卦
+	zodiac      *Zodiac
+	zodiacPoint int
 }
 
 func (n Name) String() string {
