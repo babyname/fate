@@ -97,20 +97,6 @@ var wuXingDiZhi = map[string]string{
 	"亥": "水",
 }
 
-//CalcXiYong 喜用神
-type XiYong struct {
-	WuXingFen map[string]int
-	//XiShen             string
-	//YongShen           string
-	Similar            []string //同类
-	SimilarPoint       int
-	Heterogeneous      []string //异类
-	HeterogeneousPoint int
-}
-
-var sheng = []string{"木", "火", "土", "金", "水"}
-var ke = []string{"木", "土", "水", "火", "金"}
-
 //WuXingTianGan 五行天干
 func WuXingTianGan(s string) string {
 	return wuXingTianGan[s]
@@ -119,30 +105,6 @@ func WuXingTianGan(s string) string {
 //WuXingDiZhi 五行地支
 func WuXingDiZhi(s string) string {
 	return wuXingDiZhi[s]
-}
-
-//AddFen 五行分
-func (xy *XiYong) AddFen(s string, point int) {
-	if xy.WuXingFen == nil {
-		xy.WuXingFen = make(map[string]int)
-	}
-
-	if v, b := xy.WuXingFen[s]; b {
-		xy.WuXingFen[s] = v + point
-	} else {
-		xy.WuXingFen[s] = point
-	}
-}
-
-//GetFen 取得分
-func (xy *XiYong) GetFen(s string) (point int) {
-	if xy.WuXingFen == nil {
-		return 0
-	}
-	if v, b := xy.WuXingFen[s]; b {
-		return v
-	}
-	return 0
 }
 
 type BaZi struct {
@@ -179,29 +141,9 @@ func (z *BaZi) XiYong() *XiYong {
 	return z.xiyong
 }
 
-func (xy *XiYong) minFenWuXing(ss ...string) (wx string) {
-	min := 9999
-	for _, s := range ss {
-		if xy.WuXingFen[s] < min {
-			min = xy.WuXingFen[s]
-			wx = s
-		} else if xy.WuXingFen[s] == min {
-			wx += s
-		}
-	}
-	return
-}
-
 //XiYongShen 平衡用神
 func (z *BaZi) XiYongShen() string {
 	return z.xiyong.Shen()
-}
-
-func (xy *XiYong) Shen() string {
-	if !xy.QiangRuo() {
-		return xy.minFenWuXing(xy.Similar...)
-	}
-	return xy.minFenWuXing(xy.Heterogeneous...)
 }
 
 //func (z *BaZi) yongShen() *BaZi {
@@ -237,11 +179,6 @@ func (z *BaZi) point() *BaZi {
 		}
 	}
 	return z
-}
-
-//QiangRuo 八字偏强（true)弱（false）
-func (xy *XiYong) QiangRuo() bool {
-	return xy.SimilarPoint > xy.HeterogeneousPoint
 }
 
 func baziToWuXing(bazi []string) []string {
