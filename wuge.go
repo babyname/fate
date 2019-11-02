@@ -1,7 +1,6 @@
 package fate
 
 import (
-	"github.com/godcong/fate/data"
 	"github.com/google/uuid"
 	"github.com/xormsharp/xorm"
 )
@@ -118,7 +117,7 @@ func zongGe(l1, l2, f1, f2 int) int {
 }
 
 func checkDaYan(idx int) bool {
-	switch data.DaYanList[idx-1].Lucky {
+	switch DaYanList[idx-1].Lucky {
 	case "吉", "半吉":
 		return true
 	}
@@ -127,7 +126,7 @@ func checkDaYan(idx int) bool {
 
 func getDaYanLucky(idx int) string {
 	if idx > 1 && idx < 81 {
-		return data.DaYanList[idx-1].Lucky
+		return DaYanList[idx-1].Lucky
 	}
 	return ""
 }
