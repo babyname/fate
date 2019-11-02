@@ -41,15 +41,25 @@ func (n Name) WuXing() string {
 }
 
 func createName(impl *fateImpl, f1 *Character, f2 *Character) *Name {
-	last := make([]*Character, len(impl.lastChar))
+	lastSize := len(impl.lastChar)
+	last := make([]*Character, lastSize, lastSize)
 	copy(last, impl.lastChar)
+
+	shang := getStroke(last[0])
+	if lastSize > 1 {
+		shang += getStroke(last[1])
+	}
+
 	ff1 := *f1
 	ff2 := *f2
 	first := []*Character{&ff1, &ff2}
+
+	xia := getStroke(first[0]) + getStroke(first[1])
+
 	return &Name{
 		FirstName: first,
 		LastName:  impl.lastChar,
-		baGua:     nil,
+		baGua:     yi.NumberQiGua(xia, shang, shang+xia),
 	}
 }
 
