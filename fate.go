@@ -72,14 +72,6 @@ func CharacterDatabase(engine *xorm.Engine) Options {
 	}
 }
 
-//func (f *fateImpl) SetCharDB(engine *xorm.Engine) {
-//	f.chardb = engine
-//}
-//
-//func (f *fateImpl) SetDB(engine *xorm.Engine) {
-//	f.db = engine
-//}
-
 func (f *fateImpl) RandomName() {
 	//filterWuGe(f.db, f.last...)
 }
