@@ -30,20 +30,11 @@ type fateImpl struct {
 	names    []*Name
 	nameType int
 	sex      string
-	isFirst  bool
-	Limit    int
-	baZi     *BaZi
-	zodiac   *Zodiac
-}
 
-type Generating struct {
-	martial *Martial
-	current interface{} //当前对象
-	step    int         //当前
-	number  int         //生成数
-	fate    *fateImpl
-	//stroke    []*Stroke
-	character []*mongo.Character
+	isFirst bool
+	Limit   int
+	baZi    *BaZi
+	zodiac  *Zodiac
 }
 
 type Options func(f *fateImpl)
@@ -217,10 +208,6 @@ func (f *fateImpl) getCharacterWugeLucky(name chan<- *Name) (e error) {
 func randomInt32(max uint32, t time.Time) uint32 {
 	r := rand.NewSource(t.UnixNano())
 	return rand.New(r).Uint32()
-}
-
-func (g *Generating) Character() []*mongo.Character {
-	return nil
 }
 
 func filterGuaXiang(characters []*mongo.Character) []*mongo.Character {
