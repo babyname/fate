@@ -1,11 +1,8 @@
 package fate
 
 import (
-	"github.com/globalsign/mgo/bson"
 	"github.com/godcong/chronos"
-	"github.com/godcong/fate/mongo"
 	"github.com/godcong/yi"
-	"strconv"
 )
 
 //Name 姓名
@@ -63,39 +60,7 @@ func createName(impl *fateImpl, f1 *Character, f2 *Character) *Name {
 	}
 }
 
-//MakeName input the lastname to make a name
-func FilterName(names []*Name) *Name {
-	//todo:make name generate list
-
-	return &Name{}
-}
-
 //BaGua
 func (n *Name) BaGua() *yi.Yi {
 	return n.baGua
-}
-
-func nameCharacter(s string) *mongo.Character {
-	c := mongo.Character{}
-	err := mongo.C("character").Find(bson.M{
-		"character": s,
-	}).One(&c)
-	log.Infof("%+v", c)
-	if err != nil {
-		return nil
-	}
-	return &c
-}
-
-//CountStroke 统计笔画
-func CountStroke(chars ...*mongo.Character) int {
-	i := 0
-	if chars == nil {
-		return i
-	}
-	for k := range chars {
-		t, _ := strconv.Atoi(chars[k].KangxiStrokes)
-		i += t
-	}
-	return i
 }
