@@ -1,7 +1,6 @@
 package fate
 
 import (
-	"math/rand"
 	"strings"
 	"time"
 
