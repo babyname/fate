@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/godcong/chronos"
-	"github.com/godcong/fate/mongo"
 	"github.com/godcong/yi"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/xormsharp/xorm"
@@ -42,9 +41,8 @@ type Options func(f *fateImpl)
 //NewFate 所有的入口,新建一个fate对象
 func NewFate(lastName string, born time.Time, options ...Options) Fate {
 	f := &fateImpl{
-		last:     strings.Split(lastName, ""),
-		born:     chronos.New(born),
-		nameType: mongo.KangXi,
+		last: strings.Split(lastName, ""),
+		born: chronos.New(born),
 	}
 	f.lastChar = make([]*Character, len(f.last))
 	if len(f.last) > 2 {
@@ -196,27 +194,5 @@ func (f *fateImpl) getCharacterWugeLucky(name chan<- *Name) (e error) {
 			}
 		}
 	}
-	return nil
-}
-
-func randomInt32(max uint32, t time.Time) uint32 {
-	r := rand.NewSource(t.UnixNano())
-	return rand.New(r).Uint32()
-}
-
-func filterGuaXiang(characters []*mongo.Character) []*mongo.Character {
-	gua := yi.NumberQiGua(0, 0, 0)
-	log.Info(gua)
-	return nil
-}
-
-func filterTianYun() []*mongo.Character {
-	//TODO:
-	return nil
-}
-
-func filterBaZi(character []*mongo.Character, wuxing []string) []*mongo.Character {
-	//TODO:
-	//计算平衡用神
 	return nil
 }
