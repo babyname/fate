@@ -42,25 +42,39 @@ func createName(impl *fateImpl, f1 *Character, f2 *Character) *Name {
 	last := make([]*Character, lastSize, lastSize)
 	copy(last, impl.lastChar)
 
-	shang := getStroke(last[0])
-	if lastSize > 1 {
-		shang += getStroke(last[1])
-	}
-
+	//shang := getStroke(last[0])
+	//if lastSize > 1 {
+	//	shang += getStroke(last[1])
+	//}
+	//log.With("last", shang)
+	//
 	ff1 := *f1
 	ff2 := *f2
 	first := []*Character{&ff1, &ff2}
-
-	xia := getStroke(first[0]) + getStroke(first[1])
+	//xia := getStroke(first[0]) + getStroke(first[1])
+	//log.With("xia", xia)
 
 	return &Name{
 		FirstName: first,
-		LastName:  impl.lastChar,
-		baGua:     yi.NumberQiGua(xia, shang, shang+xia),
+		LastName:  last,
+		//baGua:     yi.NumberQiGua(xia, shang, shang+xia),
 	}
 }
 
 //BaGua
 func (n *Name) BaGua() *yi.Yi {
+	if n.baGua == nil {
+		lastSize := len(n.LastName)
+		shang := getStroke(n.LastName[0])
+		if lastSize > 1 {
+			shang += getStroke(n.LastName[1])
+		}
+		log.With("last", shang).Info("shang")
+		xia := getStroke(n.FirstName[0]) + getStroke(n.FirstName[1])
+		log.With("xia", xia).Info("xia")
+		n.baGua = yi.NumberQiGua(xia, shang, shang+xia)
+
+	}
+
 	return n.baGua
 }
