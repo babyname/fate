@@ -120,9 +120,11 @@ func (f *fateImpl) MakeName() (e error) {
 		tmpChar = n.FirstName
 		tmpChar = append(tmpChar, n.LastName...)
 		if filterXiYong(f.XiYong().Shen(), tmpChar...) {
-			log.With("born", f.born.LunarDate(), "wuxing", n.WuXing(), "god", f.XiYong().Shen(),
-				"ben", n.baGua.Get(yi.BenGua).GuaMing,
-				"bian", n.baGua.Get(yi.BianGua).GuaMing).Info(n)
+			log.With("name", n.String()).Info("name")
+			log.With("born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter()).Info("bazi")
+			log.With("wuxing", n.WuXing(), "god", f.XiYong().Shen(), "pinheng", f.XiYong()).Info("xiyong")
+			log.With("ben", n.baGua.Get(yi.BenGua).GuaMing,
+				"bian", n.baGua.Get(yi.BianGua).GuaMing).Info("bagua")
 			//supply = true
 		}
 	}
