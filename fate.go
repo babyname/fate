@@ -129,6 +129,10 @@ func (f *fateImpl) MakeName() (e error) {
 		if f.zodiacFilter && true {
 			//TODO:
 		}
+
+		if f.baguaFilter && true {
+			//TODO:
+		}
 		log.With("name", n.String()).Info("name")
 		log.With("born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter()).Info("bazi")
 		log.With("wuxing", n.WuXing(), "god", f.XiYong().Shen(), "pinheng", f.XiYong()).Info("xiyong")
