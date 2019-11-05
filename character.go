@@ -36,10 +36,10 @@ func getCharacters(f *fateImpl, fn func(engine *xorm.Engine) *xorm.Session) ([]*
 	s := fn(f.chardb)
 	var c []*Character
 	e := s.Find(&c)
-	if e != nil {
-		return nil, fmt.Errorf("%w", e)
+	if e == nil {
+		return c, nil
 	}
-	return c, nil
+	return nil, fmt.Errorf("character list get error:%w", e)
 }
 
 func getCharacter(f *fateImpl, fn func(engine *xorm.Engine) *xorm.Session) (*Character, error) {
@@ -49,7 +49,7 @@ func getCharacter(f *fateImpl, fn func(engine *xorm.Engine) *xorm.Session) (*Cha
 	if e == nil && b {
 		return &c, nil
 	}
-	return nil, fmt.Errorf("%w", e)
+	return nil, fmt.Errorf("character get error:%w", e)
 }
 
 type CharacterOptions func(session *xorm.Session) *xorm.Session
