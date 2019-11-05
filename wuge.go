@@ -124,11 +124,12 @@ func checkDaYan(idx int) bool {
 	return false
 }
 
-func getDaYanLucky(idx int) string {
-	if idx > 1 && idx < 81 {
-		return DaYanList[idx-1].Lucky
+func getDaYan(idx int) DaYan {
+	i := (idx - 1) % 80
+	if i <= 0 {
+		panic("wrong idx")
 	}
-	return ""
+	return DaYanList[i]
 }
 
 //Check 格检查
