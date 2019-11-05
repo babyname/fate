@@ -35,6 +35,7 @@ type fateImpl struct {
 	zodiac       *Zodiac
 	supplyFilter bool //补八字
 	zodiacFilter bool //生肖
+	baguaFilter  bool //卦象
 }
 
 type Options func(f *fateImpl)
