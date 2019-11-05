@@ -110,3 +110,12 @@ func (dy *DaYan) IsSex() bool {
 func (dy *DaYan) IsMax() bool {
 	return dy.Max
 }
+
+//GetDaYan 获取大衍之数
+func GetDaYan(idx int) DaYan {
+	if idx <= 0 {
+		panic("wrong idx")
+	}
+	i := (idx - 1) % 81
+	return DaYanList[i]
+}
