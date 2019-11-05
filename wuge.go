@@ -153,6 +153,8 @@ type WuGeLucky struct {
 	ZongGe       int    `xorm:"zong_ge"`
 	ZongDaYan    string `xorm:"zong_da_yan"`
 	ZongLucky    bool   `xorm:"zong_lucky"`
+	ZongSex      bool   `xorm:"zong_sex"`
+	ZongMax      bool   `xorm:"zong_max"`
 }
 
 func (w *WuGeLucky) BeforeInsert() {
@@ -194,6 +196,7 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 				for f2 := 1; f2 <= WuGeMax; f2++ {
 					wuge = CalcWuGe(l1, l2, f1, f2)
 					lucky <- &WuGeLucky{
+						ID:           "",
 						LastStroke1:  l1,
 						LastStroke2:  l2,
 						FirstStroke1: f1,
@@ -209,6 +212,8 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 						ZongGe:       wuge.zongGe,
 						ZongDaYan:    GetDaYan(wuge.zongGe).Lucky,
 						ZongLucky:    wuge.Check(),
+						ZongSex:      GetDaYan(wuge.zongGe).IsSex(),
+						ZongMax:      GetDaYan(wuge.zongGe).IsMax(),
 					}
 				}
 			}
