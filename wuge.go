@@ -14,24 +14,24 @@ type WuGe struct {
 	zongGe int
 }
 
-func (wuGe *WuGe) ZongGe() int {
-	return wuGe.zongGe
+func (ge *WuGe) ZongGe() int {
+	return ge.zongGe
 }
 
-func (wuGe *WuGe) WaiGe() int {
-	return wuGe.waiGe
+func (ge *WuGe) WaiGe() int {
+	return ge.waiGe
 }
 
-func (wuGe *WuGe) DiGe() int {
-	return wuGe.diGe
+func (ge *WuGe) DiGe() int {
+	return ge.diGe
 }
 
-func (wuGe *WuGe) RenGe() int {
-	return wuGe.renGe
+func (ge *WuGe) RenGe() int {
+	return ge.renGe
 }
 
-func (wuGe *WuGe) TianGe() int {
-	return wuGe.tianGe
+func (ge *WuGe) TianGe() int {
+	return ge.tianGe
 }
 
 //CalcWuGe 计算五格
@@ -207,15 +207,15 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 						FirstStroke1: f1,
 						FirstStroke2: f2,
 						TianGe:       wuge.tianGe,
-						TianDaYan:    getDaYanLucky(wuge.tianGe),
+						TianDaYan:    getDaYan(wuge.tianGe).Lucky,
 						RenGe:        wuge.renGe,
-						RenDaYan:     getDaYanLucky(wuge.renGe),
+						RenDaYan:     getDaYan(wuge.renGe).Lucky,
 						DiGe:         wuge.diGe,
-						DiDaYan:      getDaYanLucky(wuge.diGe),
+						DiDaYan:      getDaYan(wuge.diGe).Lucky,
 						WaiGe:        wuge.waiGe,
-						WaiDaYan:     getDaYanLucky(wuge.waiGe),
+						WaiDaYan:     getDaYan(wuge.waiGe).Lucky,
 						ZongGe:       wuge.zongGe,
-						ZongDaYan:    getDaYanLucky(wuge.zongGe),
+						ZongDaYan:    getDaYan(wuge.zongGe).Lucky,
 						ZongLucky:    wuge.Check(),
 					}
 				}
