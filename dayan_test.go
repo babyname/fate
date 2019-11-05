@@ -24,3 +24,11 @@ func TestDecompress(t *testing.T) {
 		}
 	}
 }
+
+func TestGetDayan(t *testing.T) {
+	for i := 1; i < 100; i++ {
+		dy := GetDaYan(i)
+		//output i == number
+		t.Logf("i:%d,%+v", i, dy)
+	}
+}
