@@ -124,14 +124,6 @@ func checkDaYan(idx int) bool {
 	return false
 }
 
-func getDaYan(idx int) DaYan {
-	i := (idx - 1) % 80
-	if i <= 0 {
-		panic("wrong idx")
-	}
-	return DaYanList[i]
-}
-
 //Check 格检查
 func (ge *WuGe) Check() bool {
 	//ignore:tianGe
@@ -207,15 +199,15 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 						FirstStroke1: f1,
 						FirstStroke2: f2,
 						TianGe:       wuge.tianGe,
-						TianDaYan:    getDaYan(wuge.tianGe).Lucky,
+						TianDaYan:    GetDaYan(wuge.tianGe).Lucky,
 						RenGe:        wuge.renGe,
-						RenDaYan:     getDaYan(wuge.renGe).Lucky,
+						RenDaYan:     GetDaYan(wuge.renGe).Lucky,
 						DiGe:         wuge.diGe,
-						DiDaYan:      getDaYan(wuge.diGe).Lucky,
+						DiDaYan:      GetDaYan(wuge.diGe).Lucky,
 						WaiGe:        wuge.waiGe,
-						WaiDaYan:     getDaYan(wuge.waiGe).Lucky,
+						WaiDaYan:     GetDaYan(wuge.waiGe).Lucky,
 						ZongGe:       wuge.zongGe,
-						ZongDaYan:    getDaYan(wuge.zongGe).Lucky,
+						ZongDaYan:    GetDaYan(wuge.zongGe).Lucky,
 						ZongLucky:    wuge.Check(),
 					}
 				}
