@@ -29,10 +29,12 @@ type fateImpl struct {
 	nameType int
 	sex      string
 
-	isFirst bool
-	Limit   int
-	baZi    *BaZi
-	zodiac  *Zodiac
+	isFirst      bool
+	Limit        int
+	baZi         *BaZi
+	zodiac       *Zodiac
+	supplyFilter bool //补八字
+	zodiacFilter bool //生肖
 }
 
 type Options func(f *fateImpl)
@@ -115,20 +117,25 @@ func (f *fateImpl) MakeName() (e error) {
 	}()
 
 	var tmpChar []*Character
-	//supply := false
+	//supplyFilter := false
 	for n := range name {
 		tmpChar = n.FirstName
 		tmpChar = append(tmpChar, n.LastName...)
-		if filterXiYong(f.XiYong().Shen(), tmpChar...) {
-			log.With("name", n.String()).Info("name")
-			log.With("born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter()).Info("bazi")
-			log.With("wuxing", n.WuXing(), "god", f.XiYong().Shen(), "pinheng", f.XiYong()).Info("xiyong")
-			ben := n.BaGua().Get(yi.BenGua)
-			log.With("ming", ben.GuaMing, "chu", ben.ChuYaoJiXiong, "er", ben.ErYaoJiXiong, "san", ben.SanYaoJiXiong, "si", ben.SiYaoJiXiong, "wu", ben.WuYaoJiXiong, "liu", ben.ShangYaoJiXiong).Info("ben")
-			bian := n.BaGua().Get(yi.BianGua)
-			log.With("ming", bian.GuaMing, "chu", bian.ChuYaoJiXiong, "er", bian.ErYaoJiXiong, "san", bian.SanYaoJiXiong, "si", bian.SiYaoJiXiong, "wu", bian.WuYaoJiXiong, "liu", bian.ShangYaoJiXiong).Info("bian")
-			//supply = true
+		//filter bazi
+		if f.supplyFilter && !filterXiYong(f.XiYong().Shen(), tmpChar...) {
+			continue
 		}
+		//filter zodiac
+		if f.zodiacFilter && true {
+			//TODO:
+		}
+		log.With("name", n.String()).Info("name")
+		log.With("born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter()).Info("bazi")
+		log.With("wuxing", n.WuXing(), "god", f.XiYong().Shen(), "pinheng", f.XiYong()).Info("xiyong")
+		ben := n.BaGua().Get(yi.BenGua)
+		log.With("ming", ben.GuaMing, "chu", ben.ChuYaoJiXiong, "er", ben.ErYaoJiXiong, "san", ben.SanYaoJiXiong, "si", ben.SiYaoJiXiong, "wu", ben.WuYaoJiXiong, "liu", ben.ShangYaoJiXiong).Info("ben")
+		bian := n.BaGua().Get(yi.BianGua)
+		log.With("ming", bian.GuaMing, "chu", bian.ChuYaoJiXiong, "er", bian.ErYaoJiXiong, "san", bian.SanYaoJiXiong, "si", bian.SiYaoJiXiong, "wu", bian.WuYaoJiXiong, "liu", bian.ShangYaoJiXiong).Info("bian")
 	}
 	return nil
 }
