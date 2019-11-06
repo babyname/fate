@@ -40,6 +40,24 @@ type fateImpl struct {
 
 type Options func(f *fateImpl)
 
+func BaGuaFilter() Options {
+	return func(f *fateImpl) {
+		f.baguaFilter = true
+	}
+}
+
+func ZodiacFilter() Options {
+	return func(f *fateImpl) {
+		f.zodiacFilter = true
+	}
+}
+
+func SupplyFilter() Options {
+	return func(f *fateImpl) {
+		f.supplyFilter = true
+	}
+}
+
 //NewFate 所有的入口,新建一个fate对象
 func NewFate(lastName string, born time.Time, options ...Options) Fate {
 	f := &fateImpl{
