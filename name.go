@@ -3,6 +3,7 @@ package fate
 import (
 	"github.com/godcong/chronos"
 	"github.com/godcong/yi"
+	"strings"
 )
 
 //Name 姓名
@@ -22,6 +23,18 @@ func (n Name) String() string {
 	}
 	for _, f := range n.FirstName {
 		s += f.Ch
+	}
+	return s
+}
+
+func (n Name) PinYin() string {
+	var s string
+	for _, l := range n.LastName {
+		s += "[" + strings.Join(l.PinYin, ",") + "]"
+	}
+
+	for _, f := range n.FirstName {
+		s += "[" + strings.Join(f.PinYin, ",") + "]"
 	}
 	return s
 }
