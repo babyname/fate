@@ -1,11 +1,10 @@
 module github.com/godcong/fate
 
 require (
-	github.com/globalsign/mgo v0.0.0-20180615134936-113d3961e731
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/godcong/chronos v0.0.0-20191031191102-b99d2144d954
 	github.com/godcong/go-trait v0.0.0-20190816072228-f216e906756e
-	github.com/godcong/yi v0.0.0-20191105071852-aa0ee5476bda
+	github.com/godcong/yi v1.0.2
 	github.com/google/uuid v1.1.1
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/olivere/elastic v6.2.23+incompatible // indirect
