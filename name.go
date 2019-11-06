@@ -61,7 +61,6 @@ func (n *Name) BaGua() *yi.Yi {
 		}
 		xia := getStroke(n.FirstName[0]) + getStroke(n.FirstName[1])
 		n.baGua = yi.NumberQiGua(xia, shang, shang+xia)
-		log.With("shang", shang, "xia", xia).Info("gua")
 	}
 
 	return n.baGua
