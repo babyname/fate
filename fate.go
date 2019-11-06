@@ -149,7 +149,7 @@ func (f *fateImpl) MakeName() (e error) {
 		if f.zodiacFilter && !filterZodiac(f.born, n.FirstName...) {
 			continue
 		}
-
+		//filter bagua
 		if f.baguaFilter && !filterYao(n.BaGua(), "凶", "平") {
 			continue
 		}
