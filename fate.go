@@ -138,6 +138,7 @@ func (f *fateImpl) MakeName() (e error) {
 	var tmpChar []*Character
 	//supplyFilter := false
 	for n := range name {
+		log.With("name", n.String()).Info("name")
 		tmpChar = n.FirstName
 		tmpChar = append(tmpChar, n.LastName...)
 		//filter bazi
@@ -152,7 +153,6 @@ func (f *fateImpl) MakeName() (e error) {
 		if f.baguaFilter && !filterYao(n.BaGua(), "凶", "平") {
 			continue
 		}
-		log.With("name", n.String()).Info("name")
 		log.With("born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter()).Info("bazi")
 		log.With("wuxing", n.WuXing(), "god", f.XiYong().Shen(), "pinheng", f.XiYong()).Info("xiyong")
 		ben := n.BaGua().Get(yi.BenGua)
