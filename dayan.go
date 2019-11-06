@@ -102,12 +102,12 @@ type DaYan struct {
 }
 
 //IsSex 女性不宜此数
-func (dy *DaYan) IsSex() bool {
+func (dy DaYan) IsSex() bool {
 	return dy.Sex
 }
 
 //IsMax 是否最大好运数
-func (dy *DaYan) IsMax() bool {
+func (dy DaYan) IsMax() bool {
 	return dy.Max
 }
 
