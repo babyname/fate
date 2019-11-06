@@ -29,6 +29,7 @@ type fateImpl struct {
 	nameType int
 	sex      string
 
+	debug        bool
 	isFirst      bool
 	Limit        int
 	baZi         *BaZi
@@ -55,6 +56,12 @@ func ZodiacFilter() Options {
 func SupplyFilter() Options {
 	return func(f *fateImpl) {
 		f.supplyFilter = true
+	}
+}
+
+func Debug() Options {
+	return func(f *fateImpl) {
+		f.debug = true
 	}
 }
 
@@ -138,7 +145,9 @@ func (f *fateImpl) MakeName() (e error) {
 	var tmpChar []*Character
 	//supplyFilter := false
 	for n := range name {
-		log.With("name", n.String()).Info("name")
+		if f.debug {
+			log.With("name", n.String()).Info("name")
+		}
 		tmpChar = n.FirstName
 		tmpChar = append(tmpChar, n.LastName...)
 		//filter bazi
@@ -153,12 +162,15 @@ func (f *fateImpl) MakeName() (e error) {
 		if f.baguaFilter && !filterYao(n.BaGua(), "凶", "平") {
 			continue
 		}
-		log.With("born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter()).Info("bazi")
-		log.With("wuxing", n.WuXing(), "god", f.XiYong().Shen(), "pinheng", f.XiYong()).Info("xiyong")
-		ben := n.BaGua().Get(yi.BenGua)
-		log.With("ming", ben.GuaMing, "chu", ben.ChuYaoJiXiong, "er", ben.ErYaoJiXiong, "san", ben.SanYaoJiXiong, "si", ben.SiYaoJiXiong, "wu", ben.WuYaoJiXiong, "liu", ben.ShangYaoJiXiong).Info("ben")
-		bian := n.BaGua().Get(yi.BianGua)
-		log.With("ming", bian.GuaMing, "chu", bian.ChuYaoJiXiong, "er", bian.ErYaoJiXiong, "san", bian.SanYaoJiXiong, "si", bian.SiYaoJiXiong, "wu", bian.WuYaoJiXiong, "liu", bian.ShangYaoJiXiong).Info("bian")
+		if f.debug {
+			log.With("born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter()).Info("bazi")
+			log.With("wuxing", n.WuXing(), "god", f.XiYong().Shen(), "pinheng", f.XiYong()).Info("xiyong")
+			ben := n.BaGua().Get(yi.BenGua)
+			log.With("ming", ben.GuaMing, "chu", ben.ChuYaoJiXiong, "er", ben.ErYaoJiXiong, "san", ben.SanYaoJiXiong, "si", ben.SiYaoJiXiong, "wu", ben.WuYaoJiXiong, "liu", ben.ShangYaoJiXiong).Info("ben")
+			bian := n.BaGua().Get(yi.BianGua)
+			log.With("ming", bian.GuaMing, "chu", bian.ChuYaoJiXiong, "er", bian.ErYaoJiXiong, "san", bian.SanYaoJiXiong, "si", bian.SiYaoJiXiong, "wu", bian.WuYaoJiXiong, "liu", bian.ShangYaoJiXiong).Info("bian")
+		}
+		log.With("name", n.String(), "pinyin", n.PinYin(), "bazi", f.born.Lunar().EightCharacter(), "shen", f.XiYong().Shen()).Info("info")
 	}
 	return nil
 }
