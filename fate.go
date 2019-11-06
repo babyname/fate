@@ -127,8 +127,8 @@ func (f *fateImpl) MakeName() (e error) {
 			continue
 		}
 		//filter zodiac
-		if f.zodiacFilter && true {
-			chronos.GetZodiac(f.born.Lunar())
+		if f.zodiacFilter && !filterZodiac(f.born, n.FirstName...) {
+			continue
 		}
 
 		if f.baguaFilter && true {

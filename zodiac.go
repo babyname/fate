@@ -1,6 +1,9 @@
 package fate
 
-import "strings"
+import (
+	"github.com/godcong/chronos"
+	"strings"
+)
 
 const (
 	ZodiacPig = "猪"
@@ -25,15 +28,12 @@ var zodiacList = map[string]Zodiac{
 	},
 }
 
-func GetZodiac(z string) *Zodiac {
+func GetZodiac(c chronos.Calendar) *Zodiac {
+	z := chronos.GetZodiac(c.Lunar())
 	if v, b := zodiacList[z]; b {
 		return &v
 	}
 	return nil
-}
-
-func ZodiacPoint(z *Zodiac, character *Character) int {
-	return z.Point(character)
 }
 
 func (z *Zodiac) zodiacJi(character *Character) int {
@@ -41,6 +41,20 @@ func (z *Zodiac) zodiacJi(character *Character) int {
 		return -3
 	}
 	return 0
+}
+
+func filterZodiac(c chronos.Calendar, chars ...*Character) bool {
+	return GetZodiac(c).PointCheck(3, chars...)
+}
+
+//PointCheck 检查point
+func (z *Zodiac) PointCheck(limit int, chars ...*Character) bool {
+	for _, c := range chars {
+		if z.Point(c) < limit {
+			return false
+		}
+	}
+	return true
 }
 
 //Point 喜忌对冲，理论上喜忌都有的话，最好不要选给1，忌给0，喜给5，都没有给3
