@@ -131,8 +131,8 @@ func (f *fateImpl) MakeName() (e error) {
 			continue
 		}
 
-		if f.baguaFilter && true {
-			//TODO:
+		if f.baguaFilter && !filterYao(n.baGua, "凶", "平") {
+			continue
 		}
 		log.With("name", n.String()).Info("name")
 		log.With("born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter()).Info("bazi")
