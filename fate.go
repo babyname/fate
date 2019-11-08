@@ -228,6 +228,11 @@ func (f *fateImpl) getCharacterWugeLucky(name chan<- *Name) (e error) {
 	var f1s []*Character
 	var f2s []*Character
 	for l := range lucky {
+
+		if f.strokeMin > l.FirstStroke1 || f.strokeMin > l.FirstStroke2 || f.strokeMax <= l.FirstStroke1 || f.strokeMax <= l.FirstStroke2 {
+			continue
+		}
+
 		if f.debug {
 			log.With("l1", l.LastStroke1, "l2", l.LastStroke2, "f1", l.FirstStroke1, "f2", l.FirstStroke2).Info("lucky")
 		}
