@@ -11,6 +11,8 @@ import (
 )
 
 var DefaultDatabase = "fate.db"
+var DefaultStrokeMax = 32
+var DefaultStrokeMin = 0
 
 type Fate interface {
 	MakeName() (e error)
@@ -29,6 +31,8 @@ type fateImpl struct {
 	nameType int
 	sex      string
 
+	strokeMax    int
+	strokeMin    int
 	debug        bool
 	isFirst      bool
 	Limit        int
@@ -68,8 +72,10 @@ func Debug() Options {
 //NewFate 所有的入口,新建一个fate对象
 func NewFate(lastName string, born time.Time, options ...Options) Fate {
 	f := &fateImpl{
-		last: strings.Split(lastName, ""),
-		born: chronos.New(born),
+		strokeMax: DefaultStrokeMax,
+		strokeMin: DefaultStrokeMin,
+		last:      strings.Split(lastName, ""),
+		born:      chronos.New(born),
 	}
 	f.lastChar = make([]*Character, len(f.last))
 	if len(f.last) > 2 {
@@ -222,7 +228,9 @@ func (f *fateImpl) getCharacterWugeLucky(name chan<- *Name) (e error) {
 	var f1s []*Character
 	var f2s []*Character
 	for l := range lucky {
-		log.With("l1", l.LastStroke1, "l2", l.LastStroke2, "f1", l.FirstStroke1, "f2", l.FirstStroke2).Info("lucky")
+		if f.debug {
+			log.With("l1", l.LastStroke1, "l2", l.LastStroke2, "f1", l.FirstStroke1, "f2", l.FirstStroke2).Info("lucky")
+		}
 		f1s, e = getCharacters(f, Stoker(l.FirstStroke1))
 		if e != nil {
 			return Wrap(e, "first stroke1 error")
