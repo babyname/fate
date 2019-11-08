@@ -8,7 +8,7 @@ import (
 
 func TestFate_FirstRunInit(t *testing.T) {
 	eng := fate.InitMysql("192.168.1.161:3306", "root", "111111")
-	c := chronos.New("2020/01/21 11:31")
+	c := chronos.New("2020/01/23 11:31")
 	//t.Log(c.Solar().Time())
 	f := fate.NewFate("王", c.Solar().Time(), fate.Database(eng), fate.BaGuaFilter(), fate.ZodiacFilter(), fate.SupplyFilter())
 
