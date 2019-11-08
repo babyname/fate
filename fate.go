@@ -252,7 +252,13 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 		}
 
 		for _, f1 := range f1s {
+			if len(f1.PinYin) == 0 {
+				continue
+			}
 			for _, f2 := range f2s {
+				if len(f2.PinYin) == 0 {
+					continue
+				}
 				n := createName(f, f1, f2)
 				name <- n
 			}
