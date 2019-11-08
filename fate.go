@@ -145,7 +145,7 @@ func (f *fateImpl) MakeName() (e error) {
 	}
 	name := make(chan *Name)
 	go func() {
-		e := f.getCharacterWugeLucky(name)
+		e := f.getWugeName(name)
 		if e != nil {
 			log.Error(e)
 		}
@@ -216,7 +216,7 @@ func (f *fateImpl) SetBornData(t time.Time) {
 	f.born = chronos.New(t)
 }
 
-func (f *fateImpl) getCharacterWugeLucky(name chan<- *Name) (e error) {
+func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 	defer func() {
 		close(name)
 	}()
