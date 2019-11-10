@@ -13,6 +13,7 @@ import (
 var DefaultDatabase = "fate.db"
 var DefaultStrokeMax = 32
 var DefaultStrokeMin = 0
+var HardMode = false
 
 type Fate interface {
 	MakeName() (e error)
@@ -31,6 +32,7 @@ type fateImpl struct {
 	nameType int
 	sex      string
 
+	isHard       bool
 	strokeMax    int
 	strokeMin    int
 	debug        bool
@@ -72,6 +74,7 @@ func Debug() Options {
 //NewFate 所有的入口,新建一个fate对象
 func NewFate(lastName string, born time.Time, options ...Options) Fate {
 	f := &fateImpl{
+		isHard:    HardMode,
 		strokeMax: DefaultStrokeMax,
 		strokeMin: DefaultStrokeMin,
 		last:      strings.Split(lastName, ""),
@@ -142,7 +145,7 @@ func (f *fateImpl) MakeName() (e error) {
 	}
 	name := make(chan *Name)
 	go func() {
-		e := f.getCharacterWugeLucky(name)
+		e := f.getWugeName(name)
 		if e != nil {
 			log.Error(e)
 		}
@@ -213,7 +216,7 @@ func (f *fateImpl) SetBornData(t time.Time) {
 	f.born = chronos.New(t)
 }
 
-func (f *fateImpl) getCharacterWugeLucky(name chan<- *Name) (e error) {
+func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 	defer func() {
 		close(name)
 	}()
@@ -228,6 +231,9 @@ func (f *fateImpl) getCharacterWugeLucky(name chan<- *Name) (e error) {
 	var f1s []*Character
 	var f2s []*Character
 	for l := range lucky {
+		if f.isHard && hardFilter(l) {
+			continue
+		}
 
 		if f.strokeMin > l.FirstStroke1 || f.strokeMin > l.FirstStroke2 || f.strokeMax <= l.FirstStroke1 || f.strokeMax <= l.FirstStroke2 {
 			continue
@@ -246,11 +252,34 @@ func (f *fateImpl) getCharacterWugeLucky(name chan<- *Name) (e error) {
 		}
 
 		for _, f1 := range f1s {
+			if len(f1.PinYin) == 0 {
+				continue
+			}
 			for _, f2 := range f2s {
+				if len(f2.PinYin) == 0 {
+					continue
+				}
 				n := createName(f, f1, f2)
 				name <- n
 			}
 		}
 	}
 	return nil
+}
+
+func isLucky(s string) bool {
+	if strings.Compare(s, "吉") == 0 || strings.Compare(s, "半吉") == 0 {
+		return true
+	}
+	return false
+}
+
+func hardFilter(lucky *WuGeLucky) bool {
+	if !isLucky(GetDaYan(lucky.DiGe).Lucky) ||
+		!isLucky(GetDaYan(lucky.RenGe).Lucky) ||
+		!isLucky(GetDaYan(lucky.WaiGe).Lucky) ||
+		!isLucky(GetDaYan(lucky.ZongGe).Lucky) {
+		return true
+	}
+	return false
 }
