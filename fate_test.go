@@ -6,10 +6,16 @@ import (
 	"testing"
 )
 
+func init() {
+	//trait.NewZapFileSugar("fate.log")
+}
 func TestFate_FirstRunInit(t *testing.T) {
 	eng := fate.InitMysql("192.168.1.161:3306", "root", "111111")
 	c := chronos.New("2020/01/23 11:31")
 	//t.Log(c.Solar().Time())
+	fate.DefaultStrokeMin = 3
+	fate.DefaultStrokeMax = 10
+	fate.HardMode = true
 	f := fate.NewFate("王", c.Solar().Time(), fate.Database(eng), fate.BaGuaFilter(), fate.ZodiacFilter(), fate.SupplyFilter())
 
 	//f.SetDB(eng)
