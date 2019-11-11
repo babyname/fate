@@ -6,7 +6,6 @@ import (
 	"github.com/godcong/fate"
 	"github.com/urfave/cli/v2"
 	"os"
-	"strings"
 )
 
 const programName = `fate`
@@ -15,7 +14,6 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = programName
-	app.Usage = "CLI for IPFS Cluster"
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
 			Name:  "last, l",
@@ -29,15 +27,15 @@ func main() {
 		},
 		&cli.StringFlag{
 			Name:  "database",
+			Value: "",
 			Usage: "set the database address",
-			Value: `"localhost:3306", "root", "111111"`,
 		},
 	}
 	var f fate.Fate
 	app.Before = func(c *cli.Context) error {
-		db := strings.Split(c.String("database"), ",")
+		db := c.String("database")
 		fmt.Println("database:", db)
-		eng := fate.InitMysql(db[0], db[1], db[2])
+		eng := fate.InitMysql(db, "root", "111111")
 		born := c.String("born")
 		fmt.Println("born:", born)
 		chr := chronos.New(born)
