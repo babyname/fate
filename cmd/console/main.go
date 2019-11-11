@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate"
 	"github.com/urfave/cli/v2"
 	"os"
+	"strings"
 )
 
 const programName = `fate`
@@ -25,21 +27,26 @@ func main() {
 			Value: "",
 			Usage: "set the born date Format(2006/01/02 03:04)",
 		},
-		&cli.StringSliceFlag{
-			Name:  "database, db",
+		&cli.StringFlag{
+			Name:  "database",
 			Usage: "set the database address",
-			Value: cli.NewStringSlice("localhost:3306", "root", "111111"),
+			Value: `"localhost:3306", "root", "111111"`,
 		},
 	}
 	var f fate.Fate
 	app.Before = func(c *cli.Context) error {
-		db := c.StringSlice("database")
+		db := strings.Split(c.String("database"), ",")
+		fmt.Println("database:", db)
 		eng := fate.InitMysql(db[0], db[1], db[2])
-		chronos := chronos.New(c.String("born"))
+		born := c.String("born")
+		fmt.Println("born:", born)
+		chr := chronos.New(born)
 		//fate.DefaultStrokeMin = 3
 		//fate.DefaultStrokeMax = 10
 		//fate.HardMode = false
-		f = fate.NewFate(c.String("last"), chronos.Solar().Time(), fate.Database(eng), fate.BaGuaFilter(), fate.ZodiacFilter(), fate.SupplyFilter())
+		last := c.String("last")
+		fmt.Println("last", last)
+		f = fate.NewFate(last, chr.Solar().Time(), fate.Database(eng), fate.BaGuaFilter(), fate.ZodiacFilter(), fate.SupplyFilter())
 		return nil
 	}
 	app.Action = func(context *cli.Context) error {
