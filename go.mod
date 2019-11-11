@@ -10,7 +10,7 @@ require (
 	github.com/olivere/elastic v6.2.23+incompatible // indirect
 	github.com/pelletier/go-toml v1.2.0
 	github.com/rakyll/statik v0.1.6
-	github.com/urfave/cli/v2 v2.0.0-alpha.2 // indirect
+	github.com/urfave/cli/v2 v2.0.0-alpha.2
 	github.com/xormsharp/builder v0.3.6
 	github.com/xormsharp/xorm v1.0.0
 	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5 // indirect
