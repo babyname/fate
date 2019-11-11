@@ -18,9 +18,15 @@ func main() {
 			Usage: "set the last name",
 		},
 		&cli.StringFlag{
-			Name:  "born",
+			Name:  "born, b",
 			Value: "",
 			Usage: "set the born date Format(2006/01/02 03:04)",
+		},
+		&cli.StringFlag{
+			Name:    "database, db",
+			Aliases: nil,
+			Usage:   "set the database address",
+			Value:   "",
 		},
 	}
 
