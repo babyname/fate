@@ -13,3 +13,25 @@ func NumberChar(ch *fate.Character) bool {
 	}
 	return false
 }
+
+var radicalCharList = map[string]int{
+	"扌": 1,
+	"忄": 1,
+	"氵": 1,
+	"犭": 1,
+	//TODO:add more
+}
+
+func RadicalChar(ch *fate.Character) bool {
+	for k, v := range radicalCharList {
+		if strings.Compare(ch.Radical, k) == 0 {
+			ch.Stroke += v
+			return true
+		}
+		if strings.Compare(ch.SimpleRadical, k) == 0 {
+			ch.SimpleTotalStroke += v
+			return true
+		}
+	}
+	return false
+}
