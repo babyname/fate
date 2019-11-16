@@ -19,7 +19,12 @@ var radicalCharList = map[string]int{
 	"忄": 1,
 	"氵": 1,
 	"犭": 1,
-	//TODO:add more
+	"礻": 1,
+	"王": 1,
+	"艹": 3,
+	"衤": 1,
+	"月": 3,
+	"辶": 4,
 }
 
 func RadicalChar(ch *fate.Character) bool {
