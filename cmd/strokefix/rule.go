@@ -40,3 +40,16 @@ func RadicalChar(ch *fate.Character) bool {
 	}
 	return false
 }
+
+var fixTable = []func(character *fate.Character) bool{
+	RadicalChar,
+	NumberChar,
+}
+
+func fixChar(character *fate.Character) {
+	for _, f := range fixTable {
+		if f(character) {
+			return
+		}
+	}
+}
