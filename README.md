@@ -96,5 +96,26 @@ Fate的本意是让起名变得简单,且能取到一个好的名字.
 
 
 写在最后,接口Readme:
+```   
+        //连接mysql数据库
+    	eng := fate.InitMysql("192.168.1.161:3306", "root", "111111")
+        //生日
+    	c := chronos.New("2020/01/23 11:31")
+        //姓名的最少笔画数（可不设）
+    	fate.DefaultStrokeMin = 3
+        //姓名的最大笔画数（可不设）
+    	fate.DefaultStrokeMax = 10
+ 
+        //设定数据库：fate.Database(eng)
+        //开启八卦过滤：fate.BaGuaFilter()
+        //开启生肖过滤：fate.ZodiacFilter()
+        //开启喜用神过滤：fate.SupplyFilter()
+        //第一参数：姓
+        //第二参数：生日 
+    	f := fate.NewFate("王", c.Solar().Time(), fate.Database(eng), fate.BaGuaFilter(), fate.ZodiacFilter(), fate.SupplyFilter())
     
-    暂无
+    	e := f.MakeName(context.Background())
+    	if e != nil {
+    		t.Fatal(e)
+    	}
+```
