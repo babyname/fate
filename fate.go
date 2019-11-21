@@ -157,6 +157,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 	for n := range name {
 		select {
 		case <-ctx.Done():
+			log.Info("end")
 			return
 		default:
 
