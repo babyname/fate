@@ -105,7 +105,7 @@ Fate的本意是让起名变得简单,且能取到一个好的名字.
         //姓名的最少笔画数（可不设）
     	fate.DefaultStrokeMin = 3
         //姓名的最大笔画数（可不设）
-    	fate.DefaultStrokeMax = 10
+    	fate.DefaultStrokeMax = 15
  
         //设定数据库：fate.Database(eng)
         //开启八卦过滤：fate.BaGuaFilter()
