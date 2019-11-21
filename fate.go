@@ -179,15 +179,15 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 		if f.baguaFilter && !filterYao(n.BaGua(), "凶", "平") {
 			continue
 		}
+		ben := n.BaGua().Get(yi.BenGua)
+		bian := n.BaGua().Get(yi.BianGua)
 		if f.debug {
 			log.With("born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter()).Info("bazi")
 			log.With("wuxing", n.WuXing(), "god", f.XiYong().Shen(), "pinheng", f.XiYong()).Info("xiyong")
-			ben := n.BaGua().Get(yi.BenGua)
 			log.With("ming", ben.GuaMing, "chu", ben.ChuYaoJiXiong, "er", ben.ErYaoJiXiong, "san", ben.SanYaoJiXiong, "si", ben.SiYaoJiXiong, "wu", ben.WuYaoJiXiong, "liu", ben.ShangYaoJiXiong).Info("ben")
-			bian := n.BaGua().Get(yi.BianGua)
 			log.With("ming", bian.GuaMing, "chu", bian.ChuYaoJiXiong, "er", bian.ErYaoJiXiong, "san", bian.SanYaoJiXiong, "si", bian.SiYaoJiXiong, "wu", bian.WuYaoJiXiong, "liu", bian.ShangYaoJiXiong).Info("bian")
 		}
-		log.With("name", n.String(), "pinyin", n.PinYin(), "bazi", f.born.Lunar().EightCharacter(), "shen", f.XiYong().Shen()).Info("info")
+		log.With("名字", n.String(), "本卦", ben.GuaMing, "变卦", bian.GuaMing, "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen()).Info("info")
 	}
 	return nil
 }
