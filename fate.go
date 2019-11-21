@@ -1,6 +1,7 @@
 package fate
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -16,7 +17,7 @@ var DefaultStrokeMin = 0
 var HardMode = false
 
 type Fate interface {
-	MakeName() (e error)
+	MakeName(ctx context.Context) (e error)
 	XiYong() *XiYong
 	//SetCharDB(engine *xorm.Engine)
 	//GetLastCharacter() error
@@ -122,7 +123,7 @@ func (f *fateImpl) getLastCharacter() error {
 	return nil
 }
 
-func (f *fateImpl) MakeName() (e error) {
+func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 	n, e := CountWuGeLucky(f.db)
 	if e != nil {
 		return Wrap(e, "count total error")
@@ -154,6 +155,12 @@ func (f *fateImpl) MakeName() (e error) {
 	var tmpChar []*Character
 	//supplyFilter := false
 	for n := range name {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+
+		}
 		if f.debug {
 			log.With("name", n.String()).Info("name")
 		}

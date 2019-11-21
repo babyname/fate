@@ -48,7 +48,7 @@ func main() {
 		return nil
 	}
 	app.Action = func(context *cli.Context) error {
-		e := f.MakeName()
+		e := f.MakeName(context.Context)
 		if e != nil {
 			return e
 		}
