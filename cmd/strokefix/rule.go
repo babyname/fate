@@ -13,7 +13,10 @@ func NumberChar(ch *fate.Character) bool {
 			ch.Stroke += i
 			return true
 		}
-
+		if ch.SimpleTotalStroke != 0 {
+			ch.SimpleTotalStroke += i
+			return true
+		}
 	}
 	return false
 }
