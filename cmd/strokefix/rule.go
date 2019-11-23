@@ -9,7 +9,11 @@ var numberCharList = `一二三四五六七八九十`
 
 func NumberChar(ch *fate.Character) bool {
 	if i := strings.Index(numberCharList, ch.Ch); i != -1 {
-		return true
+		if ch.Stroke != 0 {
+			ch.Stroke += i
+			return true
+		}
+
 	}
 	return false
 }
