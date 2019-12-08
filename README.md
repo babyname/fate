@@ -1,5 +1,5 @@
 # FATE: A modern science chinese name create tool #
-# FATE：现代科学取名工具 #
+# 命运：现代科学取名工具 #
 
 ## Github第一个开源的中文取名项目 ##
 
