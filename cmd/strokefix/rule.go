@@ -17,7 +17,7 @@ var charCharList = []string{
 
 func CharChar(ch *fate.Character) bool {
 	if i := strings.Index(charCharList[0], ch.Ch); i != -1 {
-
+		//TODO:
 	}
 	return false
 }
