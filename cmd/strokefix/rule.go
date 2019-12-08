@@ -15,6 +15,13 @@ var charCharList = []string{
 		`邹郢邻鄷郆郅酂酄鄊郊邓郏郇郊邗郖鄭鄫鄖郉酆酄郵郁郋邧都邶邡`,
 }
 
+func CharChar(ch *fate.Character) bool {
+	if i := strings.Index(charCharList[0], ch.Ch); i != -1 {
+
+	}
+	return false
+}
+
 var numberCharList = `一二三四五六七八九十`
 
 func NumberChar(ch *fate.Character) bool {
