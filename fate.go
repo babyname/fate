@@ -3,6 +3,7 @@ package fate
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -113,8 +114,13 @@ func (f *fateImpl) RandomName() {
 }
 
 func (f *fateImpl) getLastCharacter() error {
-	if len(f.last) == 0 {
+	size := len(f.last)
+	if size == 0 {
 		return errors.New("last name was not inputted")
+	} else if size > 2 {
+		return fmt.Errorf("%d characters last name was not supported", size)
+	} else {
+		//ok
 	}
 
 	for i, c := range f.last {
