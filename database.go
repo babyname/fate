@@ -3,34 +3,16 @@ package fate
 import (
 	"fmt"
 	"github.com/go-sql-driver/mysql"
-	"github.com/mattn/go-sqlite3"
+
 	"github.com/xormsharp/xorm"
 	"net/url"
 )
 
-const sqlite3Source = "file:%s?cache=shared&mode=rwc&_journal_mode=WAL"
 const mysqlSource = "%s:%s@tcp(%s)/%s?loc=%s&charset=utf8mb4&parseTime=true"
 const createDatabase = "CREATE DATABASE `%s` CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_bin'"
 
 var _ = mysql.Config{}
-var _ = sqlite3.SQLiteDriver{}
 var DefaultTableName = "fate"
-
-func NewSQLite3(name string) (eng *xorm.Engine, e error) {
-	eng, e = xorm.NewEngine("sqlite3", fmt.Sprintf(sqlite3Source, name))
-	if e != nil {
-		return nil, e
-	}
-	return eng, nil
-}
-
-func LoadCharacter(path string) (eng *xorm.Engine, e error) {
-	eng, e = xorm.NewEngine("sqlite3", fmt.Sprintf(sqlite3Source, path))
-	if e != nil {
-		return nil, e
-	}
-	return eng, nil
-}
 
 func InitMysql(addr, name, pass string) *xorm.Engine {
 
