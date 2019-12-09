@@ -2,6 +2,7 @@ package fate
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -112,6 +113,10 @@ func (f *fateImpl) RandomName() {
 }
 
 func (f *fateImpl) getLastCharacter() error {
+	if len(f.last) == 0 {
+		return errors.New("last name was not inputted")
+	}
+
 	for i, c := range f.last {
 		character, e := getCharacter(f, Char(c))
 		if e != nil {
