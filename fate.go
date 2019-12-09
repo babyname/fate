@@ -9,7 +9,6 @@ import (
 
 	"github.com/godcong/chronos"
 	"github.com/godcong/yi"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/xormsharp/xorm"
 )
 
