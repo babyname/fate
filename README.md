@@ -2,6 +2,9 @@
 # FATE: A modern science chinese name create tool #
 ## Github第一个开源的中文取名项目 ##
 ## The first chinese name create tool in github ##
+
+## [在起名算法中目前排第一个](https://www.google.com/search?q=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&oq=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&aqs=chrome..69i57.3721j0j8&sourceid=chrome&ie=UTF-8) ##
+
 1、配合八字命理的喜忌，是起名字的核心所在。     
 八字是每个人出生的年、月、日、时，小孩取名的第一步即是分析八字，了解命理五行所缺并找出喜用神，并且据此起名，这是最关键的核心，所有姓名的吉凶预测与取名，都以此为准。     
 2、名字用字字义务必吉祥     
