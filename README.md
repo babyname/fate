@@ -1,6 +1,5 @@
-# FATE: A modern science chinese name create tool #
 # 命运：现代科学取名工具 #
-
+# FATE: A modern science chinese name create tool #
 ## Github第一个开源的中文取名项目 ##
 ## The first chinese name create tool in github ##
 1、配合八字命理的喜忌，是起名字的核心所在。     
