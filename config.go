@@ -1,10 +1,12 @@
 package fate
 
-type NameConfig struct {
+type DBConfig struct {
 }
 
-var defaultConfig = NewNameConfig()
+type Config struct {
+	Database DBConfig
+}
 
-func NewNameConfig() *NameConfig {
-	return &NameConfig{}
+func DefaultConfig() *Config {
+	return &Config{}
 }
