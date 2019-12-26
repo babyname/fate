@@ -20,7 +20,7 @@ func UpdateFix(engine *xorm.Engine) error {
 			continue
 		}
 		if fixChar(ch) {
-			_, e := engine.Where("hash = ?", ch.Hash).Update(&ch)
+			_, e := engine.Where("hash = ?", ch.Hash).Update(ch)
 			if e != nil {
 				log.Errorw("update", "charater", ch.Ch, "error", e)
 				continue
