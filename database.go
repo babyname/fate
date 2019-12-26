@@ -3,6 +3,7 @@ package fate
 import (
 	"fmt"
 	"github.com/go-sql-driver/mysql"
+	"github.com/goextension/log"
 
 	"github.com/xormsharp/xorm"
 	"net/url"

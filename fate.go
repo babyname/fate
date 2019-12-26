@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/goextension/log"
 	"strings"
 	"time"
 
@@ -127,7 +128,7 @@ func (f *fateImpl) getLastCharacter() error {
 		if e != nil {
 			return e
 		}
-		log.With("index", i, "char", c, "character", character).Info("last name")
+		log.Infow("lastname", "index", i, "char", c, "character", character)
 		f.lastChar[i] = character
 	}
 	return nil
@@ -173,7 +174,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 
 		}
 		if f.debug {
-			log.With("name", n.String()).Info("name")
+			log.Infow("name", "name", n.String())
 		}
 		tmpChar = n.FirstName
 		tmpChar = append(tmpChar, n.LastName...)
@@ -192,12 +193,12 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 		ben := n.BaGua().Get(yi.BenGua)
 		bian := n.BaGua().Get(yi.BianGua)
 		if f.debug {
-			log.With("born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter()).Info("bazi")
-			log.With("wuxing", n.WuXing(), "god", f.XiYong().Shen(), "pinheng", f.XiYong()).Info("xiyong")
-			log.With("ming", ben.GuaMing, "chu", ben.ChuYaoJiXiong, "er", ben.ErYaoJiXiong, "san", ben.SanYaoJiXiong, "si", ben.SiYaoJiXiong, "wu", ben.WuYaoJiXiong, "liu", ben.ShangYaoJiXiong).Info("ben")
-			log.With("ming", bian.GuaMing, "chu", bian.ChuYaoJiXiong, "er", bian.ErYaoJiXiong, "san", bian.SanYaoJiXiong, "si", bian.SiYaoJiXiong, "wu", bian.WuYaoJiXiong, "liu", bian.ShangYaoJiXiong).Info("bian")
+			log.Infow("bazi", "born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter())
+			log.Infow("xiyong", "wuxing", n.WuXing(), "god", f.XiYong().Shen(), "pinheng", f.XiYong())
+			log.Infow("ben", "ming", ben.GuaMing, "chu", ben.ChuYaoJiXiong, "er", ben.ErYaoJiXiong, "san", ben.SanYaoJiXiong, "si", ben.SiYaoJiXiong, "wu", ben.WuYaoJiXiong, "liu", ben.ShangYaoJiXiong)
+			log.Infow("bian", "ming", bian.GuaMing, "chu", bian.ChuYaoJiXiong, "er", bian.ErYaoJiXiong, "san", bian.SanYaoJiXiong, "si", bian.SiYaoJiXiong, "wu", bian.WuYaoJiXiong, "liu", bian.ShangYaoJiXiong)
 		}
-		log.With("名字", n.String(), "本卦", ben.GuaMing, "变卦", bian.GuaMing, "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen()).Info("info")
+		log.Infow("info", "名字", n.String(), "本卦", ben.GuaMing, "变卦", bian.GuaMing, "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen())
 	}
 	return nil
 }
@@ -255,7 +256,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 		}
 
 		if f.debug {
-			log.With("l1", l.LastStroke1, "l2", l.LastStroke2, "f1", l.FirstStroke1, "f2", l.FirstStroke2).Info("lucky")
+			log.Infow("lucky", "l1", l.LastStroke1, "l2", l.LastStroke2, "f1", l.FirstStroke1, "f2", l.FirstStroke2)
 		}
 		f1s, e = getCharacters(f, Stoker(l.FirstStroke1))
 		if e != nil {
