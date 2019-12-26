@@ -11,7 +11,7 @@ type Character struct {
 	Hash                     string   `xorm:"pk hash"`
 	PinYin                   []string `xorm:"default() notnull pin_yin"` //拼音
 	Ch                       string   `xorm:"default() notnull ch"`      //字符
-	ScienceStroke            int      `xorm:"science_stroke" json:"science_stroke"`
+	ScienceStroke            int      `xorm:"default (0) notnull science_stroke" json:"science_stroke"`
 	Radical                  string   `xorm:"default() notnull radical"`                     //部首
 	RadicalStroke            int      `xorm:"default(0) notnull radical_stroke"`             //部首笔画
 	Stroke                   int      `xorm:"default() notnull stroke"`                      //总笔画数
