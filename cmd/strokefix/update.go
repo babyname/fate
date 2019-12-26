@@ -23,6 +23,7 @@ func UpdateFix(engine *xorm.Engine) error {
 			_, e := engine.Where("hash = ?", ch.Hash).Update(&ch)
 			if e != nil {
 				log.Errorw("update", "charater", ch.Ch, "error", e)
+				continue
 			}
 			log.Infow("updated", "charater", ch.Ch, "stroke", ch.ScienceStroke)
 		}
