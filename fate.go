@@ -212,10 +212,7 @@ func (f *fateImpl) XiYong() *XiYong {
 func (f *fateImpl) init() {
 	var e error
 	if f.db == nil {
-		f.db, e = NewSQLite3(DefaultDatabase)
-		if e != nil {
-			panic(e)
-		}
+		panic("database was not set")
 	}
 
 	//use the same db when char db not set

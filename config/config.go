@@ -1,115 +1,52 @@
 package config
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"os"
-
-	"github.com/pelletier/go-toml"
+	"path/filepath"
 )
 
+const DefaultJSONName = "config.json"
+
 type Config struct {
-	*toml.Tree
+	Database Database `json:"database"`
 }
 
-const DefaultFileName = "config.toml"
-
-var config *Config
+var DefaultJSONPath = ""
 
 func init() {
-	config = defaultConfig()
+	if DefaultJSONPath == "" {
+		dir, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+		s, err := filepath.Abs(dir)
+		if err != nil {
+			panic(err)
+		}
+		DefaultJSONPath = s
+	}
 }
 
-func Default() *Config {
+func setDefault(config *Config) *Config {
+	if config == nil {
+		config = &Config{}
+	}
+	//TODO:
 	return config
 }
 
-//NewConfig panic prevent do not return nil
-func NewConfig(name string) *Config {
-	file, err := os.OpenFile(name, os.O_RDONLY, os.ModePerm)
-	if err != nil {
-		return &Config{
-			Tree: &toml.Tree{},
-		}
+func LoadConfig() (c *Config) {
+	c = &Config{}
+	f := filepath.Join(DefaultJSONPath, DefaultJSONName)
+	bys, e := ioutil.ReadFile(f)
+	if e != nil {
+		return setDefault(c)
 	}
-	tree, err := toml.LoadReader(file)
-	if err != nil {
-		return &Config{
-			Tree: &toml.Tree{},
-		}
+	e = json.Unmarshal(bys, &c)
+	if e != nil {
+		return setDefault(c)
 	}
-	return &Config{
-		Tree: tree,
-	}
-}
-
-func defaultConfig() *Config {
-	return NewConfig(DefaultFileName)
-}
-
-//GetTree  GetTree
-func (c *Config) GetTree(name string) *toml.Tree {
-	if c == nil {
-		return nil
-	}
-	if v := c.Get(name); v != nil {
-		if tree, b := v.(*toml.Tree); b {
-			return tree
-		}
-	}
-	return nil
-}
-
-//GetSub GetSub
-func (c *Config) GetSub(name string) *Config {
-	if v := c.GetTree(name); v != nil {
-		return &Config{
-			Tree: v,
-		}
-	}
-	return (*Config)(nil)
-}
-
-//GetString GetString
-func (c *Config) GetString(name string) string {
-	if v := c.Get(name); v != nil {
-		if v1, b := v.(string); b {
-			return v1
-		}
-	}
-	return ""
-}
-
-//GetStringD GetStringD
-func (c *Config) GetStringD(name string, def string) string {
-	if c == nil {
-		return def
-	}
-	if v := c.Get(name); v != nil {
-		if v1, b := v.(string); b {
-			return v1
-		}
-	}
-	return def
-}
-
-//GetBool GetBool
-func (c *Config) GetBool(name string) bool {
-	if c == nil {
-		return false
-	}
-	if v := c.Get(name); v != nil {
-		if v1, b := v.(bool); b {
-			return v1
-		}
-	}
-	return false
-}
-
-//GetBoolD GetBoolD
-func (c *Config) GetBoolD(name string, def bool) bool {
-	if v := c.Get(name); v != nil {
-		if v1, b := v.(bool); b {
-			return v1
-		}
-	}
-	return def
+	return c
 }
