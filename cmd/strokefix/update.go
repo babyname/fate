@@ -14,7 +14,7 @@ func UpdateFix(engine *xorm.Engine) error {
 	var ch *fate.Character
 	for rows.Next() {
 		ch = &fate.Character{}
-		e := rows.Scan(&ch)
+		e := rows.Scan(ch)
 		if e != nil {
 			log.Errorw("fix", "charater", ch.Ch, "error", e)
 			continue
@@ -24,6 +24,7 @@ func UpdateFix(engine *xorm.Engine) error {
 			if e != nil {
 				log.Errorw("update", "charater", ch.Ch, "error", e)
 			}
+			log.Info("updated", "charater", ch.Ch, "stroke", ch.ScienceStroke)
 		}
 	}
 	return nil
