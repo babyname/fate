@@ -1,6 +1,7 @@
 package fate
 
 import (
+	"github.com/goextension/log"
 	"github.com/google/uuid"
 	"github.com/xormsharp/xorm"
 )
@@ -175,7 +176,7 @@ func InsertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e 
 	if e != nil {
 		return n, e
 	}
-	log.With("lucky", lucky).Info("count:", n)
+	log.Infow("lucky", lucky)
 	if n == 0 {
 		n, e = engine.InsertOne(lucky)
 		return
