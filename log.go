@@ -1,5 +1,9 @@
 package fate
 
-import "github.com/godcong/go-trait"
+import (
+	"github.com/goextension/log/zap"
+)
 
-var log = trait.NewZapFileSugar(`fate.log`)
+func init() {
+	zap.InitZapFileSugar()
+}
