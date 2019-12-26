@@ -27,11 +27,11 @@ var numberCharList = `一二三四五六七八九十`
 func NumberChar(ch *fate.Character) bool {
 	if i := strings.Index(numberCharList, ch.Ch); i != -1 {
 		if ch.Stroke != 0 {
-			ch.Stroke += i
+			ch.ScienceStroke = ch.Stroke + i
 			return true
 		}
 		if ch.SimpleTotalStroke != 0 {
-			ch.SimpleTotalStroke += i
+			ch.ScienceStroke = ch.SimpleTotalStroke + i
 			return true
 		}
 	}
@@ -54,11 +54,11 @@ var radicalCharList = map[string]int{
 func RadicalChar(ch *fate.Character) bool {
 	for k, v := range radicalCharList {
 		if strings.Compare(ch.Radical, k) == 0 {
-			ch.Stroke += v
+			ch.ScienceStroke = ch.Stroke + v
 			return true
 		}
 		if strings.Compare(ch.SimpleRadical, k) == 0 {
-			ch.SimpleTotalStroke += v
+			ch.ScienceStroke = ch.SimpleTotalStroke + v
 			return true
 		}
 	}
@@ -68,12 +68,14 @@ func RadicalChar(ch *fate.Character) bool {
 var fixTable = []func(character *fate.Character) bool{
 	RadicalChar,
 	NumberChar,
+	CharChar,
 }
 
-func fixChar(character *fate.Character) {
+func fixChar(character *fate.Character) bool {
 	for _, f := range fixTable {
 		if f(character) {
-			return
+			return true
 		}
 	}
+	return false
 }
