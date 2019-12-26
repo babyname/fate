@@ -24,7 +24,7 @@ func UpdateFix(engine *xorm.Engine) error {
 			if e != nil {
 				log.Errorw("update", "charater", ch.Ch, "error", e)
 			}
-			log.Info("updated", "charater", ch.Ch, "stroke", ch.ScienceStroke)
+			log.Infow("updated", "charater", ch.Ch, "stroke", ch.ScienceStroke)
 		}
 	}
 	return nil
