@@ -27,6 +27,17 @@ func CharChar(ch *fate.Character) bool {
 		}
 	}
 
+	if i := strings.Index(charCharList[0], ch.Ch); i != -1 {
+		if ch.Stroke != 0 {
+			ch.ScienceStroke = ch.Stroke + 7
+			return true
+		}
+		if ch.SimpleTotalStroke != 0 {
+			ch.ScienceStroke = ch.SimpleTotalStroke + 7
+			return true
+		}
+	}
+
 	return false
 }
 
