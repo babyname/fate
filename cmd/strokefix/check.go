@@ -37,11 +37,11 @@ func CheckVerify(db *xorm.Engine) error {
 		})
 		if e != nil {
 			log.Errorw("check error", "character", s)
-			continue
+			return e
 		}
 		if character.ScienceStroke != idx {
 			log.Warnw("check warning", "character", s, "db", character.ScienceStroke, "need", idx)
 		}
 	}
-
+	return nil
 }
