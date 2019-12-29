@@ -10,11 +10,16 @@ func main() {
 		panic(e)
 	}
 
-	CheckLoader("check.json")
-
 	e = UpdateFix(db)
 	if e != nil {
 		panic(e)
 	}
-
+	e = CheckLoader("check.json")
+	if e != nil {
+		panic(e)
+	}
+	e = CheckVerify(db)
+	if e != nil {
+		panic(e)
+	}
 }
