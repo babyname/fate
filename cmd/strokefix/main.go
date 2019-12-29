@@ -9,8 +9,12 @@ func main() {
 	if e != nil {
 		panic(e)
 	}
+
+	CheckLoader("check.json")
+
 	e = UpdateFix(db)
 	if e != nil {
 		panic(e)
 	}
+
 }
