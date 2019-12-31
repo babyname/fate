@@ -56,10 +56,7 @@ func CheckVerify(db *xorm.Engine) error {
 
 func verifySub(engine *xorm.Engine, m map[string][]string, fn WuXingFunc) error {
 	for k, v := range m {
-		log.Infof("%+v,val:%+v", k, v)
 		for _, vv := range v {
-
-			log.Infow("check", "character", vv)
 			character, e := fate.GetCharacter(engine, func(eng *xorm.Engine) *xorm.Session {
 				return eng.Where("ch = ?", vv)
 			})
@@ -68,7 +65,7 @@ func verifySub(engine *xorm.Engine, m map[string][]string, fn WuXingFunc) error 
 				continue
 			}
 			if !fn(character.WuXing) {
-				log.Warnw("wrong wuxing", "character", vv)
+				log.Warnw("wrong wuxing", "character", vv, "wuxing", character.WuXing)
 			}
 			i, _ := strconv.Atoi(k)
 			if character.ScienceStroke != i {
