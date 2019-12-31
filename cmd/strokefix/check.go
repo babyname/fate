@@ -63,7 +63,7 @@ func verifySub(engine *xorm.Engine, m map[string][]string, wx string) error {
 				return eng.Where("ch = ?", vv)
 			})
 			if e != nil {
-				log.Errorw("check error", "character", vv)
+				log.Errorw("get character error", "character", vv)
 				continue
 			}
 			if character.WuXing != wx {
@@ -71,7 +71,7 @@ func verifySub(engine *xorm.Engine, m map[string][]string, wx string) error {
 					//fix wuxing
 					character.WuXing = wx
 				} else {
-					log.Warnw("wrong wuxing", "character", vv, "wuxing", character.WuXing)
+					log.Warnw("wrong wuxing", "character", vv, "charwuxing", character.WuXing, "dictwuxing", wx)
 				}
 			}
 			i, _ := strconv.Atoi(k)
@@ -88,7 +88,7 @@ func verifySub(engine *xorm.Engine, m map[string][]string, wx string) error {
 				return e
 			}
 			if update != 1 {
-				log.Errorw("not updated", "update", update)
+				//log.Errorw("not updated", "update", update)
 			}
 		}
 	}
