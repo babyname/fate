@@ -76,9 +76,9 @@ func verifySub(engine *xorm.Engine, m map[string][]string, wx string) error {
 			}
 			i, _ := strconv.Atoi(k)
 			if character.ScienceStroke != i {
+				log.Warnw("check warning", "character", vv, "db", character.ScienceStroke, "need", k)
 				//fix stroke
 				character.ScienceStroke = i
-				log.Warnw("check warning", "character", vv, "db", character.ScienceStroke, "need", k)
 			}
 			update, e := engine.Where("hash = ?", character.Hash).Update(character)
 			if e != nil {
