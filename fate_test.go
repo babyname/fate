@@ -12,6 +12,7 @@ func init() {
 }
 func TestFate_FirstRunInit(t *testing.T) {
 	eng := fate.InitMysql("127.0.0.1", "root", "111111")
+
 	c := chronos.New("2020/01/23 11:31")
 	//t.Log(c.Solar().Time())
 	fate.DefaultStrokeMin = 3
