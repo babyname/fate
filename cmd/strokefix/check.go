@@ -35,26 +35,26 @@ func CheckLoader(s string) error {
 }
 
 func CheckVerify(db *xorm.Engine) error {
-	verifySub(db, dict.Jin, func(s string) bool {
-		return s == "金"
-	})
-	verifySub(db, dict.Mu, func(s string) bool {
-		return s == "木"
-	})
-	verifySub(db, dict.Shui, func(s string) bool {
-		return s == "水"
-	})
-	verifySub(db, dict.Huo, func(s string) bool {
-		return s == "火"
-	})
-	verifySub(db, dict.Tu, func(s string) bool {
-		return s == "土"
-	})
+	if err := verifySub(db, dict.Jin, "金"); err != nil {
+		return err
+	}
+	if err := verifySub(db, dict.Mu, "木"); err != nil {
+		return err
+	}
+	if err := verifySub(db, dict.Shui, "水"); err != nil {
+		return err
+	}
+	if err := verifySub(db, dict.Huo, "火"); err != nil {
+		return err
+	}
+	if err := verifySub(db, dict.Tu, "土"); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func verifySub(engine *xorm.Engine, m map[string][]string, fn WuXingFunc) error {
+func verifySub(engine *xorm.Engine, m map[string][]string, wx string) error {
 	count := 0
 	for k, v := range m {
 		for _, vv := range v {
@@ -66,12 +66,29 @@ func verifySub(engine *xorm.Engine, m map[string][]string, fn WuXingFunc) error 
 				log.Errorw("check error", "character", vv)
 				continue
 			}
-			if !fn(character.WuXing) {
-				log.Warnw("wrong wuxing", "character", vv, "wuxing", character.WuXing)
+			if character.WuXing != wx {
+				if character.WuXing == "" {
+					//fix wuxing
+					character.WuXing = wx
+				} else {
+					log.Warnw("wrong wuxing", "character", vv, "wuxing", character.WuXing)
+				}
 			}
 			i, _ := strconv.Atoi(k)
 			if character.ScienceStroke != i {
-				log.Warnw("check warning", "character", vv, "db", character.ScienceStroke, "need", k)
+				if character.ScienceStroke == 0 {
+					//fix stroke
+					character.ScienceStroke = i
+				} else {
+					log.Warnw("check warning", "character", vv, "db", character.ScienceStroke, "need", k)
+				}
+			}
+			update, e := engine.Update(character)
+			if e != nil {
+				return e
+			}
+			if update != 1 {
+				log.Errorw("not updated", "update", update)
 			}
 		}
 	}
