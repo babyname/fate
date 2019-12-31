@@ -223,7 +223,9 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 }
 
 func getStroke(character *Character) int {
-	if character.KangXiStroke != 0 {
+	if character.ScienceStroke != 0 {
+		return character.ScienceStroke
+	} else if character.KangXiStroke != 0 {
 		return character.KangXiStroke
 	} else if character.Stroke != 0 {
 		return character.Stroke
