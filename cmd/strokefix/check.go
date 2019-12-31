@@ -55,8 +55,10 @@ func CheckVerify(db *xorm.Engine) error {
 }
 
 func verifySub(engine *xorm.Engine, m map[string][]string, fn WuXingFunc) error {
+	count := 0
 	for k, v := range m {
 		for _, vv := range v {
+			count++
 			character, e := fate.GetCharacter(engine, func(eng *xorm.Engine) *xorm.Session {
 				return eng.Where("ch = ?", vv)
 			})
@@ -72,7 +74,7 @@ func verifySub(engine *xorm.Engine, m map[string][]string, fn WuXingFunc) error 
 				log.Warnw("check warning", "character", vv, "db", character.ScienceStroke, "need", k)
 			}
 		}
-
 	}
+	log.Infow("total", "count", count)
 	return nil
 }
