@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/godcong/fate"
 	"github.com/goextension/log"
 	"github.com/xormsharp/xorm"
@@ -18,45 +17,64 @@ type Dict struct {
 	Tu   map[string][]string `json:"tu"`
 }
 
+var dict Dict
+
+type WuXingFunc func(s string) bool
+
 func CheckLoader(s string) error {
 	bytes, e := ioutil.ReadFile(s)
 	if e != nil {
 		return e
 	}
-
-	e = json.Unmarshal(bytes, &checks)
+	e = json.Unmarshal(bytes, &dict)
 	if e != nil {
 		return e
-	}
-
-	if len(checks) == 0 {
-		return errors.New("no data")
 	}
 
 	return nil
 }
 
 func CheckVerify(db *xorm.Engine) error {
-	for _, s := range checks {
-		for five, val := range s {
-			for idx, vv := range val {
-				log.Infof("%+v,val:%+v", idx, val)
-				continue
-				log.Infow("check", "character", s)
-				character, e := fate.GetCharacter(db, func(eng *xorm.Engine) *xorm.Session {
-					return eng.Where("ch = ?", s)
-				})
-				if e != nil {
-					log.Errorw("check error", "character", s)
-					return e
-				}
-				i, _ := strconv.Atoi(idx)
-				if character.ScienceStroke != i {
-					log.Warnw("check warning", "character", s, "db", character.ScienceStroke, "need", idx)
-				}
-			}
+	verifySub(db, dict.Jin, func(s string) bool {
+		return s == "金"
+	})
+	verifySub(db, dict.Mu, func(s string) bool {
+		return s == "木"
+	})
+	verifySub(db, dict.Shui, func(s string) bool {
+		return s == "水"
+	})
+	verifySub(db, dict.Huo, func(s string) bool {
+		return s == "火"
+	})
+	verifySub(db, dict.Tu, func(s string) bool {
+		return s == "土"
+	})
 
+	return nil
+}
+
+func verifySub(engine *xorm.Engine, m map[string][]string, fn WuXingFunc) error {
+	for k, v := range m {
+		log.Infof("%+v,val:%+v", k, v)
+		for _, vv := range v {
+			if !fn(vv) {
+				log.Warnw("wrong wuxing", "character", vv)
+			}
+			log.Infow("check", "character", vv)
+			character, e := fate.GetCharacter(engine, func(eng *xorm.Engine) *xorm.Session {
+				return eng.Where("ch = ?", vv)
+			})
+			if e != nil {
+				log.Errorw("check error", "character", vv)
+				return e
+			}
+			i, _ := strconv.Atoi(k)
+			if character.ScienceStroke != i {
+				log.Warnw("check warning", "character", vv, "db", character.ScienceStroke, "need", k)
+			}
 		}
+
 	}
 	return nil
 }

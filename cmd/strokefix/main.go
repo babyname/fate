@@ -10,11 +10,11 @@ func main() {
 		panic(e)
 	}
 
-	e = UpdateFix(db)
-	if e != nil {
-		panic(e)
-	}
-	e = CheckLoader("check.json")
+	//e = UpdateFix(db)
+	//if e != nil {
+	//	panic(e)
+	//}
+	e = CheckLoader(`E:\project\fate\cmd\strokefix\dict.json`)
 	if e != nil {
 		panic(e)
 	}
