@@ -83,7 +83,7 @@ func verifySub(engine *xorm.Engine, m map[string][]string, wx string) error {
 					log.Warnw("check warning", "character", vv, "db", character.ScienceStroke, "need", k)
 				}
 			}
-			update, e := engine.Update(character)
+			update, e := engine.Where("hash = ?", character.Hash).Update(character)
 			if e != nil {
 				return e
 			}
