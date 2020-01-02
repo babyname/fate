@@ -237,7 +237,7 @@ func getStroke(character *Character) int {
 	return 0
 }
 
-func filterWuGe(eng *xorm.Engine, last []string, wg chan<- *WuGeLucky) error {
+func filterWuGe(eng *xorm.Engine, last []*Character, wg chan<- *WuGeLucky) error {
 	defer func() {
 		close(wg)
 	}()

@@ -225,7 +225,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 	}()
 	lucky := make(chan *WuGeLucky)
 	go func() {
-		e = f.db.FilterWuGe(f.last, lucky)
+		e = f.db.FilterWuGe(f.lastChar, lucky)
 		if e != nil {
 			log.Error(e)
 			return
