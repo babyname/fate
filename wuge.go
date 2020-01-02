@@ -237,16 +237,16 @@ func getStroke(character *Character) int {
 	return 0
 }
 
-func filterWuGe(wg chan<- *WuGeLucky, f *fateImpl) error {
+func filterWuGe(engine *xorm.Engine, last []*Character, wg chan<- *WuGeLucky) error {
 	defer func() {
 		close(wg)
 	}()
-	l1 := getStroke(f.lastChar[0])
+	l1 := getStroke(last[0])
 	l2 := 0
 	if len(f.last) == 2 {
-		l2 = getStroke(f.lastChar[1])
+		l2 = getStroke(last[1])
 	}
-	s := f.db.Where("last_stroke_1 =?", l1).
+	s := eng.Where("last_stroke_1 =?", l1).
 		And("last_stroke_2 =?", l2).
 		And("zong_lucky = ?", 1)
 	rows, e := s.Rows(&WuGeLucky{})
