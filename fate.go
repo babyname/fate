@@ -48,6 +48,12 @@ type fateImpl struct {
 
 type Options func(f *fateImpl)
 
+func DBOption(database Database) Options {
+	return func(f *fateImpl) {
+		f.db = database
+	}
+}
+
 func BaGuaFilter() Options {
 	return func(f *fateImpl) {
 		f.baguaFilter = true
@@ -219,7 +225,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 	}()
 	lucky := make(chan *WuGeLucky)
 	go func() {
-		e = filterWuGe(lucky, f)
+		e = f.db.FilterWuGe(f.last, lucky)
 		if e != nil {
 			log.Error(e)
 			return
@@ -239,11 +245,11 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 		if f.debug {
 			log.Infow("lucky", "l1", l.LastStroke1, "l2", l.LastStroke2, "f1", l.FirstStroke1, "f2", l.FirstStroke2)
 		}
-		f1s, e = getCharacters(f, Stoker(l.FirstStroke1))
+		f1s, e = f.db.GetCharacters(Stoker(l.FirstStroke1))
 		if e != nil {
 			return Wrap(e, "first stroke1 error")
 		}
-		f2s, e = getCharacters(f, Stoker(l.FirstStroke2))
+		f2s, e = f.db.GetCharacters(Stoker(l.FirstStroke2))
 		if e != nil {
 			return Wrap(e, "first stoke2 error")
 		}
