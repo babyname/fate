@@ -162,11 +162,11 @@ func (w *WuGeLucky) BeforeInsert() {
 	w.ID = uuid.Must(uuid.NewUUID()).String()
 }
 
-func CountWuGeLucky(engine *xorm.Engine) (n int64, e error) {
+func countWuGeLucky(engine *xorm.Engine) (n int64, e error) {
 	return engine.Table(&WuGeLucky{}).Count()
 }
 
-func InsertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e error) {
+func insertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e error) {
 	session := engine.Where("last_stroke_1 = ?", lucky.LastStroke1).
 		Where("last_stroke_2 = ?", lucky.LastStroke2).
 		Where("first_stroke_1 = ?", lucky.FirstStroke1).
