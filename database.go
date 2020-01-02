@@ -17,15 +17,35 @@ var _ = mysql.Config{}
 var DefaultTableName = "fate"
 
 type Database interface {
+	Sync(v ...interface{}) error
+	CountWuGeLucky() (n int64, e error)
+	InsertOrUpdateWuGeLucky(lucky *WuGeLucky) (n int64, e error)
+	GetCharacter(fn func(engine *xorm.Engine) *xorm.Session) (*Character, error)
 }
 
 type xormDatabase struct {
 	*xorm.Engine
 }
 
+func (db *xormDatabase) Sync(v ...interface{}) error {
+	return db.Engine.Sync2(v...)
+}
+
+func (db *xormDatabase) GetCharacter(fn func(engine *xorm.Engine) *xorm.Session) (*Character, error) {
+	return getCharacter(db.Engine, fn)
+}
+
+func (db *xormDatabase) InsertOrUpdateWuGeLucky(lucky *WuGeLucky) (n int64, e error) {
+	return insertOrUpdateWuGeLucky(db.Engine, lucky)
+}
+
+func (db *xormDatabase) CountWuGeLucky() (n int64, e error) {
+	return countWuGeLucky(db.Engine)
+}
+
 func InitFromConfig(config config.Config) Database {
 	engine := initSQL(config.Database)
-	return xormDatabase{
+	return &xormDatabase{
 		Engine: engine,
 	}
 }
