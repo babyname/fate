@@ -237,13 +237,13 @@ func getStroke(character *Character) int {
 	return 0
 }
 
-func filterWuGe(engine *xorm.Engine, last []*Character, wg chan<- *WuGeLucky) error {
+func filterWuGe(eng *xorm.Engine, last []*Character, wg chan<- *WuGeLucky) error {
 	defer func() {
 		close(wg)
 	}()
 	l1 := getStroke(last[0])
 	l2 := 0
-	if len(f.last) == 2 {
+	if len(last) == 2 {
 		l2 = getStroke(last[1])
 	}
 	s := eng.Where("last_stroke_1 =?", l1).
