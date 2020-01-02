@@ -10,7 +10,14 @@ import (
 const DefaultJSONName = "config.json"
 
 type Config struct {
-	Database Database `json:"database"`
+	HardMode     bool
+	StrokeMax    int
+	StrokeMin    int
+	FixBazi      bool     //八字修正
+	SupplyFilter bool     //过滤补八字
+	ZodiacFilter bool     //过滤生肖
+	BaguaFilter  bool     //过滤卦象
+	Database     Database `json:"database"`
 }
 
 var DefaultJSONPath = ""
