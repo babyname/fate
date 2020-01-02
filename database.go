@@ -21,10 +21,20 @@ type Database interface {
 	CountWuGeLucky() (n int64, e error)
 	InsertOrUpdateWuGeLucky(lucky *WuGeLucky) (n int64, e error)
 	GetCharacter(fn func(engine *xorm.Engine) *xorm.Session) (*Character, error)
+	GetCharacters(fn func(engine *xorm.Engine) *xorm.Session) ([]*Character, error)
+	FilterWuGe(last []*Character, wg chan<- *WuGeLucky) error
 }
 
 type xormDatabase struct {
 	*xorm.Engine
+}
+
+func (db *xormDatabase) FilterWuGe(last []*Character, wg chan<- *WuGeLucky) error {
+	return filterWuGe(db.Engine, last, wg)
+}
+
+func (db *xormDatabase) GetCharacters(fn func(engine *xorm.Engine) *xorm.Session) ([]*Character, error) {
+	return getCharacters(db.Engine, fn)
 }
 
 func (db *xormDatabase) Sync(v ...interface{}) error {
