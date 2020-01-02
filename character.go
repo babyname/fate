@@ -33,24 +33,14 @@ type Character struct {
 	Comment                  []string `xorm:"default() notnull comment"`                     //解释
 }
 
-func getCharacters(f *fateImpl, fn func(engine *xorm.Engine) *xorm.Session) ([]*Character, error) {
-	s := fn(f.chardb)
+func getCharacters(engine *xorm.Engine, fn func(engine *xorm.Engine) *xorm.Session) ([]*Character, error) {
+	s := fn(engine)
 	var c []*Character
 	e := s.Find(&c)
 	if e == nil {
 		return c, nil
 	}
 	return nil, fmt.Errorf("character list get error:%w", e)
-}
-
-func GetCharacter(eng *xorm.Engine, fn func(eng *xorm.Engine) *xorm.Session) (*Character, error) {
-	s := fn(eng)
-	var c Character
-	b, e := s.Get(&c)
-	if e == nil && b {
-		return &c, nil
-	}
-	return nil, fmt.Errorf("character get error:%w", e)
 }
 
 func getCharacter(eng *xorm.Engine, fn func(engine *xorm.Engine) *xorm.Session) (*Character, error) {
