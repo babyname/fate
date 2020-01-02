@@ -53,8 +53,8 @@ func GetCharacter(eng *xorm.Engine, fn func(eng *xorm.Engine) *xorm.Session) (*C
 	return nil, fmt.Errorf("character get error:%w", e)
 }
 
-func getCharacter(f *fateImpl, fn func(engine *xorm.Engine) *xorm.Session) (*Character, error) {
-	s := fn(f.chardb)
+func getCharacter(eng *xorm.Engine, fn func(engine *xorm.Engine) *xorm.Session) (*Character, error) {
+	s := fn(eng)
 	var c Character
 	b, e := s.Get(&c)
 	if e == nil && b {

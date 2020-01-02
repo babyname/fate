@@ -10,7 +10,6 @@ import (
 
 	"github.com/godcong/chronos"
 	"github.com/godcong/yi"
-	"github.com/xormsharp/xorm"
 )
 
 var DefaultDatabase = "fate.db"
@@ -26,8 +25,7 @@ type Fate interface {
 }
 
 type fateImpl struct {
-	chardb   *xorm.Engine
-	db       *xorm.Engine
+	db       Database
 	born     chronos.Calendar
 	last     []string
 	lastChar []*Character
@@ -97,18 +95,6 @@ func NewFate(lastName string, born time.Time, options ...Options) Fate {
 	return f
 }
 
-func Database(engine *xorm.Engine) Options {
-	return func(f *fateImpl) {
-		f.db = engine
-	}
-}
-
-func CharacterDatabase(engine *xorm.Engine) Options {
-	return func(f *fateImpl) {
-		f.chardb = engine
-	}
-}
-
 func (f *fateImpl) RandomName() {
 	//filterWuGe(f.db, f.last...)
 }
@@ -124,7 +110,7 @@ func (f *fateImpl) getLastCharacter() error {
 	}
 
 	for i, c := range f.last {
-		character, e := getCharacter(f, Char(c))
+		character, e := f.db.GetCharacter(Char(c))
 		if e != nil {
 			return e
 		}
@@ -135,7 +121,7 @@ func (f *fateImpl) getLastCharacter() error {
 }
 
 func (f *fateImpl) MakeName(ctx context.Context) (e error) {
-	n, e := CountWuGeLucky(f.db)
+	n, e := f.db.CountWuGeLucky()
 	if e != nil {
 		return Wrap(e, "count total error")
 	}
@@ -144,7 +130,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 		lucky := make(chan *WuGeLucky)
 		go initWuGe(lucky)
 		for la := range lucky {
-			_, e = InsertOrUpdateWuGeLucky(f.db, la)
+			_, e = f.db.InsertOrUpdateWuGeLucky(la)
 			if e != nil {
 				return Wrap(e, "insert failed")
 			}
@@ -216,12 +202,7 @@ func (f *fateImpl) init() {
 		panic("database was not set")
 	}
 
-	//use the same db when char db not set
-	if f.chardb == nil {
-		f.chardb = f.db
-	}
-
-	e = f.db.Sync2(WuGeLucky{})
+	e = f.db.Sync(WuGeLucky{})
 	if e != nil {
 		panic(e)
 	}
