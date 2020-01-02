@@ -22,14 +22,14 @@ type Database interface {
 	InsertOrUpdateWuGeLucky(lucky *WuGeLucky) (n int64, e error)
 	GetCharacter(fn func(engine *xorm.Engine) *xorm.Session) (*Character, error)
 	GetCharacters(fn func(engine *xorm.Engine) *xorm.Session) ([]*Character, error)
-	FilterWuGe(last []string, wg chan<- *WuGeLucky) error
+	FilterWuGe(last []*Character, wg chan<- *WuGeLucky) error
 }
 
 type xormDatabase struct {
 	*xorm.Engine
 }
 
-func (db *xormDatabase) FilterWuGe(last []string, wg chan<- *WuGeLucky) error {
+func (db *xormDatabase) FilterWuGe(last []*Character, wg chan<- *WuGeLucky) error {
 	return filterWuGe(db.Engine, last, wg)
 }
 
@@ -53,7 +53,7 @@ func (db *xormDatabase) CountWuGeLucky() (n int64, e error) {
 	return countWuGeLucky(db.Engine)
 }
 
-func InitFromConfig(config config.Config) Database {
+func InitDatabaseFromConfig(config config.Config) Database {
 	engine := initSQL(config.Database)
 	return &xormDatabase{
 		Engine: engine,
