@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-const DefaultJSONName = "config.json"
+const JSONName = "config.json"
 
 type Config struct {
 	HardMode     bool
@@ -36,18 +36,10 @@ func init() {
 	}
 }
 
-func setConfig(config *Config, src *Config) *Config {
-	if config == nil {
-		config = DefaultConfig()
-	}
-	//TODO:
-	return config
-}
-
 func LoadConfig() (c *Config) {
 	c = &Config{}
 	def := DefaultConfig()
-	f := filepath.Join(DefaultJSONPath, DefaultJSONName)
+	f := filepath.Join(DefaultJSONPath, JSONName)
 	bys, e := ioutil.ReadFile(f)
 	if e != nil {
 		return def
@@ -56,19 +48,18 @@ func LoadConfig() (c *Config) {
 	if e != nil {
 		return def
 	}
-	setConfig(c, def)
 	return c
 }
 
 func DefaultConfig() *Config {
 	return &Config{
 		HardMode:     false,
-		StrokeMax:    0,
-		StrokeMin:    0,
+		StrokeMax:    3,
+		StrokeMin:    18,
 		FixBazi:      false,
-		SupplyFilter: false,
-		ZodiacFilter: false,
-		BaguaFilter:  false,
+		SupplyFilter: true,
+		ZodiacFilter: true,
+		BaguaFilter:  true,
 		Database: Database{
 			Host:         "127.0.0.1",
 			Port:         "3306",
