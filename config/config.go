@@ -51,6 +51,14 @@ func LoadConfig() (c *Config) {
 	return c
 }
 
+func OutputConfig(path string, config *Config) error {
+	bys, e := json.Marshal(config)
+	if e != nil {
+		return e
+	}
+	return ioutil.WriteFile(path, bys, 0755)
+}
+
 func DefaultConfig() *Config {
 	return &Config{
 		HardMode:     false,
