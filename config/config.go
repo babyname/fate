@@ -36,9 +36,9 @@ func init() {
 	}
 }
 
-func setDefault(config *Config) *Config {
+func setConfig(config *Config, src *Config) *Config {
 	if config == nil {
-		config = &Config{}
+		config = DefaultConfig()
 	}
 	//TODO:
 	return config
@@ -46,14 +46,42 @@ func setDefault(config *Config) *Config {
 
 func LoadConfig() (c *Config) {
 	c = &Config{}
+	def := DefaultConfig()
 	f := filepath.Join(DefaultJSONPath, DefaultJSONName)
 	bys, e := ioutil.ReadFile(f)
 	if e != nil {
-		return setDefault(c)
+		return def
 	}
 	e = json.Unmarshal(bys, &c)
 	if e != nil {
-		return setDefault(c)
+		return def
 	}
+	setConfig(c, def)
 	return c
+}
+
+func DefaultConfig() *Config {
+	return &Config{
+		HardMode:     false,
+		StrokeMax:    0,
+		StrokeMin:    0,
+		FixBazi:      false,
+		SupplyFilter: false,
+		ZodiacFilter: false,
+		BaguaFilter:  false,
+		Database: Database{
+			Host:         "127.0.0.1",
+			Port:         "3306",
+			User:         "root",
+			Pwd:          "111111",
+			Name:         "fate",
+			MaxIdleCon:   0,
+			MaxOpenCon:   0,
+			Driver:       "mysql",
+			File:         "",
+			Dsn:          "",
+			ShowSQL:      true,
+			ShowExecTime: true,
+		},
+	}
 }
