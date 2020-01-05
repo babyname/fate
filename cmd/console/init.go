@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/godcong/fate/config"
 	"github.com/spf13/cobra"
+	"log"
+	"path/filepath"
 )
 
 func cmdInit() *cobra.Command {
@@ -13,9 +15,14 @@ func cmdInit() *cobra.Command {
 		Short: "output the init config",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("config will output to %s/config.json\n", path)
-			e := config.OutputConfig(path, config.DefaultConfig())
+			if ext := filepath.Ext(path); ext != "" {
+				log.Fatal("path cannot have a file name")
+			}
+			config.DefaultJSONPath = path
+
+			e := config.OutputConfig(config.DefaultConfig())
 			if e != nil {
-				panic(e)
+				log.Fatal(e)
 			}
 		},
 	}
