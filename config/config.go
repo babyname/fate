@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -52,16 +51,13 @@ func LoadConfig() (c *Config) {
 	return c
 }
 
-func OutputConfig(path string, config *Config) error {
+func OutputConfig(config *Config) error {
 	bys, e := json.Marshal(config)
 	if e != nil {
 		return e
 	}
-	if ext := filepath.Ext(path); ext != "" {
-		return errors.New("path cannot have a file name")
-	}
 
-	return ioutil.WriteFile(filepath.Join(path, JSONName), bys, 0755)
+	return ioutil.WriteFile(filepath.Join(DefaultJSONPath, JSONName), bys, 0755)
 }
 
 func DefaultConfig() *Config {
