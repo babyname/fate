@@ -25,7 +25,8 @@ func cmdName() *cobra.Command {
 			if e != nil {
 				return
 			}
-			f := fate.NewFate(last, bornTime)
+			//TODO:optimize option
+			fate.NewFate(last, bornTime)
 
 		},
 	}
