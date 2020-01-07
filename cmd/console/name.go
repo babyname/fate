@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate"
 	"github.com/godcong/fate/config"
+	"github.com/goextension/log"
 	"github.com/spf13/cobra"
 	"time"
 )
@@ -25,9 +27,27 @@ func cmdName() *cobra.Command {
 			if e != nil {
 				return
 			}
-			//TODO:optimize option
-			fate.NewFate(last, bornTime)
+			var ops []fate.Options
+			db := fate.InitDatabaseFromConfig(*cfg)
 
+			ops = append(ops, fate.DBOption(db))
+			if cfg.SupplyFilter {
+				ops = append(ops, fate.SupplyFilter())
+			}
+			if cfg.BaguaFilter {
+				ops = append(ops, fate.BaGuaFilter())
+			}
+			if cfg.ZodiacFilter {
+				ops = append(ops, fate.ZodiacFilter())
+			}
+
+			f := fate.NewFate(last, bornTime, ops...)
+
+			e = f.MakeName(context.Background())
+			if e != nil {
+				log.Errorw("makename", "error", e)
+				return
+			}
 		},
 	}
 	cmd.Flags().StringVarP(&last, "last", "l", "", "set lastname")
