@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/godcong/fate/config"
 	"github.com/goextension/log"
 	"strings"
 	"time"
@@ -25,6 +26,7 @@ type Fate interface {
 }
 
 type fateImpl struct {
+	config   *config.Config
 	db       Database
 	born     chronos.Calendar
 	last     []string
