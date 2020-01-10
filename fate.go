@@ -26,7 +26,7 @@ type Fate interface {
 }
 
 type fateImpl struct {
-	config   *config.Config
+	config   config.Config
 	db       Database
 	born     chronos.Calendar
 	last     []string
@@ -35,17 +35,14 @@ type fateImpl struct {
 	nameType int
 	sex      string
 
-	isHard       bool
-	strokeMax    int
-	strokeMin    int
-	debug        bool
-	isFirst      bool
-	Limit        int
-	baZi         *BaZi
-	zodiac       *Zodiac
-	supplyFilter bool //补八字
-	zodiacFilter bool //生肖
-	baguaFilter  bool //卦象
+	isHard    bool
+	strokeMax int
+	strokeMin int
+	debug     bool
+	isFirst   bool
+	Limit     int
+	baZi      *BaZi
+	zodiac    *Zodiac
 }
 
 type Options func(f *fateImpl)
@@ -53,24 +50,6 @@ type Options func(f *fateImpl)
 func DBOption(database Database) Options {
 	return func(f *fateImpl) {
 		f.db = database
-	}
-}
-
-func BaGuaFilter() Options {
-	return func(f *fateImpl) {
-		f.baguaFilter = true
-	}
-}
-
-func ZodiacFilter() Options {
-	return func(f *fateImpl) {
-		f.zodiacFilter = true
-	}
-}
-
-func SupplyFilter() Options {
-	return func(f *fateImpl) {
-		f.supplyFilter = true
 	}
 }
 
@@ -173,15 +152,15 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 		tmpChar = n.FirstName
 		tmpChar = append(tmpChar, n.LastName...)
 		//filter bazi
-		if f.supplyFilter && !filterXiYong(f.XiYong().Shen(), tmpChar...) {
+		if f.config.SupplyFilter && !filterXiYong(f.XiYong().Shen(), tmpChar...) {
 			continue
 		}
 		//filter zodiac
-		if f.zodiacFilter && !filterZodiac(f.born, n.FirstName...) {
+		if f.config.ZodiacFilter && !filterZodiac(f.born, n.FirstName...) {
 			continue
 		}
 		//filter bagua
-		if f.baguaFilter && !filterYao(n.BaGua(), "凶", "平") {
+		if f.config.BaguaFilter && !filterYao(n.BaGua(), "凶", "平") {
 			continue
 		}
 		ben := n.BaGua().Get(yi.BenGua)
