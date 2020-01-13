@@ -23,7 +23,7 @@ type Database interface {
 	GetCharacter(fn func(engine *xorm.Engine) *xorm.Session) (*Character, error)
 	GetCharacters(fn func(engine *xorm.Engine) *xorm.Session) ([]*Character, error)
 	FilterWuGe(last []*Character, wg chan<- *WuGeLucky) error
-	Engine() *xorm.Engine
+	Database() interface{}
 }
 
 type xormDatabase struct {
