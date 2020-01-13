@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/md5"
 	"encoding/json"
+	"fmt"
 	"github.com/godcong/fate"
 	"github.com/goextension/log"
 	"github.com/xormsharp/xorm"
@@ -63,8 +65,38 @@ func verifySub(db fate.Database, m map[string][]string, wx string) error {
 			character, e := db.GetCharacter(func(eng *xorm.Engine) *xorm.Session {
 				return eng.Where("ch = ?", vv)
 			})
+			i, _ := strconv.Atoi(k)
 			if e != nil {
 				log.Errorw("get character error", "character", vv)
+				ch := fate.Character{
+					Hash:                     hash(vv),
+					PinYin:                   nil,
+					Ch:                       vv,
+					ScienceStroke:            i,
+					Radical:                  "",
+					RadicalStroke:            0,
+					Stroke:                   0,
+					IsKangXi:                 false,
+					KangXi:                   "",
+					KangXiStroke:             0,
+					SimpleRadical:            "",
+					SimpleRadicalStroke:      0,
+					SimpleTotalStroke:        0,
+					TraditionalRadical:       "",
+					TraditionalRadicalStroke: 0,
+					TraditionalTotalStroke:   0,
+					NameScience:              true,
+					WuXing:                   wx,
+					Lucky:                    "",
+					Regular:                  false,
+					TraditionalCharacter:     nil,
+					VariantCharacter:         nil,
+					Comment:                  []string{"custom"},
+				}
+				_, e := eng.InsertOne(ch)
+				if e != nil {
+					log.Error("inser error", "character", ch.Ch)
+				}
 				continue
 			}
 			if character.WuXing != wx {
@@ -75,7 +107,6 @@ func verifySub(db fate.Database, m map[string][]string, wx string) error {
 					log.Warnw("wrong wuxing", "character", vv, "charwuxing", character.WuXing, "dictwuxing", wx)
 				}
 			}
-			i, _ := strconv.Atoi(k)
 			if character.ScienceStroke != i {
 				log.Warnw("check warning", "character", vv, "db", character.ScienceStroke, "need", k)
 				//fix stroke
@@ -92,4 +123,9 @@ func verifySub(db fate.Database, m map[string][]string, wx string) error {
 	}
 	log.Infow("total", "count", count)
 	return nil
+}
+
+func hash(char string) string {
+	s := md5.Sum([]byte(char))
+	return fmt.Sprintf("%x", s)
 }
