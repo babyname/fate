@@ -34,7 +34,7 @@ func CheckLoader(s string) error {
 	return nil
 }
 
-func CheckVerify(db *xorm.Engine) error {
+func CheckVerify(db fate.Database) error {
 	if err := verifySub(db, dict.Jin, "金"); err != nil {
 		return err
 	}
@@ -54,12 +54,12 @@ func CheckVerify(db *xorm.Engine) error {
 	return nil
 }
 
-func verifySub(engine *xorm.Engine, m map[string][]string, wx string) error {
+func verifySub(db fate.Database, m map[string][]string, wx string) error {
 	count := 0
 	for k, v := range m {
 		for _, vv := range v {
 			count++
-			character, e := fate.GetCharacter(engine, func(eng *xorm.Engine) *xorm.Session {
+			character, e := db.GetCharacter(func(eng *xorm.Engine) *xorm.Session {
 				return eng.Where("ch = ?", vv)
 			})
 			if e != nil {
