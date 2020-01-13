@@ -56,6 +56,7 @@ func CheckVerify(db fate.Database) error {
 
 func verifySub(db fate.Database, m map[string][]string, wx string) error {
 	count := 0
+	eng := db.Database().(*xorm.Engine)
 	for k, v := range m {
 		for _, vv := range v {
 			count++
@@ -80,7 +81,7 @@ func verifySub(db fate.Database, m map[string][]string, wx string) error {
 				//fix stroke
 				character.ScienceStroke = i
 			}
-			update, e := engine.Where("hash = ?", character.Hash).Update(character)
+			update, e := eng.Where("hash = ?", character.Hash).Update(character)
 			if e != nil {
 				return e
 			}
