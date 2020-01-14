@@ -40,6 +40,7 @@ func TestFate_FirstRunInit(t *testing.T) {
 	fate.DefaultStrokeMin = 3
 	fate.DefaultStrokeMax = 18
 	fate.HardMode = true
+
 	f := fate.NewFate("王", c.Solar().Time(), fate.DBOption(eng), fate.BaGuaFilter(), fate.ZodiacFilter(), fate.SupplyFilter())
 
 	//f.SetDB(eng)
