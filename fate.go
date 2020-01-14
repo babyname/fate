@@ -170,7 +170,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 			continue
 		}
 		//filter bagua
-		if f.config.BaguaFilter && !filterYao(n.BaGua(), "凶", "平") {
+		if f.config.BaguaFilter && !filterYao(n.BaGua(), "凶") {
 			log.Infow("bagua", "name", n.String())
 			continue
 		}
