@@ -21,21 +21,21 @@ func TestFate_FirstRunInit(t *testing.T) {
 		ZodiacFilter: false,
 		BaguaFilter:  false,
 		Database: config.Database{
-			Host:         "",
-			Port:         "",
-			User:         "",
-			Pwd:          "",
-			Name:         "",
+			Host:         "localhost",
+			Port:         "3306",
+			User:         "root",
+			Pwd:          "111111",
+			Name:         "fate",
 			MaxIdleCon:   0,
 			MaxOpenCon:   0,
-			Driver:       "",
+			Driver:       "mysql",
 			File:         "",
 			Dsn:          "",
 			ShowSQL:      false,
 			ShowExecTime: false,
 		},
 	})
-	c := chronos.New("2020/01/23 11:31")
+	c := chronos.New("2020/01/14 06:57")
 	//t.Log(c.Solar().Time())
 	cfg := config.DefaultConfig()
 	cfg.BaguaFilter = true
@@ -45,7 +45,7 @@ func TestFate_FirstRunInit(t *testing.T) {
 	cfg.StrokeMin = 3
 	cfg.StrokeMax = 18
 	cfg.FileOutput = "output.csv"
-	f := fate.NewFate("王", c.Solar().Time(), fate.DBOption(eng), fate.ConfigOption(*cfg))
+	f := fate.NewFate("李", c.Solar().Time(), fate.DBOption(eng), fate.ConfigOption(*cfg))
 
 	//f.SetDB(eng)
 	e := f.MakeName(context.Background())
