@@ -11,7 +11,7 @@ import (
 func init() {
 	//trait.NewZapFileSugar("fate.log")
 }
-func TestFate_FirstRunInit(t *testing.T) {
+func TestFate_RunMakeName(t *testing.T) {
 	eng := fate.InitDatabaseFromConfig(config.Config{
 		HardMode:     false,
 		StrokeMax:    0,
@@ -44,8 +44,8 @@ func TestFate_FirstRunInit(t *testing.T) {
 	cfg.HardMode = true
 	cfg.StrokeMin = 3
 	cfg.StrokeMax = 18
-	cfg.FileOutput = "output.csv"
-	f := fate.NewFate("李", c.Solar().Time(), fate.DBOption(eng), fate.ConfigOption(*cfg))
+	//cfg.FileOutput = "output.csv"
+	f := fate.NewFate("曹", c.Solar().Time(), fate.DBOption(eng), fate.ConfigOption(*cfg))
 
 	//f.SetDB(eng)
 	e := f.MakeName(context.Background())
