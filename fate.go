@@ -1,6 +1,7 @@
 package fate
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
@@ -35,14 +36,11 @@ type fateImpl struct {
 	nameType int
 	sex      string
 
-	isHard    bool
-	strokeMax int
-	strokeMin int
-	debug     bool
-	isFirst   bool
-	Limit     int
-	baZi      *BaZi
-	zodiac    *Zodiac
+	debug   bool
+	isFirst bool
+	Limit   int
+	baZi    *BaZi
+	zodiac  *Zodiac
 }
 
 type Options func(f *fateImpl)
@@ -68,11 +66,8 @@ func Debug() Options {
 //NewFate 所有的入口,新建一个fate对象
 func NewFate(lastName string, born time.Time, options ...Options) Fate {
 	f := &fateImpl{
-		isHard:    HardMode,
-		strokeMax: DefaultStrokeMax,
-		strokeMin: DefaultStrokeMin,
-		last:      strings.Split(lastName, ""),
-		born:      chronos.New(born),
+		last: strings.Split(lastName, ""),
+		born: chronos.New(born),
 	}
 	f.lastChar = make([]*Character, len(f.last))
 	if len(f.last) > 2 {
@@ -144,6 +139,15 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 
 	var tmpChar []*Character
 	//supplyFilter := false
+	var w *bufio.Writer
+	if f.config.FileOutput != "" {
+		w, e = NewOutput(f.config.FileOutput)
+		if e != nil {
+			return e
+		}
+		w.WriteString("名字，本卦，变卦，拼音，八字，喜用神")
+	}
+
 	for n := range name {
 		select {
 		case <-ctx.Done():
@@ -177,7 +181,15 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 			log.Infow("ben", "ming", ben.GuaMing, "chu", ben.ChuYaoJiXiong, "er", ben.ErYaoJiXiong, "san", ben.SanYaoJiXiong, "si", ben.SiYaoJiXiong, "wu", ben.WuYaoJiXiong, "liu", ben.ShangYaoJiXiong)
 			log.Infow("bian", "ming", bian.GuaMing, "chu", bian.ChuYaoJiXiong, "er", bian.ErYaoJiXiong, "san", bian.SanYaoJiXiong, "si", bian.SiYaoJiXiong, "wu", bian.WuYaoJiXiong, "liu", bian.ShangYaoJiXiong)
 		}
-		log.Infow("info", "名字", n.String(), "本卦", ben.GuaMing, "变卦", bian.GuaMing, "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen())
+
+		if w != nil {
+			_, e := w.WriteString(strings.Join([]string{n.String(), ben.GuaMing, bian.GuaMing, n.PinYin(), strings.Join(f.born.Lunar().EightCharacter(), ""), f.XiYong().Shen()}, ","))
+			if e != nil {
+				log.Error("output error", "error", e)
+			}
+		} else {
+			log.Infow("info", "名字", n.String(), "本卦", ben.GuaMing, "变卦", bian.GuaMing, "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen())
+		}
 	}
 	return nil
 }
@@ -221,11 +233,11 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 	var f1s []*Character
 	var f2s []*Character
 	for l := range lucky {
-		if f.isHard && hardFilter(l) {
+		if f.config.HardMode && hardFilter(l) {
 			continue
 		}
 
-		if f.strokeMin > l.FirstStroke1 || f.strokeMin > l.FirstStroke2 || f.strokeMax <= l.FirstStroke1 || f.strokeMax <= l.FirstStroke2 {
+		if f.config.StrokeMin > l.FirstStroke1 || f.config.StrokeMin > l.FirstStroke2 || f.config.StrokeMax <= l.FirstStroke1 || f.config.StrokeMax <= l.FirstStroke2 {
 			continue
 		}
 

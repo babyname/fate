@@ -18,6 +18,7 @@ type Config struct {
 	ZodiacFilter bool     //过滤生肖
 	BaguaFilter  bool     //过滤卦象
 	Database     Database `json:"database"`
+	FileOutput   string
 }
 
 var DefaultJSONPath = ""

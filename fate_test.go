@@ -37,11 +37,15 @@ func TestFate_FirstRunInit(t *testing.T) {
 	})
 	c := chronos.New("2020/01/23 11:31")
 	//t.Log(c.Solar().Time())
-	fate.DefaultStrokeMin = 3
-	fate.DefaultStrokeMax = 18
-	fate.HardMode = true
+	cfg := config.DefaultConfig()
+	cfg.BaguaFilter = true
+	cfg.ZodiacFilter = true
+	cfg.SupplyFilter = true
+	cfg.HardMode = true
+	cfg.StrokeMin = 3
+	cfg.StrokeMax = 18
 
-	f := fate.NewFate("王", c.Solar().Time(), fate.DBOption(eng), fate.BaGuaFilter(), fate.ZodiacFilter(), fate.SupplyFilter())
+	f := fate.NewFate("王", c.Solar().Time(), fate.DBOption(eng), fate.ConfigOption(*cfg))
 
 	//f.SetDB(eng)
 	e := f.MakeName(context.Background())
