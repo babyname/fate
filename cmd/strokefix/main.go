@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/godcong/fate"
 	"github.com/godcong/fate/config"
+	"github.com/xormsharp/xorm"
 )
 
 func main() {
@@ -16,10 +17,10 @@ func main() {
 		return
 	}
 
-	//e = UpdateFix(db)
-	//if e != nil {
-	//	panic(e)
-	//}
+	e = UpdateFix(db.Database().(*xorm.Engine))
+	if e != nil {
+		panic(e)
+	}
 	e = CheckLoader(`E:\project\fate\cmd\strokefix\dict.json`)
 	if e != nil {
 		panic(e)
