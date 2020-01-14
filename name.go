@@ -3,6 +3,7 @@ package fate
 import (
 	"github.com/godcong/chronos"
 	"github.com/godcong/yi"
+	"strconv"
 	"strings"
 )
 
@@ -25,6 +26,18 @@ func (n Name) String() string {
 		s += f.Ch
 	}
 	return s
+}
+
+func (n Name) Strokes() string {
+	var s []string
+	for _, l := range n.LastName {
+		s = append(s, strconv.Itoa(l.ScienceStroke))
+	}
+
+	for _, f := range n.FirstName {
+		s = append(s, strconv.Itoa(f.ScienceStroke))
+	}
+	return strings.Join(s, ",")
 }
 
 func (n Name) PinYin() string {
