@@ -53,6 +53,12 @@ func DBOption(database Database) Options {
 	}
 }
 
+func ConfigOption(cfg config.Config) Options {
+	return func(f *fateImpl) {
+		f.config = cfg
+	}
+}
+
 func Debug() Options {
 	return func(f *fateImpl) {
 		f.debug = true
