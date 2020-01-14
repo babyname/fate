@@ -190,7 +190,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 				log.Error("output error", "error", e)
 			}
 		} else {
-			log.Info("笔画", n.Strokes(), "名字", n.String(), "本卦", ben.GuaMing, "变卦", bian.GuaMing, "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen())
+			log.Infow("output", "笔画", n.Strokes(), "名字", n.String(), "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen(), "本卦", ben.GuaMing, "变卦", bian.GuaMing)
 		}
 	}
 	return nil
@@ -238,7 +238,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 
 		if f.config.HardMode && hardFilter(l) {
 			sc := NewSanCai(l.TianGe, l.RenGe, l.DiGe)
-			if !Check(f.db.Database().(*xorm.Engine), sc, 3) {
+			if !Check(f.db.Database().(*xorm.Engine), sc, 5) {
 				continue
 			}
 		}
