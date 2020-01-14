@@ -44,7 +44,7 @@ func TestFate_FirstRunInit(t *testing.T) {
 	cfg.HardMode = true
 	cfg.StrokeMin = 3
 	cfg.StrokeMax = 18
-
+	cfg.FileOutput = "output.csv"
 	f := fate.NewFate("王", c.Solar().Time(), fate.DBOption(eng), fate.ConfigOption(*cfg))
 
 	//f.SetDB(eng)
