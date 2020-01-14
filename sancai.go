@@ -1,6 +1,8 @@
 //三才五格
 package fate
 
+import "github.com/xormsharp/xorm"
+
 const sanCai = "水木木火火土土金金水"
 const yinYang = "阴阳"
 
@@ -28,8 +30,8 @@ func NewSanCai(tian, ren, di int) *SanCai {
 }
 
 //Check 检查三才属性
-func (cai *SanCai) Check(point int) bool {
-	wx := FindWuXing(cai.tianCai + cai.renCai + cai.diCai)
+func Check(engine *xorm.Engine, cai *SanCai, point int) bool {
+	wx := FindWuXing(engine, cai.tianCai, cai.renCai, cai.diCai)
 	if wx.Luck.Point() >= point {
 		return true
 	}

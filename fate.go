@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/godcong/fate/config"
 	"github.com/goextension/log"
+	"github.com/xormsharp/xorm"
 	"strings"
 	"time"
 
@@ -234,8 +235,12 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 	var f1s []*Character
 	var f2s []*Character
 	for l := range lucky {
+
 		if f.config.HardMode && hardFilter(l) {
-			continue
+			sc := NewSanCai(l.TianGe, l.RenGe, l.DiGe)
+			if !Check(f.db.Database().(*xorm.Engine), sc, 3) {
+				continue
+			}
 		}
 
 		if f.config.StrokeMin > l.FirstStroke1 || f.config.StrokeMin > l.FirstStroke2 || f.config.StrokeMax <= l.FirstStroke1 || f.config.StrokeMax <= l.FirstStroke2 {

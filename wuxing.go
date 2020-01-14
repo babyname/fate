@@ -2,6 +2,7 @@ package fate
 
 import (
 	"errors"
+	"github.com/xormsharp/xorm"
 )
 
 type Luck int
@@ -29,6 +30,11 @@ type WuXing struct {
 }
 
 //FindWuXing find a wuxing
-func FindWuXing(wx string) *WuXing {
-	return nil
+func FindWuXing(engine *xorm.Engine, s ...string) *WuXing {
+	var wx WuXing
+	_, e := engine.Where("first = ?", s[0]).And("second = ?", s[1]).And("third = ?", s[2]).Get(&wx)
+	if e != nil {
+		return nil
+	}
+	return &wx
 }
