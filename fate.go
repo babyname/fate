@@ -162,17 +162,17 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 		tmpChar = append(tmpChar, n.LastName...)
 		//filter bazi
 		if f.config.SupplyFilter && !filterXiYong(f.XiYong().Shen(), tmpChar...) {
-			log.Infow("supply", "name", n.String())
+			//log.Infow("supply", "name", n.String())
 			continue
 		}
 		//filter zodiac
 		if f.config.ZodiacFilter && !filterZodiac(f.born, n.FirstName...) {
-			log.Infow("zodiac", "name", n.String())
+			//log.Infow("zodiac", "name", n.String())
 			continue
 		}
 		//filter bagua
 		if f.config.BaguaFilter && !filterYao(n.BaGua(), "凶") {
-			log.Infow("bagua", "name", n.String())
+			//log.Infow("bagua", "name", n.String())
 			continue
 		}
 		ben := n.BaGua().Get(yi.BenGua)
@@ -190,7 +190,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 				log.Error("output error", "error", e)
 			}
 		} else {
-			log.Infow("info", "笔画", n.Strokes(), "名字", n.String(), "本卦", ben.GuaMing, "变卦", bian.GuaMing, "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen())
+			log.Info("笔画", n.Strokes(), "名字", n.String(), "本卦", ben.GuaMing, "变卦", bian.GuaMing, "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen())
 		}
 	}
 	return nil
@@ -243,7 +243,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 			}
 		}
 
-		if f.config.StrokeMin > l.FirstStroke1 || f.config.StrokeMin > l.FirstStroke2 || f.config.StrokeMax <= l.FirstStroke1 || f.config.StrokeMax <= l.FirstStroke2 {
+		if f.config.StrokeMin > l.FirstStroke1 || f.config.StrokeMin > l.FirstStroke2 || f.config.StrokeMax < l.FirstStroke1 || f.config.StrokeMax < l.FirstStroke2 {
 			continue
 		}
 
