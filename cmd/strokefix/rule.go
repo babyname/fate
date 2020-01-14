@@ -88,6 +88,7 @@ var fixTable = []func(character *fate.Character) bool{
 	RadicalChar,
 	NumberChar,
 	CharChar,
+	DefaultChar,
 }
 
 func fixChar(character *fate.Character) bool {
@@ -97,4 +98,19 @@ func fixChar(character *fate.Character) bool {
 		}
 	}
 	return false
+}
+
+func DefaultChar(character *fate.Character) bool {
+	if character.KangXiStroke != 0 {
+		character.ScienceStroke = character.KangXiStroke
+	} else if character.TraditionalTotalStroke != 0 {
+		character.ScienceStroke = character.TraditionalTotalStroke
+	} else if character.Stroke != 0 {
+		character.ScienceStroke = character.Stroke
+	} else if character.SimpleTotalStroke != 0 {
+		character.ScienceStroke = character.SimpleTotalStroke
+	} else {
+		return false
+	}
+	return true
 }
