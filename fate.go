@@ -145,7 +145,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 		if e != nil {
 			return e
 		}
-		w.WriteString("名字，本卦，变卦，拼音，八字，喜用神")
+		w.WriteString("名字，本卦，变卦，拼音，八字，喜用神\n")
 	}
 
 	for n := range name {
@@ -183,7 +183,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 		}
 
 		if w != nil {
-			_, e := w.WriteString(strings.Join([]string{n.String(), ben.GuaMing, bian.GuaMing, n.PinYin(), strings.Join(f.born.Lunar().EightCharacter(), ""), f.XiYong().Shen()}, ","))
+			_, e := w.WriteString(strings.Join([]string{n.String(), ben.GuaMing, bian.GuaMing, n.PinYin(), strings.Join(f.born.Lunar().EightCharacter(), ""), f.XiYong().Shen()}, ",") + "\n")
 			if e != nil {
 				log.Error("output error", "error", e)
 			}
