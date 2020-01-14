@@ -156,21 +156,22 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 		default:
 
 		}
-		if f.debug {
-			log.Infow("name", "name", n.String())
-		}
+
 		tmpChar = n.FirstName
 		tmpChar = append(tmpChar, n.LastName...)
 		//filter bazi
 		if f.config.SupplyFilter && !filterXiYong(f.XiYong().Shen(), tmpChar...) {
+			log.Infow("supply", "name", n.String())
 			continue
 		}
 		//filter zodiac
 		if f.config.ZodiacFilter && !filterZodiac(f.born, n.FirstName...) {
+			log.Infow("zodiac", "name", n.String())
 			continue
 		}
 		//filter bagua
 		if f.config.BaguaFilter && !filterYao(n.BaGua(), "凶", "平") {
+			log.Infow("bagua", "name", n.String())
 			continue
 		}
 		ben := n.BaGua().Get(yi.BenGua)
@@ -244,6 +245,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 		if f.debug {
 			log.Infow("lucky", "l1", l.LastStroke1, "l2", l.LastStroke2, "f1", l.FirstStroke1, "f2", l.FirstStroke2)
 		}
+
 		f1s, e = f.db.GetCharacters(Stoker(l.FirstStroke1))
 		if e != nil {
 			return Wrap(e, "first stroke1 error")
