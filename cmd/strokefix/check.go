@@ -70,7 +70,7 @@ func verifySub(db fate.Database, m map[string][]string, wx string) error {
 				log.Errorw("get character error", "character", vv)
 				ch := fate.Character{
 					Hash:                     hash(vv),
-					PinYin:                   nil,
+					PinYin:                   []string{"custom"},
 					Ch:                       vv,
 					ScienceStroke:            i,
 					Radical:                  "",
