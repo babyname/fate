@@ -193,7 +193,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 				log.Error("output error", "error", e)
 			}
 		} else {
-			log.Infow("output", "笔画", n.Strokes(), "名字", n.String(), "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen(), "本卦", ben.GuaMing, "变卦", bian.GuaMing)
+			log.Infow("Output-->", "名字", n.String(), "笔画", n.Strokes(), "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen(), "本卦", ben.GuaMing, "变卦", bian.GuaMing)
 		}
 	}
 	return nil
