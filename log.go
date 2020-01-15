@@ -13,7 +13,7 @@ func init() {
 	//p = filepath.Join(p, "zap.log")
 	//os.OpenFile(p,os.O_APPEND|os.O_CREATE|os.O_RDWR|os.O_SYNC,os.ModePerm)
 	cfg.EncoderConfig = zapcore.EncoderConfig{
-		MessageKey:     "message",
+		MessageKey:     "msg",
 		LevelKey:       "",
 		TimeKey:        "",
 		NameKey:        "",
