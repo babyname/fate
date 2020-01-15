@@ -103,7 +103,6 @@ func (f *fateImpl) getLastCharacter() error {
 		if e != nil {
 			return e
 		}
-		log.Infow("lastname", "index", i, "char", c, "character", character)
 		f.lastChar[i] = character
 	}
 	return nil
@@ -147,7 +146,10 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 		if e != nil {
 			return e
 		}
-		w.WriteString("名字，本卦，变卦，拼音，八字，喜用神\n")
+		_, e = w.WriteString("名字;本卦;变卦;拼音;八字;喜用神\n")
+		if e != nil {
+			return e
+		}
 	}
 
 	for n := range name {
