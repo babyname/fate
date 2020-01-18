@@ -35,7 +35,7 @@ func TestFate_RunMakeName(t *testing.T) {
 			ShowExecTime: false,
 		},
 	})
-	c := chronos.New("2020/01/14 06:57")
+	c := chronos.New("2020/01/14 02:45")
 	//t.Log(c.Solar().Time())
 	cfg := config.DefaultConfig()
 	cfg.BaguaFilter = true
@@ -43,9 +43,9 @@ func TestFate_RunMakeName(t *testing.T) {
 	cfg.SupplyFilter = true
 	cfg.HardMode = true
 	cfg.StrokeMin = 3
-	cfg.StrokeMax = 18
+	cfg.StrokeMax = 24
 	//cfg.FileOutput = "output.csv"
-	f := fate.NewFate("曹", c.Solar().Time(), fate.DBOption(eng), fate.ConfigOption(*cfg))
+	f := fate.NewFate("刘", c.Solar().Time(), fate.DBOption(eng), fate.ConfigOption(*cfg))
 
 	//f.SetDB(eng)
 	e := f.MakeName(context.Background())
