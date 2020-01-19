@@ -17,6 +17,7 @@ type Config struct {
 	SupplyFilter bool     //过滤补八字
 	ZodiacFilter bool     //过滤生肖
 	BaguaFilter  bool     //过滤卦象
+	Sex          bool     //性别（false：男，true：女）
 	Database     Database `json:"database"`
 	FileOutput   string
 }
