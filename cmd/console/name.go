@@ -31,17 +31,8 @@ func cmdName() *cobra.Command {
 			db := fate.InitDatabaseFromConfig(*cfg)
 
 			ops = append(ops, fate.DBOption(db))
-			if cfg.SupplyFilter {
-				ops = append(ops, fate.SupplyFilter())
-			}
-			if cfg.BaguaFilter {
-				ops = append(ops, fate.BaGuaFilter())
-			}
-			if cfg.ZodiacFilter {
-				ops = append(ops, fate.ZodiacFilter())
-			}
 
-			f := fate.NewFate(last, bornTime, ops...)
+			f := fate.NewFate(last, bornTime, fate.ConfigOption(*cfg))
 
 			e = f.MakeName(context.Background())
 			if e != nil {
