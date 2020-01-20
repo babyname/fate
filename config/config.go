@@ -18,7 +18,7 @@ const (
 
 type Config struct {
 	HardMode     bool
-	FilterMode   FilterMode
+	FilterMode   FilterMode `json:"filter_mode"`
 	StrokeMax    int
 	StrokeMin    int
 	FixBazi      bool     //八字修正
