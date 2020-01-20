@@ -9,8 +9,16 @@ import (
 
 const JSONName = "config.json"
 
+type FilterMode int
+
+const (
+	FilterModeNormal FilterMode = iota
+	FilterModeHard
+)
+
 type Config struct {
 	HardMode     bool
+	FilterMode   FilterMode
 	StrokeMax    int
 	StrokeMin    int
 	FixBazi      bool     //八字修正
