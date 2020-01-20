@@ -25,6 +25,7 @@ func getYao(xiang *yi.GuaXiang, yao int) GuaYao {
 		panic("wrong yao")
 	}
 }
+
 func filterYao(y *yi.Yi, fs ...string) bool {
 	yao := getYao(y.Get(yi.BianGua), y.BianYao())
 	for _, s := range fs {
