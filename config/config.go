@@ -18,10 +18,10 @@ const (
 )
 
 type Config struct {
-	HardMode     bool
 	FilterMode   FilterMode `json:"filter_mode"`
 	StrokeMax    int
 	StrokeMin    int
+	HardFilter   bool
 	FixBazi      bool     //八字修正
 	SupplyFilter bool     //过滤补八字
 	ZodiacFilter bool     //过滤生肖
@@ -73,7 +73,7 @@ func OutputConfig(config *Config) error {
 
 func DefaultConfig() *Config {
 	return &Config{
-		HardMode:     false,
+		HardFilter:   false,
 		StrokeMax:    3,
 		StrokeMin:    18,
 		FixBazi:      false,

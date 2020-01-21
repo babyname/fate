@@ -241,7 +241,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 		if f.config.FilterMode == config.FilterModeCustom {
 			//TODO
 		}
-		if f.config.HardMode && hardFilter(l) {
+		if f.config.HardFilter && hardFilter(l) {
 			sc := NewSanCai(l.TianGe, l.RenGe, l.DiGe)
 			if !Check(f.db.Database().(*xorm.Engine), sc, 5) {
 				continue
