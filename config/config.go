@@ -14,6 +14,7 @@ type FilterMode int
 const (
 	FilterModeNormal FilterMode = iota
 	FilterModeHard
+	FilterModeCustom
 )
 
 type Config struct {
