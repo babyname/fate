@@ -13,7 +13,7 @@ func init() {
 }
 func TestFate_RunMakeName(t *testing.T) {
 	eng := fate.InitDatabaseFromConfig(config.Config{
-		HardMode:     false,
+		HardFilter:   false,
 		StrokeMax:    0,
 		StrokeMin:    0,
 		FixBazi:      false,
@@ -41,7 +41,7 @@ func TestFate_RunMakeName(t *testing.T) {
 	cfg.BaguaFilter = true
 	cfg.ZodiacFilter = true
 	cfg.SupplyFilter = true
-	cfg.HardMode = true
+	cfg.HardFilter = true
 	cfg.StrokeMin = 3
 	cfg.StrokeMax = 24
 	//cfg.FileOutput = "output.csv"
