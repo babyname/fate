@@ -17,6 +17,14 @@ const (
 	FilterModeCustom
 )
 
+type OutputMode int
+
+const (
+	OutputModeLog OutputMode = iota
+	OutputModeCSV
+	OutputModelJSON
+)
+
 type Config struct {
 	FilterMode   FilterMode `json:"filter_mode"`
 	StrokeMax    int
@@ -27,6 +35,7 @@ type Config struct {
 	ZodiacFilter bool     //过滤生肖
 	BaguaFilter  bool     //过滤卦象
 	Database     Database `json:"database"`
+	OutputMode   OutputMode
 	FileOutput   string
 }
 
