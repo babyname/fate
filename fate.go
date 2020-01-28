@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/godcong/fate/config"
-	"github.com/godcong/fate/output"
+	"github.com/godcong/fate/information"
 	"github.com/goextension/log"
 	"github.com/xormsharp/xorm"
 	"strings"
@@ -31,7 +31,7 @@ type Fate interface {
 type fateImpl struct {
 	config   config.Config
 	db       Database
-	out      output.Output
+	out      information.Information
 	born     chronos.Calendar
 	last     []string
 	lastChar []*Character
@@ -185,7 +185,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 				log.Error("output error", "error", e)
 			}
 		} else {
-			log.Infow("Output-->", "名字", n.String(), "笔画", n.Strokes(), "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen(), "本卦", ben.GuaMing, "变卦", bian.GuaMing)
+			log.Infow("Information-->", "名字", n.String(), "笔画", n.Strokes(), "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen(), "本卦", ben.GuaMing, "变卦", bian.GuaMing)
 		}
 	}
 	return nil
@@ -203,7 +203,7 @@ func (f *fateImpl) init() {
 		panic("database was not set")
 	}
 
-	f.out = output.NewOutputWithConfig(f.config)
+	f.out = information.NewWithConfig(f.config)
 }
 
 //SetBornData 设定生日
