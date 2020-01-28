@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/godcong/fate/config"
+	"github.com/godcong/fate/output"
 	"github.com/goextension/log"
 	"github.com/xormsharp/xorm"
 	"strings"
@@ -30,6 +31,7 @@ type Fate interface {
 type fateImpl struct {
 	config   config.Config
 	db       Database
+	out      output.Output
 	born     chronos.Calendar
 	last     []string
 	lastChar []*Character
@@ -141,16 +143,6 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 	var tmpChar []*Character
 	//supplyFilter := false
 	var w *bufio.Writer
-	if f.config.FileOutput != "" {
-		w, e = NewOutput(f.config.FileOutput)
-		if e != nil {
-			return e
-		}
-		_, e = w.WriteString("名字;本卦;变卦;拼音;八字;喜用神\n")
-		if e != nil {
-			return e
-		}
-	}
 
 	for n := range name {
 		select {
@@ -207,15 +199,11 @@ func (f *fateImpl) XiYong() *XiYong {
 }
 
 func (f *fateImpl) init() {
-	var e error
 	if f.db == nil {
 		panic("database was not set")
 	}
 
-	e = f.db.Sync(WuGeLucky{})
-	if e != nil {
-		panic(e)
-	}
+	f.out = output.NewOutputWithConfig(f.config)
 }
 
 //SetBornData 设定生日
