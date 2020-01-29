@@ -16,11 +16,6 @@ import (
 	"github.com/godcong/yi"
 )
 
-var DefaultDatabase = "fate.db"
-var DefaultStrokeMax = 32
-var DefaultStrokeMin = 0
-var HardMode = false
-
 type Fate interface {
 	MakeName(ctx context.Context) (e error)
 	XiYong() *XiYong
