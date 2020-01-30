@@ -8,8 +8,8 @@ import (
 )
 
 type Information interface {
-	Write(name Name)
-	Finish()
+	Write(name ...Name) error
+	Finish() error
 }
 
 func NewWithConfig(config config.Config) Information {
@@ -17,14 +17,21 @@ func NewWithConfig(config config.Config) Information {
 }
 
 type jsonInformation struct {
-	path   string
-	writer *bufio.Writer
+	path string
+	file *os.File
 }
 
-func (j jsonInformation) Finish() {
+func (j *jsonInformation) Finish() error {
+	return j.file.Close()
 }
 
-func (j jsonInformation) Write(name Name) {
+func (j *jsonInformation) Write(names ...Name) error {
+	w := bufio.NewWriter(j.file)
+	for _, n := range names {
+		_, _ = w.WriteString(n.String())
+		_, _ = w.WriteString("\r\n")
+	}
+	return w.Flush()
 
 }
 
@@ -33,9 +40,8 @@ func jsonOutput(path string) Information {
 	if e != nil {
 		panic(fmt.Errorf("json output failed:%w", e))
 	}
-	writer := bufio.NewWriter(file)
 	return &jsonInformation{
-		path:   path,
-		writer: writer,
+		path: path,
+		file: file,
 	}
 }
