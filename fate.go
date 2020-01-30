@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/godcong/fate/config"
-	"github.com/godcong/fate/information"
 	"github.com/goextension/log"
 	"github.com/xormsharp/xorm"
 	"strings"
@@ -26,7 +25,7 @@ type Fate interface {
 type fateImpl struct {
 	config   config.Config
 	db       Database
-	out      information.Information
+	out      Information
 	born     chronos.Calendar
 	last     []string
 	lastChar []*Character
@@ -198,7 +197,7 @@ func (f *fateImpl) init() {
 		panic("database was not set")
 	}
 
-	f.out = information.NewWithConfig(f.config)
+	f.out = NewWithConfig(f.config)
 }
 
 //SetBornData 设定生日
