@@ -35,10 +35,6 @@ func TestFate_RunMakeName(t *testing.T) {
 			ShowSQL:      false,
 			ShowExecTime: false,
 		},
-		FileOutput: config.FileOutput{
-			OutputMode: config.OutputModeLog,
-			Path:       "name.txt",
-		},
 	})
 	c := chronos.New("2020/01/14 02:45")
 	//t.Log(c.Solar().Time())
@@ -49,6 +45,10 @@ func TestFate_RunMakeName(t *testing.T) {
 	cfg.HardFilter = true
 	cfg.StrokeMin = 3
 	cfg.StrokeMax = 24
+	cfg.FileOutput = config.FileOutput{
+		OutputMode: config.OutputModeLog,
+		Path:       "name.txt",
+	}
 	//cfg.FileOutput = "output.csv"
 	f := fate.NewFate("刘", c.Solar().Time(), fate.DBOption(eng), fate.ConfigOption(*cfg))
 
