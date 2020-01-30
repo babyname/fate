@@ -9,9 +9,7 @@ import (
 
 func init() {
 	cfg := zap.NewProductionConfig()
-	//p, _ := os.Getwd()
-	//p = filepath.Join(p, "zap.log")
-	//os.OpenFile(p,os.O_APPEND|os.O_CREATE|os.O_RDWR|os.O_SYNC,os.ModePerm)
+
 	cfg.EncoderConfig = zapcore.EncoderConfig{
 		MessageKey:     "msg",
 		LevelKey:       "",
