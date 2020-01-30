@@ -13,9 +13,10 @@ func init() {
 }
 func TestFate_RunMakeName(t *testing.T) {
 	eng := fate.InitDatabaseFromConfig(config.Config{
-		HardFilter:   false,
+		FilterMode:   0,
 		StrokeMax:    0,
 		StrokeMin:    0,
+		HardFilter:   false,
 		FixBazi:      false,
 		SupplyFilter: false,
 		ZodiacFilter: false,
@@ -33,6 +34,10 @@ func TestFate_RunMakeName(t *testing.T) {
 			Dsn:          "",
 			ShowSQL:      false,
 			ShowExecTime: false,
+		},
+		FileOutput: config.FileOutput{
+			OutputMode: config.OutputModeLog,
+			Path:       "name.txt",
 		},
 	})
 	c := chronos.New("2020/01/14 02:45")
