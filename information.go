@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/godcong/fate/config"
-	"github.com/goextension/log"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
@@ -27,7 +26,7 @@ type logInformation struct {
 
 func (l *logInformation) Write(names ...Name) error {
 	for _, n := range names {
-		log.Infow("Information-->", "名字", n.String(), "笔画", n.Strokes(), "拼音", n.PinYin())
+		l.sugar.Infow("Information-->", "名字", n.String(), "笔画", n.Strokes(), "拼音", n.PinYin())
 	}
 	return nil
 }

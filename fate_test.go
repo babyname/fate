@@ -47,7 +47,7 @@ func TestFate_RunMakeName(t *testing.T) {
 	cfg.StrokeMax = 24
 	cfg.FileOutput = config.FileOutput{
 		OutputMode: config.OutputModeLog,
-		Path:       "name.txt",
+		Path:       "name2.txt",
 	}
 	//cfg.FileOutput = "output.csv"
 	f := fate.NewFate("刘", c.Solar().Time(), fate.DBOption(eng), fate.ConfigOption(*cfg))
