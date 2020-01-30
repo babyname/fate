@@ -3,11 +3,12 @@ package fate
 import (
 	"fmt"
 	"github.com/godcong/fate/config"
+	"github.com/goextension/log"
 	"os"
 )
 
 type Information interface {
-	Write(src string)
+	Write(name Name)
 }
 
 func NewWithConfig(config config.Config) Information {
@@ -19,8 +20,8 @@ type jsonInformation struct {
 	file *os.File
 }
 
-func (j jsonInformation) Write(src string) {
-	panic("implement me")
+func (j jsonInformation) Write(name Name) {
+	log.Info(name)
 }
 
 func jsonOutput(path string) Information {
