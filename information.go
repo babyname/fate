@@ -4,12 +4,36 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/godcong/fate/config"
+	"github.com/goextension/log"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"os"
 )
 
 type Information interface {
-	Write(name ...Name) error
+	Write(names ...Name) error
 	Finish() error
+}
+
+type jsonInformation struct {
+	path string
+	file *os.File
+}
+
+type logInformation struct {
+	path  string
+	sugar *zap.SugaredLogger
+}
+
+func (l *logInformation) Write(names ...Name) error {
+	for _, n := range names {
+		log.Infow("Information-->", "名字", n.String(), "笔画", n.Strokes(), "拼音", n.PinYin())
+	}
+	return nil
+}
+
+func (l *logInformation) Finish() error {
+	return l.sugar.Sync()
 }
 
 func NewWithConfig(cfg config.Config) Information {
@@ -18,12 +42,7 @@ func NewWithConfig(cfg config.Config) Information {
 		return jsonOutput(cfg.FileOutput.Path)
 	}
 
-	return nil
-}
-
-type jsonInformation struct {
-	path string
-	file *os.File
+	return logOutput(cfg.FileOutput.Path)
 }
 
 func (j *jsonInformation) Finish() error {
@@ -48,5 +67,42 @@ func jsonOutput(path string) Information {
 	return &jsonInformation{
 		path: path,
 		file: file,
+	}
+}
+
+func logOutput(path string) Information {
+	cfg := zap.NewProductionConfig()
+
+	cfg.EncoderConfig = zapcore.EncoderConfig{
+		MessageKey:     "msg",
+		LevelKey:       "",
+		TimeKey:        "",
+		NameKey:        "",
+		CallerKey:      "",
+		StacktraceKey:  "",
+		LineEnding:     "",
+		EncodeLevel:    nil,
+		EncodeTime:     nil,
+		EncodeDuration: nil,
+		EncodeCaller:   nil,
+		EncodeName:     nil,
+	}
+	cfg.OutputPaths = []string{
+		path,
+	}
+
+	cfg.DisableCaller = true
+	cfg.DisableStacktrace = true
+
+	logger, e := cfg.Build(
+		zap.AddCaller(),
+		zap.AddCallerSkip(1),
+	)
+	if e != nil {
+		panic(e)
+	}
+	return &logInformation{
+		path:  path,
+		sugar: logger.Sugar(),
 	}
 }
