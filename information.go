@@ -1,6 +1,7 @@
 package fate
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/godcong/fate/config"
 	"os"
@@ -16,12 +17,11 @@ func NewWithConfig(config config.Config) Information {
 }
 
 type jsonInformation struct {
-	path string
-	file *os.File
+	path   string
+	writer *bufio.Writer
 }
 
 func (j jsonInformation) Finish() {
-
 }
 
 func (j jsonInformation) Write(name Name) {
@@ -33,8 +33,9 @@ func jsonOutput(path string) Information {
 	if e != nil {
 		panic(fmt.Errorf("json output failed:%w", e))
 	}
+	writer := bufio.NewWriter(file)
 	return &jsonInformation{
-		path: path,
-		file: file,
+		path:   path,
+		writer: writer,
 	}
 }
