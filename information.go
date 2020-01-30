@@ -12,7 +12,12 @@ type Information interface {
 	Finish() error
 }
 
-func NewWithConfig(config config.Config) Information {
+func NewWithConfig(cfg config.Config) Information {
+	switch cfg.FileOutput.OutputMode {
+	case config.OutputModelJSON:
+		return jsonOutput(cfg.FileOutput.Path)
+	}
+
 	return nil
 }
 
