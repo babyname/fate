@@ -28,7 +28,7 @@ func cmdName() *cobra.Command {
 			if e != nil {
 				return
 			}
-			f := fate.NewFate(last, bornTime, fate.ConfigOption(*cfg))
+			f := fate.NewFate(last, bornTime, fate.ConfigOption(cfg))
 
 			e = f.MakeName(context.Background())
 			if e != nil {
