@@ -35,13 +35,13 @@ func (l *logInformation) Finish() error {
 	return l.sugar.Sync()
 }
 
-func InitOutputWithConfig(cfg config.Config) Information {
-	switch cfg.FileOutput.OutputMode {
+func initOutputWithConfig(ouput config.FileOutput) Information {
+	switch output.OutputMode {
 	case config.OutputModelJSON:
-		return jsonOutput(cfg.FileOutput.Path)
+		return jsonOutput(output.Path)
 	}
 
-	return logOutput(cfg.FileOutput.Path)
+	return logOutput(output.Path)
 }
 
 func (j *jsonInformation) Finish() error {

@@ -10,7 +10,7 @@ func main() {
 	var e error
 
 	cfg := config.DefaultConfig()
-	db := fate.InitDatabaseFromConfig(*cfg)
+	db := fate.InitDatabaseWithConfig(*cfg)
 
 	e = db.Sync(fate.Character{})
 	if e != nil {

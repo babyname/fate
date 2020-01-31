@@ -58,8 +58,12 @@ func (db *xormDatabase) CountWuGeLucky() (n int64, e error) {
 	return countWuGeLucky(db.Engine)
 }
 
-func InitDatabaseFromConfig(config config.Config) Database {
-	engine := initSQL(config.Database)
+func InitDatabaseWithConfig(cfg config.Config) Database {
+	return initDatabaseWithConfig(cfg.Database)
+}
+
+func initDatabaseWithConfig(db config.Database) Database {
+	engine := initSQL(db)
 	return &xormDatabase{
 		Engine: engine,
 	}
