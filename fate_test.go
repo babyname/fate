@@ -21,20 +21,6 @@ func TestFate_RunMakeName(t *testing.T) {
 		SupplyFilter: false,
 		ZodiacFilter: false,
 		BaguaFilter:  false,
-		Database: config.Database{
-			Host:         "localhost",
-			Port:         "3306",
-			User:         "root",
-			Pwd:          "111111",
-			Name:         "fate",
-			MaxIdleCon:   0,
-			MaxOpenCon:   0,
-			Driver:       "mysql",
-			File:         "",
-			Dsn:          "",
-			ShowSQL:      false,
-			ShowExecTime: false,
-		},
 	})
 	c := chronos.New("2020/01/14 02:45")
 	//t.Log(c.Solar().Time())
@@ -48,6 +34,20 @@ func TestFate_RunMakeName(t *testing.T) {
 	cfg.FileOutput = config.FileOutput{
 		OutputMode: config.OutputModeLog,
 		Path:       "name2.txt",
+	}
+	cfg.Database = config.Database{
+		Host:         "localhost",
+		Port:         "3306",
+		User:         "root",
+		Pwd:          "111111",
+		Name:         "fate",
+		MaxIdleCon:   0,
+		MaxOpenCon:   0,
+		Driver:       "mysql",
+		File:         "",
+		Dsn:          "",
+		ShowSQL:      false,
+		ShowExecTime: false,
 	}
 	//cfg.FileOutput = "output.csv"
 	f := fate.NewFate("刘", c.Solar().Time(), fate.DBOption(eng), fate.ConfigOption(*cfg))
