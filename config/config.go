@@ -85,9 +85,10 @@ func OutputConfig(config *Config) error {
 
 func DefaultConfig() *Config {
 	return &Config{
-		HardFilter:   false,
+		FilterMode:   0,
 		StrokeMax:    3,
 		StrokeMin:    18,
+		HardFilter:   false,
 		FixBazi:      false,
 		SupplyFilter: true,
 		ZodiacFilter: true,
@@ -105,6 +106,10 @@ func DefaultConfig() *Config {
 			Dsn:          "",
 			ShowSQL:      true,
 			ShowExecTime: true,
+		},
+		FileOutput: FileOutput{
+			OutputMode: OutputModeLog,
+			Path:       "name.txt",
 		},
 	}
 }
