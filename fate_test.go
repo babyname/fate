@@ -39,7 +39,7 @@ func TestFate_RunMakeName(t *testing.T) {
 		ShowSQL:      false,
 		ShowExecTime: false,
 	}
-	f := fate.NewFate(last, born, fate.ConfigOption(*cfg))
+	f := fate.NewFate(last, born, fate.ConfigOption(cfg))
 
 	//f.SetDB(eng)
 	e := f.MakeName(context.Background())
