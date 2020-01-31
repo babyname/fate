@@ -67,7 +67,6 @@ func main() {
 	}
 	f := fate.NewFate(lastName, born.Solar().Time(), fate.ConfigOption(*cfg))
 
-	//f.SetDB(eng)
 	e := f.MakeName(context.Background())
 	if e != nil {
 		panic(e)
