@@ -12,18 +12,8 @@ func init() {
 	//trait.NewZapFileSugar("fate.log")
 }
 func TestFate_RunMakeName(t *testing.T) {
-	eng := fate.initDatabaseWithConfig(config.Config{
-		FilterMode:   0,
-		StrokeMax:    0,
-		StrokeMin:    0,
-		HardFilter:   false,
-		FixBazi:      false,
-		SupplyFilter: false,
-		ZodiacFilter: false,
-		BaguaFilter:  false,
-	})
-	c := chronos.New("2020/01/14 02:45")
-	//t.Log(c.Solar().Time())
+	born := chronos.New("2020/01/14 02:45").Solar().Time()
+	last := "张"
 	cfg := config.DefaultConfig()
 	cfg.BaguaFilter = true
 	cfg.ZodiacFilter = true
@@ -49,8 +39,7 @@ func TestFate_RunMakeName(t *testing.T) {
 		ShowSQL:      false,
 		ShowExecTime: false,
 	}
-	//cfg.FileOutput = "output.csv"
-	f := fate.NewFate("刘", c.Solar().Time(), fate.DBOption(eng), fate.ConfigOption(*cfg))
+	f := fate.NewFate(last, born, fate.ConfigOption(*cfg))
 
 	//f.SetDB(eng)
 	e := f.MakeName(context.Background())

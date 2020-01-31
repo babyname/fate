@@ -23,7 +23,7 @@ type Fate interface {
 }
 
 type fateImpl struct {
-	config   config.Config
+	config   *config.Config
 	db       Database
 	out      Information
 	born     chronos.Calendar
@@ -42,13 +42,7 @@ type fateImpl struct {
 
 type Options func(f *fateImpl)
 
-func DBOption(database Database) Options {
-	return func(f *fateImpl) {
-		f.db = database
-	}
-}
-
-func ConfigOption(cfg config.Config) Options {
+func ConfigOption(cfg *config.Config) Options {
 	return func(f *fateImpl) {
 		f.config = cfg
 	}
@@ -68,7 +62,7 @@ func NewFate(lastName string, born time.Time, options ...Options) Fate {
 	}
 	f.lastChar = make([]*Character, len(f.last))
 	if len(f.last) > 2 {
-		panic("last name could not bigger than 2 characters")
+		panic("last name was bigger than 2 characters")
 	}
 
 	for _, op := range options {
@@ -194,6 +188,10 @@ func (f *fateImpl) XiYong() *XiYong {
 }
 
 func (f *fateImpl) init() {
+	if f.config == nil {
+		f.config = config.DefaultConfig()
+	}
+
 	f.db = initDatabaseWithConfig(f.config.Database)
 	f.out = initOutputWithConfig(f.config.FileOutput)
 }
