@@ -12,7 +12,7 @@ func init() {
 	//trait.NewZapFileSugar("fate.log")
 }
 func TestFate_RunMakeName(t *testing.T) {
-	eng := fate.InitDatabaseFromConfig(config.Config{
+	eng := fate.initDatabaseWithConfig(config.Config{
 		FilterMode:   0,
 		StrokeMax:    0,
 		StrokeMin:    0,

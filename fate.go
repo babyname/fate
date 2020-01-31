@@ -194,8 +194,8 @@ func (f *fateImpl) XiYong() *XiYong {
 }
 
 func (f *fateImpl) init() {
-	f.db = InitDatabaseFromConfig(f.config)
-	f.out = InitOutputWithConfig(f.config)
+	f.db = initDatabaseWithConfig(f.config.Database)
+	f.out = initOutputWithConfig(f.config.FileOutput)
 }
 
 //SetBornData 设定生日

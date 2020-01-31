@@ -28,11 +28,6 @@ func cmdName() *cobra.Command {
 			if e != nil {
 				return
 			}
-			var ops []fate.Options
-			db := fate.InitDatabaseFromConfig(*cfg)
-
-			ops = append(ops, fate.DBOption(db))
-
 			f := fate.NewFate(last, bornTime, fate.ConfigOption(*cfg))
 
 			e = f.MakeName(context.Background())
