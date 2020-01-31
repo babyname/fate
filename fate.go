@@ -194,11 +194,8 @@ func (f *fateImpl) XiYong() *XiYong {
 }
 
 func (f *fateImpl) init() {
-	if f.db == nil {
-		panic("database was not set")
-	}
-
-	f.out = NewWithConfig(f.config)
+	f.db = InitDatabaseFromConfig(f.config)
+	f.out = InitOutputWithConfig(f.config)
 }
 
 //SetBornData 设定生日

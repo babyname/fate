@@ -80,7 +80,7 @@ func initSQL(database config.Database) *xorm.Engine {
 		log.Infow("create database failed", "database", DefaultTableName)
 	}
 	u := fmt.Sprintf(mysqlSource, database.User, database.Pwd, database.Addr(), database.Name, url.QueryEscape("Asia/Shanghai"))
-	eng, e := xorm.NewEngine("mysql", u)
+	eng, e := xorm.NewEngine(database.Driver, u)
 	if e != nil {
 		log.Panicw("connect table failed", "error", e)
 	}
