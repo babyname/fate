@@ -15,11 +15,12 @@ import (
 	"github.com/godcong/yi"
 )
 
+type HandleOutputFunc func(name Name)
+
 type Fate interface {
 	MakeName(ctx context.Context) (e error)
 	XiYong() *XiYong
-	//SetCharDB(engine *xorm.Engine)
-	//GetLastCharacter() error
+	RegisterHandle(outputFunc HandleOutputFunc)
 }
 
 type fateImpl struct {
@@ -32,12 +33,11 @@ type fateImpl struct {
 	names    []*Name
 	nameType int
 	sex      string
-
-	debug   bool
-	isFirst bool
-	Limit   int
-	baZi    *BaZi
-	zodiac  *Zodiac
+	debug    bool
+	isFirst  bool
+	baZi     *BaZi
+	zodiac   *Zodiac
+	handle   HandleOutputFunc
 }
 
 type Options func(f *fateImpl)
@@ -74,8 +74,8 @@ func NewFate(lastName string, born time.Time, options ...Options) Fate {
 	return f
 }
 
-func (f *fateImpl) RandomName() {
-	//filterWuGe(f.db, f.last...)
+func (f *fateImpl) RegisterHandle(outputFunc HandleOutputFunc) {
+	f.handle = outputFunc
 }
 
 func (f *fateImpl) getLastCharacter() error {
