@@ -42,6 +42,10 @@ type fateImpl struct {
 
 func (f *fateImpl) RunInit() (e error) {
 	if f.config.RunInit {
+		if err := f.db.Sync(WuGeLucky{}); err != nil {
+			return err
+		}
+
 		lucky := make(chan *WuGeLucky)
 		go initWuGe(lucky)
 		for la := range lucky {
