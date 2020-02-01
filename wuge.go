@@ -213,7 +213,7 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 						ZongGe:       wuge.zongGe,
 						ZongDaYan:    GetDaYan(wuge.zongGe).Lucky,
 						ZongLucky:    wuge.Check(),
-						ZongSex:      GetDaYan(wuge.zongGe).IsSex(),
+						ZongSex:      isSex(wuge.zongGe, wuge.waiGe, wuge.renGe, wuge.diGe),
 						ZongMax:      GetDaYan(wuge.zongGe).IsMax(),
 					}
 				}
@@ -235,6 +235,15 @@ func getStroke(character *Character) int {
 		return character.TraditionalTotalStroke
 	}
 	return 0
+}
+
+func isSex(dys ...int) bool {
+	for _, dy := range dys {
+		if GetDaYan(dy).Sex {
+			return true
+		}
+	}
+	return false
 }
 
 func filterWuGe(eng *xorm.Engine, last []*Character, wg chan<- *WuGeLucky) error {
