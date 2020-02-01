@@ -20,6 +20,7 @@ type HandleOutputFunc func(name Name)
 type Fate interface {
 	MakeName(ctx context.Context) (e error)
 	XiYong() *XiYong
+	RunInit() (e error)
 	RegisterHandle(outputFunc HandleOutputFunc)
 }
 
@@ -34,10 +35,23 @@ type fateImpl struct {
 	nameType int
 	sex      string
 	debug    bool
-	isFirst  bool
 	baZi     *BaZi
 	zodiac   *Zodiac
 	handle   HandleOutputFunc
+}
+
+func (f *fateImpl) RunInit() (e error) {
+	if f.config.RunInit {
+		lucky := make(chan *WuGeLucky)
+		go initWuGe(lucky)
+		for la := range lucky {
+			_, e = f.db.InsertOrUpdateWuGeLucky(la)
+			if e != nil {
+				return Wrap(e, "insert failed")
+			}
+		}
+	}
+	return nil
 }
 
 type Options func(f *fateImpl)
@@ -100,20 +114,14 @@ func (f *fateImpl) getLastCharacter() error {
 
 func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 	log.Info("正在使用Fate生成姓名列表，如遇到问题请访问项目地址：https://github.com/godcong/fate获取帮助：")
-	n, e := f.db.CountWuGeLucky()
+
+	e = f.RunInit()
 	if e != nil {
-		return Wrap(e, "count total error")
+		return Wrap(e, "init failed")
 	}
-	f.isFirst = n == 0
-	if f.isFirst {
-		lucky := make(chan *WuGeLucky)
-		go initWuGe(lucky)
-		for la := range lucky {
-			_, e = f.db.InsertOrUpdateWuGeLucky(la)
-			if e != nil {
-				return Wrap(e, "insert failed")
-			}
-		}
+	n, e := f.db.CountWuGeLucky()
+	if e != nil || n == 0 {
+		return Wrap(e, "count total error")
 	}
 
 	e = f.getLastCharacter()
