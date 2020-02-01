@@ -21,6 +21,7 @@ func TestFate_RunMakeName(t *testing.T) {
 	cfg.HardFilter = true
 	cfg.StrokeMin = 3
 	cfg.StrokeMax = 24
+	cfg.RunInit = true
 	cfg.FileOutput = config.FileOutput{
 		OutputMode: config.OutputModeLog,
 		Path:       "name2.txt",
