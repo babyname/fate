@@ -31,6 +31,7 @@ type FileOutput struct {
 }
 
 type Config struct {
+	RunInit      bool
 	FilterMode   FilterMode `json:"filter_mode"`
 	StrokeMax    int
 	StrokeMin    int
@@ -85,6 +86,7 @@ func OutputConfig(config *Config) error {
 
 func DefaultConfig() *Config {
 	return &Config{
+		RunInit:      false,
 		FilterMode:   0,
 		StrokeMax:    3,
 		StrokeMin:    18,
