@@ -11,6 +11,7 @@ import (
 func init() {
 	//trait.NewZapFileSugar("fate.log")
 }
+
 func TestFate_RunMakeName(t *testing.T) {
 	born := chronos.New("2020/01/14 02:45").Solar().Time()
 	last := "张"
@@ -40,7 +41,7 @@ func TestFate_RunMakeName(t *testing.T) {
 		ShowSQL:      false,
 		ShowExecTime: false,
 	}
-	f := fate.NewFate(last, born, fate.ConfigOption(cfg))
+	f := fate.NewFate(last, born, fate.ConfigOption(cfg), fate.SexOption(fate.SexGirl))
 
 	//f.SetDB(eng)
 	e := f.MakeName(context.Background())
