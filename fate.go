@@ -17,6 +17,13 @@ import (
 
 type HandleOutputFunc func(name Name)
 
+type Sex bool
+
+const (
+	SexBoy Sex = false
+	SexGir Sex = true
+)
+
 type Fate interface {
 	MakeName(ctx context.Context) (e error)
 	XiYong() *XiYong
@@ -33,7 +40,7 @@ type fateImpl struct {
 	lastChar []*Character
 	names    []*Name
 	nameType int
-	sex      string
+	sex      Sex
 	debug    bool
 	baZi     *BaZi
 	zodiac   *Zodiac
@@ -63,6 +70,12 @@ type Options func(f *fateImpl)
 func ConfigOption(cfg *config.Config) Options {
 	return func(f *fateImpl) {
 		f.config = cfg
+	}
+}
+
+func SexOption(sex Sex) Options {
+	return func(f *fateImpl) {
+		f.sex = sex
 	}
 }
 
