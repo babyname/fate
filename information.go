@@ -89,9 +89,9 @@ func logOutput(path string) Information {
 	cfg.OutputPaths = []string{
 		path,
 	}
-	cfg.ErrorOutputPaths = []string{
-		"out.log",
-	}
+	//cfg.ErrorOutputPaths = []string{
+	//	"out.log",
+	//}
 
 	cfg.DisableCaller = true
 	cfg.DisableStacktrace = true
