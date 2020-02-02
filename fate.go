@@ -20,8 +20,8 @@ type HandleOutputFunc func(name Name)
 type Sex bool
 
 const (
-	SexBoy Sex = false
-	SexGir Sex = true
+	SexBoy  Sex = false
+	SexGirl Sex = true
 )
 
 type Fate interface {
