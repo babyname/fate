@@ -26,7 +26,7 @@ type logInformation struct {
 
 func (l *logInformation) Write(names ...Name) error {
 	for _, n := range names {
-		l.sugar.Infow("Information-->", "名字", n.String(), "笔画", n.Strokes(), "拼音", n.PinYin())
+		l.sugar.Infow(n.String(), "笔画", n.Strokes(), "拼音", n.PinYin())
 	}
 	return nil
 }
@@ -73,7 +73,7 @@ func logOutput(path string) Information {
 	cfg := zap.NewProductionConfig()
 
 	cfg.EncoderConfig = zapcore.EncoderConfig{
-		MessageKey:     "msg",
+		MessageKey:     "name",
 		LevelKey:       "",
 		TimeKey:        "",
 		NameKey:        "",
