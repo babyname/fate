@@ -65,7 +65,7 @@ func main() {
 		ShowSQL:      false,
 		ShowExecTime: false,
 	}
-	f := fate.NewFate(lastName, born.Solar().Time(), fate.ConfigOption(*cfg))
+	f := fate.NewFate(lastName, born.Solar().Time(), fate.ConfigOption(cfg))
 
 	e := f.MakeName(context.Background())
 	if e != nil {
