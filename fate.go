@@ -131,7 +131,10 @@ func (f *fateImpl) getLastCharacter() error {
 
 func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 	log.Info("正在使用Fate生成姓名列表，如遇到问题请访问项目地址：https://github.com/godcong/fate获取帮助：")
-
+	e = f.out.Head(f.config.FileOutput.Heads...)
+	if e != nil {
+		return Wrap(e, "write head failed")
+	}
 	e = f.RunInit()
 	if e != nil {
 		return Wrap(e, "init failed")

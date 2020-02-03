@@ -28,6 +28,7 @@ const (
 type FileOutput struct {
 	OutputMode OutputMode
 	Path       string
+	Heads      []string
 }
 
 type Config struct {
@@ -110,6 +111,7 @@ func DefaultConfig() *Config {
 			ShowExecTime: true,
 		},
 		FileOutput: FileOutput{
+			Heads:      []string{"姓名", "笔画", "喜用神"},
 			OutputMode: OutputModeLog,
 			Path:       "name.txt",
 		},
