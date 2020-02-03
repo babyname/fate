@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
+	"strings"
 )
 
 type Information interface {
@@ -29,6 +30,7 @@ type logInformation struct {
 }
 
 type csvInformation struct {
+	head []string
 	path string
 	file *os.File
 }
@@ -62,8 +64,9 @@ func (j *jsonInformation) Finish() error {
 func (j *jsonInformation) Write(names ...Name) error {
 	w := bufio.NewWriter(j.file)
 	for _, n := range names {
-		_, _ = w.WriteString(n.String())
-		_, _ = w.WriteString("\r\n")
+		out := headNameJSONOutput(j.head, n, nil)
+		//output json
+		_, _ = w.WriteString(strings.Join(out, ","))
 	}
 	return w.Flush()
 
@@ -156,6 +159,7 @@ func (c *csvInformation) Finish() error {
 }
 
 func (c *csvInformation) Head(heads ...string) (e error) {
+	c.head = heads
 	w := csv.NewWriter(c.file)
 	e = w.Write(heads)
 	if e != nil {
@@ -163,4 +167,23 @@ func (c *csvInformation) Head(heads ...string) (e error) {
 	}
 	w.Flush()
 	return nil
+}
+
+func headNameJSONOutput(heads []string, name Name, skip func(string) bool) (out []string) {
+	for _, h := range heads {
+		if skip != nil && skip(h) {
+			continue
+		}
+		switch h {
+		case "姓名":
+			out = append(out, h, name.String())
+		case "笔画":
+			out = append(out, h, name.Strokes())
+		case "拼音":
+			out = append(out, h, name.PinYin())
+		case "喜用神":
+			out = append(out, h, name.WuXing())
+		}
+	}
+	return
 }
