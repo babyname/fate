@@ -214,7 +214,7 @@ func nameOutputString(heads []string, name Name) (out []string) {
 		case "拼音":
 			out = append(out, name.PinYin())
 		case "喜用神":
-			out = append(out, h, name.XiYongShen())
+			out = append(out, name.XiYongShen())
 		}
 	}
 	return
