@@ -2,6 +2,7 @@ package fate
 
 import (
 	"bufio"
+	"encoding/csv"
 	"fmt"
 	"github.com/godcong/fate/config"
 	"go.uber.org/zap"
@@ -24,6 +25,11 @@ type logInformation struct {
 	sugar *zap.SugaredLogger
 }
 
+type csvInformation struct {
+	path string
+	file *os.File
+}
+
 func (l *logInformation) Write(names ...Name) error {
 	for _, n := range names {
 		l.sugar.Infow(n.String(), "笔画", n.Strokes(), "拼音", n.PinYin())
@@ -39,6 +45,8 @@ func initOutputWithConfig(output config.FileOutput) Information {
 	switch output.OutputMode {
 	case config.OutputModelJSON:
 		return jsonOutput(output.Path)
+	case config.OutputModeCSV:
+		return csvOutput(output.Path)
 	}
 
 	return logOutput(output.Path)
@@ -107,4 +115,31 @@ func logOutput(path string) Information {
 		path:  path,
 		sugar: logger.Sugar(),
 	}
+}
+
+func csvOutput(path string) Information {
+	file, e := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_SYNC|os.O_RDWR, 0755)
+	if e != nil {
+		panic(fmt.Errorf("json output failed:%w", e))
+	}
+
+	return &csvInformation{
+		path: path,
+		file: file,
+	}
+}
+
+func (c *csvInformation) Write(names ...Name) error {
+	w := csv.NewWriter(c.file)
+	for _, n := range names {
+		_ = w.Write([]string{
+			"姓名", n.String(), "笔画", n.Strokes(),
+		})
+	}
+	w.Flush()
+	return nil
+}
+
+func (c *csvInformation) Finish() error {
+	return c.file.Close()
 }
