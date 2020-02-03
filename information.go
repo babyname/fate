@@ -145,9 +145,8 @@ func csvOutput(path string) Information {
 func (c *csvInformation) Write(names ...Name) error {
 	w := csv.NewWriter(c.file)
 	for _, n := range names {
-		_ = w.Write([]string{
-			n.String(), n.Strokes(), n.PinYin(), n.WuXing(),
-		})
+		out := nameOutputString(c.head, n)
+		_ = w.Write(out)
 	}
 	w.Flush()
 	return nil
@@ -181,7 +180,7 @@ func headNameOutput(heads []string, name Name, skip func(string) bool) (out []in
 		case "拼音":
 			out = append(out, h, name.PinYin())
 		case "喜用神":
-			out = append(out, h, name.WuXing())
+			out = append(out, h, name.XiYongShen())
 		}
 	}
 	return
@@ -200,7 +199,22 @@ func headNameOutputString(heads []string, name Name, skip func(string) bool) (ou
 		case "拼音":
 			out = append(out, h, name.PinYin())
 		case "喜用神":
-			out = append(out, h, name.WuXing())
+			out = append(out, h, name.XiYongShen())
+		}
+	}
+	return
+}
+func nameOutputString(heads []string, name Name) (out []string) {
+	for _, h := range heads {
+		switch h {
+		case "姓名":
+			out = append(out, name.String())
+		case "笔画":
+			out = append(out, name.Strokes())
+		case "拼音":
+			out = append(out, name.PinYin())
+		case "喜用神":
+			out = append(out, h, name.XiYongShen())
 		}
 	}
 	return
