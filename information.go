@@ -12,10 +12,12 @@ import (
 
 type Information interface {
 	Write(names ...Name) error
+	Head(heads ...string) error
 	Finish() error
 }
 
 type jsonInformation struct {
+	head []string
 	path string
 	file *os.File
 }
@@ -23,6 +25,7 @@ type jsonInformation struct {
 type logInformation struct {
 	path  string
 	sugar *zap.SugaredLogger
+	head  []string
 }
 
 type csvInformation struct {
@@ -65,7 +68,15 @@ func (j *jsonInformation) Write(names ...Name) error {
 	return w.Flush()
 
 }
+func (j *jsonInformation) Head(heads ...string) error {
+	j.head = heads
+	return nil
+}
 
+func (l *logInformation) Head(heads ...string) error {
+	l.head = heads
+	return nil
+}
 func jsonOutput(path string) Information {
 	file, e := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_SYNC|os.O_RDWR, 0755)
 	if e != nil {
@@ -133,7 +144,7 @@ func (c *csvInformation) Write(names ...Name) error {
 	w := csv.NewWriter(c.file)
 	for _, n := range names {
 		_ = w.Write([]string{
-			"姓名", n.String(), "笔画", n.Strokes(),
+			n.String(), n.Strokes(), n.PinYin(), n.WuXing(),
 		})
 	}
 	w.Flush()
@@ -142,4 +153,14 @@ func (c *csvInformation) Write(names ...Name) error {
 
 func (c *csvInformation) Finish() error {
 	return c.file.Close()
+}
+
+func (c *csvInformation) Head(heads ...string) (e error) {
+	w := csv.NewWriter(c.file)
+	e = w.Write(heads)
+	if e != nil {
+		return e
+	}
+	w.Flush()
+	return nil
 }
