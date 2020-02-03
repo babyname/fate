@@ -25,7 +25,7 @@ func TestFate_RunMakeName(t *testing.T) {
 	cfg.RunInit = false
 	cfg.FileOutput = config.FileOutput{
 		OutputMode: config.OutputModeCSV,
-		Path:       "name2.txt",
+		Path:       "name2.csv",
 	}
 	cfg.Database = config.Database{
 		Host:         "localhost",
