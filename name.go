@@ -12,6 +12,7 @@ type Name struct {
 	FirstName   []*Character //名姓
 	LastName    []*Character
 	born        *chronos.Calendar
+	baZi        *BaZi
 	baGua       *yi.Yi //周易八卦
 	zodiac      *Zodiac
 	zodiacPoint int
@@ -61,6 +62,10 @@ func (n Name) WuXing() string {
 		s += f.WuXing
 	}
 	return s
+}
+
+func (n Name) XiYongShen() string {
+	return n.baZi.XiYongShen()
 }
 
 func createName(impl *fateImpl, f1 *Character, f2 *Character) *Name {

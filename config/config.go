@@ -46,6 +46,7 @@ type Config struct {
 }
 
 var DefaultJSONPath = ""
+var DefaultHeads = []string{"姓名", "笔画", "拼音", "喜用神"}
 
 func init() {
 	if DefaultJSONPath == "" {
@@ -111,7 +112,7 @@ func DefaultConfig() *Config {
 			ShowExecTime: true,
 		},
 		FileOutput: FileOutput{
-			Heads:      []string{"姓名", "笔画", "喜用神"},
+			Heads:      DefaultHeads,
 			OutputMode: OutputModeLog,
 			Path:       "name.txt",
 		},

@@ -220,6 +220,10 @@ func (f *fateImpl) init() {
 		f.config = config.DefaultConfig()
 	}
 
+	if f.config.FileOutput.Heads == nil {
+		f.config.FileOutput.Heads = config.DefaultHeads
+	}
+
 	f.db = initDatabaseWithConfig(f.config.Database)
 	f.out = initOutputWithConfig(f.config.FileOutput)
 }
@@ -280,6 +284,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 					continue
 				}
 				n := createName(f, f1, f2)
+				n.baZi = NewBazi(f.born)
 				name <- n
 			}
 		}

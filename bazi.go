@@ -143,7 +143,7 @@ func (z *BaZi) XiYong() *XiYong {
 
 //XiYongShen 平衡用神
 func (z *BaZi) XiYongShen() string {
-	return z.xiyong.Shen()
+	return z.XiYong().Shen()
 }
 
 //func (z *BaZi) yongShen() *BaZi {
