@@ -35,21 +35,14 @@ type csvInformation struct {
 	file *os.File
 }
 
-func (l *logInformation) Write(names ...Name) error {
-	for _, n := range names {
-		l.sugar.Infow(n.String(), "笔画", n.Strokes(), "拼音", n.PinYin())
-	}
-	return nil
-}
-
 func (l *logInformation) Finish() error {
 	return l.sugar.Sync()
 }
 
 func initOutputWithConfig(output config.FileOutput) Information {
 	switch output.OutputMode {
-	case config.OutputModelJSON:
-		return jsonOutput(output.Path)
+	//case config.OutputModelJSON:
+	//	return jsonOutput(output.Path)
 	case config.OutputModeCSV:
 		return csvOutput(output.Path)
 	}
@@ -64,7 +57,7 @@ func (j *jsonInformation) Finish() error {
 func (j *jsonInformation) Write(names ...Name) error {
 	w := bufio.NewWriter(j.file)
 	for _, n := range names {
-		out := headNameJSONOutput(j.head, n, nil)
+		out := headNameOutputString(j.head, n, nil)
 		//output json
 		_, _ = w.WriteString(strings.Join(out, ","))
 	}
@@ -76,10 +69,6 @@ func (j *jsonInformation) Head(heads ...string) error {
 	return nil
 }
 
-func (l *logInformation) Head(heads ...string) error {
-	l.head = heads
-	return nil
-}
 func jsonOutput(path string) Information {
 	file, e := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_SYNC|os.O_RDWR, 0755)
 	if e != nil {
@@ -90,7 +79,20 @@ func jsonOutput(path string) Information {
 		file: file,
 	}
 }
+func (l *logInformation) Write(names ...Name) error {
+	for _, n := range names {
+		out := headNameOutput(l.head, n, func(s string) bool {
+			return s == "姓名"
+		})
+		l.sugar.Infow(n.String(), out...)
+	}
+	return nil
+}
 
+func (l *logInformation) Head(heads ...string) error {
+	l.head = heads
+	return nil
+}
 func logOutput(path string) Information {
 	cfg := zap.NewProductionConfig()
 
@@ -111,9 +113,6 @@ func logOutput(path string) Information {
 	cfg.OutputPaths = []string{
 		path,
 	}
-	//cfg.ErrorOutputPaths = []string{
-	//	"out.log",
-	//}
 
 	cfg.DisableCaller = true
 	cfg.DisableStacktrace = true
@@ -169,7 +168,26 @@ func (c *csvInformation) Head(heads ...string) (e error) {
 	return nil
 }
 
-func headNameJSONOutput(heads []string, name Name, skip func(string) bool) (out []string) {
+func headNameOutput(heads []string, name Name, skip func(string) bool) (out []interface{}) {
+	for _, h := range heads {
+		if skip != nil && skip(h) {
+			continue
+		}
+		switch h {
+		case "姓名":
+			out = append(out, h, name.String())
+		case "笔画":
+			out = append(out, h, name.Strokes())
+		case "拼音":
+			out = append(out, h, name.PinYin())
+		case "喜用神":
+			out = append(out, h, name.WuXing())
+		}
+	}
+	return
+}
+
+func headNameOutputString(heads []string, name Name, skip func(string) bool) (out []string) {
 	for _, h := range heads {
 		if skip != nil && skip(h) {
 			continue
