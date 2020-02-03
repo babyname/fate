@@ -24,7 +24,7 @@ func TestFate_RunMakeName(t *testing.T) {
 	cfg.StrokeMax = 24
 	cfg.RunInit = false
 	cfg.FileOutput = config.FileOutput{
-		OutputMode: config.OutputModeLog,
+		OutputMode: config.OutputModeCSV,
 		Path:       "name2.txt",
 	}
 	cfg.Database = config.Database{
