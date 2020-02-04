@@ -3,6 +3,7 @@ package fate
 import (
 	"bufio"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"github.com/godcong/fate/config"
 	"go.uber.org/zap"
@@ -167,23 +168,28 @@ func (c *csvInformation) Head(heads ...string) (e error) {
 	return nil
 }
 
-func headNameOutput(heads []string, name Name, skip func(string) bool) (out []interface{}) {
+func headNameJSONOutput(heads []string, name Name, skip func(string) bool) (b []byte) {
+	out := make(map[string]string)
 	for _, h := range heads {
 		if skip != nil && skip(h) {
 			continue
 		}
 		switch h {
 		case "姓名":
-			out = append(out, h, name.String())
+			out[h] = name.String()
 		case "笔画":
-			out = append(out, h, name.Strokes())
+			out[h] = name.Strokes()
 		case "拼音":
-			out = append(out, h, name.PinYin())
+			out[h] = name.PinYin()
 		case "喜用神":
-			out = append(out, h, name.XiYongShen())
+			out[h] = name.XiYongShen()
 		}
 	}
-	return
+	by, e := json.Marshal(out)
+	if e != nil {
+		return nil
+	}
+	return by
 }
 
 func headNameOutputString(heads []string, name Name, skip func(string) bool) (out []string) {
