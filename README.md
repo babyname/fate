@@ -5,11 +5,11 @@ The first chinese name create tool in github
 
 ## [起名算法搜索排第一位](https://www.google.com/search?q=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&oq=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&aqs=chrome..69i57.3721j0j8&sourceid=chrome&ie=UTF-8) ##
 
+# 最新Release版下载： [v3.1.1](https://github.com/godcong/fate/releases/tag/v3.1.1) #
+
 ## 简介 ##
 一个好名字伴随人的一生，FATE让你取一个好名字：
 本程序适用于单个姓或双个姓，起2个名的情况。（如：独孤**，李张**，张**，王**）  
-
-最新Release版下载： [v3.1.1](https://github.com/godcong/fate/releases/tag/v3.1.1)
 
 ## 参考算法 ##
   周易卦象  
