@@ -2,6 +2,7 @@ package fate
 
 import (
 	"github.com/godcong/chronos"
+	"strings"
 )
 
 var diIndex = map[string]int{
@@ -120,6 +121,10 @@ func NewBazi(calendar chronos.Calendar) *BaZi {
 		baZi:   ec,
 		wuXing: baziToWuXing(ec),
 	}
+}
+
+func (z *BaZi) String() string {
+	return strings.Join(z.baZi, "")
 }
 
 //RiZhu 日主
