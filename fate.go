@@ -251,6 +251,11 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 		if f.config.FilterMode == config.FilterModeCustom {
 			//TODO
 		}
+
+		if bool(f.sex) || filterSex(l) {
+			continue
+		}
+
 		if f.config.HardFilter && hardFilter(l) {
 			sc := NewSanCai(l.TianGe, l.RenGe, l.DiGe)
 			if !Check(f.db.Database().(*xorm.Engine), sc, 5) {
@@ -290,6 +295,10 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 		}
 	}
 	return nil
+}
+
+func filterSex(lucky *WuGeLucky) bool {
+	return lucky.ZongSex == true
 }
 
 func isLucky(s string) bool {
