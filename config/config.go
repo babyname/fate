@@ -41,6 +41,7 @@ type Config struct {
 	SupplyFilter bool     //过滤补八字
 	ZodiacFilter bool     //过滤生肖
 	BaguaFilter  bool     //过滤卦象
+	Regular      bool     //常用
 	Database     Database `json:"database"`
 	FileOutput   FileOutput
 }
