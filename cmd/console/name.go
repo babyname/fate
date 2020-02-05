@@ -20,20 +20,18 @@ func cmdName() *cobra.Command {
 		Use:   "name",
 		Short: "output the name",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("config will output to %s/config.json\n", path)
 			config.DefaultJSONPath = path
 			cfg := config.LoadConfig()
 			fmt.Printf("config loaded: %+v", cfg)
 			bornTime, e := time.Parse(chronos.DateFormat, born)
 			if e != nil {
-				return
+				log.Fatalw("parseborn", "error", e)
 			}
 			f := fate.NewFate(last, bornTime, fate.ConfigOption(cfg), fate.SexOption(fate.Sex(sex)))
 
 			e = f.MakeName(context.Background())
 			if e != nil {
-				log.Errorw("makename", "error", e)
-				return
+				log.Fatalw("makename", "error", e)
 			}
 		},
 	}

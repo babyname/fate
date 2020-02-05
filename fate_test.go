@@ -13,7 +13,7 @@ func init() {
 }
 
 func TestFate_RunMakeName(t *testing.T) {
-	born := chronos.New("2020/01/14 02:45").Solar().Time()
+	born := chronos.New("2020/02/06 15:45").Solar().Time()
 	last := "张"
 	cfg := config.DefaultConfig()
 	cfg.BaguaFilter = true

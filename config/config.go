@@ -91,8 +91,8 @@ func DefaultConfig() *Config {
 	return &Config{
 		RunInit:      false,
 		FilterMode:   0,
-		StrokeMax:    3,
-		StrokeMin:    18,
+		StrokeMax:    18,
+		StrokeMin:    3,
 		HardFilter:   false,
 		FixBazi:      false,
 		SupplyFilter: true,
