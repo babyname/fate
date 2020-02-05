@@ -98,6 +98,7 @@ func DefaultConfig() *Config {
 		SupplyFilter: true,
 		ZodiacFilter: true,
 		BaguaFilter:  true,
+		Regular:      true,
 		Database: Database{
 			Host:         "127.0.0.1",
 			Port:         "3306",
