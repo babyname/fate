@@ -26,24 +26,24 @@ const (
 )
 
 type FileOutput struct {
-	OutputMode OutputMode
-	Path       string
-	Heads      []string
+	OutputMode OutputMode `json:"output_mode"`
+	Path       string     `json:"path"`
+	Heads      []string   `json:"heads"`
 }
 
 type Config struct {
 	RunInit      bool
 	FilterMode   FilterMode `json:"filter_mode"`
-	StrokeMax    int
-	StrokeMin    int
-	HardFilter   bool
-	FixBazi      bool     //八字修正
-	SupplyFilter bool     //过滤补八字
-	ZodiacFilter bool     //过滤生肖
-	BaguaFilter  bool     //过滤卦象
-	Regular      bool     //常用
-	Database     Database `json:"database"`
-	FileOutput   FileOutput
+	StrokeMax    int        `json:"stroke_max"`
+	StrokeMin    int        `json:"stroke_min"`
+	HardFilter   bool       `json:"hard_filter"`
+	FixBazi      bool       `json:"fix_bazi"`      //八字修正
+	SupplyFilter bool       `json:"supply_filter"` //过滤补八字
+	ZodiacFilter bool       `json:"zodiac_filter"` //过滤生肖
+	BaguaFilter  bool       `json:"bagua_filter"`  //过滤卦象
+	Regular      bool       `json:"regular"`       //常用
+	Database     Database   `json:"database"`
+	FileOutput   FileOutput `json:"file_output"`
 }
 
 var DefaultJSONPath = ""
