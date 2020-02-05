@@ -252,7 +252,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 			//TODO
 		}
 
-		if bool(f.sex) || filterSex(l) {
+		if bool(f.sex) && filterSex(l) {
 			continue
 		}
 
