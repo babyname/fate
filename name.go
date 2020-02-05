@@ -96,3 +96,7 @@ func (n *Name) BaGua() *yi.Yi {
 
 	return n.baGua
 }
+
+func (n Name) BaZi() string {
+	return n.baZi.String()
+}

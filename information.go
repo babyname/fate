@@ -182,6 +182,8 @@ func headNameOutput(heads []string, name Name, skip func(string) bool) (out []in
 			out = append(out, h, name.PinYin())
 		case "喜用神":
 			out = append(out, h, name.XiYongShen())
+		case "八字", "生辰八字":
+			out = append(out, h, name.BaZi())
 		}
 	}
 	return
