@@ -264,12 +264,22 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 		if f.debug {
 			log.Infow("lucky", "l1", l.LastStroke1, "l2", l.LastStroke2, "f1", l.FirstStroke1, "f2", l.FirstStroke2)
 		}
+		if f.config.Regular {
+			f1s, e = f.db.GetCharacters(Stoker(l.FirstStroke1, Regular()))
+		} else {
+			f1s, e = f.db.GetCharacters(Stoker(l.FirstStroke1))
+		}
 
-		f1s, e = f.db.GetCharacters(Stoker(l.FirstStroke1))
 		if e != nil {
 			return Wrap(e, "first stroke1 error")
 		}
-		f2s, e = f.db.GetCharacters(Stoker(l.FirstStroke2))
+
+		if f.config.Regular {
+			f2s, e = f.db.GetCharacters(Stoker(l.FirstStroke2, Regular()))
+		} else {
+			f2s, e = f.db.GetCharacters(Stoker(l.FirstStroke2))
+		}
+
 		if e != nil {
 			return Wrap(e, "first stoke2 error")
 		}
