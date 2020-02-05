@@ -32,7 +32,7 @@ type FileOutput struct {
 }
 
 type Config struct {
-	RunInit      bool
+	RunInit      bool       `json:"run_init"`
 	FilterMode   FilterMode `json:"filter_mode"`
 	StrokeMax    int        `json:"stroke_max"`
 	StrokeMin    int        `json:"stroke_min"`
@@ -110,8 +110,8 @@ func DefaultConfig() *Config {
 			Driver:       "mysql",
 			File:         "",
 			Dsn:          "",
-			ShowSQL:      true,
-			ShowExecTime: true,
+			ShowSQL:      false,
+			ShowExecTime: false,
 		},
 		FileOutput: FileOutput{
 			Heads:      DefaultHeads,
