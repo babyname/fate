@@ -14,18 +14,19 @@ func cmdInit() *cobra.Command {
 		Use:   "init",
 		Short: "output the init config",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("config will output to %s/config.json\n", path)
-			if ext := filepath.Ext(path); ext != "" {
-				log.Fatal("path cannot have a file name")
+			absPath, e := filepath.Abs(path)
+			if e != nil {
+				log.Fatalf("wrong path with:%v", e)
 			}
+			fmt.Printf("config will output to %s\n", filepath.Join(absPath, config.JSONName))
 			config.DefaultJSONPath = path
 
-			e := config.OutputConfig(config.DefaultConfig())
+			e = config.OutputConfig(config.DefaultConfig())
 			if e != nil {
 				log.Fatal(e)
 			}
 		},
 	}
-	cmd.Flags().StringVarP(&path, "path", "p", ".", "set the output path")
+	cmd.Flags().StringVarP(&path, "path", "p", "", "set the output path")
 	return cmd
 }
