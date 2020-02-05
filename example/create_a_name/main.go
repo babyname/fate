@@ -67,7 +67,7 @@ func main() {
 	}
 	cfg.FileOutput = config.FileOutput{
 		OutputMode: config.OutputModeLog,
-		Path:       "name2.txt",
+		Path:       "name.log",
 	}
 
 	f := fate.NewFate(lastName, born.Solar().Time(), fate.ConfigOption(cfg))
