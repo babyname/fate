@@ -28,7 +28,7 @@ func cmdName() *cobra.Command {
 			if e != nil {
 				return
 			}
-			f := fate.NewFate(last, bornTime, fate.ConfigOption(cfg))
+			f := fate.NewFate(last, bornTime, fate.ConfigOption(cfg), fate.SexOption(fate.Sex(sex)))
 
 			e = f.MakeName(context.Background())
 			if e != nil {
@@ -40,6 +40,6 @@ func cmdName() *cobra.Command {
 	cmd.Flags().StringVarP(&last, "last", "l", "", "set lastname")
 	cmd.Flags().StringVarP(&born, "born", "b", time.Now().Format(chronos.DateFormat), "set birth as 2016/01/02 15:04")
 	cmd.Flags().StringVarP(&path, "path", "p", ".", "set the input path")
-	cmd.Flags().BoolVarP(&sex, "sex", "s", true, "set sex of the baby")
+	cmd.Flags().BoolVarP(&sex, "sex", "s", false, "set sex of the baby")
 	return cmd
 }
