@@ -79,7 +79,7 @@ func LoadConfig() (c *Config) {
 }
 
 func OutputConfig(config *Config) error {
-	bys, e := json.Marshal(config)
+	bys, e := json.MarshalIndent(config, "", " ")
 	if e != nil {
 		return e
 	}
