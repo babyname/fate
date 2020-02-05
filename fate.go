@@ -1,7 +1,6 @@
 package fate
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"fmt"
@@ -159,15 +158,12 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 
 	var tmpChar []*Character
 	//supplyFilter := false
-	var w *bufio.Writer
-
 	for n := range name {
 		select {
 		case <-ctx.Done():
 			log.Info("end")
 			return
 		default:
-
 		}
 
 		tmpChar = n.FirstName
@@ -196,14 +192,11 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 			log.Infow("bian", "ming", bian.GuaMing, "chu", bian.ChuYaoJiXiong, "er", bian.ErYaoJiXiong, "san", bian.SanYaoJiXiong, "si", bian.SiYaoJiXiong, "wu", bian.WuYaoJiXiong, "liu", bian.ShangYaoJiXiong)
 		}
 
-		if w != nil {
-			_, e := w.WriteString(strings.Join([]string{n.String(), ben.GuaMing, bian.GuaMing, n.PinYin(), strings.Join(f.born.Lunar().EightCharacter(), ""), f.XiYong().Shen()}, ",") + "\n")
-			if e != nil {
-				log.Error("output error", "error", e)
-			}
-		} else {
-			f.out.Write(*n)
-			log.Infow("Information-->", "名字", n.String(), "笔画", n.Strokes(), "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen(), "本卦", ben.GuaMing, "变卦", bian.GuaMing)
+		if err := f.out.Write(*n); err != nil {
+			return err
+		}
+		if f.debug {
+			log.Infow(n.String(), "笔画", n.Strokes(), "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen(), "本卦", ben.GuaMing, "变卦", bian.GuaMing)
 		}
 	}
 	return nil
