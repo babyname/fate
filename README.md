@@ -1,14 +1,17 @@
 # 命运：现代科学取名工具 #
-# FATE: A modern science chinese name create tool #
+FATE: A modern science chinese name create tool
 ## Github第一个开源的中文取名项目 ##
-## The first chinese name create tool in github ##
+The first chinese name create tool in github
 
-## [起名算法中目前排第一个](https://www.google.com/search?q=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&oq=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&aqs=chrome..69i57.3721j0j8&sourceid=chrome&ie=UTF-8) ##
+## [起名算法搜索排第一位](https://www.google.com/search?q=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&oq=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&aqs=chrome..69i57.3721j0j8&sourceid=chrome&ie=UTF-8) ##
 
-### 一个好名字伴随人的一生，FATE让你取一个好名字 ###
-程序适用于单个姓或双个姓，起2个名的情况。（如：独孤**，李张**，张**，王**）  
+## 简介 ##
+一个好名字伴随人的一生，FATE让你取一个好名字：
+本程序适用于单个姓或双个姓，起2个名的情况。（如：独孤**，李张**，张**，王**）  
 
-### 参考算法 ###
+最新Release版下载： [v3.1.1](https://github.com/godcong/fate/releases/tag/v3.1.1)
+
+## 参考算法 ##
   周易卦象  
   大衍之数  
   三才五格  
@@ -43,8 +46,8 @@
        fate.exe name -l 张 -b "2020/02/06 15:04"
 ```
 
-#### 版本履历:
-
+## 版本履历:
+```
 第一版:
     大部分是手动工作,现已废弃
     
@@ -68,7 +71,7 @@
     
 第四版(计划):  
     通过AI,大数据匹配算法,取出更好更佳的名字.
-
+```
 
 
 
