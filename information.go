@@ -9,7 +9,6 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
-	"strings"
 )
 
 type Information interface {
@@ -58,9 +57,10 @@ func (j *jsonInformation) Finish() error {
 func (j *jsonInformation) Write(names ...Name) error {
 	w := bufio.NewWriter(j.file)
 	for _, n := range names {
-		out := headNameOutputString(j.head, n, nil)
+		out := headNameJSONOutput(j.head, n, nil)
 		//output json
-		_, _ = w.WriteString(strings.Join(out, ","))
+		_, _ = w.Write(out)
+		_, _ = w.WriteString(",\n")
 	}
 	return w.Flush()
 
@@ -186,6 +186,7 @@ func headNameOutput(heads []string, name Name, skip func(string) bool) (out []in
 	}
 	return
 }
+
 func headNameJSONOutput(heads []string, name Name, skip func(string) bool) (b []byte) {
 	out := make(map[string]string)
 	for _, h := range heads {
