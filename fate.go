@@ -23,6 +23,7 @@ const (
 	SexBoy  Sex = false
 	SexGirl Sex = true
 )
+const HelpContent = "正在使用Fate生成姓名列表，如遇到问题请访问项目地址：https://github.com/godcong/fate获取帮助!"
 
 type Fate interface {
 	MakeName(ctx context.Context) (e error)
@@ -130,7 +131,7 @@ func (f *fateImpl) getLastCharacter() error {
 }
 
 func (f *fateImpl) MakeName(ctx context.Context) (e error) {
-	log.Info("正在使用Fate生成姓名列表，如遇到问题请访问项目地址：https://github.com/godcong/fate获取帮助：")
+	log.Info(HelpContent)
 	e = f.out.Head(f.config.FileOutput.Heads...)
 	if e != nil {
 		return Wrap(e, "write head failed")
