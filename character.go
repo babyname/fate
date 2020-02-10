@@ -34,6 +34,7 @@ type Character struct {
 	Comment                  []string `xorm:"default() notnull comment"`                               //解释
 }
 
+// InsertOrUpdateCharacter ...
 func InsertOrUpdateCharacter(engine *xorm.Engine, c *Character) (i int64, e error) {
 	tmp := new(Character)
 	b, e := engine.Where("hash = ?", Hash(c.Ch)).Get(tmp)
@@ -68,14 +69,17 @@ func getCharacter(eng *xorm.Engine, fn func(engine *xorm.Engine) *xorm.Session) 
 	return nil, fmt.Errorf("character get error:%w", e)
 }
 
+// CharacterOptions ...
 type CharacterOptions func(session *xorm.Session) *xorm.Session
 
+// Regular ...
 func Regular() CharacterOptions {
 	return func(session *xorm.Session) *xorm.Session {
 		return session.And("regular = ?", 1)
 	}
 }
 
+// Stoker ...
 func Stoker(s int, options ...CharacterOptions) func(engine *xorm.Engine) *xorm.Session {
 	return func(engine *xorm.Engine) *xorm.Session {
 		session := engine.Where("pin_yin IS NOT NULL").
@@ -92,6 +96,7 @@ func Stoker(s int, options ...CharacterOptions) func(engine *xorm.Engine) *xorm.
 
 }
 
+// Char ...
 func Char(name string) func(engine *xorm.Engine) *xorm.Session {
 	return func(engine *xorm.Engine) *xorm.Session {
 		return engine.Where(builder.Eq{"ch": name}.
@@ -100,6 +105,7 @@ func Char(name string) func(engine *xorm.Engine) *xorm.Session {
 	}
 }
 
+// Hash ...
 func Hash(url string) string {
 	sum256 := sha256.Sum256([]byte(url))
 	return fmt.Sprintf("%x", sum256)
