@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// NewOutput ...
 func NewOutput(path string) (*bufio.Writer, error) {
 	file, e := os.Create(path)
 	if e != nil {

@@ -14,16 +14,22 @@ import (
 	"github.com/godcong/yi"
 )
 
+// HandleOutputFunc ...
 type HandleOutputFunc func(name Name)
 
+// Sex ...
 type Sex bool
 
+// SexBoy ...
 const (
 	SexBoy  Sex = false
 	SexGirl Sex = true
 )
+
+// HelpContent ...
 const HelpContent = "正在使用Fate生成姓名列表，如遇到问题请访问项目地址：https://github.com/godcong/fate获取帮助!"
 
+// Fate ...
 type Fate interface {
 	MakeName(ctx context.Context) (e error)
 	XiYong() *XiYong
@@ -47,6 +53,7 @@ type fateImpl struct {
 	handle   HandleOutputFunc
 }
 
+// RunInit ...
 func (f *fateImpl) RunInit() (e error) {
 	if f.config.RunInit {
 		if err := f.db.Sync(WuGeLucky{}); err != nil {
@@ -65,20 +72,24 @@ func (f *fateImpl) RunInit() (e error) {
 	return nil
 }
 
+// Options ...
 type Options func(f *fateImpl)
 
+// ConfigOption ...
 func ConfigOption(cfg *config.Config) Options {
 	return func(f *fateImpl) {
 		f.config = cfg
 	}
 }
 
+// SexOption ...
 func SexOption(sex Sex) Options {
 	return func(f *fateImpl) {
 		f.sex = sex
 	}
 }
 
+// Debug ...
 func Debug() Options {
 	return func(f *fateImpl) {
 		f.debug = true
@@ -105,6 +116,7 @@ func NewFate(lastName string, born time.Time, options ...Options) Fate {
 	return f
 }
 
+// RegisterHandle ...
 func (f *fateImpl) RegisterHandle(outputFunc HandleOutputFunc) {
 	f.handle = outputFunc
 }
@@ -129,6 +141,7 @@ func (f *fateImpl) getLastCharacter() error {
 	return nil
 }
 
+// MakeName ...
 func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 	log.Info(HelpContent)
 	e = f.out.Head(f.config.FileOutput.Heads...)
@@ -202,6 +215,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 	return nil
 }
 
+// XiYong ...
 func (f *fateImpl) XiYong() *XiYong {
 	if f.baZi == nil {
 		f.baZi = NewBazi(f.born)
