@@ -1,4 +1,3 @@
-//三才五格
 package fate
 
 import "github.com/xormsharp/xorm"
@@ -6,6 +5,7 @@ import "github.com/xormsharp/xorm"
 const sanCai = "水木木火火土土金金水"
 const yinYang = "阴阳"
 
+// SanCai ...
 type SanCai struct {
 	tianCai        string `bson:"tian_cai"`
 	tianCaiYinYang string `bson:"tian_cai_yin_yang"`

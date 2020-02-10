@@ -108,6 +108,7 @@ func WuXingDiZhi(s string) string {
 	return wuXingDiZhi[s]
 }
 
+// BaZi ...
 type BaZi struct {
 	baZi   []string
 	wuXing []string
@@ -123,6 +124,7 @@ func NewBazi(calendar chronos.Calendar) *BaZi {
 	}
 }
 
+// String ...
 func (z *BaZi) String() string {
 	return strings.Join(z.baZi, "")
 }
