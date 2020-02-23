@@ -6,7 +6,7 @@ import (
 	"github.com/xormsharp/xorm"
 )
 
-//WuGe
+// WuGe ...
 type WuGe struct {
 	tianGe int
 	renGe  int
@@ -15,22 +15,27 @@ type WuGe struct {
 	zongGe int
 }
 
+// ZongGe ...
 func (ge *WuGe) ZongGe() int {
 	return ge.zongGe
 }
 
+// WaiGe ...
 func (ge *WuGe) WaiGe() int {
 	return ge.waiGe
 }
 
+// DiGe ...
 func (ge *WuGe) DiGe() int {
 	return ge.diGe
 }
 
+// RenGe ...
 func (ge *WuGe) RenGe() int {
 	return ge.renGe
 }
 
+// TianGe ...
 func (ge *WuGe) TianGe() int {
 	return ge.tianGe
 }
@@ -66,9 +71,8 @@ func renGe(l1, l2, f1, _ int) int {
 	//人格（复姓单名）姓的第二字加名
 	if l2 != 0 {
 		return l2 + f1
-	} else {
-		return l1 + f1
 	}
+	return l1 + f1
 }
 
 //diGe input the ScienceStrokes with name
@@ -118,7 +122,7 @@ func zongGe(l1, l2, f1, f2 int) int {
 }
 
 func checkDaYan(idx int) bool {
-	switch DaYanList[idx-1].Lucky {
+	switch daYanList[idx-1].Lucky {
 	case "吉", "半吉":
 		return true
 	}
@@ -158,6 +162,7 @@ type WuGeLucky struct {
 	ZongMax      bool   `xorm:"zong_max"`
 }
 
+// BeforeInsert ...
 func (w *WuGeLucky) BeforeInsert() {
 	w.ID = uuid.Must(uuid.NewUUID()).String()
 }
@@ -184,6 +189,7 @@ func insertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e 
 	return session.Clone().Update(lucky)
 }
 
+// WuGeMax ...
 const WuGeMax = 32
 
 func initWuGe(lucky chan<- *WuGeLucky) {

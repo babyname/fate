@@ -11,6 +11,7 @@ import (
 	"os"
 )
 
+// Information ...
 type Information interface {
 	Write(names ...Name) error
 	Head(heads ...string) error
@@ -35,6 +36,7 @@ type csvInformation struct {
 	file *os.File
 }
 
+// Finish ...
 func (l *logInformation) Finish() error {
 	return l.sugar.Sync()
 }
@@ -50,10 +52,12 @@ func initOutputWithConfig(output config.FileOutput) Information {
 	return logOutput(output.Path)
 }
 
+// Finish ...
 func (j *jsonInformation) Finish() error {
 	return j.file.Close()
 }
 
+// Write ...
 func (j *jsonInformation) Write(names ...Name) error {
 	w := bufio.NewWriter(j.file)
 	for _, n := range names {
@@ -65,6 +69,8 @@ func (j *jsonInformation) Write(names ...Name) error {
 	return w.Flush()
 
 }
+
+// Head ...
 func (j *jsonInformation) Head(heads ...string) error {
 	j.head = heads
 	return nil
@@ -80,6 +86,8 @@ func jsonOutput(path string) Information {
 		file: file,
 	}
 }
+
+// Write ...
 func (l *logInformation) Write(names ...Name) error {
 	for _, n := range names {
 		out := headNameOutput(l.head, n, func(s string) bool {
@@ -90,6 +98,7 @@ func (l *logInformation) Write(names ...Name) error {
 	return nil
 }
 
+// Head ...
 func (l *logInformation) Head(heads ...string) error {
 	l.head = heads
 	return nil
@@ -143,6 +152,7 @@ func csvOutput(path string) Information {
 	}
 }
 
+// Write ...
 func (c *csvInformation) Write(names ...Name) error {
 	w := csv.NewWriter(c.file)
 	for _, n := range names {
@@ -153,10 +163,12 @@ func (c *csvInformation) Write(names ...Name) error {
 	return nil
 }
 
+// Finish ...
 func (c *csvInformation) Finish() error {
 	return c.file.Close()
 }
 
+// Head ...
 func (c *csvInformation) Head(heads ...string) (e error) {
 	c.head = heads
 	w := csv.NewWriter(c.file)
