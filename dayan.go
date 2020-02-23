@@ -4,10 +4,10 @@ import (
 	_ "github.com/godcong/fate/statik"
 )
 
-var DaYanList [81]DaYan
+var daYanList [81]DaYan
 
 func init() {
-	DaYanList = [81]DaYan{
+	daYanList = [81]DaYan{
 		{Number: 1, Lucky: "吉", SkyNine: "太极之数", Comment: "太极之数，万物开泰，生发无穷，利禄亨通。"},
 		{Number: 2, Lucky: "凶", SkyNine: "两仪之数", Comment: "两仪之数，混沌未开，进退保守，志望难达。"},
 		{Number: 3, Lucky: "吉", SkyNine: "三才之数", Comment: "三才之数，天地人和，大事大业，繁荣昌隆。"},
@@ -92,6 +92,7 @@ func init() {
 	}
 }
 
+// DaYan ...
 type DaYan struct {
 	Number  int
 	Lucky   string
@@ -117,5 +118,5 @@ func GetDaYan(idx int) DaYan {
 		panic("wrong idx")
 	}
 	i := (idx - 1) % 81
-	return DaYanList[i]
+	return daYanList[i]
 }
