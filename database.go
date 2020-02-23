@@ -14,8 +14,11 @@ const mysqlSource = "%s:%s@tcp(%s)/%s?loc=%s&charset=utf8mb4&parseTime=true"
 const createDatabase = "CREATE DATABASE `%s` CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_bin'"
 
 var _ = mysql.Config{}
+
+// DefaultTableName ...
 var DefaultTableName = "fate"
 
+// Database ...
 type Database interface {
 	Sync(v ...interface{}) error
 	CountWuGeLucky() (n int64, e error)
@@ -30,34 +33,42 @@ type xormDatabase struct {
 	*xorm.Engine
 }
 
+// Database ...
 func (db *xormDatabase) Database() interface{} {
 	return db.Engine
 }
 
+// FilterWuGe ...
 func (db *xormDatabase) FilterWuGe(last []*Character, wg chan<- *WuGeLucky) error {
 	return filterWuGe(db.Engine, last, wg)
 }
 
+// GetCharacters ...
 func (db *xormDatabase) GetCharacters(fn func(engine *xorm.Engine) *xorm.Session) ([]*Character, error) {
 	return getCharacters(db.Engine, fn)
 }
 
+// Sync ...
 func (db *xormDatabase) Sync(v ...interface{}) error {
 	return db.Engine.Sync2(v...)
 }
 
+// GetCharacter ...
 func (db *xormDatabase) GetCharacter(fn func(engine *xorm.Engine) *xorm.Session) (*Character, error) {
 	return getCharacter(db.Engine, fn)
 }
 
+// InsertOrUpdateWuGeLucky ...
 func (db *xormDatabase) InsertOrUpdateWuGeLucky(lucky *WuGeLucky) (n int64, e error) {
 	return insertOrUpdateWuGeLucky(db.Engine, lucky)
 }
 
+// CountWuGeLucky ...
 func (db *xormDatabase) CountWuGeLucky() (n int64, e error) {
 	return countWuGeLucky(db.Engine)
 }
 
+// InitDatabaseWithConfig ...
 func InitDatabaseWithConfig(cfg config.Config) Database {
 	return initDatabaseWithConfig(cfg.Database)
 }

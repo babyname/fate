@@ -1,5 +1,6 @@
 package fate
 
+// IteratorFunc ...
 type IteratorFunc func(v interface{}) error
 
 type iterator struct {
@@ -7,7 +8,8 @@ type iterator struct {
 	index int
 }
 
-func NewIterator() *iterator {
+// newIterator ...
+func newIterator() *iterator {
 	return &iterator{
 		data:  nil,
 		index: 0,

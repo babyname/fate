@@ -1,5 +1,6 @@
 package fate
 
+// LikeUseGod ...
 type LikeUseGod struct {
 	LikeGod string //喜神
 	UseGod  string //用神

@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// ZodiacPig ...
 const (
 	ZodiacPig  = "猪"
 	ZodiacMice = "鼠"
@@ -36,6 +37,7 @@ var zodiacList = map[string]Zodiac{
 	},
 }
 
+// GetZodiac ...
 func GetZodiac(c chronos.Calendar) *Zodiac {
 	z := chronos.GetZodiac(c.Lunar())
 	if v, b := zodiacList[z]; b {
