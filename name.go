@@ -18,6 +18,7 @@ type Name struct {
 	zodiacPoint int
 }
 
+// String ...
 func (n Name) String() string {
 	var s string
 	for _, l := range n.LastName {
@@ -29,6 +30,7 @@ func (n Name) String() string {
 	return s
 }
 
+// Strokes ...
 func (n Name) Strokes() string {
 	var s []string
 	for _, l := range n.LastName {
@@ -41,6 +43,7 @@ func (n Name) Strokes() string {
 	return strings.Join(s, ",")
 }
 
+// PinYin ...
 func (n Name) PinYin() string {
 	var s string
 	for _, l := range n.LastName {
@@ -53,6 +56,7 @@ func (n Name) PinYin() string {
 	return s
 }
 
+// WuXing ...
 func (n Name) WuXing() string {
 	var s string
 	for _, l := range n.LastName {
@@ -64,6 +68,7 @@ func (n Name) WuXing() string {
 	return s
 }
 
+// XiYongShen ...
 func (n Name) XiYongShen() string {
 	return n.baZi.XiYongShen()
 }
@@ -82,7 +87,7 @@ func createName(impl *fateImpl, f1 *Character, f2 *Character) *Name {
 	}
 }
 
-//BaGua
+// BaGua ...
 func (n *Name) BaGua() *yi.Yi {
 	if n.baGua == nil {
 		lastSize := len(n.LastName)
@@ -97,6 +102,7 @@ func (n *Name) BaGua() *yi.Yi {
 	return n.baGua
 }
 
+// BaZi ...
 func (n Name) BaZi() string {
 	return n.baZi.String()
 }
