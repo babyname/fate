@@ -13,6 +13,7 @@ import (
 
 // Information ...
 type Information interface {
+	Group(b bool)
 	Write(names ...Name) error
 	Head(heads ...string) error
 	Finish() error
@@ -24,16 +25,28 @@ type jsonInformation struct {
 	file *os.File
 }
 
+func (j *jsonInformation) Group(b bool) {
+	panic("implement me")
+}
+
 type logInformation struct {
 	path  string
 	sugar *zap.SugaredLogger
 	head  []string
 }
 
+func (l *logInformation) Group(b bool) {
+	panic("implement me")
+}
+
 type csvInformation struct {
 	head []string
 	path string
 	file *os.File
+}
+
+func (c *csvInformation) Group(b bool) {
+	panic("implement me")
 }
 
 // Finish ...
