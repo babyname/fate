@@ -216,6 +216,12 @@ func New(database fate.Database) Regular {
 	}
 }
 
+func setAllRegular(db fate.Database, b bool) error {
+	//engine := db.Database().(*xorm.Engine)
+	//TODO
+	return nil
+}
+
 func fixRegular(db fate.Database, ch string) bool {
 	char, err := db.GetCharacter(fate.Char(ch))
 	if err != nil {
