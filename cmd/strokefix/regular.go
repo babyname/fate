@@ -171,3 +171,7 @@ var regularList = map[int]string{
 	22: `囊`,
 	23: `罐`,
 }
+
+func fixRegular(ch string) bool {
+	return false
+}
