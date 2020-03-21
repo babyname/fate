@@ -1,6 +1,7 @@
 package regular
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/godcong/fate"
@@ -192,8 +193,17 @@ func (r *regular) Run() {
 		if len(list) == 0 {
 			continue
 		}
-
+		for _, ch := range list {
+			r.total++
+			fmt.Printf("character %s is fixing\n", ch)
+			if fixRegular(r.db, ch) {
+				r.fixed++
+			} else {
+				r.unfixed++
+			}
+		}
 	}
+	fmt.Printf("fix regular finished(total:%d,fixed:%d,unfixed%d)\n", r.total, r.fixed, r.unfixed)
 }
 
 type Regular interface {
