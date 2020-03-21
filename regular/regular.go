@@ -1,4 +1,4 @@
-package main
+package regular
 
 import (
 	"github.com/godcong/fate"
