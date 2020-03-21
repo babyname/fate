@@ -1,6 +1,8 @@
 package regular
 
 import (
+	"strings"
+
 	"github.com/godcong/fate"
 	"github.com/xormsharp/xorm"
 )
@@ -175,6 +177,33 @@ var regularList = map[int]string{
 	21: `蠢、霸、露`,
 	22: `囊`,
 	23: `罐`,
+}
+
+type regular struct {
+	db      fate.Database
+	total   int
+	fixed   int
+	unfixed int
+}
+
+func (r *regular) Run() {
+	for _, strVal := range regularList {
+		list := strings.Split(strVal, "、")
+		if len(list) == 0 {
+			continue
+		}
+
+	}
+}
+
+type Regular interface {
+	Run()
+}
+
+func New(database fate.Database) Regular {
+	return &regular{
+		db: database,
+	}
 }
 
 func fixRegular(db fate.Database, ch string) bool {
