@@ -1,5 +1,10 @@
 package main
 
+import (
+	"github.com/godcong/fate"
+	"github.com/xormsharp/xorm"
+)
+
 var regularList = map[int]string{
 	1: `一、乙`,
 	2: `二、十、丁、厂、七、卜、人、入、八、九、几、儿、了、力、乃、刀、又`,
@@ -172,6 +177,22 @@ var regularList = map[int]string{
 	23: `罐`,
 }
 
-func fixRegular(ch string) bool {
+func fixRegular(db fate.Database, ch string) bool {
+	char, err := db.GetCharacter(fate.Char(ch))
+	if err != nil {
+		return false
+	}
+	char.Regular = true
+	engine, b := db.Database().(*xorm.Engine)
+	if !b {
+		return false
+	}
+	update, e := engine.Where("hash = ?", char.Hash).Update(char)
+	if e != nil {
+		return false
+	}
+	if update == 0 {
+		return false
+	}
 	return false
 }
