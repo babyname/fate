@@ -1,6 +1,7 @@
 package regular
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -188,6 +189,10 @@ type regular struct {
 }
 
 func (r *regular) Run() {
+	e := setAllRegular(r.db, false)
+	if e != nil {
+		return
+	}
 	for _, strVal := range regularList {
 		list := strings.Split(strVal, "、")
 		if len(list) == 0 {
@@ -216,9 +221,19 @@ func New(database fate.Database) Regular {
 	}
 }
 
-func setAllRegular(db fate.Database, b bool) error {
-	//engine := db.Database().(*xorm.Engine)
-	//TODO
+func setAllRegular(db fate.Database, regular bool) (e error) {
+	engine, b := db.Database().(*xorm.Engine)
+	if !b {
+		return errors.New("wrong type")
+	}
+	if !regular {
+		_, e = engine.Exec("UPDATE `character` set regular = 0")
+	} else {
+		_, e = engine.Exec("UPDATE `character` set regular = 1")
+	}
+	if e != nil {
+		return e
+	}
 	return nil
 }
 
