@@ -47,7 +47,7 @@ The first chinese name create tool in github
 ```
 
 ## 版本履历:
-```
+
 第一版:
     大部分是手动工作,现已废弃
     
@@ -69,11 +69,17 @@ The first chinese name create tool in github
     生肖(30%) 生肖获取完成,字库筛选待完成
     天运(TODO)
     
-第四版(计划):  
+第四版: 
+  优化算法,调整接口,数据库,完善文档以及修复一些bug.
+  
+第五版:
+  图形界面UI,api接口调用.
+  
+第六版:
+  占坑备用
+
+第七版:
     通过AI,大数据匹配算法,取出更好更佳的名字.
-```
-
-
 
 
 ### 其他(补充资料) ###
