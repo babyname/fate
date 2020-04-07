@@ -18,6 +18,7 @@ jobs:
       matrix:
         go-version: [1.13.x]
         platform: [ubuntu-latest, macos-latest, windows-latest]
+        arch: [386, amd64, arm64, arm]
     runs-on: ${{ matrix.platform }}
     steps:
 
@@ -38,19 +39,30 @@ jobs:
             dep ensure
         fi
 
-    - name: Build
-      id: build
-      run: |
-          export GOOS=${{ env.OS }}
-          export GOARCH=${{ env.ARCH }}
-          go build -o fate_${{ env.ARCH }}_${{ env.OS }} -v ./cmd/console
+    - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+      with:
+          GOARCH: ${{ matrix.arch }}
+      id: build_linux
+      if: matrix.platform == "windows-latest"
+    - run: |
+          go build -o fate_$GOARCH_$GOOS.exe -v ./cmd/console
+      
+    - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+      with:
+          GOARCH: ${{ matrix.arch }}
+      id: build_win
+      if: matrix.platform == "ubuntu-latest" || matrix.platform == "macos-latest"
+    - run: |
+          go build -o fate_$GOARCH_$GOOS -v ./cmd/console     
       
     - name: Tar
       id: tar
-      run: tar -czvf fate_${{ env.ARCH }}_${{ env.OS }}.tar.gz ./fate_${{ env.ARCH }}_${{ env.OS }}
-      
+      if: matrix.platform == "ubuntu-latest" || matrix.platform == "macos-latest"
+      run: |
+          tar -czvf fate_$GOARCH_$GOOS.tar.gz ./fate_$GOARCH_$GOOS
+    
     - name: Upload
       uses: actions/upload-artifact@master
       with:
-        name: fate_${{ env.ARCH }}_${{ env.OS }}.tar.gz
-        path: fate_${{ env.ARCH }}_${{ env.OS }}.tar.gz
+        name: fate_$GOARCH_$GOOS.tar.gz
+        path: fate_$GOARCH_$GOOS.tar.gz
