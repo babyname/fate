@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [ master ]
 env:
+  OS: linux 
   UPLOAD_BIN_FILE: true
 
 jobs:
@@ -35,18 +36,13 @@ jobs:
     - name: Build
       id: build
       run: go build -o fate -v ./cmd/console
-          echo "::set-output name=status::success"
       
     - name: Tar
       id: tar
-      if: steps.build.outputs.status == 'success'
-      run: tar -czvf fate.tar.gz ./fate
-          echo "::set-output name=status::success"
-
+      run: tar -czvf fate_${env.OS}.tar.gz ./fate
       
     - name: Upload
       uses: actions/upload-artifact@master
-      if: steps.tar.outputs.status == 'success'
       with:
-        name: fate.tar.gz
-        path: fate.tar.gz
+        name: fate_${env.OS}.tar.gz
+        path: fate_${env.OS}.tar.gz
