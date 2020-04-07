@@ -6,8 +6,6 @@ on:
   pull_request:
     branches: [ master ]
 env:
-  ARCH: amd64
-  OS: linux 
   UPLOAD_BIN_FILE: true
 
 jobs:
@@ -58,17 +56,16 @@ jobs:
           go build -o fate_$(go env GOOS)_$(go env GOARCH).exe -v ./cmd/console
           Compress-Archive -Path fate_$(go env GOOS)_$(go env GOARCH).exe -DestinationPath fate_$(go env GOOS)_$(go env GOARCH).zip
         
-       
     - name: Upload Linux
       uses: actions/upload-artifact@master
-      if: matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest'
+      if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && UPLOAD_BIN_FILE
       with:
         name: ${{ env.FATENAME }}.tar.gz
         path: ${{ env.FATENAME }}.tar.gz     
 
     - name: Upload Windows
       uses: actions/upload-artifact@master
-      if: matrix.platform == 'windows-latest'
+      if: matrix.platform == 'windows-latest' && UPLOAD_BIN_FILE
       with:
         name: ${{ env.FATENAME }}.zip
         path: ${{ env.FATENAME }}.zip
