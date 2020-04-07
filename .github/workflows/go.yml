@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         go-version: [1.13.x]
-        platform: [ubuntu-latest, macos-latest, windows-latest]
+        platform: [ windows-latest, ubuntu-latest, macos-latest]
         arch: [386, amd64]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -30,18 +30,15 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
-    - name: Get dependencies
-      run: |
-        ${GOROOT}/bin/go mod tidy
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
-
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
       if: matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest'
       id: build_linux
       run: |
+          ${GOROOT}/bin/go mod tidy
+          if [ -f Gopkg.toml ]; then
+             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+             dep ensure
+          fi
           export GOARCH=${{ matrix.arch }}
           echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
           ${GOROOT}/bin/go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
@@ -51,6 +48,11 @@ jobs:
       if: matrix.platform == 'windows-latest'
       id: build_windows
       run: |
+          ${GOROOT}\bin\go mod tidy
+          if [ -f Gopkg.toml ]; then
+             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+             dep ensure
+          fi
           set GOARCH=${{ matrix.arch }}
           echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
           ${GOROOT}\bin\go build -o fate_$(go env GOOS)_$(go env GOARCH).exe -v ./cmd/console
