@@ -35,11 +35,14 @@ jobs:
     - name: Build
       id: build
       run: go build -o fate -v ./cmd/console
+          echo "::set-output name=status::success"
       
     - name: Tar
       id: tar
       if: steps.build.outputs.status == 'success'
       run: tar -czvf fate.tar.gz ./fate
+          echo "::set-output name=status::success"
+
       
     - name: Upload
       uses: actions/upload-artifact@master
