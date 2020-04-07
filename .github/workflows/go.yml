@@ -32,7 +32,7 @@ jobs:
 
     - name: Get dependencies
       run: |
-        ${GOROOT}\bin\go mod tidy
+        ${GOROOT}/bin/go mod tidy
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
