@@ -41,13 +41,13 @@ jobs:
           tar -zcvf fate_$(go env GOOS)_$(go env GOARCH).tar.gz ./fate_$(go env GOOS)_$(go env GOARCH)
  
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
-      if: matrix.platform == 'windows-latest'
+      if: matrix.platform == 'windows-latest' && matrix.arch == 'amd64'
       id: build_windows
       run: |
-          ${GOROOT}/bin/go mod tidy
+          go mod tidy
           set GOARCH=${{ matrix.arch }}
           echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
-          ${GOROOT}/bin/go build -o fate_$(go env GOOS)_$(go env GOARCH).exe -v ./cmd/console
+          go build -o fate_$(go env GOOS)_$(go env GOARCH).exe -v ./cmd/console
           Compress-Archive -Path fate_$(go env GOOS)_$(go env GOARCH).exe -DestinationPath fate_$(go env GOOS)_$(go env GOARCH).zip
         
     - name: Upload Linux
