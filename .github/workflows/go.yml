@@ -5,6 +5,8 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+env:
+  UPLOAD_BIN_FILE: true
 
 jobs:
 
@@ -31,4 +33,11 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v ./cmd/console
+      run: go build -o fate -v ./cmd/console
+      
+    - name: Upload bin file
+      uses: actions/upload-artifact@master
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_FILE == 'true'
+      with:
+        name: fate
+        path: fate
