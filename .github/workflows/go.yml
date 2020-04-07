@@ -43,13 +43,13 @@ jobs:
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
       id: build
       run: |
-          go build -o fate_$GOARCH_$GOOS -v ./cmd/console
-          echo "::set-env name=FATENAME::$GOARCH_$GOOS"
+          go build -o fate_${GOARCH}_${GOOS} -v ./cmd/console
+          echo "::set-env name=FATENAME::${GOARCH}_${GOOS}"
       
     - name: Tar
       id: tar
       run: |
-          tar -zcvf fate_$GOARCH_$GOOS.tar.gz ./fate_$GOARCH_$GOOS
+          tar -zcvf fate_${GOARCH}_${GOOS}.tar.gz ./fate_${GOARCH}_${GOOS}
     
     - name: Upload
       uses: actions/upload-artifact@master
