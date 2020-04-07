@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [ master ]
 env:
+  ARCH: amd64
   OS: linux 
   UPLOAD_BIN_FILE: true
 
@@ -35,14 +36,17 @@ jobs:
 
     - name: Build
       id: build
-      run: go build -o fate -v ./cmd/console
+      run: |
+          export GOOS=${{ env.OS }}
+          export GOARCH=${{ env.ARCH }}
+          go build -o fate_${{ env.ARCH }}_${{ env.OS }} -v ./cmd/console
       
     - name: Tar
       id: tar
-      run: tar -czvf fate_${{ env.OS }}.tar.gz ./fate
+      run: tar -czvf fate_${{ env.ARCH }}_${{ env.OS }}.tar.gz ./fate_${{ env.ARCH }}_${{ env.OS }}
       
     - name: Upload
       uses: actions/upload-artifact@master
       with:
-        name: fate_${{ env.OS }}.tar.gz
-        path: fate_${{ env.OS }}.tar.gz
+        name: fate_${{ env.ARCH }}_${{ env.OS }}.tar.gz
+        path: fate_${{ env.ARCH }}_${{ env.OS }}.tar.gz
