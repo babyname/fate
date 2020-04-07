@@ -32,7 +32,7 @@ jobs:
 
     - name: Get dependencies
       run: |
-        $(echo GOROOT)\bin\go mod tidy
+        $GOROOT\bin\go mod tidy
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
@@ -44,7 +44,7 @@ jobs:
       run: |
           export GOARCH=${{ matrix.arch }}
           echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
-          $(echo GOROOT)\bin\go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
+          $GOROOT\bin\go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
           tar -zcvf fate_$(go env GOOS)_$(go env GOARCH).tar.gz ./fate_$(go env GOOS)_$(go env GOARCH)
  
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
