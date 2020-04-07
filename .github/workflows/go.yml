@@ -44,7 +44,7 @@ jobs:
       id: build
       run: |
           go build -o fate_$GOARCH_$GOOS -v ./cmd/console
-          echo "::set-env name=BUILD_NAME::$GOARCH_$GOOS"
+          echo "::set-env name=FATENAME::$GOARCH_$GOOS"
       
     - name: Tar
       id: tar
@@ -54,5 +54,5 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@master
       with:
-        name: fate_${{ BUILD_NAME }}.tar.gz
-        path: fate_${{ BUILD_NAME }}.tar.gz
+        name: fate_${{ FATENAME }}.tar.gz
+        path: fate_${{ FATENAME }}.tar.gz
