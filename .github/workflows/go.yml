@@ -44,7 +44,7 @@ jobs:
       run: |
           export GOARCH=${{ matrix.arch }}
           echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
-          ${GOROOT}\bin\go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
+          ${GOROOT}/bin/go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
           tar -zcvf fate_$(go env GOOS)_$(go env GOARCH).tar.gz ./fate_$(go env GOOS)_$(go env GOARCH)
  
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
