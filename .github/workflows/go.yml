@@ -41,16 +41,9 @@ jobs:
         fi
 
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
-      id: build_linux
-      if: matrix.platform == windows-latest
+      id: build
       run: |
           go build -o fate_$GOARCH_$GOOS.exe -v ./cmd/console
-      
-    - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
-      id: build_win
-      if: matrix.platform == ubuntu-latest || matrix.platform == macos-latest
-      run: |
-          go build -o fate_$GOARCH_$GOOS -v ./cmd/console     
       
     - name: Tar
       id: tar
