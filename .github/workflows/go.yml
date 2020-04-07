@@ -34,6 +34,7 @@ jobs:
 
     - name: Get dependencies
       run: |
+        echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
         go mod tidy
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
@@ -44,8 +45,9 @@ jobs:
       if: matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest'
       id: build_linux
       run: |
-          go build -o fate_$(go env GOARCH)_$(go env GOOS) -v ./cmd/console
-          echo "::set-env name=FATENAME::fate_$(go env GOARCH)_$(go env GOOS)"
+          export GOARCH=${{ matrix.arch }}
+          go build -o ${{ env.FATENAME }} -v ./cmd/console
+       
       
     - name: Tar
       id: tar
