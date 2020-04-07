@@ -39,10 +39,10 @@ jobs:
       
     - name: Tar
       id: tar
-      run: tar -czvf fate_${env.OS}.tar.gz ./fate
+      run: tar -czvf fate_${{ env.OS }}.tar.gz ./fate
       
     - name: Upload
       uses: actions/upload-artifact@master
       with:
-        name: fate_${env.OS}.tar.gz
-        path: fate_${env.OS}.tar.gz
+        name: fate_${{ env.OS }}.tar.gz
+        path: fate_${{ env.OS }}.tar.gz
