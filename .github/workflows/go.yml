@@ -33,10 +33,17 @@ jobs:
         fi
 
     - name: Build
+      id: build
       run: go build -o fate -v ./cmd/console
+      
+    - name: Tar
+      id: tar
+      if: steps.build.outputs.status == 'success'
+      run: tar -czvf fate.tar.gz ./fate
       
     - name: Upload
       uses: actions/upload-artifact@master
+      if: steps.tar.outputs.status == 'success'
       with:
-        name: fate
-        path: fate
+        name: fate.tar.gz
+        path: fate.tar.gz
