@@ -49,7 +49,7 @@ jobs:
           go build -o ${{ env.FATENAME }} -v ./cmd/console
  
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
-      if: matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest'
+      if: matrix.platform == 'windows-latest'
       id: build_windows
       run: |
           set GOARCH=${{ matrix.arch }}
