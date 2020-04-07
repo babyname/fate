@@ -44,14 +44,15 @@ jobs:
       id: build
       run: |
           go build -o fate_$GOARCH_$GOOS -v ./cmd/console
+          echo "::set-env name=BUILD_NAME::$GOARCH_$GOOS"
       
     - name: Tar
       id: tar
       run: |
-          tar -czvf fate_$GOARCH_$GOOS.tar.gz ./fate_$GOARCH_$GOOS
+          tar -zcvf fate_$GOARCH_$GOOS.tar.gz ./fate_$GOARCH_$GOOS
     
     - name: Upload
       uses: actions/upload-artifact@master
       with:
-        name: fate_$GOARCH_$GOOS.tar.gz
-        path: fate_$GOARCH_$GOOS.tar.gz
+        name: fate_${{ BUILD_NAME }}.tar.gz
+        path: fate_${{ BUILD_NAME }}.tar.gz
