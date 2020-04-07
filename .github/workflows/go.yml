@@ -54,5 +54,5 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@master
       with:
-        name: fate_${{ FATENAME }}.tar.gz
-        path: fate_${{ FATENAME }}.tar.gz
+        name: fate_${{ env.FATENAME }}.tar.gz
+        path: fate_${{ env.FATENAME }}.tar.gz
