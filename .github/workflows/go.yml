@@ -41,18 +41,19 @@ jobs:
         fi
 
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
-      id: build
+      if: matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest'
+      id: build_linux
       run: |
-          go build -o fate_${GOARCH}_${GOOS} -v ./cmd/console
-          echo "::set-env name=FATENAME::${GOARCH}_${GOOS}"
+          go build -o fate_$(go env GOARCH)_$(go env GOOS) -v ./cmd/console
+          echo "::set-env name=FATENAME::fate_$(go env GOARCH)_$(go env GOOS)"
       
     - name: Tar
       id: tar
       run: |
-          tar -zcvf fate_${GOARCH}_${GOOS}.tar.gz ./fate_${GOARCH}_${GOOS}
+          tar -zcvf ${{ env.FATENAME }}.tar.gz ./${{ env.FATENAME }}
     
     - name: Upload
       uses: actions/upload-artifact@master
       with:
-        name: fate_${{ env.FATENAME }}.tar.gz
-        path: fate_${{ env.FATENAME }}.tar.gz
+        name: ${{ env.FATENAME }}.tar.gz
+        path: ${{ env.FATENAME }}.tar.gz
