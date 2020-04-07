@@ -35,10 +35,6 @@ jobs:
       id: build_linux
       run: |
           ${GOROOT}/bin/go mod tidy
-          if [ -f Gopkg.toml ]; then
-             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-             dep ensure
-          fi
           export GOARCH=${{ matrix.arch }}
           echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
           ${GOROOT}/bin/go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
@@ -49,10 +45,6 @@ jobs:
       id: build_windows
       run: |
           ${GOROOT}\bin\go mod tidy
-          if [ -f Gopkg.toml ]; then
-             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-             dep ensure
-          fi
           set GOARCH=${{ matrix.arch }}
           echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
           ${GOROOT}\bin\go build -o fate_$(go env GOOS)_$(go env GOARCH).exe -v ./cmd/console
