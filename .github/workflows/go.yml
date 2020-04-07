@@ -58,14 +58,14 @@ jobs:
         
     - name: Upload Linux
       uses: actions/upload-artifact@master
-      if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && UPLOAD_BIN_FILE
+      if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && env.UPLOAD_BIN_FILE
       with:
         name: ${{ env.FATENAME }}.tar.gz
         path: ${{ env.FATENAME }}.tar.gz     
 
     - name: Upload Windows
       uses: actions/upload-artifact@master
-      if: matrix.platform == 'windows-latest' && UPLOAD_BIN_FILE
+      if: matrix.platform == 'windows-latest' && env.UPLOAD_BIN_FILE
       with:
         name: ${{ env.FATENAME }}.zip
         path: ${{ env.FATENAME }}.zip
