@@ -45,7 +45,7 @@ jobs:
           GOARCH: ${{ matrix.arch }}
       id: build_linux
       if: matrix.platform == "windows-latest"
-    - run: |
+      run: |
           go build -o fate_$GOARCH_$GOOS.exe -v ./cmd/console
       
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
