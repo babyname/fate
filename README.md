@@ -4,8 +4,7 @@
 
 ## 简介 ##
   一个好名字伴随人的一生，FATE让你取一个好名字  
-  FATE是时下最火的起名算法工具,在起名算法工具中搜索排行中排第一位  
-  [点击查看](https://www.google.com/search?q=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&oq=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&aqs=chrome..69i57.3721j0j8&sourceid=chrome&ie=UTF-8)  
+  FATE是时下最火的起名算法工具,在起名算法工具中搜索排行中排第一位:[点击查看](https://www.google.com/search?q=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&oq=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&aqs=chrome..69i57.3721j0j8&sourceid=chrome&ie=UTF-8)  
   PS:　本程序适用于单个姓或双个姓，起2个名的情况。（如：独孤**，李张**，张**，王**）  
 
 ## 关于版本：
