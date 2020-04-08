@@ -99,6 +99,6 @@ jobs:
         tag_name: ${{ github.ref }}
         release_name: Auto Build ${{ github.ref }}
         body: |
-          this is only a latest build on master
+          this is only a latest build from master
         draft: false
         prerelease: true
