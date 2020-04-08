@@ -93,6 +93,7 @@ jobs:
       if: matrix.platform == 'windows-latest' && matrix.arch == 'amd64'
       uses: actions/create-release@v1.0.0
       env:
+        BOX_VERSION: 3.8.4
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
         tag_name: ${{ github.ref }}
@@ -100,4 +101,4 @@ jobs:
         body: |
           this is only a latest build on master
         draft: false
-        prerelease: true 
+        prerelease: true
