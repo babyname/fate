@@ -37,7 +37,11 @@ jobs:
           ${GOROOT}/bin/go mod tidy
           export GOARCH=${{ matrix.arch }}
           echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
+          
+          echo "buiding"
           ${GOROOT}/bin/go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
+          
+          echo "compress"
           tar -zcvf fate_$(go env GOOS)_$(go env GOARCH).tar.gz ./fate_$(go env GOOS)_$(go env GOARCH)
  
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
@@ -46,8 +50,12 @@ jobs:
       run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
-          echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
+          echo "::set-env name=FATENAME::fate_windows_amd64"
+          
+          echo "buiding"
           go build -o fate_windows_amd64.exe -v ./cmd/console
+          
+          echo "compress"
           Compress-Archive -Path fate_windows_amd64.exe -DestinationPath fate_windos_amd64.zip
         
     - name: Upload Linux
