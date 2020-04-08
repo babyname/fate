@@ -97,8 +97,8 @@ jobs:
       with:
         artifacts: "${{ env.FATENAME }}.zip"
         allowUpdates: true 
-        tag_name: ${{ github.ref }}_${{ github.sha }}
-        release_name: Auto Build ${{ github.ref }}_${{ github.sha }}
+        commit: master 
+        tag: ${{ github.ref }}_${{ github.sha }}
         body: |
           this is only a latest build from master
         draft: false
@@ -113,8 +113,8 @@ jobs:
       with:
         artifacts: "${{ env.FATENAME }}.tar.gz"
         allowUpdates: true 
-        tag_name: ${{ github.ref }}_${{ github.sha }}
-        release_name: Auto Build ${{ github.ref }}_${{ github.sha }}
+        commit: master 
+        tag: ${{ github.ref }}_${{ github.sha }}
         body: |
           this is only a latest build from master
         draft: false
