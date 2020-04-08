@@ -46,18 +46,33 @@ jobs:
  
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
       if: matrix.platform == 'windows-latest' && matrix.arch == 'amd64'
-      id: build_windows
+      id: build_windows_amd64
       run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
-          echo "::set-env name=FATENAME::fate_windows_$(go env GOARCH)"
+          echo "::set-env name=FATENAME::fate_windows_amd64"
           
           echo "buiding"
-          go build -o fate_windows_$(go env GOARCH).exe -v ./cmd/console
+          go build -o fate_windows_amd64.exe -v ./cmd/console
           
           echo "compress"
-          Compress-Archive -Path fate_windows_$(go env GOARCH).exe -DestinationPath fate_windows_$(go env GOARCH).zip
-        
+          Compress-Archive -Path fate_windows_amd64.exe -DestinationPath fate_windows_amd64.zip
+  
+    - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+      if: matrix.platform == 'windows-latest' && matrix.arch == '386'
+      id: build_windows_386
+      run: |
+          go mod tidy
+          set GOARCH=${{ matrix.arch }}
+          echo "::set-env name=FATENAME::fate_windows_386"
+          
+          echo "buiding"
+          go build -o fate_windows_386.exe -v ./cmd/console
+          
+          echo "compress"
+          Compress-Archive -Path fate_windows_386.exe -DestinationPath fate_windows_386.zip
+  
+  
     - name: Upload Linux
       uses: actions/upload-artifact@master
       if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && env.UPLOAD_BIN_FILE
@@ -67,7 +82,7 @@ jobs:
 
     - name: Upload Windows
       uses: actions/upload-artifact@master
-      if: matrix.platform == 'windows-latest' && matrix.arch == 'amd64' && env.UPLOAD_BIN_FILE
+      if: matrix.platform == 'windows-latest' && env.UPLOAD_BIN_FILE
       with:
         name: ${{ env.FATENAME }}.zip
         path: ${{ env.FATENAME }}.zip
