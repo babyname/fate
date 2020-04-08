@@ -13,9 +13,10 @@ Github第一个开源的中文取名项目(The first chinese name create tool in
 
 ## 简介 ##
 一个好名字伴随人的一生，FATE让你取一个好名字：
-本程序适用于单个姓或双个姓，起2个名的情况。（如：独孤**，李张**，张**，王**）  
+本程序适用于单个姓或双个姓，起2个名的情况。（如：独孤**，李张**，张**，王**）
 
-## 参考算法 ##
+## 关于起名算法 ##
+  本工具使用了以下算法,按照每种算法的准确度,使用程度也有高有低,不会一概而否,也不会偏向单独某种算法.
   周易卦象  
   大衍之数  
   三才五格  
@@ -25,15 +26,15 @@ Github第一个开源的中文取名项目(The first chinese name create tool in
 
 ## 接口调用生成姓名 ##
 ```   
-        使用前请导入database的数据（测试字库已基本完善，保险起见生成姓名后可以去一些测名网站验证下）
-        //加载配置（具体参数参考example/create_a_name）
+      使用前请导入database的数据（测试字库已基本完善，保险起见生成姓名后可以去一些测名网站验证下）
+      //加载配置（具体参数参考example/create_a_name）
     	cfg := config.Default()
-        //生日：
+      //生日：
     	born := chronos.New("2020/01/23 11:31")
-        //姓氏：
-        lastName := "张"
-        //第一参数：姓氏
-        //第二参数：生日 
+      //姓氏：
+      lastName := "张"
+      //第一参数：姓氏
+      //第二参数：生日 
     	f := fate.NewFate(lastName, born.Solar().Time(), fate.ConfigOption(cfg))
     
     	e := f.MakeName(context.Background())
@@ -64,8 +65,22 @@ Github第一个开源的中文取名项目(The first chinese name create tool in
     八字计算: https://github.com/godcong/chronos  
     字典数据: https://github.com/godcong/excavator  
     数据库重新切回mysql,mongo虽然插入简单,检索语法太繁琐了...
-    
-    起名算法:
+ 
+第四版(计划中): 
+  优化算法,调整接口,数据库,完善文档以及修复一些bug.
+  
+第五版(计划中):
+  图形界面UI,api接口调用.
+  
+第六版(计划中):
+  占坑备用
+
+第七版(计划中):
+    通过AI,大数据匹配算法,取出更好更佳的名字.
+
+
+### 其他(补充资料) ###
+起名算法:
     算法(进度) 备注
     五格(95%) 暂用字库已补全
     三才(95%) 暂用字库已补全
@@ -73,21 +88,6 @@ Github第一个开源的中文取名项目(The first chinese name create tool in
     卦象(100%) 算法完成，起卦完成,吉凶过滤完成。
     生肖(30%) 生肖获取完成,字库筛选待完成
     天运(TODO)
-    
-第四版: 
-  优化算法,调整接口,数据库,完善文档以及修复一些bug.
-  
-第五版:
-  图形界面UI,api接口调用.
-  
-第六版:
-  占坑备用
-
-第七版:
-    通过AI,大数据匹配算法,取出更好更佳的名字.
-
-
-### 其他(补充资料) ###
 
 立春：  
 2019年02月04日 11:14:14  
