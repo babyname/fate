@@ -91,9 +91,8 @@ jobs:
     - name: Create Release
       id: create_release
       if: matrix.platform == 'windows-latest' && matrix.arch == 'amd64'
-      uses: actions/create-release@v1.0.0
+      uses: actions/create-release@latest
       env:
-        BOX_VERSION: 3.8.4
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
         tag_name: ${{ github.ref }}_${{ github.sha }}
@@ -102,3 +101,27 @@ jobs:
           this is only a latest build from master
         draft: false
         prerelease: true
+        
+    - name: Upload Release Asset
+      id: upload-release-asset_windows
+      if: matrix.platform == 'windows-latest' && env.UPLOAD_BIN_FILE
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ${{ env.FATENAME }}.zip
+        asset_name: ${{ env.FATENAME }}.zip
+        asset_content_type: application/zip
+
+    - name: Upload Release Asset
+      id: upload-release-asset_linux 
+      if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && env.UPLOAD_BIN_FILE
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ${{ env.FATENAME }}.tar.gz
+        asset_name: ${{ env.FATENAME }}.tar.gz
+        asset_content_type: application/gzip
