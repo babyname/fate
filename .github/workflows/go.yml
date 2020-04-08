@@ -90,6 +90,7 @@ jobs:
         
     - name: Create Release
       id: create_release
+      if: matrix.platform == 'windows-latest' && matrix.arch == 'amd64'
       uses: actions/create-release@latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
