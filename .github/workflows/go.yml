@@ -98,7 +98,7 @@ jobs:
         artifacts: "${{ env.FATENAME }}.zip"
         allowUpdates: true 
         commit: master 
-        tag: ${{ github.ref }}_${{ github.sha }}
+        tag: build_${{ github.sha }}
         body: |
           this is only a latest build from master
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -115,7 +115,7 @@ jobs:
         artifacts: "${{ env.FATENAME }}.tar.gz"
         allowUpdates: true 
         commit: master 
-        tag: ${{ github.ref }}_${{ github.sha }}
+        tag: build_${{ github.sha }}
         body: |
           this is only a latest build from master
         token: ${{ secrets.GITHUB_TOKEN }}
