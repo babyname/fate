@@ -6,6 +6,10 @@ The first chinese name create tool in github
 ## [起名算法搜索排第一位](https://www.google.com/search?q=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&oq=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&aqs=chrome..69i57.3721j0j8&sourceid=chrome&ie=UTF-8) ##
 
 # 最新Release版下载： [v3.1.1](https://github.com/godcong/fate/releases/tag/v3.1.1) #
+# 数据库文件:[database]https://github.com/godcong/fate/releases/download/v3.5.1/fate_db_200331.7z
+
+# 最新测试版: 
+  除非稳定版本会单独出release,以后每次提交都会生成二进制文件的prerelease提供下载.
 
 ## 简介 ##
 一个好名字伴随人的一生，FATE让你取一个好名字：
@@ -40,6 +44,7 @@ The first chinese name create tool in github
 
 ## 可执行文件生成姓名 ##
 ```   
+       //没有安装go环境的请下载master下的zoneinfo文件和fate二进制文件放一起
        //生成配置文件(可修改数据库，及一些基本参数)：
        fate.exe init
        //输出姓名：
