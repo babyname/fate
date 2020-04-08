@@ -96,8 +96,8 @@ jobs:
         BOX_VERSION: 3.8.4
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Auto Build ${{ github.ref }}
+        tag_name: ${{ github.ref }}_${{ github.sha }}
+        release_name: Auto Build ${{ github.ref }}_${{ github.sha }}
         body: |
           this is only a latest build from master
         draft: false
