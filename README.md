@@ -1,6 +1,10 @@
 # 命运(Fate)
 
 ![Go](https://github.com/godcong/fate/workflows/Go/badge.svg)
+[![GoDoc](https://godoc.org/github.com/godcong/fate?status.svg)](http://godoc.org/github.com/godcong/fate)
+[![license](https://img.shields.io/github/license/godcong/fate.svg)](https://github.com/godcong/fate/blob/master/LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/godcong/fate)](https://goreportcard.com/report/github.com/godcong/fate)
+
 
 ## 现代科学取名工具(A modern science chinese name create tool)
   Github第一个开源的中文取名项目(The first chinese name create tool in github)  
