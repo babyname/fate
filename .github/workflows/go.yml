@@ -95,13 +95,14 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
+        allowUpdates: true 
         tag_name: ${{ github.ref }}_${{ github.sha }}
         release_name: Auto Build ${{ github.ref }}_${{ github.sha }}
         body: |
           this is only a latest build from master
         draft: false
         prerelease: true
-        
+
     - name: Upload Release Asset
       id: upload-release-asset_windows
       if: matrix.platform == 'windows-latest' && env.UPLOAD_BIN_FILE
