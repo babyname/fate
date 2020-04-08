@@ -47,8 +47,8 @@ jobs:
           go mod tidy
           set GOARCH=${{ matrix.arch }}
           echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
-          go build -o fate_$(go env GOOS)_$(go env GOARCH).exe -v ./cmd/console
-          Compress-Archive -Path fate_$(go env GOOS)_$(go env GOARCH).exe -DestinationPath fate_$(go env GOOS)_$(go env GOARCH).zip
+          go build -o fate_windows_amd64.exe -v ./cmd/console
+          Compress-Archive -Path fate_windows_amd64.exe -DestinationPath fate_windos_amd64.zip
         
     - name: Upload Linux
       uses: actions/upload-artifact@master
