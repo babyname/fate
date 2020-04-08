@@ -1,9 +1,9 @@
 # 命运(Fate)
 ## 现代科学取名工具(A modern science chinese name create tool)
-    Github第一个开源的中文取名项目(The first chinese name create tool in github)
+Github第一个开源的中文取名项目(The first chinese name create tool in github)
 
 ## 起名算法搜索排第一位
-    [点击查看](https://www.google.com/search?q=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&oq=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&aqs=chrome..69i57.3721j0j8&sourceid=chrome&ie=UTF-8) ##
+[点击查看](https://www.google.com/search?q=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&oq=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&aqs=chrome..69i57.3721j0j8&sourceid=chrome&ie=UTF-8)
 
 ## 关于版本：
   除非稳定版本会单独出release,以后每次提交都会生成二进制文件的prerelease提供下载.
