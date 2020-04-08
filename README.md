@@ -1,17 +1,15 @@
 # 命运(Fate)
-## 现代科学取名工具(A modern science chinese name create tool) ##
+## 现代科学取名工具(A modern science chinese name create tool)
     Github第一个开源的中文取名项目(The first chinese name create tool in github)
 
-## [起名算法搜索排第一位](https://www.google.com/search?q=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&oq=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&aqs=chrome..69i57.3721j0j8&sourceid=chrome&ie=UTF-8) ##
+## 起名算法搜索排第一位
+    [点击查看](https://www.google.com/search?q=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&oq=%E8%B5%B7%E5%90%8D%E7%AE%97%E6%B3%95&aqs=chrome..69i57.3721j0j8&sourceid=chrome&ie=UTF-8) ##
 
-# 关于版本：
+## 关于版本：
   除非稳定版本会单独出release,以后每次提交都会生成二进制文件的prerelease提供下载.
   
   [Release_v3.1.1](https://github.com/godcong/fate/releases/tag/v3.1.1) #
   [数据库文件]https://github.com/godcong/fate/releases/download/v3.5.1/fate_db_200331.7z
-
-
-  
 
 ## 简介 ##
 一个好名字伴随人的一生，FATE让你取一个好名字：
