@@ -1,8 +1,9 @@
 # 命运(Fate)
-## 现代科学取名工具(A modern science chinese name create tool)
-  Github第一个开源的中文取名项目(The first chinese name create tool in github)  
 
 ![Go](https://github.com/godcong/fate/workflows/Go/badge.svg)
+
+## 现代科学取名工具(A modern science chinese name create tool)
+  Github第一个开源的中文取名项目(The first chinese name create tool in github)  
 
 ## 简介 ##
   一个好名字伴随人的一生，FATE让你取一个好名字
