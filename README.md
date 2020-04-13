@@ -58,6 +58,10 @@
        //输出姓名：
        fate.exe name -l 张 -b "2020/02/06 15:04"
 ```
+### 使用二进制文件在运行前务必把zoninfo.zip下载并和二进制文件放在一起,不然会报错.
+[zoneinfo文件](https://github.com/godcong/fate/blob/master/zoneinfo.zip)
+
+
 
 ## 版本履历:
 
