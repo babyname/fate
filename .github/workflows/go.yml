@@ -103,7 +103,7 @@ jobs:
           this is only a latest build from master
           version: https://github.com/godcong/fate/commit/${{ github.sha }}
         token: ${{ secrets.GITHUB_TOKEN }}
-        draft: true
+        draft: false
         prerelease: false
 
     - name: Create Release
@@ -122,5 +122,5 @@ jobs:
           version: https://github.com/godcong/fate/commit/${{ github.sha }}
         token: ${{ secrets.GITHUB_TOKEN }}
         draft: false
-        prerelease: true
+        prerelease: false
         
