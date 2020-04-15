@@ -2,7 +2,7 @@ module github.com/godcong/fate
 
 require (
 	github.com/go-sql-driver/mysql v1.4.1
-	github.com/godcong/chronos v0.0.2
+	github.com/godcong/chronos v0.0.3
 	github.com/godcong/yi v1.0.2
 	github.com/goextension/log v0.0.2
 	github.com/google/uuid v1.1.1
