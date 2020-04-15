@@ -20,6 +20,7 @@ func cmdName() *cobra.Command {
 		Use:   "name",
 		Short: "output the name",
 		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("start", time.Now().String())
 			config.DefaultJSONPath = path
 			cfg := config.LoadConfig()
 			fmt.Printf("config loaded: %+v", cfg)
@@ -33,6 +34,8 @@ func cmdName() *cobra.Command {
 			if e != nil {
 				log.Fatalw("makename", "error", e)
 			}
+
+			fmt.Println("end", time.Now().String())
 		},
 	}
 	cmd.Flags().StringVarP(&last, "last", "l", "", "set lastname")

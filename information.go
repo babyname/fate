@@ -25,6 +25,7 @@ type jsonInformation struct {
 	file *os.File
 }
 
+// Group ...
 func (j *jsonInformation) Group(b bool) {
 	panic("implement me")
 }
@@ -35,6 +36,7 @@ type logInformation struct {
 	head  []string
 }
 
+// Group ...
 func (l *logInformation) Group(b bool) {
 	panic("implement me")
 }
@@ -45,6 +47,7 @@ type csvInformation struct {
 	file *os.File
 }
 
+// Group ...
 func (c *csvInformation) Group(b bool) {
 	panic("implement me")
 }

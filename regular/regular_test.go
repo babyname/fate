@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// TestNew ...
 func TestNew(t *testing.T) {
 	c := config.LoadConfig()
 	db := fate.InitDatabaseWithConfig(*c)

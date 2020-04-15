@@ -42,6 +42,7 @@ type regular struct {
 	unfixed int
 }
 
+// Run ...
 func (r *regular) Run() {
 	e := setAllRegular(r.db, false)
 	if e != nil {
@@ -69,10 +70,12 @@ func (r *regular) Run() {
 	fmt.Printf("fix regular finished(total:%d,fixed:%d,unfixed:%d)\n", r.total, r.fixed, r.unfixed)
 }
 
+// Regular ...
 type Regular interface {
 	Run()
 }
 
+// New ...
 func New(database fate.Database) Regular {
 	return &regular{
 		db: database,
