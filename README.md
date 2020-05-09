@@ -9,7 +9,7 @@
   Github第一个开源的中文取名项目(The first chinese name create tool in github)  
 
 ## 简介 ##
-  一个好名字伴随人的一生，FATE让你取一个好名字。
+  一个好名字伴随人的一生，FATE让你取一个好名字。  
   TIPS:　本程序适用于单个姓或双个姓，起2个名的情况。（如：独孤**，李张**，张**，王**）  
 
 ## 关于版本：
