@@ -3,13 +3,14 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/godcong/fate/config"
-	"github.com/spf13/cobra"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+
+	"github.com/godcong/fate/config"
+	"github.com/goextension/log"
+	"github.com/spf13/cobra"
 )
 
 func cmdInit() *cobra.Command {
@@ -20,19 +21,19 @@ func cmdInit() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			absPath, e := filepath.Abs(path)
 			if e != nil {
-				log.Fatalf("wrong path with:%v", e)
+				log.Fatalw("wrong path", "error", e, "path", path)
 			}
 			fmt.Printf("config will output to %s\n", filepath.Join(absPath, config.JSONName))
 			config.DefaultJSONPath = path
 
 			e = config.OutputConfig(config.DefaultConfig())
 			if e != nil {
-				log.Fatal(e)
+				log.Fatalw("config wrong", "error", e)
 			}
 
 			e = zoneCheck()
 			if e != nil {
-				log.Fatal(e)
+				log.Fatalw("zoneinfo fix failed", "error", e)
 			}
 		},
 	}
