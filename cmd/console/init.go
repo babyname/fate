@@ -41,16 +41,17 @@ func cmdInit() *cobra.Command {
 }
 
 func zoneCheck() error {
+	fmt.Println("GOROOT:", runtime.GOROOT())
 	path := runtime.GOROOT() + "/lib/time"
 	info, e := os.Stat(path)
 	if e != nil {
 		if os.IsNotExist(e) {
 			e = os.MkdirAll(path, 0755)
 			if e != nil {
-				return e
+				return fmt.Errorf("could not make dir for copy zoneinfo:%w", e)
 			}
 		} else {
-			return e
+			return fmt.Errorf("the target file is exist(%s):%w", path, e)
 		}
 	}
 	if !info.IsDir() {
@@ -63,7 +64,9 @@ func zoneCheck() error {
 	if e != nil {
 		return e
 	}
-	dst, e := os.OpenFile(filepath.Join(path, filename), os.O_CREATE|os.O_RDWR|os.O_SYNC|os.O_TRUNC, 0755)
+	target := filepath.Join(path, filename)
+	fmt.Println("copy zoneinfo to:", target)
+	dst, e := os.OpenFile(target, os.O_CREATE|os.O_RDWR|os.O_SYNC|os.O_TRUNC, 0755)
 	if e != nil {
 		return e
 	}
