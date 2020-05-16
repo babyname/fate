@@ -48,7 +48,9 @@
     	}
 ```
 
-## 可执行文件生成姓名 ##
+### 使用二进制文件在运行前务必把zoninfo.zip下载并和二进制文件放在一起(不要解压),不然会报错.
+### [zoneinfo文件](https://github.com/godcong/fate/blob/master/zoneinfo.zip)
+## 二进制可执行文件生成姓名 ##
 ```   
        //没有安装go环境的请下载master下的zoneinfo文件和fate二进制文件放一起
        //生成配置文件(可修改数据库，及一些基本参数)：
@@ -56,8 +58,6 @@
        //输出姓名：
        fate.exe name -l 张 -b "2020/02/06 15:04"
 ```
-### 使用二进制文件在运行前务必把zoninfo.zip下载并和二进制文件放在一起(不要解压),不然会报错.
-### [zoneinfo文件](https://github.com/godcong/fate/blob/master/zoneinfo.zip)
 
 ## 版本履历:
 
