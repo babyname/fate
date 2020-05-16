@@ -8,6 +8,7 @@ import (
 	"github.com/godcong/fate/config"
 	"github.com/goextension/log"
 	"github.com/spf13/cobra"
+	"os"
 	"time"
 )
 
@@ -20,6 +21,7 @@ func cmdName() *cobra.Command {
 		Use:   "name",
 		Short: "output the name",
 		Run: func(cmd *cobra.Command, args []string) {
+			os.Setenv("ZONEINFO", "zoneinfo.zip")
 			fmt.Println("start", time.Now().String())
 			config.DefaultJSONPath = path
 			cfg := config.LoadConfig()
