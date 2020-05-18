@@ -48,7 +48,7 @@
     	}
 ```
 
-### 使用二进制文件在运行前务必把zoninfo.zip下载并和二进制文件放在一起(不要解压),不然会报错.
+### 使用二进制文件在运行前务必把zoneinfo.zip下载并和二进制文件放在一起(不要解压),不然会报错.
 ### [zoneinfo文件](https://github.com/godcong/fate/blob/master/zoneinfo.zip)
 ## 二进制可执行文件生成姓名 ##
 ```   
@@ -57,6 +57,15 @@
        fate.exe init
        //输出姓名：
        fate.exe name -l 张 -b "2020/02/06 15:04"
+```
+
+## 常见问题:
+```
+1. Q: count total error:The system cannot find the path specified
+    A: 这就是最常见zoneinfo缺失导致的时间转换失败问题(一般发生在windows环境下),
+        下载上面的zoneinfo文件并放到执行文件相同的目录下即可解决.
+        最新版会检查根目录,已无需重新init.
+    
 ```
 
 ## 版本履历:
