@@ -2,6 +2,7 @@ package fate
 
 import (
 	"github.com/godcong/chronos"
+	"strings"
 )
 
 var diIndex = map[string]int{
@@ -9,18 +10,10 @@ var diIndex = map[string]int{
 }
 
 var tianIndex = map[string]int{
-	"甲": 0,
-	"乙": 1,
-	"丙": 2,
-	"丁": 3,
-	"戊": 4,
-	"己": 5,
-	"庚": 6,
-	"辛": 7,
-	"壬": 8,
-	"癸": 9,
+	"甲": 0, "乙": 1, "丙": 2, "丁": 3, "戊": 4, "己": 5, "庚": 6, "辛": 7, "壬": 8, "癸": 9,
 }
 
+//天干强度表
 var tiangan = [][]int{
 	{1200, 1200, 1000, 1000, 1000, 1000, 1000, 1000, 1200, 1200},
 	{1060, 1060, 1000, 1000, 1100, 1100, 1140, 1140, 1100, 1100},
@@ -36,10 +29,7 @@ var tiangan = [][]int{
 	{1200, 1200, 1000, 1000, 1000, 1000, 1000, 1000, 1140, 1140},
 }
 
-//var zhizang = map[string]int{
-//
-//}
-
+//地支强度表
 var dizhi = []map[string][]int{
 	{
 		"癸": {1200, 1100, 1000, 1000, 1040, 1060, 1000, 1000, 1200, 1200, 1060, 1140},
@@ -108,9 +98,6 @@ var wuXingDiZhi = map[string]string{
 	"亥": "水",
 }
 
-var sheng = []string{"木", "火", "土", "金", "水"}
-var ke = []string{"木", "土", "水", "火", "金"}
-
 //WuXingTianGan 五行天干
 func WuXingTianGan(s string) string {
 	return wuXingTianGan[s]
@@ -121,41 +108,7 @@ func WuXingDiZhi(s string) string {
 	return wuXingDiZhi[s]
 }
 
-//XiYong 喜用神
-type XiYong struct {
-	WuXingFen  map[string]int
-	XiShen     string
-	YongShen   string
-	TongLei    []string
-	TongLeiFen int
-	YiLei      []string
-	YiLeiFen   int
-}
-
-//AddFen 五行分
-func (xy *XiYong) AddFen(s string, point int) {
-	if xy.WuXingFen == nil {
-		xy.WuXingFen = make(map[string]int)
-	}
-
-	if v, b := xy.WuXingFen[s]; b {
-		xy.WuXingFen[s] = v + point
-	} else {
-		xy.WuXingFen[s] = point
-	}
-}
-
-//GetFen 取得分
-func (xy *XiYong) GetFen(s string) (point int) {
-	if xy.WuXingFen == nil {
-		return 0
-	}
-	if v, b := xy.WuXingFen[s]; b {
-		return v
-	}
-	return 0
-}
-
+// BaZi ...
 type BaZi struct {
 	baZi   []string
 	wuXing []string
@@ -168,9 +121,12 @@ func NewBazi(calendar chronos.Calendar) *BaZi {
 	return &BaZi{
 		baZi:   ec,
 		wuXing: baziToWuXing(ec),
-
-		xiyong: &XiYong{},
 	}
+}
+
+// String ...
+func (z *BaZi) String() string {
+	return strings.Join(z.baZi, "")
 }
 
 //RiZhu 日主
@@ -178,44 +134,58 @@ func (z *BaZi) RiZhu() string {
 	return z.baZi[4]
 }
 
+func (z *BaZi) calcXiYong() {
+	z.xiyong = &XiYong{}
+	//TODO:need fix
+	z.point().calcSimilar().calcHeterogeneous() //.yongShen().xiShen()
+}
+
 //XiYong 喜用神
 func (z *BaZi) XiYong() *XiYong {
-	z.xiyong = point(z)
-	z.xiyong = tongl(z)
-	z.xiyong = yil(z)
-	z.xiyong = yongShen(z)
-	z.xiyong = xiShen(z)
+	if z.xiyong == nil {
+		z.calcXiYong()
+	}
 	return z.xiyong
 }
 
-func yongShen(z *BaZi) *XiYong {
-	z.xiyong.YongShen = z.xiyong.TongLei[0]
-	return z.xiyong
+//XiYongShen 平衡用神
+func (z *BaZi) XiYongShen() string {
+	return z.XiYong().Shen()
 }
 
-//QiangRuo 八字偏强:true,八字偏弱:false.
-func (z *BaZi) QiangRuo() bool {
-	if z.xiyong.TongLeiFen > z.xiyong.YiLeiFen {
-		return true
-	}
-	return false
-}
-
-func xiShen(z *BaZi) (*XiYong) {
-	rt := sheng
-	if z.QiangRuo() {
-		rt = ke
-	}
-	for i := range rt {
-		if rt[i] == z.xiyong.YongShen {
-			if i == len(rt)-1 {
-				i = -1
+//func (z *BaZi) yongShen() *BaZi {
+//	z.xiyong.YongShen = z.xiyong.Similar[0]
+//	return z
+//}
+//func (z *BaZi) xiShen() *BaZi {
+//	rt := sheng
+//	if z.QiangRuo() {
+//		rt = ke
+//	}
+//	for i := range rt {
+//		if rt[i] == z.xiyong.YongShen {
+//			if i == len(rt) {
+//				i = -1
+//			}
+//			z.xiyong.XiShen = rt[i-1]
+//			break
+//		}
+//	}
+//	return z
+//}
+func (z *BaZi) point() *BaZi {
+	di := diIndex[z.baZi[3]]
+	for idx, v := range z.baZi {
+		if idx%2 == 0 {
+			z.xiyong.AddFen(WuXingTianGan(v), tiangan[di][tianIndex[v]])
+		} else {
+			dz := dizhi[diIndex[v]]
+			for k := range dz {
+				z.xiyong.AddFen(WuXingTianGan(k), dz[k][di])
 			}
-			z.xiyong.XiShen = rt[i+1]
-			break
 		}
 	}
-	return z.xiyong
+	return z
 }
 
 func baziToWuXing(bazi []string) []string {
@@ -230,52 +200,39 @@ func baziToWuXing(bazi []string) []string {
 	return wx
 }
 
-func point(zi *BaZi) *XiYong {
-	di := diIndex[zi.baZi[3]]
-	for idx, v := range zi.baZi {
-		if idx%2 == 0 {
-			zi.xiyong.AddFen(WuXingTianGan(v), tiangan[di][tianIndex[v]])
-		} else {
-			dz := dizhi[diIndex[v]]
-			for k := range dz {
-				zi.xiyong.AddFen(WuXingTianGan(k), dz[k][di])
-			}
-		}
-	}
-	return zi.xiyong
-}
-
-func tongl(z *BaZi) *XiYong {
+//计算同类
+func (z *BaZi) calcSimilar() *BaZi {
 	for i := range sheng {
 		if wuXingTianGan[z.RiZhu()] == sheng[i] {
-			z.xiyong.TongLei = append(z.xiyong.TongLei, sheng[i])
-			z.xiyong.TongLeiFen = z.xiyong.GetFen(sheng[i])
+			z.xiyong.Similar = append(z.xiyong.Similar, sheng[i])
+			z.xiyong.SimilarPoint = z.xiyong.GetFen(sheng[i])
 			if i == 0 {
 				i = len(sheng) - 1
-				z.xiyong.TongLei = append(z.xiyong.TongLei, sheng[i])
-				z.xiyong.TongLeiFen += z.xiyong.GetFen(sheng[i])
+				z.xiyong.Similar = append(z.xiyong.Similar, sheng[i])
+				z.xiyong.SimilarPoint += z.xiyong.GetFen(sheng[i])
 			} else {
-				z.xiyong.TongLei = append(z.xiyong.TongLei, sheng[i-1])
-				z.xiyong.TongLeiFen += z.xiyong.GetFen(sheng[i-1])
+				z.xiyong.Similar = append(z.xiyong.Similar, sheng[i-1])
+				z.xiyong.SimilarPoint += z.xiyong.GetFen(sheng[i-1])
 			}
 			break
 		}
 	}
-	return z.xiyong
+	return z
 }
 
-func yil(z *BaZi) *XiYong {
+//计算异类
+func (z *BaZi) calcHeterogeneous() *BaZi {
 	for i := range sheng {
-		for ti := range z.xiyong.TongLei {
-			if z.xiyong.TongLei[ti] == sheng[i] {
-				goto end
+		for ti := range z.xiyong.Similar {
+			if z.xiyong.Similar[ti] == sheng[i] {
+				goto EndSimilar
 			}
 		}
-		z.xiyong.YiLei = append(z.xiyong.YiLei, sheng[i])
-		z.xiyong.YiLeiFen += z.xiyong.GetFen(sheng[i])
-	end:
+		z.xiyong.Heterogeneous = append(z.xiyong.Heterogeneous, sheng[i])
+		z.xiyong.HeterogeneousPoint += z.xiyong.GetFen(sheng[i])
+	EndSimilar:
 		continue
 
 	}
-	return z.xiyong
+	return z
 }

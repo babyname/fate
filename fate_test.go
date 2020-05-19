@@ -1,48 +1,52 @@
 package fate_test
 
 import (
-	"fmt"
-	"log"
-	"math/rand"
-	"testing"
-	"time"
-
+	"context"
+	"github.com/godcong/chronos"
 	"github.com/godcong/fate"
+	"github.com/godcong/fate/config"
+	"testing"
 )
 
-func TestFate_EightCharacter(t *testing.T) {
-	log.SetFlags(log.Llongfile)
-	fate := fate.NewFate("毛")
-	fate.SetLunarData(time.Now())
-	//log.Println(fate.EightCharacter())
+func init() {
+	//trait.NewZapFileSugar("fate.log")
 }
 
-func TestTime(t *testing.T) {
-	tt, err := time.Parse("2006-01-02T15:04", "2017-11-14T08:17")
-	if err != nil {
-		panic(err)
+func TestFate_RunMakeName(t *testing.T) {
+	born := chronos.New("2020/02/06 15:45").Solar().Time()
+	last := "张"
+	cfg := config.DefaultConfig()
+	cfg.BaguaFilter = true
+	cfg.ZodiacFilter = true
+	cfg.SupplyFilter = true
+	cfg.HardFilter = true
+	cfg.StrokeMin = 3
+	cfg.StrokeMax = 24
+	cfg.Regular = true
+	cfg.RunInit = false
+	cfg.FileOutput = config.FileOutput{
+		OutputMode: config.OutputModeLog,
+		Path:       "name.log",
 	}
-	sour := rand.NewSource(tt.UnixNano())
-	fmt.Println(rand.New(sour).Uint64())
-	fmt.Println(rand.New(sour).Uint64())
-	//10547234835636046708
-}
-
-func TestFate_BestStrokes(t *testing.T) {
-	f := fate.NewFate("毛")
-	//fate.SetMartial()
-	m := &fate.Martial{
-		BiHua:     true,
-		SanCai:    true,
-		BaZi:      false,
-		GuaXiang:  false,
-		TianYun:   false,
-		ShengXiao: false,
+	cfg.Database = config.Database{
+		Host:         "localhost",
+		Port:         "3306",
+		User:         "root",
+		Pwd:          "111111",
+		Name:         "fate",
+		MaxIdleCon:   0,
+		MaxOpenCon:   0,
+		Driver:       "mysql",
+		File:         "",
+		Dsn:          "",
+		ShowSQL:      false,
+		ShowExecTime: false,
 	}
+	f := fate.NewFate(last, born, fate.ConfigOption(cfg), fate.SexOption(fate.SexGirl))
 
-	f.SetLunarData(time.Now())
-	g := f.Generate(6)
-	g.SetMartial(m)
-	g.Continue()
-	g.Continue()
+	//f.SetDB(eng)
+	e := f.MakeName(context.Background())
+	if e != nil {
+		t.Fatal(e)
+	}
 }

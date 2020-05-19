@@ -1,64 +1,108 @@
 package fate
 
 import (
-	"log"
+	"github.com/godcong/chronos"
+	"github.com/godcong/yi"
 	"strconv"
 	"strings"
-
-	"github.com/globalsign/mgo/bson"
-	"github.com/godcong/fate/mongo"
-	"github.com/godcong/yi"
 )
 
 //Name 姓名
 type Name struct {
-	FirstName []string //名姓
-	LastName  []string
-	baGua     *yi.Yi //周易八卦
+	FirstName   []*Character //名姓
+	LastName    []*Character
+	born        *chronos.Calendar
+	baZi        *BaZi
+	baGua       *yi.Yi //周易八卦
+	zodiac      *Zodiac
+	zodiacPoint int
 }
 
-func MakeName(last string) *Name {
+// String ...
+func (n Name) String() string {
+	var s string
+	for _, l := range n.LastName {
+		s += l.Ch
+	}
+	for _, f := range n.FirstName {
+		s += f.Ch
+	}
+	return s
+}
+
+// Strokes ...
+func (n Name) Strokes() string {
+	var s []string
+	for _, l := range n.LastName {
+		s = append(s, strconv.Itoa(l.ScienceStroke))
+	}
+
+	for _, f := range n.FirstName {
+		s = append(s, strconv.Itoa(f.ScienceStroke))
+	}
+	return strings.Join(s, ",")
+}
+
+// PinYin ...
+func (n Name) PinYin() string {
+	var s string
+	for _, l := range n.LastName {
+		s += "[" + strings.Join(l.PinYin, ",") + "]"
+	}
+
+	for _, f := range n.FirstName {
+		s += "[" + strings.Join(f.PinYin, ",") + "]"
+	}
+	return s
+}
+
+// WuXing ...
+func (n Name) WuXing() string {
+	var s string
+	for _, l := range n.LastName {
+		s += l.WuXing
+	}
+	for _, f := range n.FirstName {
+		s += f.WuXing
+	}
+	return s
+}
+
+// XiYongShen ...
+func (n Name) XiYongShen() string {
+	return n.baZi.XiYongShen()
+}
+
+func createName(impl *fateImpl, f1 *Character, f2 *Character) *Name {
+	lastSize := len(impl.lastChar)
+	last := make([]*Character, lastSize, lastSize)
+	copy(last, impl.lastChar)
+	ff1 := *f1
+	ff2 := *f2
+	first := []*Character{&ff1, &ff2}
+
 	return &Name{
-		FirstName: nil,
-		LastName:  strings.Split(last, ""),
-		baGua:     nil,
+		FirstName: first,
+		LastName:  last,
 	}
 }
 
-//MakeName input the lastname to make a name
-func FilterName(names []*Name) *Name {
-	//todo:make name generate list
-
-	return &Name{}
-}
-
-//BaGua
+// BaGua ...
 func (n *Name) BaGua() *yi.Yi {
+	if n.baGua == nil {
+		lastSize := len(n.LastName)
+		shang := getStroke(n.LastName[0])
+		if lastSize > 1 {
+			shang += getStroke(n.LastName[1])
+		}
+		xia := getStroke(n.FirstName[0]) + getStroke(n.FirstName[1])
+		n.baGua = yi.NumberQiGua(xia, shang, shang+xia)
+	}
+
 	return n.baGua
 }
 
-func nameCharacter(s string) *mongo.Character {
-	c := mongo.Character{}
-	err := mongo.C("character").Find(bson.M{
-		"character": s,
-	}).One(&c)
-	log.Printf("%+v", c)
-	if err != nil {
-		log.Println(err)
-		return nil
-	}
-	return &c
-}
-
-//CountStroke 统计笔画
-func CountStroke(chars ...*mongo.Character) int {
-	i := 0
-	if chars == nil {
-		return i
-	}
-	for k := range chars {
-		t, _ := strconv.Atoi(chars[k].KangxiStrokes)
-		i += t
-	}
-	return i
+// BaZi ...
+func (n Name) BaZi() string {
+	return n.baZi.String()
 }

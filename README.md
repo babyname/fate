@@ -1,5 +1,119 @@
-# FATE：现代科学取名工具 #
-## Github第一个开源的取名项目(也是迄今为止唯一一个) ##
+# 命运(Fate)
+
+![Go](https://github.com/godcong/fate/workflows/Go/badge.svg)
+[![GoDoc](https://godoc.org/github.com/godcong/fate?status.svg)](http://godoc.org/github.com/godcong/fate)
+[![license](https://img.shields.io/github/license/godcong/fate.svg)](https://github.com/godcong/fate/blob/master/LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/godcong/fate)](https://goreportcard.com/report/github.com/godcong/fate)
+
+## 现代科学取名工具(A modern science chinese name create tool)
+  Github第一个开源的中文取名项目(The first chinese name create tool in github)  
+
+## 简介 ##
+  一个好名字伴随人的一生，FATE让你取一个好名字。  
+  TIPS:　本程序适用于单个姓或双个姓，起2个名的情况。（如：独孤**，李张**，张**，王**）  
+
+## 关于版本：
+  除非稳定版本会单独出release,以后每次提交都会生成二进制文件的pre_release提供下载.  
+  [最新自编译版本](https://github.com/godcong/fate/releases/tag/auto_build)  
+  [Release版本:v3.1.1](https://github.com/godcong/fate/releases/tag/v3.1.1)  
+  [最新数据库文件:20200331](https://github.com/godcong/fate/releases/download/v3.5.1/fate_db_200331.7z)
+
+## 关于起名算法 ##
+  FATE使用了以下算法,按照每种算法的准确度,使用程度也有高有低,不会一概而否,也不会偏向单独某种算法.  
+```
+周易卦象  
+大衍之数  
+三才五格  
+喜用神（平衡用神）  
+生肖用字  
+八字吉凶  
+```  
+
+## 接口调用生成姓名 ##
+```   
+      使用前请导入database的数据（测试字库已基本完善，保险起见生成姓名后可以去一些测名网站验证下）
+      //加载配置（具体参数参考example/create_a_name）
+    	cfg := config.Default()
+      //生日：
+    	born := chronos.New("2020/01/23 11:31")
+      //姓氏：
+      lastName := "张"
+      //第一参数：姓氏
+      //第二参数：生日 
+    	f := fate.NewFate(lastName, born.Solar().Time(), fate.ConfigOption(cfg))
+    
+    	e := f.MakeName(context.Background())
+    	if e != nil {
+    		t.Fatal(e)
+    	}
+```
+
+### 使用二进制文件在运行前务必把zoneinfo.zip下载并和二进制文件放在一起(不要解压),不然会报错.
+### [zoneinfo文件](https://github.com/godcong/fate/blob/master/zoneinfo.zip)
+## 二进制可执行文件生成姓名 ##
+```   
+       //没有安装go环境的请下载master下的zoneinfo文件和fate二进制文件放一起
+       //生成配置文件(可修改数据库，及一些基本参数)：
+       fate.exe init
+       //输出姓名：
+       fate.exe name -l 张 -b "2020/02/06 15:04"
+```
+
+## 常见问题:
+```
+1. Q: count total error:The system cannot find the path specified
+   A: zoneinfo缺失导致的时间转换失败问题(一般发生在windows环境下),
+        下载上面的zoneinfo文件并放到执行文件相同的目录下即可解决.
+        最新版会检查根目录,已无需重新init.
+    
+```
+
+## 版本履历:
+
+第一版:
+    大部分是手动工作,现已废弃
+    
+第二版:
+    可自动生成名字字符 + 手工筛选
+    
+第三版(开发中):
+    每次生成一个名字,并目标喜用神,生肖喜忌,月历转换,生成八字等功能  
+    八字计算: https://github.com/godcong/chronos  
+    字典数据: https://github.com/godcong/excavator  
+    数据库重新切回mysql,mongo虽然插入简单,检索语法太繁琐了...
+ 
+第四版(计划中): 
+  优化算法,调整接口,数据库,完善文档以及修复一些bug.
+  
+第五版(计划中):
+  图形界面UI,api接口调用.
+  
+第六版(计划中):
+  占坑备用
+
+第七版(计划中):
+    通过AI,大数据匹配算法,取出更好更佳的名字.
+
+
+### 其他(补充资料) ###
+起名算法:  
+    算法(进度) 备注  
+    五格(95%) 暂用字库已补全  
+    三才(95%) 暂用字库已补全  
+    八字(100%) 喜用神完成, 补八字完成  
+    卦象(100%) 算法完成，起卦完成,吉凶过滤完成。  
+    生肖(30%) 生肖获取完成,字库筛选待完成  
+    天运(TODO)  
+
+立春：  
+2019年02月04日 11:14:14    
+2020年02月04日 17:03:12    
+2021年02月03日 22:58:39    
+2022年02月04日 04:50:36    
+2023年02月04日 10:42:21    
+2024年02月04日 16:26:53    
+2025年02月03日 22:10:13    
+生肖按八字算从立春开始算起，不到时间则为上一年。  
 
 1、配合八字命理的喜忌，是起名字的核心所在。     
 八字是每个人出生的年、月、日、时，小孩取名的第一步即是分析八字，了解命理五行所缺并找出喜用神，并且据此起名，这是最关键的核心，所有姓名的吉凶预测与取名，都以此为准。     
@@ -23,7 +137,7 @@
 6、小孩取名字时还要结合命主的出生方位、父母资料等因素，以达到事半功倍的效果。  
   其实任何事情道理都是一样的，只有适合自己的才是最好的。
 
-周易卦象编码:
+周易卦象编码参考:
 
 六十四卦
 # ䷀ ䷁ ䷂ ䷃ ䷄ ䷅ ䷆ ䷇ ䷈ ䷉ ䷊ ䷋ ䷌ ䷍ ䷎ ䷏ 
@@ -39,8 +153,6 @@
 
 两仪
 # ⚋⚊
-
-
 
 为什么要集六大派与一体?  
 看下下面这个统计,每一派的取名法其实都有其不足之处.  
@@ -67,38 +179,3 @@ Fate的本意是让起名变得简单,且能取到一个好的名字.
 算法开源就是为了让每个人知道,  
 这个名字取名过程的来龙去脉.  
 
-
-### 一个好名字伴随人的一生，FATE让你取一个好名字 ###
-
-版本履历:
-
-第一版:
-
-    大部分是手动工作,现已废弃
-    
-第二版:
-
-    可自动生成名字字符 + 手工筛选
-    
-第三版(开发中):
-
-    每次生成一个名字,并目标喜用神,生肖喜忌,月历转换,生成八字等功能
-    八字计算: https://github.com/godcong/chronos
-    字典数据: https://github.com/godcong/excavator
-    
-    起名六大派进度:
-    五格(50%) 缺: 字库
-    三才(50%) 缺: 字库
-    八字(80%) 喜用完成,缺补八字
-    卦象(50%) 算法完成，待集成
-    天运(TODO)
-    生肖(TODO)
-    
-第四版(计划):
-
-    通过AI,大数据匹配算法,取出更好更佳的名字.
-
-
-写在最后,接口Readme:
-    
-    暂无
