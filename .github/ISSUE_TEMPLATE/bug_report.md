@@ -20,3 +20,5 @@ If applicable, add screenshots to help explain your problem.
 
 **Additional context**
 Add any other context about the problem here.
+Issues that have not been followed up for more than 14 days may be closed
+
