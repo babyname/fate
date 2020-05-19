@@ -62,7 +62,7 @@
 ## 常见问题:
 ```
 1. Q: count total error:The system cannot find the path specified
-    A: 这就是最常见zoneinfo缺失导致的时间转换失败问题(一般发生在windows环境下),
+   A: zoneinfo缺失导致的时间转换失败问题(一般发生在windows环境下),
         下载上面的zoneinfo文件并放到执行文件相同的目录下即可解决.
         最新版会检查根目录,已无需重新init.
     
