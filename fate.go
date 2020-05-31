@@ -256,6 +256,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 	var f1s []*Character
 	var f2s []*Character
 	fsa := map[int][]*Character{}
+	bazi := NewBazi(f.born)
 	for l := range lucky {
 		if f.config.FilterMode == config.FilterModeCustom {
 			//TODO
@@ -320,7 +321,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 					continue
 				}
 				n := createName(f, f1, f2)
-				n.baZi = NewBazi(f.born)
+				n.baZi = bazi
 				name <- n
 			}
 		}
