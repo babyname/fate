@@ -153,26 +153,6 @@ func (z *BaZi) XiYongShen() string {
 	return z.XiYong().Shen()
 }
 
-//func (z *BaZi) yongShen() *BaZi {
-//	z.xiyong.YongShen = z.xiyong.Similar[0]
-//	return z
-//}
-//func (z *BaZi) xiShen() *BaZi {
-//	rt := sheng
-//	if z.QiangRuo() {
-//		rt = ke
-//	}
-//	for i := range rt {
-//		if rt[i] == z.xiyong.YongShen {
-//			if i == len(rt) {
-//				i = -1
-//			}
-//			z.xiyong.XiShen = rt[i-1]
-//			break
-//		}
-//	}
-//	return z
-//}
 func (z *BaZi) point() *BaZi {
 	di := diIndex[z.baZi[3]]
 	for idx, v := range z.baZi {
