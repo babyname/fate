@@ -1,6 +1,7 @@
 package fate_test
 
 import (
+	"fmt"
 	"github.com/godcong/fate"
 	"log"
 	"testing"
@@ -27,6 +28,7 @@ func TestWuGe_WaiGe(t *testing.T) {
 		if wg.ZongGe() != sum {
 			log.Println(wg.ZongGe() == sum, l1, l2, f1, f2, wg.ZongGe())
 		}
+		fmt.Println("result:", wg.Check())
 		f2++
 	}
 }
