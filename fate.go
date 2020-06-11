@@ -17,15 +17,6 @@ import (
 // HandleOutputFunc ...
 type HandleOutputFunc func(name Name)
 
-// Sex ...
-type Sex bool
-
-// SexBoy ...
-const (
-	SexBoy  Sex = false
-	SexGirl Sex = true
-)
-
 // HelpContent ...
 const HelpContent = "正在使用Fate生成姓名列表，如遇到问题请访问项目地址：https://github.com/godcong/fate获取帮助!"
 
