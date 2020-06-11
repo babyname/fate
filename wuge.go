@@ -121,23 +121,33 @@ func zongGe(l1, l2, f1, f2 int) int {
 	return zg%81 + 1
 }
 
-func checkDaYan(idx int) bool {
-	switch daYanList[idx-1].Lucky {
-	case "吉", "半吉":
-		return true
-	}
-	return false
-}
-
 //Check 格检查
-func (ge *WuGe) Check() bool {
+func (ge *WuGe) Check(ss ...string) bool {
+	v := map[string]bool{}
+	if ss == nil {
+		ss = append(ss, "吉", "半吉")
+	}
 	//ignore:tianGe
-	for _, v := range []int{ge.diGe, ge.renGe, ge.waiGe, ge.zongGe} {
-		if !checkDaYan(v) {
+	v[GetDaYan(ge.diGe).Lucky] = false
+	v[GetDaYan(ge.renGe).Lucky] = false
+	v[GetDaYan(ge.waiGe).Lucky] = false
+	v[GetDaYan(ge.zongGe).Lucky] = false
+
+	for l := range v {
+		for i := range ss {
+			if ss[i] == l {
+				v[l] = true
+				break
+			}
+		}
+	}
+	for l := range v {
+		if v[l] == false {
 			return false
 		}
 	}
 	return true
+
 }
 
 //WuGeLucky ...
