@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// TestWuGe_WaiGe ...
 func TestWuGe_WaiGe(t *testing.T) {
 	l1, l2, f1, f2 := 1, 1, 1, 1
 	for i := 0; i < 80000; i++ {
