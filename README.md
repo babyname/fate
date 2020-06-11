@@ -65,6 +65,7 @@
    A: zoneinfo缺失导致的时间转换失败问题(一般发生在windows环境下),
         下载上面的zoneinfo文件并放到执行文件相同的目录下即可解决.
         最新版会检查根目录,已无需重新init.
+        地址:https://github.com/godcong/fate/blob/master/zoneinfo.zip
     
 ```
 
