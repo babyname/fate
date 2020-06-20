@@ -68,7 +68,10 @@
         地址:https://github.com/godcong/fate/blob/master/zoneinfo.zip
 
 2. Q: 数据库导入生成
-   A: CREATE schema `fate` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+   A: 
+      //创建数据库
+      CREATE schema `fate` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+      //导入数据库文件
       source /path/to/sql/file;
     
 ```
