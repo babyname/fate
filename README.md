@@ -67,8 +67,10 @@
         最新版会检查根目录,已无需重新init.
         地址:https://github.com/godcong/fate/blob/master/zoneinfo.zip
 
-2. Q: 数据库导入生成
+2. Q: 如何导入数据
    A: 
+      //链接到mysql数据库
+      mysql -u用户名 -p密码
       //创建数据库
       CREATE schema `fate` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
       //使用fate数据库
