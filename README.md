@@ -71,6 +71,8 @@
    A: 
       //创建数据库
       CREATE schema `fate` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+      //使用fate数据库
+      use fate;
       //导入数据库文件
       source /path/to/sql/file;
     
