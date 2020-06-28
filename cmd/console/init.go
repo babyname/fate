@@ -51,6 +51,11 @@ func zoneCheck() error {
 			if e != nil {
 				return fmt.Errorf("could not make dir for copy zoneinfo:%w", e)
 			}
+			//fix:https://github.com/godcong/fate/issues/68
+			info, e = os.Stat(path)
+			if e != nil {
+				return fmt.Errorf("error after make dir:%v", e)
+			}
 		} else {
 			return fmt.Errorf("the target file is exist(%s):%w", path, e)
 		}
