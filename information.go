@@ -120,6 +120,9 @@ func (l *logInformation) Head(heads ...string) error {
 	return nil
 }
 func logOutput(path string) Information {
+	if path == "" {
+		path = "stdout"
+	}
 	cfg := zap.NewProductionConfig()
 
 	cfg.EncoderConfig = zapcore.EncoderConfig{
