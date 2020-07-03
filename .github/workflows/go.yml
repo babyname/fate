@@ -23,7 +23,7 @@ jobs:
     - name: Set up Go 1.13
       uses: actions/setup-go@v1
       with:
-        GOARCH: ${{ matrix.arch }}
+       #GOARCH: ${{ matrix.arch }}
         go-version: ${{ matrix.go-version }}
       id: go
 
