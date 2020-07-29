@@ -30,16 +30,21 @@ func cmdName() *cobra.Command {
 			fmt.Println("start", time.Now().String())
 			config.DefaultJSONPath = path
 			cfg := config.LoadConfig()
-			fmt.Printf("config loaded: %+v", cfg)
+
+			if cfg == nil {
+				log.Info("use default config")
+				cfg = config.DefaultConfig()
+			}
+			log.Infow("config loaded", "data", *cfg)
 			bornTime, e := time.Parse(chronos.DateFormat, born)
 			if e != nil {
-				log.Fatalw("parseborn", "error", e)
+				log.Fatalw("parse born failed", "error", e)
 			}
 			f := fate.NewFate(last, bornTime, fate.ConfigOption(cfg), fate.SexOption(fate.Sex(sex)))
 
 			e = f.MakeName(context.Background())
 			if e != nil {
-				log.Fatalw("makename", "error", e)
+				log.Fatalw("makename failed", "error", e)
 			}
 
 			fmt.Println("end", time.Now().String())
