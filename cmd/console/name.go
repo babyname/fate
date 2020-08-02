@@ -17,6 +17,7 @@ func cmdName() *cobra.Command {
 	path := ""
 	born := ""
 	last := ""
+	output := ""
 	sex := false
 	cmd := &cobra.Command{
 		Use:   "name",
@@ -53,6 +54,7 @@ func cmdName() *cobra.Command {
 	cmd.Flags().StringVarP(&last, "last", "l", "", "set lastname")
 	cmd.Flags().StringVarP(&born, "born", "b", time.Now().Format(chronos.DateFormat), "set birth as 2016/01/02 15:04")
 	cmd.Flags().StringVarP(&path, "path", "p", ".", "set the input config path")
+	cmd.Flags().StringVarP(&output, "outout", "o", "", "set the output path")
 	cmd.Flags().BoolVarP(&sex, "sex", "s", false, "set sex of the baby")
 	return cmd
 }
