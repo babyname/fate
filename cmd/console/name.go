@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/godcong/chronos"
@@ -37,6 +38,11 @@ func cmdName() *cobra.Command {
 				cfg = config.DefaultConfig()
 			}
 			log.Infow("config loaded", "data", *cfg)
+
+			if output != "" {
+				cfg.FileOutput.Path = filepath.Join(output, cfg.FileOutput.Path)
+			}
+
 			bornTime, e := time.Parse(chronos.DateFormat, born)
 			if e != nil {
 				log.Fatalw("parse born failed", "error", e)
