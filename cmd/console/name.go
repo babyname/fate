@@ -24,11 +24,11 @@ func cmdName() *cobra.Command {
 		Use:   "name",
 		Short: "output the name",
 		Run: func(cmd *cobra.Command, args []string) {
-			_, e := os.Stat("zoneinfo.zip")
+			_, e := os.Stat(filepath.Join(getCurrentPath(), "zoneinfo.zip"))
 			if e != nil {
 				log.Fatalw("zoneinfo file is not exist", "error", e)
 			}
-			os.Setenv("ZONEINFO", "zoneinfo.zip")
+			os.Setenv("ZONEINFO", filepath.Join(getCurrentPath(), "zoneinfo.zip"))
 			fmt.Println("start", time.Now().String())
 			config.DefaultJSONPath = path
 			cfg := config.LoadConfig()
@@ -63,4 +63,12 @@ func cmdName() *cobra.Command {
 	cmd.Flags().StringVarP(&output, "outout", "o", "", "set the output path")
 	cmd.Flags().BoolVarP(&sex, "sex", "s", false, "set sex of the baby")
 	return cmd
+}
+
+func getCurrentPath() string {
+	getwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	return getwd
 }
