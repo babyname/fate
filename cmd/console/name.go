@@ -27,6 +27,7 @@ func cmdName() *cobra.Command {
 			_, e := os.Stat(filepath.Join(getCurrentPath(), "zoneinfo.zip"))
 			if e != nil {
 				log.Fatalw("zoneinfo file is not exist", "error", e)
+				return
 			}
 			os.Setenv("ZONEINFO", filepath.Join(getCurrentPath(), "zoneinfo.zip"))
 			fmt.Println("start", time.Now().String())
@@ -34,10 +35,10 @@ func cmdName() *cobra.Command {
 			cfg := config.LoadConfig()
 
 			if cfg == nil {
-				log.Info("use default config")
+				log.Warnw("config file not found,use default config")
 				cfg = config.DefaultConfig()
 			}
-			log.Infow("config loaded", "data", *cfg)
+			log.Infow("show config info", "data", *cfg)
 
 			if output != "" {
 				cfg.FileOutput.Path = filepath.Join(output, cfg.FileOutput.Path)
