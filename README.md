@@ -77,7 +77,7 @@
       use fate;
       //导入数据库文件
       source /path/to/sql/file;
-    
+   PS:建议使用Navicat等工具导入,导入速度较快
 ```
 
 ## 版本履历:
