@@ -14,8 +14,7 @@
 
 ## 关于版本：
   除非稳定版本会单独出release,以后每次提交都会生成二进制文件的pre_release提供下载.  
-  [最新自编译版本](https://github.com/godcong/fate/releases/tag/auto_build)  
-  [Release版本:v3.1.1](https://github.com/godcong/fate/releases/tag/v3.1.1)  
+  [最新自编译版本](https://github.com/godcong/fate/releases/tag/auto_build)
   [最新数据库文件:20200331](https://github.com/godcong/fate/releases/download/v3.5.1/fate_db_200331.7z)
 
 ## 关于起名算法 ##
