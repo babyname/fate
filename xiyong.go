@@ -42,7 +42,7 @@ func (xy *XiYong) GetFen(s string) (point int) {
 }
 
 func (xy *XiYong) minFenWuXing(ss ...string) (wx string) {
-	min := math.MaxInt64
+	min := math.MaxInt32
 	for _, s := range ss {
 		if xy.WuXingFen[s] < min {
 			min = xy.WuXingFen[s]
