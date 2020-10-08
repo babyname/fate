@@ -1,5 +1,7 @@
 package fate
 
+import "strings"
+
 //XiYong 喜用神
 type XiYong struct {
 	WuXingFen          map[string]int
@@ -64,7 +66,7 @@ func (xy *XiYong) QiangRuo() bool {
 
 func filterXiYong(yong string, cs ...*Character) (b bool) {
 	for _, c := range cs {
-		if c.WuXing == yong {
+		if strings.Contains(yong, c.WuXing) {
 			return true
 		}
 	}
