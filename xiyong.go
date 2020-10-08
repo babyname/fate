@@ -1,6 +1,9 @@
 package fate
 
-import "strings"
+import (
+	"math"
+	"strings"
+)
 
 //XiYong 喜用神
 type XiYong struct {
@@ -39,7 +42,7 @@ func (xy *XiYong) GetFen(s string) (point int) {
 }
 
 func (xy *XiYong) minFenWuXing(ss ...string) (wx string) {
-	min := 9999
+	min := math.MaxInt64
 	for _, s := range ss {
 		if xy.WuXingFen[s] < min {
 			min = xy.WuXingFen[s]
