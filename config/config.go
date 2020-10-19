@@ -1,115 +1,122 @@
 package config
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"os"
-
-	"github.com/pelletier/go-toml"
+	"path/filepath"
 )
 
-type Config struct {
-	*toml.Tree
+const JSONName = "config.json"
+
+type FilterMode int
+
+const (
+	FilterModeNormal FilterMode = iota
+	FilterModeHard
+	FilterModeCustom
+)
+
+type OutputMode int
+
+const (
+	OutputModeLog OutputMode = iota
+	OutputModeCSV
+	OutputModelJSON
+)
+
+type FileOutput struct {
+	OutputMode OutputMode `json:"output_mode"`
+	Path       string     `json:"path"`
+	Heads      []string   `json:"heads"`
 }
 
-const DefaultFileName = "config.toml"
+type Config struct {
+	RunInit      bool       `json:"run_init"`
+	FilterMode   FilterMode `json:"filter_mode"`
+	StrokeMax    int        `json:"stroke_max"`
+	StrokeMin    int        `json:"stroke_min"`
+	HardFilter   bool       `json:"hard_filter"`
+	FixBazi      bool       `json:"fix_bazi"`      //八字修正
+	SupplyFilter bool       `json:"supply_filter"` //过滤补八字
+	ZodiacFilter bool       `json:"zodiac_filter"` //过滤生肖
+	BaguaFilter  bool       `json:"bagua_filter"`  //过滤卦象
+	Regular      bool       `json:"regular"`       //常用
+	Database     Database   `json:"database"`
+	FileOutput   FileOutput `json:"file_output"`
+}
 
-var config *Config
+var DefaultJSONPath = ""
+var DefaultHeads = []string{"姓名", "笔画", "拼音", "喜用神", "八字"}
 
 func init() {
-	config = defaultConfig()
-}
-
-func Default() *Config {
-	return config
-}
-
-//NewConfig panic prevent do not return nil
-func NewConfig(name string) *Config {
-	file, err := os.OpenFile(name, os.O_RDONLY, os.ModePerm)
-	if err != nil {
-		return &Config{
-			Tree: &toml.Tree{},
+	if DefaultJSONPath == "" {
+		dir, err := os.Getwd()
+		if err != nil {
+			panic(err)
 		}
-	}
-	tree, err := toml.LoadReader(file)
-	if err != nil {
-		return &Config{
-			Tree: &toml.Tree{},
+		s, err := filepath.Abs(dir)
+		if err != nil {
+			panic(err)
 		}
-	}
-	return &Config{
-		Tree: tree,
+		DefaultJSONPath = s
 	}
 }
 
-func defaultConfig() *Config {
-	return NewConfig(DefaultFileName)
-}
-
-//GetTree  GetTree
-func (c *Config) GetTree(name string) *toml.Tree {
-	if c == nil {
-		return nil
-	}
-	if v := c.Get(name); v != nil {
-		if tree, b := v.(*toml.Tree); b {
-			return tree
-		}
-	}
-	return nil
-}
-
-//GetSub GetSub
-func (c *Config) GetSub(name string) *Config {
-	if v := c.GetTree(name); v != nil {
-		return &Config{
-			Tree: v,
-		}
-	}
-	return (*Config)(nil)
-}
-
-//GetString GetString
-func (c *Config) GetString(name string) string {
-	if v := c.Get(name); v != nil {
-		if v1, b := v.(string); b {
-			return v1
-		}
-	}
-	return ""
-}
-
-//GetStringD GetStringD
-func (c *Config) GetStringD(name string, def string) string {
-	if c == nil {
+func LoadConfig() (c *Config) {
+	c = &Config{}
+	def := DefaultConfig()
+	f := filepath.Join(DefaultJSONPath, JSONName)
+	bys, e := ioutil.ReadFile(f)
+	if e != nil {
 		return def
 	}
-	if v := c.Get(name); v != nil {
-		if v1, b := v.(string); b {
-			return v1
-		}
+	e = json.Unmarshal(bys, &c)
+	if e != nil {
+		return def
 	}
-	return def
+	return c
 }
 
-//GetBool GetBool
-func (c *Config) GetBool(name string) bool {
-	if c == nil {
-		return false
+func OutputConfig(config *Config) error {
+	bys, e := json.MarshalIndent(config, "", " ")
+	if e != nil {
+		return e
 	}
-	if v := c.Get(name); v != nil {
-		if v1, b := v.(bool); b {
-			return v1
-		}
-	}
-	return false
+
+	return ioutil.WriteFile(filepath.Join(DefaultJSONPath, JSONName), bys, 0755)
 }
 
-//GetBoolD GetBoolD
-func (c *Config) GetBoolD(name string, def bool) bool {
-	if v := c.Get(name); v != nil {
-		if v1, b := v.(bool); b {
-			return v1
-		}
+func DefaultConfig() *Config {
+	return &Config{
+		RunInit:      false,
+		FilterMode:   0,
+		StrokeMax:    18,
+		StrokeMin:    3,
+		HardFilter:   false,
+		FixBazi:      false,
+		SupplyFilter: true,
+		ZodiacFilter: true,
+		BaguaFilter:  true,
+		Regular:      true,
+		Database: Database{
+			Host:         "127.0.0.1",
+			Port:         "3306",
+			User:         "root",
+			Pwd:          "111111",
+			Name:         "fate",
+			MaxIdleCon:   0,
+			MaxOpenCon:   0,
+			Driver:       "mysql",
+			File:         "",
+			Dsn:          "",
+			ShowSQL:      false,
+			ShowExecTime: false,
+		},
+		FileOutput: FileOutput{
+			Heads:      DefaultHeads,
+			OutputMode: OutputModeLog,
+			Path:       "name.txt",
+		},
 	}
-	return def
 }

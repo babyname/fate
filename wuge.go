@@ -1,11 +1,12 @@
 package fate
 
 import (
-	"github.com/go-xorm/xorm"
-	"github.com/godcong/fate/data"
+	"github.com/goextension/log"
+	"github.com/google/uuid"
+	"github.com/xormsharp/xorm"
 )
 
-//WuGe
+// WuGe ...
 type WuGe struct {
 	tianGe int
 	renGe  int
@@ -14,28 +15,33 @@ type WuGe struct {
 	zongGe int
 }
 
-func (wuGe *WuGe) ZongGe() int {
-	return wuGe.zongGe
+// ZongGe ...
+func (ge *WuGe) ZongGe() int {
+	return ge.zongGe
 }
 
-func (wuGe *WuGe) WaiGe() int {
-	return wuGe.waiGe
+// WaiGe ...
+func (ge *WuGe) WaiGe() int {
+	return ge.waiGe
 }
 
-func (wuGe *WuGe) DiGe() int {
-	return wuGe.diGe
+// DiGe ...
+func (ge *WuGe) DiGe() int {
+	return ge.diGe
 }
 
-func (wuGe *WuGe) RenGe() int {
-	return wuGe.renGe
+// RenGe ...
+func (ge *WuGe) RenGe() int {
+	return ge.renGe
 }
 
-func (wuGe *WuGe) TianGe() int {
-	return wuGe.tianGe
+// TianGe ...
+func (ge *WuGe) TianGe() int {
+	return ge.tianGe
 }
 
-//NewWuGe 计算五格
-func NewWuGe(l1, l2, f1, f2 int) *WuGe {
+//CalcWuGe 计算五格
+func CalcWuGe(l1, l2, f1, f2 int) *WuGe {
 	return &WuGe{
 		tianGe: tianGe(l1, l2, f1, f2),
 		renGe:  renGe(l1, l2, f1, f2),
@@ -65,9 +71,8 @@ func renGe(l1, l2, f1, _ int) int {
 	//人格（复姓单名）姓的第二字加名
 	if l2 != 0 {
 		return l2 + f1
-	} else {
-		return l1 + f1
 	}
+	return l1 + f1
 }
 
 //diGe input the ScienceStrokes with name
@@ -116,38 +121,42 @@ func zongGe(l1, l2, f1, f2 int) int {
 	return zg%81 + 1
 }
 
-func checkDaYan(idx int) bool {
-	switch data.DaYanList[idx-1].Lucky {
-	case "吉", "半吉":
-		return true
-	}
-	return false
-}
-
-func getDaYanLucky(idx int) string {
-	if idx > 1 && idx < 81 {
-		return data.DaYanList[idx-1].Lucky
-	}
-	return ""
-}
-
 //Check 格检查
-func (ge *WuGe) Check() bool {
+func (ge *WuGe) Check(ss ...string) bool {
+	v := map[string]bool{}
+	if ss == nil {
+		ss = append(ss, "吉", "半吉")
+	}
 	//ignore:tianGe
-	for _, v := range []int{ge.diGe, ge.renGe, ge.waiGe, ge.zongGe} {
-		if !checkDaYan(v) {
+	v[GetDaYan(ge.diGe).Lucky] = false
+	v[GetDaYan(ge.renGe).Lucky] = false
+	v[GetDaYan(ge.waiGe).Lucky] = false
+	v[GetDaYan(ge.zongGe).Lucky] = false
+
+	for l := range v {
+		for i := range ss {
+			if ss[i] == l {
+				v[l] = true
+				break
+			}
+		}
+	}
+	for l := range v {
+		if v[l] == false {
 			return false
 		}
 	}
 	return true
+
 }
 
 //WuGeLucky ...
 type WuGeLucky struct {
+	ID           string `xorm:"id pk"`
 	LastStroke1  int    `xorm:"last_stroke_1"`
 	LastStroke2  int    `xorm:"last_stroke_2"`
-	FirstStroke1 int    `json:"first_stroke_1"`
-	FirstStroke2 int    `json:"first_stroke_2"`
+	FirstStroke1 int    `xorm:"first_stroke_1"`
+	FirstStroke2 int    `xorm:"first_stroke_2"`
 	TianGe       int    `xorm:"tian_ge"`
 	TianDaYan    string `xorm:"tian_da_yan"`
 	RenGe        int    `xorm:"ren_ge"`
@@ -159,72 +168,124 @@ type WuGeLucky struct {
 	ZongGe       int    `xorm:"zong_ge"`
 	ZongDaYan    string `xorm:"zong_da_yan"`
 	ZongLucky    bool   `xorm:"zong_lucky"`
+	ZongSex      bool   `xorm:"zong_sex"`
+	ZongMax      bool   `xorm:"zong_max"`
 }
 
-func InsertOrUpdate(session *xorm.Session, lucky *WuGeLucky) (n int64, e error) {
-	n, e = session.Where("tian_ge = ?", lucky.TianGe).Where("ren_ge = ?", lucky.RenGe).Where("di_ge = ?", lucky.DiGe).Count(&WuGeLucky{})
+// BeforeInsert ...
+func (w *WuGeLucky) BeforeInsert() {
+	w.ID = uuid.Must(uuid.NewUUID()).String()
+}
+
+func countWuGeLucky(engine *xorm.Engine) (n int64, e error) {
+	return engine.Table(&WuGeLucky{}).Count()
+}
+
+func insertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e error) {
+	session := engine.Where("last_stroke_1 = ?", lucky.LastStroke1).
+		Where("last_stroke_2 = ?", lucky.LastStroke2).
+		Where("first_stroke_1 = ?", lucky.FirstStroke1).
+		Where("first_stroke_2 = ?", lucky.FirstStroke2)
+
+	n, e = session.Clone().Count(&WuGeLucky{})
 	if e != nil {
 		return n, e
 	}
-	log.With("lucky", lucky).Info("count:", n)
+	log.Infow("lucky", lucky)
 	if n == 0 {
-		n, e = session.InsertOne(lucky)
+		n, e = engine.InsertOne(lucky)
 		return
 	}
-	return session.Where("tian_ge = ?", lucky.TianGe).Where("ren_ge = ?", lucky.RenGe).Where("di_ge = ?", lucky.DiGe).Update(lucky)
+	return session.Clone().Update(lucky)
 }
 
-const WuGeMax = 31
+// WuGeMax ...
+const WuGeMax = 32
 
-func initWuGe() <-chan *WuGeLucky {
-	var wuge *WuGe
-	lucky := make(chan *WuGeLucky)
-	l1, l2, f1, f2 := 1, 1, 1, 1
-	go func() {
-		for ; l1 < WuGeMax; l1++ {
-			for ; l2 < WuGeMax; l2++ {
-				for ; f1 < WuGeMax; f1++ {
-					for ; f2 < WuGeMax; f2++ {
-						wuge = NewWuGe(l1, l2, f1, f2)
-						lucky <- &WuGeLucky{
-							LastStroke1:  l1,
-							LastStroke2:  l2,
-							FirstStroke1: f1,
-							FirstStroke2: f2,
-							TianGe:       wuge.tianGe,
-							TianDaYan:    getDaYanLucky(wuge.tianGe),
-							RenGe:        wuge.renGe,
-							RenDaYan:     getDaYanLucky(wuge.renGe),
-							DiGe:         wuge.diGe,
-							DiDaYan:      getDaYanLucky(wuge.diGe),
-							WaiGe:        wuge.waiGe,
-							WaiDaYan:     getDaYanLucky(wuge.waiGe),
-							ZongGe:       wuge.zongGe,
-							ZongDaYan:    getDaYanLucky(wuge.zongGe),
-							ZongLucky:    wuge.Check(),
-						}
-					}
-					f2 = 1
-				}
-				f1 = 1
-			}
-			l2 = 1
-		}
-		lucky <- nil
+func initWuGe(lucky chan<- *WuGeLucky) {
+	defer func() {
+		close(lucky)
 	}()
-
-	return lucky
+	var wuge *WuGe
+	for l1 := 1; l1 <= WuGeMax; l1++ {
+		for l2 := 0; l2 <= WuGeMax; l2++ {
+			for f1 := 1; f1 <= WuGeMax; f1++ {
+				for f2 := 1; f2 <= WuGeMax; f2++ {
+					wuge = CalcWuGe(l1, l2, f1, f2)
+					lucky <- &WuGeLucky{
+						ID:           "",
+						LastStroke1:  l1,
+						LastStroke2:  l2,
+						FirstStroke1: f1,
+						FirstStroke2: f2,
+						TianGe:       wuge.tianGe,
+						TianDaYan:    GetDaYan(wuge.tianGe).Lucky,
+						RenGe:        wuge.renGe,
+						RenDaYan:     GetDaYan(wuge.renGe).Lucky,
+						DiGe:         wuge.diGe,
+						DiDaYan:      GetDaYan(wuge.diGe).Lucky,
+						WaiGe:        wuge.waiGe,
+						WaiDaYan:     GetDaYan(wuge.waiGe).Lucky,
+						ZongGe:       wuge.zongGe,
+						ZongDaYan:    GetDaYan(wuge.zongGe).Lucky,
+						ZongLucky:    wuge.Check(),
+						ZongSex:      isSex(wuge.zongGe, wuge.waiGe, wuge.renGe, wuge.diGe),
+						ZongMax:      GetDaYan(wuge.zongGe).IsMax(),
+					}
+				}
+			}
+		}
+	}
 }
 
-func filterWuGe(engine *xorm.Engine, last ...int) []*WuGeLucky {
-	s := engine.NewSession()
-	size := len(last)
-	if size == 1 {
-		s = s.Where("last_stroke_1", last[0])
-	} else if size == 2 {
-		s = s.Where("last_stroke_1", last[0]).Where("last_stroke_2", last[1])
-	} else {
-		//nothing
+func getStroke(character *Character) int {
+	if character.ScienceStroke != 0 {
+		return character.ScienceStroke
+	} else if character.KangXiStroke != 0 {
+		return character.KangXiStroke
+	} else if character.Stroke != 0 {
+		return character.Stroke
+	} else if character.SimpleTotalStroke != 0 {
+		return character.SimpleTotalStroke
+	} else if character.TraditionalTotalStroke != 0 {
+		return character.TraditionalTotalStroke
 	}
+	return 0
+}
+
+func isSex(dys ...int) bool {
+	for _, dy := range dys {
+		if GetDaYan(dy).Sex {
+			return true
+		}
+	}
+	return false
+}
+
+func filterWuGe(eng *xorm.Engine, last []*Character, wg chan<- *WuGeLucky) error {
+	defer func() {
+		close(wg)
+	}()
+	l1 := getStroke(last[0])
+	l2 := 0
+	if len(last) == 2 {
+		l2 = getStroke(last[1])
+	}
+	s := eng.Where("last_stroke_1 =?", l1).
+		And("last_stroke_2 =?", l2).
+		And("zong_lucky = ?", 1)
+	rows, e := s.Rows(&WuGeLucky{})
+	if e != nil {
+		return e
+	}
+	for rows.Next() {
+		var tmp WuGeLucky
+		e := rows.Scan(&tmp)
+		if e != nil {
+			return e
+		}
+		wg <- &tmp
+	}
+
 	return nil
 }

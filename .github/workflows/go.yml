@@ -1,0 +1,128 @@
+name: Go
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+env:
+  UPLOAD_BIN_FILE: true
+
+jobs:
+
+  build:
+    name: Build
+    strategy:
+      matrix:
+        go-version: [1.13.x]
+        platform: [ windows-latest, ubuntu-latest, macos-latest]
+        arch: [386, amd64]
+    runs-on: ${{ matrix.platform }}
+    steps:
+
+    - name: Set up Go 1.13
+      uses: actions/setup-go@v1
+      with:
+       #GOARCH: ${{ matrix.arch }}
+        go-version: ${{ matrix.go-version }}
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+      if: matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest'
+      id: build_linux
+      run: |
+          ${GOROOT}/bin/go mod tidy
+          export GOARCH=${{ matrix.arch }}
+          echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
+          
+          echo "$(go env GOOS) $(go env GOARCH)"
+          
+          echo "buiding"
+          ${GOROOT}/bin/go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
+          
+          echo "compress"
+          tar -zcvf fate_$(go env GOOS)_$(go env GOARCH).tar.gz ./fate_$(go env GOOS)_$(go env GOARCH)
+ 
+    - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+      if: matrix.platform == 'windows-latest' && matrix.arch == 'amd64'
+      id: build_windows_amd64
+      run: |
+          go mod tidy
+          set GOARCH=${{ matrix.arch }}
+          echo "::set-env name=FATENAME::fate_windows_amd64"
+          
+          echo "buiding"
+          go build -o fate_windows_amd64.exe -v ./cmd/console
+          
+          echo "compress"
+          Compress-Archive -Path fate_windows_amd64.exe -DestinationPath fate_windows_amd64.zip
+  
+    - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+      if: matrix.platform == 'windows-latest' && matrix.arch == '386'
+      id: build_windows_386
+      run: |
+          go mod tidy
+          set GOARCH=${{ matrix.arch }}
+          echo "::set-env name=FATENAME::fate_windows_386"
+          
+          echo "buiding"
+          go build -o fate_windows_386.exe -v ./cmd/console
+          
+          echo "compress"
+          Compress-Archive -Path fate_windows_386.exe -DestinationPath fate_windows_386.zip
+  
+  
+    - name: Upload Linux
+      uses: actions/upload-artifact@master
+      if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && env.UPLOAD_BIN_FILE
+      with:
+        name: ${{ env.FATENAME }}.tar.gz
+        path: ${{ env.FATENAME }}.tar.gz     
+
+    - name: Upload Windows
+      uses: actions/upload-artifact@master
+      if: matrix.platform == 'windows-latest' && env.UPLOAD_BIN_FILE
+      with:
+        name: ${{ env.FATENAME }}.zip
+        path: ${{ env.FATENAME }}.zip
+        
+        
+    - name: Create Release
+      id: create_release_windows
+      if: matrix.platform == 'windows-latest' && env.UPLOAD_BIN_FILE
+      uses: ncipollo/release-action@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        artifacts: "${{ env.FATENAME }}.zip"
+        allowUpdates: true 
+        commit: master 
+        tag: auto_build
+        body: |
+          this is only a latest build from master
+          version: https://github.com/godcong/fate/commit/${{ github.sha }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        draft: false
+        prerelease: false
+
+    - name: Create Release
+      id: create_release_linux
+      if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && env.UPLOAD_BIN_FILE
+      uses: ncipollo/release-action@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        artifacts: "${{ env.FATENAME }}.tar.gz"
+        allowUpdates: true 
+        commit: master 
+        tag: auto_build
+        body: |
+          this is only a latest build from master
+          version: https://github.com/godcong/fate/commit/${{ github.sha }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        draft: false
+        prerelease: false
+        
