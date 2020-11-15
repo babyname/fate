@@ -18,6 +18,9 @@
   【[最新数据库文件:20200331](https://github.com/godcong/fate/releases/download/v3.5.1/fate_db_200331.7z)】
   【[v3.5.2下载](https://github.com/godcong/fate/releases/tag/v3.5.2)】
 
+## 重名查询
+  [全国及各省重名查询网址汇总](https://zhuanlan.zhihu.com/p/89654568)
+  
 ## 关于起名算法 ##
   FATE使用了以下算法,按照每种算法的准确度,使用程度也有高有低,不会一概而否,也不会偏向单独某种算法.  
 ```
