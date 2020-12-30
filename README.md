@@ -13,7 +13,7 @@
   一个好名字伴随人的一生，FATE让你取一个好名字。  
 
 ## 全国及各省重名查询网址汇总
-  原地址：https://zhuanlan.zhihu.com/p/89654568
+  原地址：`https://zhuanlan.zhihu.com/p/89654568
   
   [本仓库地址](./docs/全国及各省重名查询网址汇总.md)
   
