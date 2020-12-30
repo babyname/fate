@@ -33,6 +33,8 @@ jobs:
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
       if: matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest'
       id: build_linux
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       run: |
           ${GOROOT}/bin/go mod tidy
           export GOARCH=${{ matrix.arch }}
@@ -49,6 +51,8 @@ jobs:
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
       if: matrix.platform == 'windows-latest' && matrix.arch == 'amd64'
       id: build_windows_amd64
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
@@ -63,6 +67,8 @@ jobs:
     - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
       if: matrix.platform == 'windows-latest' && matrix.arch == '386'
       id: build_windows_386
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
@@ -73,8 +79,7 @@ jobs:
           
           echo "compress"
           Compress-Archive -Path fate_windows_386.exe -DestinationPath fate_windows_386.zip
-  
-  
+    
     - name: Upload Linux
       uses: actions/upload-artifact@master
       if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && env.UPLOAD_BIN_FILE
