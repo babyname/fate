@@ -53,7 +53,7 @@
     	}
 ```
 
-### 使用二进制文件在运行前务必把zoneinfo.zip下载并和二进制文件放在一起(不要解压),不然会报错.
+### 针对没有安装Go环境的用户,使用二进制文件在运行前务必把zoneinfo.zip下载并和二进制文件放在一起(不要解压),不然会报错.
 ### [zoneinfo文件](https://github.com/godcong/fate/blob/master/zoneinfo.zip)
 ## 二进制可执行文件生成姓名 ##
 ```   
