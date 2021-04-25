@@ -1,49 +1,71 @@
 package fate
 
-import "github.com/xormsharp/xorm"
+import (
+	"strings"
 
-const sanCai = "水木木火火土土金金水"
-const yinYang = "阴阳"
+	"github.com/godcong/yi"
+)
 
-// SanCai ...
 type SanCai struct {
-	tianCai        string `bson:"tian_cai"`
-	tianCaiYinYang string `bson:"tian_cai_yin_yang"`
-	renCai         string `bson:"ren_cai"`
-	renCaiYinYang  string `bson:"ren_cai_yin_yang"`
-	diCai          string `bson:"di_cai"`
-	diCaiYingYang  string `bson:"di_cai_ying_yang"`
-	fortune        string `bson:"fortune"` //吉凶
-	comment        string `bson:"comment"` //说明
+	tian      int    //天格
+	ren       int    //人格
+	di        int    //地格
+	tianRenDi string //三才
 }
 
-//NewSanCai 新建一个三才对象
-func NewSanCai(tian, ren, di int) *SanCai {
-	return &SanCai{
-		tianCai:        sanCaiAttr(tian),
-		tianCaiYinYang: yinYangAttr(tian),
-		renCai:         sanCaiAttr(ren),
-		renCaiYinYang:  yinYangAttr(ren),
-		diCai:          sanCaiAttr(di),
-		diCaiYingYang:  yinYangAttr(di),
+//SanCaiWuGe 三才五格
+func GetSanCai(tian, ren, di int) SanCai {
+	sanCaiNum := SanCai{
+		tian: tian,
+		ren:  ren,
+		di:   di,
+	}
+	sanCaiNum.tianRenDi = strings.Join([]string{yi.NumberWuXing(tian), yi.NumberWuXing(ren), yi.NumberWuXing(di)}, "")
+
+	return sanCaiNum
+}
+
+// SanCaiFortune ...
+type SanCaiFortune struct {
+	fortune string //吉凶
+	comment string //说明
+}
+
+//key为tianRenDi
+var sanCaiList map[string]*SanCaiFortune = make(map[string]*SanCaiFortune)
+
+func init() {
+	file_3wuxing, err := DataFiles.Open("data/3wuxing.csv")
+	if err != nil {
+		panic(err)
+	}
+
+	records, err := readData(file_3wuxing)
+
+	if err != nil {
+		panic(err)
+	}
+
+	for _, record := range records {
+		sancai := SanCaiFortune{
+			fortune: record[1],
+			comment: record[2],
+		}
+
+		sanCaiList[record[0]] = &sancai
 	}
 }
 
-//Check 检查三才属性
-func Check(engine *xorm.Engine, cai *SanCai, point int) bool {
-	wx := FindWuXing(engine, cai.tianCai, cai.renCai, cai.diCai)
-	if wx.Luck.Point() >= point {
-		return true
+// 由三才数获得描述
+func (sc *SanCai) getSanCaiFortune() *SanCaiFortune {
+	if sanCaiList[sc.tianRenDi] == nil {
+		panic(sc.tianRenDi)
 	}
-	return false
+
+	return sanCaiList[sc.tianRenDi]
 }
 
-// GenerateThreeTalent 计算字符的三才属性
-// 1-2木：1为阳木，2为阴木   3-4火：3为阳火，4为阴火   5-6土：5为阳土，6为阴土   7-8金：7为阳金，8为阴金   9-10水：9为阳水，10为阴水
-func sanCaiAttr(i int) string {
-	return string([]rune(sanCai)[i%10])
-}
-
-func yinYangAttr(i int) string {
-	return string([]rune(yinYang)[i%2])
+//Check 检查三才吉凶
+func (sc *SanCaiFortune) IsLucky() bool {
+	return sc.fortune == "吉"
 }

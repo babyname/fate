@@ -5,10 +5,11 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/godcong/fate/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
 )
 
 // Information ...

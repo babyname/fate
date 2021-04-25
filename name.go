@@ -1,21 +1,23 @@
 package fate
 
 import (
-	"github.com/godcong/chronos"
-	"github.com/godcong/yi"
 	"strconv"
 	"strings"
+
+	"github.com/godcong/chronos"
+	"github.com/godcong/yi"
 )
 
 //Name 姓名
 type Name struct {
-	FirstName   []*Character //名姓
-	LastName    []*Character
-	born        *chronos.Calendar
-	baZi        *BaZi
-	baGua       *yi.Yi //周易八卦
-	zodiac      *Zodiac
-	zodiacPoint int
+	FirstName         []*Character //名
+	LastName          []*Character //姓
+	born              *chronos.Calendar
+	baZi              *BaZi
+	nameScienceStroke *NameStroke //康熙（古典）
+	nameStroke        *NameStroke //简体
+	zodiac            *Zodiac
+	zodiacPoint       int
 }
 
 // String ...
@@ -73,33 +75,79 @@ func (n Name) XiYongShen() string {
 	return n.baZi.XiYongShen()
 }
 
-func createName(impl *fateImpl, f1 *Character, f2 *Character) *Name {
-	lastSize := len(impl.lastChar)
-	last := make([]*Character, lastSize, lastSize)
-	copy(last, impl.lastChar)
-	ff1 := *f1
-	ff2 := *f2
-	first := []*Character{&ff1, &ff2}
-
-	return &Name{
-		FirstName: first,
-		LastName:  last,
+//GetName
+func (impl *fateImpl) createName(first []*Character, nk NameStroke) *Name { // impl_last []*Character, impl_sex yi.Sex,
+	if len(first) > 2 || len(first) < 1 || len(impl.last) > 2 || len(impl.last) < 1 {
+		panic("input error")
 	}
+
+	var first1, first2, last1, last2 *Character
+	first1 = first[0]
+
+	if len(first) == 2 {
+
+		first2 = first[1]
+
+	} else {
+		first2 = nil
+	}
+
+	last1 = impl.lastChar[0]
+
+	if len(impl.lastChar) == 2 {
+		last2 = impl.lastChar[1]
+	} else {
+		last2 = nil
+	}
+
+	name := Name{
+		FirstName: first,
+		LastName:  impl.lastChar,
+	}
+
+	if first2 == nil {
+		if last2 == nil {
+			name.nameScienceStroke = GetNameStroke(last1.getStrokeScience(true), 0, first1.getStrokeScience(false), 0)
+			name.nameStroke = NewNameStroke(last1.getStroke(), 0, first1.getStroke(), 0)
+		} else {
+			name.nameScienceStroke = GetNameStroke(last1.getStrokeScience(true), last2.getStrokeScience(true), first1.getStrokeScience(false), 0)
+			name.nameStroke = NewNameStroke(last1.getStroke(), last2.getStroke(), first1.getStroke(), 0)
+		}
+	} else {
+		if last2 == nil {
+			name.nameScienceStroke = GetNameStroke(last1.getStrokeScience(true), 0, first1.getStrokeScience(false), first2.getStrokeScience(false))
+			name.nameStroke = NewNameStroke(last1.getStroke(), 0, first1.getStroke(), first2.getStroke())
+		} else {
+			name.nameScienceStroke = GetNameStroke(last1.getStrokeScience(true), last2.getStrokeScience(true), first1.getStrokeScience(false), first2.getStrokeScience(false))
+			name.nameStroke = NewNameStroke(last1.getStroke(), last2.getStroke(), first1.getStroke(), first2.getStroke())
+		}
+	}
+
+	return &name
 }
 
-// BaGua ...
-func (n *Name) BaGua() *yi.Yi {
-	if n.baGua == nil {
-		lastSize := len(n.LastName)
-		shang := getStroke(n.LastName[0])
-		if lastSize > 1 {
-			shang += getStroke(n.LastName[1])
-		}
-		xia := getStroke(n.FirstName[0]) + getStroke(n.FirstName[1])
-		n.baGua = yi.NumberQiGua(xia, shang, shang+xia)
+func (n *Name) IsLucky(sex yi.Sex, filter_gua bool, filter_hard bool) bool {
+	if !n.nameScienceStroke.IsWuGeLucky(sex, filter_hard) {
+		return false
 	}
 
-	return n.baGua
+	if filter_gua {
+		if filter_hard {
+			if !n.nameScienceStroke.IsGuaLucky(sex, true) {
+				return false
+			} else if !n.nameStroke.IsGuaLucky(sex, true) {
+				return false
+			}
+		} else {
+			if !n.nameScienceStroke.IsGuaLucky(sex, false) {
+				return false
+			} else if !n.nameStroke.IsGuaLucky(sex, false) {
+				return false
+			}
+		}
+	}
+
+	return true
 }
 
 // BaZi ...

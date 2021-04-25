@@ -1,8 +1,9 @@
 package main
 
 import (
+	"fate"
 	"fmt"
-	"github.com/godcong/fate"
+
 	"github.com/spf13/cobra"
 )
 

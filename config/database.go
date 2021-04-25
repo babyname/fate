@@ -1,6 +1,6 @@
 package config
 
-type Database struct {
+type DatabaseConfig struct {
 	Host         string `json:"host"`
 	Port         string `json:"port"`
 	User         string `json:"user"`
@@ -15,6 +15,6 @@ type Database struct {
 	ShowExecTime bool   `json:"show_exec_time"`
 }
 
-func (d *Database) Addr() string {
+func (d *DatabaseConfig) Addr() string {
 	return d.Host + ":" + d.Port
 }

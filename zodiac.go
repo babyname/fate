@@ -1,7 +1,6 @@
 package fate
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/godcong/chronos"
@@ -98,7 +97,7 @@ func GetZodiac(c chronos.Calendar) *Zodiac {
 	z := chronos.GetZodiac(c.Lunar())
 	b := zodiacSupportList[z]
 	if !b {
-		fmt.Println("[Warning]生肖:", z, ",该生肖库资料尚未补足")
+		//fmt.Println("[Warning]生肖:", z, ",该生肖库资料尚未补足")
 	}
 	if v, b := zodiacList[z]; b {
 		return &v

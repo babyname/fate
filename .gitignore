@@ -32,3 +32,6 @@ _ReSharper*/
 packages/
 /.idea
 go.sum
+.vscode
+debug.test
+config.json

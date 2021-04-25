@@ -1,8 +1,9 @@
 package fate
 
 import (
-	"github.com/godcong/chronos"
 	"strings"
+
+	"github.com/godcong/chronos"
 )
 
 var diIndex = map[string]int{

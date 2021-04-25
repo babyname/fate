@@ -32,18 +32,18 @@ type FileOutput struct {
 }
 
 type Config struct {
-	RunInit      bool       `json:"run_init"`
-	FilterMode   FilterMode `json:"filter_mode"`
-	StrokeMax    int        `json:"stroke_max"`
-	StrokeMin    int        `json:"stroke_min"`
-	HardFilter   bool       `json:"hard_filter"`
-	FixBazi      bool       `json:"fix_bazi"`      //八字修正
-	SupplyFilter bool       `json:"supply_filter"` //过滤补八字
-	ZodiacFilter bool       `json:"zodiac_filter"` //过滤生肖
-	BaguaFilter  bool       `json:"bagua_filter"`  //过滤卦象
-	Regular      bool       `json:"regular"`       //常用
-	Database     Database   `json:"database"`
-	FileOutput   FileOutput `json:"file_output"`
+	RunInit      bool           `json:"run_init"`
+	FilterMode   FilterMode     `json:"filter_mode"`
+	StrokeMax    int            `json:"stroke_max"`
+	StrokeMin    int            `json:"stroke_min"`
+	HardFilter   bool           `json:"hard_filter"`
+	FixBazi      bool           `json:"fix_bazi"`      //八字修正
+	SupplyFilter bool           `json:"supply_filter"` //过滤补八字
+	ZodiacFilter bool           `json:"zodiac_filter"` //过滤生肖
+	BaguaFilter  bool           `json:"bagua_filter"`  //过滤卦象
+	Regular      bool           `json:"regular"`       //常用
+	Database     DatabaseConfig `json:"database"`
+	FileOutput   FileOutput     `json:"file_output"`
 }
 
 var DefaultJSONPath = ""
@@ -65,15 +65,14 @@ func init() {
 
 func LoadConfig() (c *Config) {
 	c = &Config{}
-	def := DefaultConfig()
 	f := filepath.Join(DefaultJSONPath, JSONName)
 	bys, e := ioutil.ReadFile(f)
 	if e != nil {
-		return def
+		panic(f)
 	}
 	e = json.Unmarshal(bys, &c)
 	if e != nil {
-		return def
+		panic(bys)
 	}
 	return c
 }
@@ -91,24 +90,24 @@ func DefaultConfig() *Config {
 	return &Config{
 		RunInit:      false,
 		FilterMode:   0,
-		StrokeMax:    18,
-		StrokeMin:    3,
+		StrokeMax:    18, //输出最大笔画数
+		StrokeMin:    1,  //输出最小笔画数
 		HardFilter:   false,
-		FixBazi:      false,
-		SupplyFilter: true,
-		ZodiacFilter: true,
-		BaguaFilter:  true,
+		FixBazi:      false, //立春修正（出生日期为立春当日时间为已过立春八字需修正）
+		SupplyFilter: true,  //三才五格过滤
+		ZodiacFilter: true,  //生肖过滤
+		BaguaFilter:  true,  //周易八卦过滤
 		Regular:      true,
-		Database: Database{
-			Host:         "127.0.0.1",
+		Database: DatabaseConfig{ //连接DB：
+			Host:         "localhost",
 			Port:         "3306",
 			User:         "root",
 			Pwd:          "111111",
 			Name:         "fate",
 			MaxIdleCon:   0,
 			MaxOpenCon:   0,
-			Driver:       "mysql",
-			File:         "",
+			Driver:       "sqlite3",
+			File:         "ft.db",
 			Dsn:          "",
 			ShowSQL:      false,
 			ShowExecTime: false,

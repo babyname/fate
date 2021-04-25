@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/godcong/fate/config"
-	"github.com/goextension/log"
-	"github.com/xormsharp/xorm"
 	"strings"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/godcong/chronos"
+	"github.com/godcong/fate/config"
 	"github.com/godcong/yi"
+	"github.com/goextension/log"
 )
 
 // HandleOutputFunc ...
@@ -29,36 +29,26 @@ type Fate interface {
 }
 
 type fateImpl struct {
-	config   *config.Config
-	db       Database
-	out      Information
-	born     chronos.Calendar
-	last     []string
-	lastChar []*Character
-	names    []*Name
-	nameType int
-	sex      Sex
-	debug    bool
-	baZi     *BaZi
-	zodiac   *Zodiac
-	handle   HandleOutputFunc
+	config    *config.Config
+	db        Database
+	out       Information
+	born      chronos.Calendar
+	last      []string
+	lastChar  []*Character
+	names     []*Name
+	nameType  int
+	sex       yi.Sex
+	debug     bool
+	baZi      *BaZi
+	xiYongStr string
+	zodiac    *Zodiac
+	handle    HandleOutputFunc
 }
 
 // RunInit ...
 func (f *fateImpl) RunInit() (e error) {
 	if f.config.RunInit {
-		if err := f.db.Sync(WuGeLucky{}); err != nil {
-			return err
-		}
-
-		lucky := make(chan *WuGeLucky)
-		go initWuGe(lucky)
-		for la := range lucky {
-			_, e = f.db.InsertOrUpdateWuGeLucky(la)
-			if e != nil {
-				return Wrap(e, "insert failed")
-			}
-		}
+		return nil
 	}
 	return nil
 }
@@ -74,9 +64,15 @@ func ConfigOption(cfg *config.Config) Options {
 }
 
 // SexOption ...
-func SexOption(sex Sex) Options {
+func SexOption(sex yi.Sex) Options {
 	return func(f *fateImpl) {
 		f.sex = sex
+	}
+}
+
+func XiYongOption(xiyong string) Options {
+	return func(f *fateImpl) {
+		f.xiYongStr = xiyong
 	}
 }
 
@@ -112,14 +108,13 @@ func (f *fateImpl) RegisterHandle(outputFunc HandleOutputFunc) {
 	f.handle = outputFunc
 }
 
+//
 func (f *fateImpl) getLastCharacter() error {
 	size := len(f.last)
 	if size == 0 {
 		return errors.New("last name was not inputted")
 	} else if size > 2 {
 		return fmt.Errorf("%d characters last name was not supported", size)
-	} else {
-		//ok
 	}
 
 	for i, c := range f.last {
@@ -129,6 +124,8 @@ func (f *fateImpl) getLastCharacter() error {
 		}
 		f.lastChar[i] = character
 	}
+
+	f.setStrokeCache()
 	return nil
 }
 
@@ -143,18 +140,20 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 	if e != nil {
 		return Wrap(e, "init failed")
 	}
-	n, e := f.db.CountWuGeLucky()
-	if e != nil || n == 0 {
-		return Wrap(e, "count total error")
-	}
 
 	e = f.getLastCharacter()
 	if e != nil {
 		return Wrap(e, "get char failed")
 	}
+
+	n := CountNameStrokesLucky()
+	if n == 0 {
+		return Wrap(e, "count total error")
+	}
+
 	name := make(chan *Name)
 	go func() {
-		e := f.getWugeName(name)
+		e := f.getLuckyName(name)
 		if e != nil {
 			log.Error(e)
 		}
@@ -173,7 +172,8 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 		tmpChar = n.FirstName
 		tmpChar = append(tmpChar, n.LastName...)
 		//filter bazi
-		if f.config.SupplyFilter && !filterXiYong(f.XiYong().Shen(), tmpChar...) {
+		//if f.config.SupplyFilter && !filterXiYong(f.XiYong().Shen(), tmpChar...) {
+		if f.config.SupplyFilter && !fixedFilterXiYong(f.xiYongStr, tmpChar...) {
 			//log.Infow("supply", "name", n.String())
 			continue
 		}
@@ -183,17 +183,23 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 			continue
 		}
 		//filter bagua
-		if f.config.BaguaFilter && !filterYao(n.BaGua(), "凶") {
+		if f.config.BaguaFilter && !n.IsLucky(f.sex, true, f.config.HardFilter) {
 			//log.Infow("bagua", "name", n.String())
 			continue
 		}
-		ben := n.BaGua().Get(yi.BenGua)
-		bian := n.BaGua().Get(yi.BianGua)
+
+		if !n.IsLucky(f.sex, f.config.BaguaFilter, f.config.HardFilter) {
+			panic("bad name")
+		}
+
+		ben := n.nameScienceStroke.BaGua().Get(yi.BenGua)
+		bian := n.nameScienceStroke.BaGua().Get(yi.BianGua)
+
 		if f.debug {
 			log.Infow("bazi", "born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter())
 			log.Infow("xiyong", "wuxing", n.WuXing(), "god", f.XiYong().Shen(), "pinheng", f.XiYong())
-			log.Infow("ben", "ming", ben.GuaMing, "chu", ben.ChuYaoJiXiong, "er", ben.ErYaoJiXiong, "san", ben.SanYaoJiXiong, "si", ben.SiYaoJiXiong, "wu", ben.WuYaoJiXiong, "liu", ben.ShangYaoJiXiong)
-			log.Infow("bian", "ming", bian.GuaMing, "chu", bian.ChuYaoJiXiong, "er", bian.ErYaoJiXiong, "san", bian.SanYaoJiXiong, "si", bian.SiYaoJiXiong, "wu", bian.WuYaoJiXiong, "liu", bian.ShangYaoJiXiong)
+			log.Infow("ben", "ming", ben.GuaMing, "chu", ben.GuaYaos[0].JiXiong, "er", ben.GuaYaos[1].JiXiong, "san", ben.GuaYaos[2].JiXiong, "si", ben.GuaYaos[3].JiXiong, "wu", ben.GuaYaos[4].JiXiong, "liu", ben.GuaYaos[5].JiXiong)
+			log.Infow("bian", "ming", bian.GuaMing, "chu", bian.GuaYaos[0].JiXiong, "er", bian.GuaYaos[1].JiXiong, "san", bian.GuaYaos[2].JiXiong, "si", bian.GuaYaos[3].JiXiong, "wu", bian.GuaYaos[4].JiXiong, "liu", bian.GuaYaos[5].JiXiong)
 		}
 
 		if err := f.out.Write(*n); err != nil {
@@ -216,14 +222,14 @@ func (f *fateImpl) XiYong() *XiYong {
 
 func (f *fateImpl) init() {
 	if f.config == nil {
-		f.config = config.DefaultConfig()
+		f.config = config.LoadConfig()
 	}
 
 	if f.config.FileOutput.Heads == nil {
 		f.config.FileOutput.Heads = config.DefaultHeads
 	}
 
-	f.db = initDatabaseWithConfig(f.config.Database)
+	f.db = InitDatabaseWithConfig(*f.config)
 	f.out = initOutputWithConfig(f.config.FileOutput)
 }
 
@@ -232,13 +238,13 @@ func (f *fateImpl) SetBornData(t time.Time) {
 	f.born = chronos.New(t)
 }
 
-func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
+func (f *fateImpl) getLuckyName(name chan<- *Name) (e error) {
 	defer func() {
 		close(name)
 	}()
-	lucky := make(chan *WuGeLucky)
+	lucky := make(chan *NameStroke)
 	go func() {
-		e = f.db.FilterWuGe(f.lastChar, lucky)
+		e = f.FilterNameStrokes(lucky)
 		if e != nil {
 			log.Error(e)
 			return
@@ -246,26 +252,13 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 	}()
 	var f1s []*Character
 	var f2s []*Character
-	fsa := map[int][]*Character{}
+	fsa := map[int]map[string]*Character{}
 	bazi := NewBazi(f.born)
 	for l := range lucky {
+		f1s_u := map[string]*Character{}
+		f2s_u := map[string]*Character{}
 		if f.config.FilterMode == config.FilterModeCustom {
 			//TODO
-		}
-
-		if bool(f.sex) && filterSex(l) {
-			continue
-		}
-
-		if f.config.HardFilter && hardFilter(l) {
-			sc := NewSanCai(l.TianGe, l.RenGe, l.DiGe)
-			if !Check(f.db.Database().(*xorm.Engine), sc, 5) {
-				continue
-			}
-		}
-
-		if f.config.StrokeMin > l.FirstStroke1 || f.config.StrokeMin > l.FirstStroke2 || f.config.StrokeMax < l.FirstStroke1 || f.config.StrokeMax < l.FirstStroke2 {
-			continue
 		}
 
 		if f.debug {
@@ -273,70 +266,86 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 		}
 		if fsa[l.FirstStroke1] == nil {
 			if f.config.Regular {
-				f1s, e = f.db.GetCharacters(Stoker(l.FirstStroke1, Regular()))
+				f1s, e = f.db.GetCharacters(StokerX(l.FirstStroke1, Regular()))
 			} else {
-				f1s, e = f.db.GetCharacters(Stoker(l.FirstStroke1))
+				f1s, e = f.db.GetCharacters(StokerX(l.FirstStroke1))
 			}
 
 			if e != nil {
 				return Wrap(e, "first stroke1 error")
 			}
 
-			fsa[l.FirstStroke1] = f1s
+			for _, f1 := range f1s {
+				f1s_u[f1.Ch] = f1
+			}
+
+			fsa[l.FirstStroke1] = f1s_u
 		} else {
-			f1s = fsa[l.FirstStroke1]
+			f1s_u = fsa[l.FirstStroke1]
 		}
 
 		if fsa[l.FirstStroke2] == nil {
 			if f.config.Regular {
-				f2s, e = f.db.GetCharacters(Stoker(l.FirstStroke2, Regular()))
+				f2s, e = f.db.GetCharacters(StokerX(l.FirstStroke2, Regular()))
 			} else {
-				f2s, e = f.db.GetCharacters(Stoker(l.FirstStroke2))
+				f2s, e = f.db.GetCharacters(StokerX(l.FirstStroke2))
 			}
 
 			if e != nil {
 				return Wrap(e, "first stoke2 error")
 			}
 
-			fsa[l.FirstStroke2] = f2s
+			for _, f2 := range f2s {
+				f2s_u[f2.Ch] = f2
+			}
+
+			fsa[l.FirstStroke2] = f2s_u
 		} else {
-			f2s = fsa[l.FirstStroke2]
+			f2s_u = fsa[l.FirstStroke2]
 		}
 
-		for _, f1 := range f1s {
+		for _, f1 := range f1s_u {
 			if len(f1.PinYin) == 0 {
 				continue
 			}
-			for _, f2 := range f2s {
+			if f1.getStrokeScience(false) != l.FirstStroke1 {
+				fmt.Println(f1)
+				panic(fmt.Sprintf("%d,%d", l.FirstStroke1, f1.getStrokeScience(false)))
+			}
+			for _, f2 := range f2s_u {
 				if len(f2.PinYin) == 0 {
 					continue
 				}
-				n := createName(f, f1, f2)
+
+				n := f.createName([]*Character{f1, f2}, *l)
+
+				if !n.IsLucky(f.sex, f.config.BaguaFilter, f.config.HardFilter) {
+					continue
+				}
+
+				if f.config.StrokeMin > n.nameStroke.FirstStroke1 || f.config.StrokeMax < n.nameStroke.FirstStroke1 {
+					continue
+				} else if (n.nameStroke.FirstStroke2 != 0 && f.config.StrokeMin > n.nameStroke.FirstStroke2) || (n.nameStroke.FirstStroke2 != 0 && f.config.StrokeMax < n.nameStroke.FirstStroke2) {
+					continue
+				}
+
+				if f.config.HardFilter {
+					if (n.nameStroke.FirstStroke2 != 0 && n.FirstName[1].IsDuoYin) || n.FirstName[0].IsDuoYin {
+						continue
+					}
+				}
+
+				if n.LastName[0].Ch == "文" && n.FirstName[0].Ch == "军" && n.FirstName[1].Ch == "润" {
+					if !n.IsLucky(f.sex, f.config.BaguaFilter, f.config.HardFilter) {
+						fmt.Println(n)
+					}
+
+				}
+
 				n.baZi = bazi
 				name <- n
 			}
 		}
 	}
 	return nil
-}
-
-func filterSex(lucky *WuGeLucky) bool {
-	return lucky.ZongSex == true
-}
-
-func isLucky(s string) bool {
-	if strings.Compare(s, "吉") == 0 || strings.Compare(s, "半吉") == 0 {
-		return true
-	}
-	return false
-}
-
-func hardFilter(lucky *WuGeLucky) bool {
-	if !isLucky(GetDaYan(lucky.DiGe).Lucky) ||
-		!isLucky(GetDaYan(lucky.RenGe).Lucky) ||
-		!isLucky(GetDaYan(lucky.WaiGe).Lucky) ||
-		!isLucky(GetDaYan(lucky.ZongGe).Lucky) {
-		return true
-	}
-	return false
 }

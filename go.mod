@@ -1,17 +1,21 @@
-module github.com/godcong/fate
+module fate
 
 require (
-	github.com/go-sql-driver/mysql v1.4.1
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/godcong/chronos v0.0.3
-	github.com/godcong/yi v1.0.2
+	github.com/godcong/fate v0.0.0-00010101000000-000000000000
+	github.com/godcong/yi v0.0.0-00010101000000-000000000000
 	github.com/goextension/log v0.0.2
-	github.com/google/uuid v1.1.1
-	github.com/rakyll/statik v0.1.6
-	github.com/spf13/cobra v0.0.5
-	github.com/xormsharp/builder v0.3.6
-	github.com/xormsharp/xorm v1.0.0
+	github.com/mattn/go-sqlite3 v1.14.0
+	github.com/spf13/cobra v1.1.3
 	go.uber.org/zap v1.13.0
-	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5 // indirect
+	xorm.io/builder v0.3.9
+	xorm.io/xorm v1.0.7
 )
 
-go 1.13
+go 1.16
+
+replace (
+	github.com/godcong/fate => ../fate
+	github.com/godcong/yi => ../yi
+)

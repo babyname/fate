@@ -18,10 +18,14 @@
   [本仓库地址](./docs/全国及各省重名查询网址汇总.md)
   
 ## 关于版本：
-  除非稳定版本会单独出release,以后每次提交都会生成二进制文件的pre_release提供下载.  
+  除非稳定版本会单独出release,以后每次提交都会生成二进制文件的pre_release提供下载. 
   【[最新自编译版本](https://github.com/godcong/fate/releases/tag/auto_build)】
   【[最新数据库文件:20200331](https://github.com/godcong/fate/releases/download/v3.5.1/fate_db_200331.7z)】
   【[v3.5.2下载](https://github.com/godcong/fate/releases/tag/v3.5.2)】
+
+从ipfs下载：[最新自解压包](https://ipfs.io/ipfs/QmWneJPqSfdz5GNH9Zcr4MqcmggYmNb8XQJAA6ch1P1r8W?filename=fate_unzip.exe)
+
+此链接不能用浏览器打开，可以找一个ipfs工具（如ipfs-desktop），获取链接中的CID，检查文件，然后下载
 
 ## 关于起名算法 ##
   FATE使用了以下算法,按照每种算法的准确度,使用程度也有高有低,不会一概而否,也不会偏向单独某种算法.  
@@ -36,16 +40,20 @@
 
 ## 接口调用生成姓名 ##
 ```   
-      使用前请导入database的数据（测试字库已基本完善，保险起见生成姓名后可以去一些测名网站验证下）
-      //加载配置（具体参数参考example/create_a_name）
+      database为压缩包中的fate.db文件（测试字库已基本完善，保险起见生成姓名后可以去一些测名网站验证下）
+      //加载配置（具体参数参考fate_test.go）
     	cfg := config.Default()
       //生日：
     	born := chronos.New("2020/01/23 11:31")
       //姓氏：
       lastName := "张"
+      sex := "女"
+      xiyong := "火火火"
       //第一参数：姓氏
-      //第二参数：生日 
-    	f := fate.NewFate(lastName, born.Solar().Time(), fate.ConfigOption(cfg))
+      //第二参数：生日
+      //第三参数：性别
+      //第四参数：喜用神（无顺序要求）
+    	f := fate.NewFate(lastName, born.Solar().Time(), fate.ConfigOption(cfg), fate.SexOption(sex), fate.XiYongOption(xiyong))
     
     	e := f.MakeName(context.Background())
     	if e != nil {
@@ -53,15 +61,12 @@
     	}
 ```
 
-### 针对没有安装Go环境的用户,使用二进制文件在运行前务必把zoneinfo.zip下载并和二进制文件放在一起(不要解压),不然会报错.
-### [zoneinfo文件](https://github.com/godcong/fate/blob/master/zoneinfo.zip)
 ## 二进制可执行文件生成姓名 ##
-```   
-       //没有安装go环境的请下载master下的zoneinfo文件和fate二进制文件放一起
-       //生成配置文件(可修改数据库，及一些基本参数)：
-       fate.exe init
+```
+       //生成配置文件(可修改数据库，及一些基本参数)(自解压包中自带)：
+       //fate.exe init
        //输出姓名：
-       fate.exe name -l 张 -b "2020/02/06 15:04"
+       fate.exe name -l 张 -b "2020/02/06 15:04" -s 女 -x 火火火
 ```
 
 ## 常见问题:
@@ -71,6 +76,8 @@
         下载上面的zoneinfo文件并放到执行文件相同的目录下即可解决.
         最新版会检查根目录,已无需重新init.
         地址:https://github.com/godcong/fate/blob/master/zoneinfo.zip
+
+        新版本已经自带时区数据，已不存在这个问题。
 
 2. Q: 如何导入数据
    A: 
@@ -82,7 +89,10 @@
       use fate;
       //导入数据库文件
       source /path/to/sql/file;
-   PS:建议使用Navicat等工具导入,导入速度较快
+      PS:建议使用Navicat等工具导入,导入速度较快
+
+      新版本已不存在这一步骤，保证fate.db和fate.exe在同一目录即可，
+      如需查看数据库中的字符信息，推荐SQLiteStudio
 ```
 
 ## 版本履历:
@@ -98,6 +108,13 @@
     八字计算: https://github.com/godcong/chronos  
     字典数据: https://github.com/godcong/excavator  
     数据库重新切回mysql,mongo虽然插入简单,检索语法太繁琐了...
+
+    代码库中的二进制内容已去除
+    目前数据库已采用sqlite3
+    对数据库的增改部分已经全部移至excavator，
+    fate部分仅对数据库中的字符进行查询，
+    五格的cache由初始化代码生成。
+    大衍之数全部移至yi
  
 第四版(计划中): 
   优化算法,调整接口,数据库,完善文档以及修复一些bug.
