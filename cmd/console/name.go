@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fate"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,6 +9,7 @@ import (
 	_ "time/tzdata"
 
 	"github.com/godcong/chronos"
+	"github.com/godcong/fate"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/yi"
 	"github.com/goextension/log"
@@ -27,12 +27,6 @@ func cmdName() *cobra.Command {
 		Use:   "name",
 		Short: "output the name",
 		Run: func(cmd *cobra.Command, args []string) {
-			// _, e := os.Stat(filepath.Join(getCurrentPath(), "zoneinfo.zip"))
-			// if e != nil {
-			// 	log.Fatalw("zoneinfo file is not exist", "error", e)
-			// 	return
-			// }
-			// os.Setenv("ZONEINFO", filepath.Join(getCurrentPath(), "zoneinfo.zip"))
 			fmt.Println("start", time.Now().String())
 			config.DefaultJSONPath = cfg
 			cfg := config.LoadConfig()
