@@ -1,10 +1,9 @@
-module fate
+module github.com/godcong/fate
 
 require (
 	github.com/free-utils-go/xorm_type_assist v0.0.0-20210507214645-5c65059bdc6a
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/godcong/chronos v0.0.3
-	github.com/godcong/fate v0.0.0-00010101000000-000000000000
 	github.com/godcong/yi v0.0.0-00010101000000-000000000000
 	github.com/goextension/log v0.0.2
 	github.com/mattn/go-sqlite3 v1.14.0

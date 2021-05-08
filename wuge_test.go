@@ -1,10 +1,11 @@
 package fate_test
 
 import (
-	"fate"
 	"fmt"
 	"log"
 	"testing"
+
+	"github.com/godcong/fate"
 )
 
 // TestWuGe_WaiGe ...

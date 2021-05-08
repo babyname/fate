@@ -35,3 +35,4 @@ go.sum
 .vscode
 debug.test
 config.json
+name.txt

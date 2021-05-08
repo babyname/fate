@@ -2,10 +2,10 @@ package fate_test
 
 import (
 	"context"
-	"fate"
 	"testing"
 
 	"github.com/godcong/chronos"
+	"github.com/godcong/fate"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/yi"
 )
