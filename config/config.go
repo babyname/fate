@@ -90,7 +90,7 @@ func DefaultConfig() *Config {
 	return &Config{
 		RunInit:      false,
 		FilterMode:   0,
-		StrokeMax:    18, //输出最大笔画数
+		StrokeMax:    24, //输出最大笔画数
 		StrokeMin:    1,  //输出最小笔画数
 		HardFilter:   false,
 		FixBazi:      false, //立春修正（出生日期为立春当日时间为已过立春八字需修正）
@@ -107,7 +107,7 @@ func DefaultConfig() *Config {
 			MaxIdleCon:   0,
 			MaxOpenCon:   0,
 			Driver:       "sqlite3",
-			File:         "ft.db",
+			File:         "fate.db",
 			Dsn:          "",
 			ShowSQL:      false,
 			ShowExecTime: false,

@@ -8,6 +8,7 @@ import (
 	"time"
 	_ "time/tzdata"
 
+	xt "github.com/free-utils-go/xorm_type_assist"
 	"github.com/godcong/chronos"
 	"github.com/godcong/fate/config"
 	"github.com/godcong/yi"
@@ -160,7 +161,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 	}()
 
 	var tmpChar []*Character
-	//supplyFilter := false
+
 	for n := range name {
 		select {
 		case <-ctx.Done():
@@ -330,16 +331,9 @@ func (f *fateImpl) getLuckyName(name chan<- *Name) (e error) {
 				}
 
 				if f.config.HardFilter {
-					if (n.nameStroke.FirstStroke2 != 0 && n.FirstName[1].IsDuoYin) || n.FirstName[0].IsDuoYin {
+					if (n.nameStroke.FirstStroke2 != 0 && n.FirstName[1].IsDuoYin == xt.TRUE) || n.FirstName[0].IsDuoYin == xt.TRUE {
 						continue
 					}
-				}
-
-				if n.LastName[0].Ch == "文" && n.FirstName[0].Ch == "军" && n.FirstName[1].Ch == "润" {
-					if !n.IsLucky(f.sex, f.config.BaguaFilter, f.config.HardFilter) {
-						fmt.Println(n)
-					}
-
 				}
 
 				n.baZi = bazi

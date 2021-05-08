@@ -1,23 +1,24 @@
 package fate
 
 import (
+	xt "github.com/free-utils-go/xorm_type_assist"
 	"xorm.io/builder"
 	"xorm.io/xorm"
 )
 
 //Character 字符
 type Character struct {
-	Ch            string   `xorm:"not null pk comment('汉字') VARCHAR(1)"`
-	PinYin        []string `xorm:"not null comment('拼音') TEXT"`
-	IsRegular     bool     `xorm:"comment('常用') TINYINT(1)"`
-	IsDuoYin      bool     `xorm:"comment('多音字') TINYINT(1)"`
-	IsSurname     bool     `xorm:"comment('姓氏') TINYINT(1)"` //姓名学（是否为姓氏）
-	SurnameGender string   `xorm:"comment('性别') VARCHAR(1)"`
-	WuXing        string   `xorm:"not null comment('五行') VARCHAR(1)"`
-	Lucky         string   `xorm:"comment('吉凶寓意') TEXT"`
-	Radical       string   `xorm:"not null comment('部首') VARCHAR(1)"`
-	Stroke        int      `xorm:"default 0 comment('笔画数') INT(11)"`    //手写笔画数
-	ScienceStroke int      `xorm:"default 0 comment('姓名学笔画数') INT(11)"` //科学笔画
+	Ch            string      `xorm:"not null pk comment('汉字') VARCHAR(1)"`
+	PinYin        []string    `xorm:"not null comment('拼音') TEXT"`
+	IsRegular     xt.BoolType `xorm:"not null comment('常用,~bool') VARCHAR(1)"`
+	IsDuoYin      xt.BoolType `xorm:"not null comment('多音字,~bool') VARCHAR(1)"`
+	IsSurname     xt.BoolType `xorm:"comment('姓氏,~bool') VARCHAR(1)"` //姓名学（是否为姓氏）
+	SurnameGender string      `xorm:"comment('性别') VARCHAR(1)"`
+	WuXing        string      `xorm:"not null comment('五行') VARCHAR(1)"`
+	Lucky         string      `xorm:"comment('吉凶寓意') TEXT"`
+	Radical       string      `xorm:"not null comment('部首') VARCHAR(1)"`
+	Stroke        int         `xorm:"default 0 comment('笔画数') INT(11)"`    //手写笔画数
+	ScienceStroke int         `xorm:"default 0 comment('姓名学笔画数') INT(11)"` //科学笔画
 }
 
 // CharacterOptions ...
@@ -26,7 +27,7 @@ type CharacterOptions func(session *xorm.Session) *xorm.Session
 // Regular 过滤常用字符
 func Regular() CharacterOptions {
 	return func(session *xorm.Session) *xorm.Session {
-		return session.And("is_regular = ?", 1)
+		return session.And("is_regular = ?", xt.TRUE)
 	}
 }
 
