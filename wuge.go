@@ -3,20 +3,12 @@ package fate
 import (
 	"fmt"
 
+	nw "github.com/godcong/name_wuge"
 	"github.com/godcong/yi"
 )
 
-// WuGe ...
-type WuGe struct {
-	tianGe int
-	renGe  int
-	diGe   int
-	waiGe  int
-	zongGe int
-}
-
 //五格笔画缓存
-var wuGes map[int][]*WuGe = map[int][]*WuGe{}
+var wuGes map[int][]*nw.WuGe = map[int][]*nw.WuGe{}
 
 func ClearWuGe(nk NameStroke) {
 	hash := nk.hash()
@@ -27,20 +19,23 @@ func ClearWuGe(nk NameStroke) {
 }
 
 //从笔画获取五格
-func GetWuGe(nk NameStroke, filter_hard bool) []*WuGe {
+func GetWuGe(nk NameStroke, filter_hard bool) []*nw.WuGe {
 	hash := nk.hash()
 
 	wuGe := wuGes[hash]
 	if wuGe == nil {
-		wuGes[hash] = []*WuGe{calcWuGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2)}
+		wuGes[hash] = []*nw.WuGe{calcWuGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2)}
 		if filter_hard && nk.LastStroke2 != 0 && nk.FirstStroke2 != 0 {
 			// 复名复姓算法2
-			wuGes[hash] = append(wuGes[hash], &WuGe{
-				tianGe: tianGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
-				renGe:  renGe2(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
-				diGe:   diGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
-				waiGe:  waiGe2(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
-				zongGe: zongGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
+			sanCaiNum := yi.SanCaiNum{
+				Tian: tianGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
+				Ren:  renGe2(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
+				Di:   diGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
+			}
+			wuGes[hash] = append(wuGes[hash], &nw.WuGe{
+				SanCaiNum: &sanCaiNum,
+				WaiGe:     waiGe2(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
+				ZongGe:    zongGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
 			})
 		}
 		return wuGes[hash]
@@ -49,43 +44,18 @@ func GetWuGe(nk NameStroke, filter_hard bool) []*WuGe {
 	return wuGe
 }
 
-func (wg *WuGe) getSanCai() SanCai {
-	return GetSanCai(wg.tianGe, wg.renGe, wg.diGe)
-}
-
-// ZongGe ...
-func (ge *WuGe) ZongGe() int {
-	return ge.zongGe
-}
-
-// WaiGe ...
-func (ge *WuGe) WaiGe() int {
-	return ge.waiGe
-}
-
-// DiGe ...
-func (ge *WuGe) DiGe() int {
-	return ge.diGe
-}
-
-// RenGe ...
-func (ge *WuGe) RenGe() int {
-	return ge.renGe
-}
-
-// TianGe ...
-func (ge *WuGe) TianGe() int {
-	return ge.tianGe
-}
-
 //calcWuGe 计算五格
-func calcWuGe(l1, l2, f1, f2 int) *WuGe {
-	return &WuGe{
-		tianGe: tianGe(l1, l2, f1, f2),
-		renGe:  renGe(l1, l2, f1, f2),
-		diGe:   diGe(l1, l2, f1, f2),
-		waiGe:  waiGe(l1, l2, f1, f2),
-		zongGe: zongGe(l1, l2, f1, f2),
+func calcWuGe(l1, l2, f1, f2 int) *nw.WuGe {
+	sanCaiNum := yi.SanCaiNum{
+		Tian: tianGe(l1, l2, f1, f2),
+		Ren:  renGe(l1, l2, f1, f2),
+		Di:   diGe(l1, l2, f1, f2),
+	}
+
+	return &nw.WuGe{
+		SanCaiNum: &sanCaiNum,
+		WaiGe:     waiGe(l1, l2, f1, f2),
+		ZongGe:    zongGe(l1, l2, f1, f2),
 	}
 }
 
@@ -171,16 +141,16 @@ func zongGe(l1, l2, f1, f2 int) int {
 }
 
 //Check 格检查
-func (ge *WuGe) Check(ss ...string) bool {
+func Check(ge *nw.WuGe, ss ...string) bool {
 	v := map[string]bool{}
 	if ss == nil {
 		ss = append(ss, "吉")
 	}
 	//ignore:tianGe
-	v[yi.GetDaYan(ge.diGe).Lucky] = false
-	v[yi.GetDaYan(ge.renGe).Lucky] = false
-	v[yi.GetDaYan(ge.waiGe).Lucky] = false
-	v[yi.GetDaYan(ge.zongGe).Lucky] = false
+	v[yi.GetDaYan(ge.SanCaiNum.Di).Lucky] = false
+	v[yi.GetDaYan(ge.SanCaiNum.Ren).Lucky] = false
+	v[yi.GetDaYan(ge.WaiGe).Lucky] = false
+	v[yi.GetDaYan(ge.ZongGe).Lucky] = false
 
 	for l := range v {
 		for i := range ss {

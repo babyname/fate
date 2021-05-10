@@ -3,6 +3,8 @@ package fate
 import (
 	"sync"
 
+	ng "github.com/godcong/name_gua"
+	nw "github.com/godcong/name_wuge"
 	"github.com/godcong/yi"
 )
 
@@ -16,18 +18,18 @@ type NameStroke struct {
 }
 
 //算卦象时有天人地，但是这个三才是不能用的，有很多姓氏依照五格三才是算不出吉祥的
-func (nk *NameStroke) getGuaSanCai() SanCai {
+func (nk *NameStroke) getGuaSanCai() *ng.GuaSanCai {
 	tian := nk.FirstStroke1 + nk.FirstStroke2
 	di := nk.LastStroke1 + nk.LastStroke2
 	ren := tian + di
-	return GetSanCai(tian, ren, di)
+	return ng.GetGuaSanCai(tian, ren, di)
 }
 
-func (nk *NameStroke) getWuGes(filter_hard bool) []*WuGe {
+func (nk *NameStroke) getWuGes(filter_hard bool) []*nw.WuGe {
 	return GetWuGe(*nk, filter_hard)
 }
 
-func (nk *NameStroke) getWuGeDaYans(sex yi.Sex, filter_hard bool) []*WuGeDaYan {
+func (nk *NameStroke) getWuGeDaYans(sex yi.Sex, filter_hard bool) []*nw.WuGeDaYan {
 	return GetWuGeDaYan(*nk, sex, filter_hard)
 }
 
@@ -45,14 +47,14 @@ func (nk *NameStroke) IsLucky(sex yi.Sex, filter_hard bool) bool {
 
 //三才五格吉祥
 func (nk *NameStroke) IsWuGeLucky(sex yi.Sex, filter_hard bool) bool {
-	var sanCais []SanCai = []SanCai{}
+	var sanCais []*nw.WuGeSanCai = []*nw.WuGeSanCai{}
 
 	wuGeDaYans := nk.getWuGeDaYans(sex, filter_hard)
 
 	wuGes := nk.getWuGes(filter_hard)
 
 	for _, wuGe := range wuGes {
-		sanCais = append(sanCais, wuGe.getSanCai())
+		sanCais = append(sanCais, wuGe.GetSanCai())
 	}
 
 	for _, daYan := range wuGeDaYans {
@@ -62,7 +64,7 @@ func (nk *NameStroke) IsWuGeLucky(sex yi.Sex, filter_hard bool) bool {
 	}
 
 	for _, sanCai := range sanCais {
-		if !sanCai.getSanCaiFortune().IsLucky() {
+		if !sanCai.GetFortune().IsLucky() {
 			return false
 		}
 	}
@@ -108,7 +110,7 @@ var guaListLock sync.Mutex
 func (nk *NameStroke) BaGua() *yi.Yi {
 	hash := nk.hash()
 
-	sanCai := nk.getGuaSanCai()
+	guaSanCai := nk.getGuaSanCai()
 
 	guaListLock.Lock()
 	defer guaListLock.Unlock()
@@ -116,7 +118,7 @@ func (nk *NameStroke) BaGua() *yi.Yi {
 	gua := guaList[hash]
 
 	if gua == nil {
-		guaList[hash] = yi.NumberQiGua(sanCai.tian, sanCai.di, sanCai.ren)
+		guaList[hash] = guaSanCai.BaGuaS1()
 	}
 
 	return guaList[hash]
@@ -127,7 +129,7 @@ func (nk *NameStroke) BaGua() *yi.Yi {
 func (nk *NameStroke) BaGuaM1() *yi.Yi {
 	hash := nk.hash()
 
-	sanCai := nk.getGuaSanCai()
+	guaSanCai := nk.getGuaSanCai()
 
 	guaListLock.Lock()
 	defer guaListLock.Unlock()
@@ -135,7 +137,7 @@ func (nk *NameStroke) BaGuaM1() *yi.Yi {
 	gua := guaList[hash]
 
 	if gua == nil {
-		guaList[hash] = yi.NumberQiGua(sanCai.ren, sanCai.tian, sanCai.ren)
+		guaList[hash] = guaSanCai.BaGuaM1()
 	}
 
 	return guaList[hash]
@@ -146,7 +148,7 @@ func (nk *NameStroke) BaGuaM1() *yi.Yi {
 func (nk *NameStroke) BaGuaM2() *yi.Yi {
 	hash := nk.hash()
 
-	sanCai := nk.getGuaSanCai()
+	guaSanCai := nk.getGuaSanCai()
 
 	guaListLock.Lock()
 	defer guaListLock.Unlock()
@@ -154,7 +156,7 @@ func (nk *NameStroke) BaGuaM2() *yi.Yi {
 	gua := guaList[hash]
 
 	if gua == nil {
-		guaList[hash] = yi.NumberQiGua(sanCai.ren, sanCai.di, sanCai.ren)
+		guaList[hash] = guaSanCai.BaGuaM2()
 	}
 
 	return guaList[hash]
@@ -162,11 +164,11 @@ func (nk *NameStroke) BaGuaM2() *yi.Yi {
 
 // 周神松卦象
 // 姓名自下而上得三爻取下卦，自上而下得天人地三格，天格取上卦，天格取动爻
-// 三字名自下而上由银行取卦，较为特殊
+// 三四字名自下而上取卦，较为特殊
 func (nk *NameStroke) BaGuaSs() []*yi.Yi {
 	hash := nk.hash()
 
-	sanCai := nk.getGuaSanCai()
+	guaSanCai := nk.getGuaSanCai()
 
 	guas := []*yi.Yi{}
 
@@ -177,11 +179,11 @@ func (nk *NameStroke) BaGuaSs() []*yi.Yi {
 
 	if gua == nil {
 
-		guaList[hash] = yi.NumberQiGua(sanCai.ren, sanCai.tian, sanCai.tian)
-		if nk.FirstStroke2 != 0 && nk.LastStroke2 == 0 {
-			guas = append(guas, yi.NumberQiGua(yi.GetGua3Num(nk.FirstStroke2, nk.FirstStroke1, nk.LastStroke1), sanCai.tian, sanCai.ren))
+		guaList[hash] = yi.NumberQiGua(guaSanCai.SanCaiNum.Ren, guaSanCai.SanCaiNum.Tian, guaSanCai.SanCaiNum.Tian)
+		if nk.FirstStroke2 != 0 {
+			guas = append(guas, guaSanCai.BaGuaS2(nk.FirstStroke2, nk.FirstStroke1))
 		}
-		guas = append(guas, yi.NumberQiGua(sanCai.ren, sanCai.tian, sanCai.tian))
+		guas = append(guas, guaSanCai.BaGuaS3())
 	}
 
 	return guas

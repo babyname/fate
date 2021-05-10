@@ -76,7 +76,7 @@ func (n Name) XiYongShen() string {
 }
 
 //GetName
-func (impl *fateImpl) createName(first []*Character, nk NameStroke) *Name { // impl_last []*Character, impl_sex yi.Sex,
+func (impl *fateImpl) createName(first []*Character, nk NameStroke) *Name {
 	if len(first) > 2 || len(first) < 1 || len(impl.last) > 2 || len(impl.last) < 1 {
 		panic("input error")
 	}
