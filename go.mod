@@ -18,9 +18,10 @@ require (
 go 1.16
 
 // pseudo-version can be got from `go get  github.com/<name>/<project>@<commit>`
+// When merged into upstream, the replace sentence can be disabled
 
 replace (
 	github.com/godcong/name_gua => github.com/fortune-fun/name_gua v0.0.0-20210510140743-082af5cba3cc
 	github.com/godcong/name_wuge => github.com/fortune-fun/name_wuge v0.0.0-20210510141111-8cee898249c6
-	github.com/godcong/yi => github.com/fortune-fun/yi v0.0.0-20210510135217-e2095161b447
+	github.com/godcong/yi => github.com/fortune-fun/yi v0.0.0-20210510181954-0bb1cb5ea507
 )
