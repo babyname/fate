@@ -8,40 +8,68 @@ import (
 )
 
 //五格笔画缓存
-var wuGes map[int][]*nw.WuGe = map[int][]*nw.WuGe{}
+var wuGes map[int]*nw.WuGe = map[int]*nw.WuGe{}
 
-func ClearWuGe(nk NameStroke) {
-	hash := nk.hash()
-
-	if wuGes[hash] != nil {
+func ClearWuGe(nk NameStroke, filter_hard bool) {
+	for _, hash := range nk.getWuGeHash(filter_hard) {
 		delete(wuGes, hash)
 	}
 }
 
-//从笔画获取五格
-func GetWuGe(nk NameStroke, filter_hard bool) []*nw.WuGe {
-	hash := nk.hash()
+func (nk *NameStroke) getWuGeHash(filter_hard bool) []int {
+	hash := []int{nk.hash() << 1}
 
-	wuGe := wuGes[hash]
+	if filter_hard && nk.LastStroke2 != 0 && nk.FirstStroke2 != 0 {
+		hash = append(hash, hash[0]+1)
+	}
+
+	return hash
+}
+
+//从笔画获取五格
+func (nk *NameStroke) GetWuGes(filter_hard bool) []*nw.WuGe {
+	wuges := []*nw.WuGe{nk.getWuGe()}
+
+	if filter_hard && nk.LastStroke2 != 0 && nk.FirstStroke2 != 0 {
+		wuges = append(wuges, nk.getWuGe4())
+	}
+
+	return wuges
+}
+
+func (nk *NameStroke) getWuGe() *nw.WuGe {
+	hash := nk.getWuGeHash(false)
+
+	wuGe := wuGes[hash[0]]
 	if wuGe == nil {
-		wuGes[hash] = []*nw.WuGe{calcWuGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2)}
-		if filter_hard && nk.LastStroke2 != 0 && nk.FirstStroke2 != 0 {
-			// 复名复姓算法2
+		wuGes[hash[0]] = calcWuGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2)
+	}
+
+	return wuGes[hash[0]]
+}
+
+// 复名复姓算法2
+func (nk *NameStroke) getWuGe4() *nw.WuGe {
+	hash := nk.getWuGeHash(true)
+
+	if len(hash) == 2 {
+		wuGe := wuGes[hash[1]]
+		if wuGe == nil {
 			sanCaiNum := yi.SanCaiNum{
 				Tian: tianGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
 				Ren:  renGe2(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
 				Di:   diGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
 			}
-			wuGes[hash] = append(wuGes[hash], &nw.WuGe{
+			wuGes[hash[1]] = &nw.WuGe{
 				SanCaiNum: &sanCaiNum,
 				WaiGe:     waiGe2(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
 				ZongGe:    zongGe(nk.LastStroke1, nk.LastStroke2, nk.FirstStroke1, nk.FirstStroke2),
-			})
+			}
 		}
-		return wuGes[hash]
+		return wuGes[hash[1]]
 	}
 
-	return wuGe
+	return nil
 }
 
 //calcWuGe 计算五格

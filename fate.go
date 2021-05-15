@@ -309,9 +309,9 @@ func (f *fateImpl) getLuckyName(name chan<- *Name) (e error) {
 			if len(f1.PinYin) == 0 {
 				continue
 			}
-			if f1.getStrokeScience(false) != l.FirstStroke1 {
+			if f1.getStrokeScience() != l.FirstStroke1 {
 				fmt.Println(f1)
-				panic(fmt.Sprintf("%d,%d", l.FirstStroke1, f1.getStrokeScience(false)))
+				panic(fmt.Sprintf("%d,%d", l.FirstStroke1, f1.getStrokeScience()))
 			}
 			for _, f2 := range f2s_u {
 				if len(f2.PinYin) == 0 {

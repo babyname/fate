@@ -23,7 +23,7 @@
   【[最新数据库文件:20200331](https://github.com/godcong/fate/releases/download/v3.5.1/fate_db_200331.7z)】
   【[v3.5.2下载](https://github.com/godcong/fate/releases/tag/v3.5.2)】
 
-从ipfs下载：[最新自解压包](https://ipfs.io/ipfs/QmfXouS5iV1NnUrF4MedeoBxgT7N3Yk7hQjX9jtDfjUe5Z?filename=fate_unzip.exe)
+从ipfs下载：[最新自解压包](https://ipfs.io/ipfs/Qmb4QaTQHzXpy3vWP2ovRxvNXN8T4QQZUihG44viitnLh6?filename=fate_unzip.exe)
 
 此链接不能用浏览器打开，可以找一个ipfs工具（如ipfs-desktop），获取链接中的CID，检查文件，然后下载
 

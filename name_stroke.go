@@ -7,19 +7,10 @@ import (
 
 // NameStroke ...
 type NameStroke struct {
-	//ID     bson.ObjectId `bson:"_id,omitempty"`
 	LastStroke1  int
 	LastStroke2  int
 	FirstStroke1 int
 	FirstStroke2 int
-}
-
-func (nk *NameStroke) getWuGes(filter_hard bool) []*nw.WuGe {
-	return GetWuGe(*nk, filter_hard)
-}
-
-func (nk *NameStroke) getWuGeDaYans(sex yi.Sex, filter_hard bool) []*nw.WuGeDaYan {
-	return GetWuGeDaYan(*nk, sex, filter_hard)
 }
 
 func (nk *NameStroke) IsLucky(sex yi.Sex, filter_hard bool) bool {
@@ -40,7 +31,7 @@ func (nk *NameStroke) IsWuGeLucky(sex yi.Sex, filter_hard bool) bool {
 
 	wuGeDaYans := nk.getWuGeDaYans(sex, filter_hard)
 
-	wuGes := nk.getWuGes(filter_hard)
+	wuGes := nk.GetWuGes(filter_hard)
 
 	for _, wuGe := range wuGes {
 		sanCais = append(sanCais, wuGe.GetSanCai())
@@ -59,14 +50,6 @@ func (nk *NameStroke) IsWuGeLucky(sex yi.Sex, filter_hard bool) bool {
 	}
 
 	return true
-}
-
-func (nk *NameStroke) Clear(sex yi.Sex) {
-	hash := nk.hash()
-
-	ClearWuGeDaYan(*nk, sex)
-	ClearWuGe(*nk)
-	delete(guaList, hash)
 }
 
 // treat int as 32 bits
@@ -122,12 +105,13 @@ func GetNameStroke(last1, last2, first1, first2 int) *NameStroke {
 	return strokeCache[hash]
 }
 
-func clearNameStroke(nk NameStroke) {
+func clearNameStroke(nk NameStroke, filter_hard bool) {
 	hash := nk.hash()
 	nameStroke := strokeCache[hash]
 
 	if nameStroke != nil {
 		delete(strokeCache, hash)
+		ClearWuGe(*nameStroke, filter_hard)
 	}
 }
 
@@ -148,11 +132,11 @@ func (f *fateImpl) setStrokeCache() {
 
 	var l1, l2 int
 	if lastCharLen == 1 {
-		l1 = f.lastChar[0].getStrokeScience(true)
+		l1 = f.lastChar[0].getStrokeScience()
 		l2 = 0
 	} else if lastCharLen == 2 {
-		l1 = f.lastChar[0].getStrokeScience(true)
-		l2 = f.lastChar[1].getStrokeScience(true)
+		l1 = f.lastChar[0].getStrokeScience()
+		l2 = f.lastChar[1].getStrokeScience()
 	} else {
 		panic("姓的长度不对")
 	}
@@ -176,7 +160,7 @@ func (f *fateImpl) setStrokeCache() {
 				}
 			}
 
-			clearNameStroke(*nk)
+			clearNameStroke(*nk, f.config.HardFilter)
 		}
 	}
 }
@@ -190,11 +174,11 @@ func (f *fateImpl) FilterNameStrokes(wg chan<- *NameStroke) error {
 	var lastCharLen = len(f.lastChar)
 	var l1, l2 int
 	if lastCharLen == 1 {
-		l1 = f.lastChar[0].getStrokeScience(true)
+		l1 = f.lastChar[0].getStrokeScience()
 		l2 = 0
 	} else if lastCharLen == 2 {
-		l1 = f.lastChar[0].getStrokeScience(true)
-		l2 = f.lastChar[1].getStrokeScience(true)
+		l1 = f.lastChar[0].getStrokeScience()
+		l2 = f.lastChar[1].getStrokeScience()
 	} else {
 		panic("姓的长度不对")
 	}

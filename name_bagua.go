@@ -7,28 +7,18 @@ import (
 	"github.com/godcong/yi"
 )
 
-type GuaType = int
-
-const (
-	DefaultBaGua GuaType = iota
-	Ss1BaGua
-	Ss2BaGua
-	M1BaGua
-	M2BaGua
-)
-
 var guaList map[int]*yi.Yi = map[int]*yi.Yi{}
 
 var guaListLock sync.Mutex
 
-func (nk *NameStroke) BaGuaHash(gt GuaType) int {
+func (nk *NameStroke) BaGuaHash(gt ng.GuaType) int {
 	return nk.hash()<<3 + gt
 }
 
 // 周易八卦
 // 姓总数取上卦，名总数取下卦，姓名总数取动爻
 func (nk *NameStroke) BaGua() *yi.Yi {
-	hash := nk.BaGuaHash(DefaultBaGua)
+	hash := nk.BaGuaHash(ng.DefaultBaGua)
 
 	guaSanCai := nk.getGuaSanCai()
 
@@ -47,7 +37,7 @@ func (nk *NameStroke) BaGua() *yi.Yi {
 // 民国卦象1
 // 名总数取上卦，姓名总数取下卦，姓名总数取动爻
 func (nk *NameStroke) BaGuaM1() *yi.Yi {
-	hash := nk.BaGuaHash(M1BaGua)
+	hash := nk.BaGuaHash(ng.M1BaGua)
 
 	guaSanCai := nk.getGuaSanCai()
 
@@ -66,7 +56,7 @@ func (nk *NameStroke) BaGuaM1() *yi.Yi {
 // 民国卦象2
 // 姓总数取上卦，姓名总数取下卦，姓名总数取动爻
 func (nk *NameStroke) BaGuaM2() *yi.Yi {
-	hash := nk.BaGuaHash(M2BaGua)
+	hash := nk.BaGuaHash(ng.M2BaGua)
 
 	guaSanCai := nk.getGuaSanCai()
 
@@ -86,7 +76,7 @@ func (nk *NameStroke) BaGuaM2() *yi.Yi {
 // 姓名自下而上得三爻取下卦，自上而下得天人地三格，天格取上卦，天格取动爻
 // 三四字名自下而上取卦，较为特殊
 func (nk *NameStroke) BaGuaSs1() []*yi.Yi {
-	hash := nk.BaGuaHash(Ss1BaGua)
+	hash := nk.BaGuaHash(ng.Ss1BaGua)
 
 	guaSanCai := nk.getGuaSanCai()
 
@@ -112,7 +102,7 @@ func (nk *NameStroke) BaGuaSs1() []*yi.Yi {
 // 周神松卦象2
 // 人格数取下卦，天格取上卦，天格取动爻
 func (nk *NameStroke) BaGuaSs2() *yi.Yi {
-	hash := nk.BaGuaHash(Ss2BaGua)
+	hash := nk.BaGuaHash(ng.Ss2BaGua)
 
 	guaSanCai := nk.getGuaSanCai()
 

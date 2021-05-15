@@ -25,7 +25,7 @@ func TestWuGe_WaiGe(t *testing.T) {
 			l2 = 1
 		}
 		nk := fate.GetNameStroke(l1, l2, f1, f2)
-		wg := fate.GetWuGe(*nk, true)[0]
+		wg := nk.GetWuGes(true)[0]
 		sum := l1 + l2 + f1 + f2
 		if wg.ZongGe != sum {
 			log.Println(wg.ZongGe == sum, l1, l2, f1, f2, wg.ZongGe)

@@ -47,7 +47,7 @@ func (ch *Character) getStroke() int {
 }
 
 //get ancient stroke
-func (ch *Character) getStrokeScience(is_surname bool) int {
+func (ch *Character) getStrokeScience() int {
 	var result int
 	if ch.ScienceStroke != 0 {
 		result = ch.ScienceStroke

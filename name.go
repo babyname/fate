@@ -107,18 +107,18 @@ func (impl *fateImpl) createName(first []*Character, nk NameStroke) *Name {
 
 	if first2 == nil {
 		if last2 == nil {
-			name.nameScienceStroke = GetNameStroke(last1.getStrokeScience(true), 0, first1.getStrokeScience(false), 0)
+			name.nameScienceStroke = GetNameStroke(last1.getStrokeScience(), 0, first1.getStrokeScience(), 0)
 			name.nameStroke = NewNameStroke(last1.getStroke(), 0, first1.getStroke(), 0)
 		} else {
-			name.nameScienceStroke = GetNameStroke(last1.getStrokeScience(true), last2.getStrokeScience(true), first1.getStrokeScience(false), 0)
+			name.nameScienceStroke = GetNameStroke(last1.getStrokeScience(), last2.getStrokeScience(), first1.getStrokeScience(), 0)
 			name.nameStroke = NewNameStroke(last1.getStroke(), last2.getStroke(), first1.getStroke(), 0)
 		}
 	} else {
 		if last2 == nil {
-			name.nameScienceStroke = GetNameStroke(last1.getStrokeScience(true), 0, first1.getStrokeScience(false), first2.getStrokeScience(false))
+			name.nameScienceStroke = GetNameStroke(last1.getStrokeScience(), 0, first1.getStrokeScience(), first2.getStrokeScience())
 			name.nameStroke = NewNameStroke(last1.getStroke(), 0, first1.getStroke(), first2.getStroke())
 		} else {
-			name.nameScienceStroke = GetNameStroke(last1.getStrokeScience(true), last2.getStrokeScience(true), first1.getStrokeScience(false), first2.getStrokeScience(false))
+			name.nameScienceStroke = GetNameStroke(last1.getStrokeScience(), last2.getStrokeScience(), first1.getStrokeScience(), first2.getStrokeScience())
 			name.nameStroke = NewNameStroke(last1.getStroke(), last2.getStroke(), first1.getStroke(), first2.getStroke())
 		}
 	}
