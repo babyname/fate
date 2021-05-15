@@ -1,9 +1,6 @@
 package fate
 
 import (
-	"sync"
-
-	ng "github.com/godcong/name_gua"
 	nw "github.com/godcong/name_wuge"
 	"github.com/godcong/yi"
 )
@@ -15,14 +12,6 @@ type NameStroke struct {
 	LastStroke2  int
 	FirstStroke1 int
 	FirstStroke2 int
-}
-
-//算卦象时有天人地，但是这个三才是不能用的，有很多姓氏依照五格三才是算不出吉祥的
-func (nk *NameStroke) getGuaSanCai() *ng.GuaSanCai {
-	tian := nk.FirstStroke1 + nk.FirstStroke2
-	di := nk.LastStroke1 + nk.LastStroke2
-	ren := tian + di
-	return ng.GetGuaSanCai(tian, ren, di)
 }
 
 func (nk *NameStroke) getWuGes(filter_hard bool) []*nw.WuGe {
@@ -72,121 +61,12 @@ func (nk *NameStroke) IsWuGeLucky(sex yi.Sex, filter_hard bool) bool {
 	return true
 }
 
-//卦象吉祥
-func (nk *NameStroke) IsGuaLucky(sex yi.Sex, filter_hard bool) bool {
-	var guas []*yi.Yi = []*yi.Yi{}
-
-	guas = append(guas, nk.BaGua())
-
-	if filter_hard {
-		guas = append(guas, nk.BaGuaSs()...)
-		guas = append(guas, nk.BaGuaM1())
-		guas = append(guas, nk.BaGuaM2())
-	}
-
-	for _, gua := range guas {
-		if !gua.IsLucky(sex) {
-			return false
-		}
-	}
-
-	return true
-}
-
 func (nk *NameStroke) Clear(sex yi.Sex) {
 	hash := nk.hash()
 
 	ClearWuGeDaYan(*nk, sex)
 	ClearWuGe(*nk)
 	delete(guaList, hash)
-}
-
-var guaList map[int]*yi.Yi = map[int]*yi.Yi{}
-
-var guaListLock sync.Mutex
-
-// 周易八卦
-// 姓总数取上卦，名总数取下卦，姓名总数取动爻
-func (nk *NameStroke) BaGua() *yi.Yi {
-	hash := nk.hash()
-
-	guaSanCai := nk.getGuaSanCai()
-
-	guaListLock.Lock()
-	defer guaListLock.Unlock()
-
-	gua := guaList[hash]
-
-	if gua == nil {
-		guaList[hash] = guaSanCai.BaGuaS1()
-	}
-
-	return guaList[hash]
-}
-
-// 民国卦象1
-// 名总数取上卦，姓名总数取下卦，姓名总数取动爻
-func (nk *NameStroke) BaGuaM1() *yi.Yi {
-	hash := nk.hash()
-
-	guaSanCai := nk.getGuaSanCai()
-
-	guaListLock.Lock()
-	defer guaListLock.Unlock()
-
-	gua := guaList[hash]
-
-	if gua == nil {
-		guaList[hash] = guaSanCai.BaGuaM1()
-	}
-
-	return guaList[hash]
-}
-
-// 民国卦象2
-// 姓总数取上卦，姓名总数取下卦，姓名总数取动爻
-func (nk *NameStroke) BaGuaM2() *yi.Yi {
-	hash := nk.hash()
-
-	guaSanCai := nk.getGuaSanCai()
-
-	guaListLock.Lock()
-	defer guaListLock.Unlock()
-
-	gua := guaList[hash]
-
-	if gua == nil {
-		guaList[hash] = guaSanCai.BaGuaM2()
-	}
-
-	return guaList[hash]
-}
-
-// 周神松卦象
-// 姓名自下而上得三爻取下卦，自上而下得天人地三格，天格取上卦，天格取动爻
-// 三四字名自下而上取卦，较为特殊
-func (nk *NameStroke) BaGuaSs() []*yi.Yi {
-	hash := nk.hash()
-
-	guaSanCai := nk.getGuaSanCai()
-
-	guas := []*yi.Yi{}
-
-	guaListLock.Lock()
-	defer guaListLock.Unlock()
-
-	gua := guaList[hash]
-
-	if gua == nil {
-
-		guaList[hash] = yi.NumberQiGua(guaSanCai.SanCaiNum.Ren, guaSanCai.SanCaiNum.Tian, guaSanCai.SanCaiNum.Tian)
-		if nk.FirstStroke2 != 0 {
-			guas = append(guas, guaSanCai.BaGuaS2(nk.FirstStroke2, nk.FirstStroke1))
-		}
-		guas = append(guas, guaSanCai.BaGuaS3())
-	}
-
-	return guas
 }
 
 // treat int as 32 bits
