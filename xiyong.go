@@ -1,9 +1,10 @@
 package fate
 
 import (
-	"fmt"
 	"math"
 	"strings"
+
+	"github.com/godcong/yi"
 )
 
 //XiYong 喜用神
@@ -77,62 +78,33 @@ func filterXiYong(yong string, cs ...*Character) (b bool) {
 	return false
 }
 
+//过滤喜用神，目前支持倒序前两个
 func fixedFilterXiYong(yong string, cs ...*Character) (b bool) {
-	jin := 0
-	mu := 0
-	shui := 0
-	huo := 0
-	tu := 0
+	wuxing_count_yong := yi.CountWuxing(nil, yong)
 
-	yong_runes := []rune(yong)
-
-	for idx, yong_rune := range yong_runes {
-		yong_str := string(yong_rune)
-		switch yong_str {
-		case "金":
-			jin++
-		case "木":
-			mu++
-		case "水":
-			shui++
-		case "火":
-			huo++
-		case "土":
-			tu++
-		default:
-			panic(fmt.Sprintf("喜用神不支持：%d:%s", idx, yong_str))
-		}
+	if wuxing_count_yong.Content[0].Count == 0 {
+		panic("没有输入喜用神")
 	}
 
-	jin_got := 0
-	mu_got := 0
-	shui_got := 0
-	huo_got := 0
-	tu_got := 0
+	wuxing_count_got := yi.CountWuxing(nil, "")
 
 	for _, c := range cs {
-		if strings.Contains("金", c.WuXing) {
-			jin_got++
-		}
-
-		if strings.Contains("木", c.WuXing) {
-			mu_got++
-		}
-
-		if strings.Contains("水", c.WuXing) {
-			shui_got++
-		}
-
-		if strings.Contains("火", c.WuXing) {
-			huo_got++
-		}
-
-		if strings.Contains("土", c.WuXing) {
-			tu_got++
-		}
+		wuxing_count_got = yi.CountWuxing(wuxing_count_got, c.WuXing)
 	}
 
-	if jin == jin_got && mu == mu_got && shui == shui_got && huo == huo_got && tu == tu_got {
+	wuxing_count_yong = yi.SortWuxingCount(wuxing_count_yong)
+
+	wuxing_count_got = yi.SortWuxingCount(wuxing_count_got)
+
+	if wuxing_count_yong.Content[0].WuXingChr == wuxing_count_got.Content[0].WuXingChr {
+		if wuxing_count_yong.Content[1].Count == 0 {
+			return true
+		} else {
+			if wuxing_count_yong.Content[1].WuXingChr == wuxing_count_got.Content[1].WuXingChr {
+				return true
+			}
+		}
+
 		return true
 	}
 

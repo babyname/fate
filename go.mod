@@ -23,5 +23,5 @@ go 1.16
 replace (
 	github.com/godcong/name_gua => github.com/fortune-fun/name_gua v0.0.0-20210515180506-8c0f084200f1
 	github.com/godcong/name_wuge => github.com/fortune-fun/name_wuge v0.0.0-20210510141111-8cee898249c6
-	github.com/godcong/yi => github.com/fortune-fun/yi v0.0.0-20210510181954-0bb1cb5ea507
+	github.com/godcong/yi => github.com/fortune-fun/yi v0.0.0-20210518235908-d42db1a65871
 )
