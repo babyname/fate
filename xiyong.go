@@ -79,8 +79,11 @@ func filterXiYong(yong string, cs ...*Character) (b bool) {
 }
 
 //过滤喜用神，目前支持倒序前两个
-func fixedFilterXiYong(yong string, cs ...*Character) (b bool) {
+//输入的喜用神序列必须是有倾向的，如果是若干种五行平分，则不能进行硬过滤
+func fixedFilterXiYong(yong string, hard_filter bool, cs ...*Character) (b bool) {
 	wuxing_count_yong := yi.CountWuxing(nil, yong)
+
+	wuxing_count_yong = yi.SortWuxingCount(wuxing_count_yong)
 
 	if wuxing_count_yong.Content[0].Count == 0 {
 		panic("没有输入喜用神")
@@ -92,20 +95,23 @@ func fixedFilterXiYong(yong string, cs ...*Character) (b bool) {
 		wuxing_count_got = yi.CountWuxing(wuxing_count_got, c.WuXing)
 	}
 
-	wuxing_count_yong = yi.SortWuxingCount(wuxing_count_yong)
-
 	wuxing_count_got = yi.SortWuxingCount(wuxing_count_got)
 
-	if wuxing_count_yong.Content[0].WuXingChr == wuxing_count_got.Content[0].WuXingChr {
-		if wuxing_count_yong.Content[1].Count == 0 {
+	if wuxing_count_yong.Content[1].Count == 0 {
+		if wuxing_count_yong.Content[0].WuXingChr == wuxing_count_got.Content[0].WuXingChr {
+			return true
+		}
+	} else {
+		if wuxing_count_yong.Content[1].WuXingChr == wuxing_count_got.Content[1].WuXingChr {
 			return true
 		} else {
-			if wuxing_count_yong.Content[1].WuXingChr == wuxing_count_got.Content[1].WuXingChr {
-				return true
+			if !hard_filter {
+				if wuxing_count_yong.Content[0].WuXingChr == wuxing_count_got.Content[1].WuXingChr &&
+					wuxing_count_yong.Content[1].WuXingChr == wuxing_count_got.Content[0].WuXingChr {
+					return true
+				}
 			}
 		}
-
-		return true
 	}
 
 	return false

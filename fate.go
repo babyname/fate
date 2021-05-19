@@ -174,7 +174,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 		tmpChar = append(tmpChar, n.LastName...)
 		//filter bazi
 		//if f.config.SupplyFilter && !filterXiYong(f.XiYong().Shen(), tmpChar...) {
-		if f.config.SupplyFilter && !fixedFilterXiYong(f.xiYongStr, tmpChar...) {
+		if f.config.SupplyFilter && !fixedFilterXiYong(f.xiYongStr, f.config.HardFilter, tmpChar...) {
 			//log.Infow("supply", "name", n.String())
 			continue
 		}
