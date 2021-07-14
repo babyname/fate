@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
-import "github.com/spf13/cobra"
+import (
+	"fmt"
+
+	"github.com/spf13/cobra"
+)
 
 const programName = `fate`
 const fateVersion = `0.0.2`

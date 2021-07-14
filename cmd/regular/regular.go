@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/godcong/fate"
 	"github.com/xormsharp/xorm"
+
+	"github.com/godcong/fate"
 )
 
 var regularList = map[int]string{
