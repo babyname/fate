@@ -10,6 +10,21 @@ type Character struct {
 	ent.Schema
 }
 
+const WuXingGold = "金"
+const WuXingWood = "木"
+const WuXingWater = "水"
+const WuXingFire = "火"
+const WuXingSoil = "土"
+const WuXingNone = "无"
+
+//const "大凶"
+//const "凶"
+//const "凶多于吉"
+//const "吉凶参半"
+//const "吉多于凶"
+//const "吉"
+//const "大吉"
+
 // Fields of the Character.
 func (Character) Fields() []ent.Field {
 	return []ent.Field{
@@ -47,9 +62,9 @@ func (Character) Fields() []ent.Field {
 		//TraditionalTotalStroke   int      `xorm:"default(0) notnull traditional_total_stroke"`             //简体部首笔画
 		field.Bool("is_name_science"),
 		//NameScience              bool     `xorm:"default(0) notnull name_science"`                         //姓名学
-		field.Enum("wu_xing"),
+		field.String("wu_xing"),
 		//WuXing                   string   `xorm:"default() notnull wu_xing"`                               //五行
-		field.Enum("lucky"),
+		field.String("lucky"),
 		//Lucky                    string   `xorm:"default() notnull lucky"`                                 //吉凶寓意
 		field.Bool("is_regular"),
 		//Regular                  bool     `xorm:"default(0) notnull regular"`                              //常用
