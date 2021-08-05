@@ -93,11 +93,11 @@ var zodiacSupportList = map[string]bool{
 	ZodiacRabbit:  true,
 	ZodiacDragon:  true,
 	ZodiacSnake:   true,
-	ZodiacHorse:   false,
-	ZodiacSheep:   false,
-	ZodiacMonkey:  false,
-	ZodiacChicken: false,
-	ZodiacDog:     false,
+	ZodiacHorse:   true,
+	ZodiacSheep:   true,
+	ZodiacMonkey:  true,
+	ZodiacChicken: true,
+	ZodiacDog:     true,
 	ZodiacPig:     true,
 }
 
