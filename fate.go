@@ -4,11 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/godcong/fate/config"
-	"github.com/goextension/log"
-	"github.com/xormsharp/xorm"
 	"strings"
 	"time"
+
+	"github.com/godcong/fate/config"
+	"github.com/godcong/fate/model"
+
+	"github.com/goextension/log"
+	"github.com/xormsharp/xorm"
 
 	"github.com/godcong/chronos"
 	"github.com/godcong/yi"
@@ -22,15 +25,13 @@ const HelpContent = "正在使用Fate生成姓名列表，如遇到问题请访�
 
 // Fate ...
 type Fate interface {
-	MakeName(ctx context.Context) (e error)
-	XiYong() *XiYong
-	RunInit() (e error)
-	RegisterHandle(outputFunc HandleOutputFunc)
+	SetConfig(config config.Config)
+	Initialize(ctx context.Context) error
+	Make(ctx context.Context) error
 }
-
 type fateImpl struct {
 	config   *config.Config
-	db       Database
+	db       *model.Model
 	out      Information
 	born     chronos.Calendar
 	last     []string
@@ -42,6 +43,21 @@ type fateImpl struct {
 	baZi     *BaZi
 	zodiac   *Zodiac
 	handle   HandleOutputFunc
+}
+
+func (f *fateImpl) SetConfig(config config.Config) {
+
+}
+
+func (f *fateImpl) Initialize(ctx context.Context) error {
+	err := f.db.Schema.Create(ctx)
+	if err != nil {
+		return err
+	}
+}
+
+func (f *fateImpl) Make(ctx context.Context) error {
+	panic("implement me")
 }
 
 // RunInit ...
@@ -192,15 +208,55 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 		if f.debug {
 			log.Infow("bazi", "born", f.born.LunarDate(), "time", f.born.Lunar().EightCharacter())
 			log.Infow("xiyong", "wuxing", n.WuXing(), "god", f.XiYong().Shen(), "pinheng", f.XiYong())
-			log.Infow("ben", "ming", ben.GuaMing, "chu", ben.ChuYaoJiXiong, "er", ben.ErYaoJiXiong, "san", ben.SanYaoJiXiong, "si", ben.SiYaoJiXiong, "wu", ben.WuYaoJiXiong, "liu", ben.ShangYaoJiXiong)
-			log.Infow("bian", "ming", bian.GuaMing, "chu", bian.ChuYaoJiXiong, "er", bian.ErYaoJiXiong, "san", bian.SanYaoJiXiong, "si", bian.SiYaoJiXiong, "wu", bian.WuYaoJiXiong, "liu", bian.ShangYaoJiXiong)
+			log.Infow("ben",
+				"ming",
+				ben.GuaMing,
+				"chu",
+				ben.ChuYaoJiXiong,
+				"er",
+				ben.ErYaoJiXiong,
+				"san",
+				ben.SanYaoJiXiong,
+				"si",
+				ben.SiYaoJiXiong,
+				"wu",
+				ben.WuYaoJiXiong,
+				"liu",
+				ben.ShangYaoJiXiong)
+			log.Infow("bian",
+				"ming",
+				bian.GuaMing,
+				"chu",
+				bian.ChuYaoJiXiong,
+				"er",
+				bian.ErYaoJiXiong,
+				"san",
+				bian.SanYaoJiXiong,
+				"si",
+				bian.SiYaoJiXiong,
+				"wu",
+				bian.WuYaoJiXiong,
+				"liu",
+				bian.ShangYaoJiXiong)
 		}
 
 		if err := f.out.Write(*n); err != nil {
 			return err
 		}
 		if f.debug {
-			log.Infow(n.String(), "笔画", n.Strokes(), "拼音", n.PinYin(), "八字", f.born.Lunar().EightCharacter(), "喜用神", f.XiYong().Shen(), "本卦", ben.GuaMing, "变卦", bian.GuaMing)
+			log.Infow(n.String(),
+				"笔画",
+				n.Strokes(),
+				"拼音",
+				n.PinYin(),
+				"八字",
+				f.born.Lunar().EightCharacter(),
+				"喜用神",
+				f.XiYong().Shen(),
+				"本卦",
+				ben.GuaMing,
+				"变卦",
+				bian.GuaMing)
 		}
 	}
 	return nil
@@ -340,3 +396,5 @@ func hardFilter(lucky *WuGeLucky) bool {
 	}
 	return false
 }
+
+var _ Fate = (*fateImpl)(nil)

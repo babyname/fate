@@ -104,9 +104,3 @@ func Char(name string) func(engine *xorm.Engine) *xorm.Session {
 			Or(builder.Eq{"traditional_character": name}))
 	}
 }
-
-// Hash ...
-func Hash(url string) string {
-	sum256 := sha256.Sum256([]byte(url))
-	return fmt.Sprintf("%x", sum256)
-}
