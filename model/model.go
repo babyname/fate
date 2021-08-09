@@ -1,6 +1,8 @@
 package model
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"net/url"
 
@@ -37,4 +39,10 @@ func New(cfg config.Database) (*Model, error) {
 		Client: open,
 		cfg:    cfg,
 	}, nil
+}
+
+// Hash ...
+func Hash(url string) string {
+	s := sha256.New()
+	return hex.EncodeToString(s.Sum([]byte(url)))
 }
