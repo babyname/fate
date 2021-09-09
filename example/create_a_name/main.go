@@ -11,7 +11,7 @@ func main() {
 
 	//cfg := config.DefaultConfig() 参数如下
 	//config.Config{
-	//	HardFilter: false,
+	//	DayanFilter: false,
 	//	//输出最大笔画数
 	//	StrokeMax: 3,
 	//	//输出最小笔画数
@@ -25,7 +25,7 @@ func main() {
 	//	//周易八卦过滤
 	//	BaguaFilter: true,
 	//	//连接DB：
-	//	Database: config.Database{
+	//	DBConfig: config.DBConfig{
 	//		Host:         "localhost",
 	//		Port:         "3306",
 	//		User:         "root",
@@ -48,10 +48,10 @@ func main() {
 	cfg.BaguaFilter = true
 	cfg.ZodiacFilter = true
 	cfg.SupplyFilter = true
-	cfg.HardFilter = true
+	cfg.DayanFilter = true
 	cfg.StrokeMin = 3
 	cfg.StrokeMax = 24
-	cfg.Database = config.Database{
+	cfg.Database = config.DBConfig{
 		Host:         "localhost",
 		Port:         "3306",
 		User:         "root",
@@ -65,7 +65,7 @@ func main() {
 		ShowSQL:      false,
 		ShowExecTime: false,
 	}
-	cfg.FileOutput = config.FileOutput{
+	cfg.FileOutput = config.OutputFormat{
 		OutputMode: config.OutputModeLog,
 		Path:       "name.log",
 	}

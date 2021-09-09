@@ -19,16 +19,16 @@ func TestFate_RunMakeName(t *testing.T) {
 	cfg.BaguaFilter = true
 	cfg.ZodiacFilter = true
 	cfg.SupplyFilter = true
-	cfg.HardFilter = true
+	cfg.DayanFilter = true
 	cfg.StrokeMin = 3
 	cfg.StrokeMax = 24
 	cfg.Regular = true
 	cfg.RunInit = false
-	cfg.FileOutput = config.FileOutput{
+	cfg.FileOutput = config.OutputFormat{
 		OutputMode: config.OutputModeLog,
 		Path:       "name.log",
 	}
-	cfg.Database = config.Database{
+	cfg.Database = config.DBConfig{
 		Host:         "localhost",
 		Port:         "3306",
 		User:         "root",
