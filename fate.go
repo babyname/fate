@@ -60,21 +60,16 @@ func (f *fateImpl) Make(ctx context.Context) error {
 	panic("implement me")
 }
 
-// RunInit ...
-func (f *fateImpl) RunInit() (e error) {
-	if f.config.RunInit {
-		if err := f.db.Sync(WuGeLucky{}); err != nil {
-			return err
-		}
-
-		lucky := make(chan *WuGeLucky)
-		go initWuGe(lucky)
-		for la := range lucky {
-			_, e = f.db.InsertOrUpdateWuGeLucky(la)
-			if e != nil {
-				return Wrap(e, "insert failed")
-			}
-		}
+func InitDayanLuckyTable(ctx context.Context, model *model.Model) error {
+	err := model.Schema.Create(ctx)
+	if err != nil {
+		return err
+	}
+	lucky := make(chan *WuGeLucky)
+	go initWuGe(lucky)
+	for la := range lucky {
+		//todo
+		fmt.Println("la", la)
 	}
 	return nil
 }
@@ -313,7 +308,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 			continue
 		}
 
-		if f.config.HardFilter && hardFilter(l) {
+		if f.config.DayanFilter && hardFilter(l) {
 			sc := NewSanCai(l.TianGe, l.RenGe, l.DiGe)
 			if !Check(f.db.Database().(*xorm.Engine), sc, 5) {
 				continue

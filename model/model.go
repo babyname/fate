@@ -14,10 +14,10 @@ const dsn = "%s:%s@tcp(%s)/%s?loc=%s&charset=utf8mb4&parseTime=true"
 
 type Model struct {
 	*ent.Client
-	cfg config.Database
+	cfg config.DBConfig
 }
 
-func New(cfg config.Database) (*Model, error) {
+func New(cfg config.DBConfig) (*Model, error) {
 	dsnPath := fmt.Sprintf(dsn, cfg.User, cfg.Pwd, cfg.Addr, cfg.Name, url.QueryEscape(cfg.Loc))
 
 	var options []ent.Option

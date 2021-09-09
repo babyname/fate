@@ -23,27 +23,29 @@ const (
 	OutputModeLog OutputMode = iota
 	OutputModeCSV
 	OutputModelJSON
+	OutputModeMarkdown
+	OutputModeMax
 )
 
-type FileOutput struct {
+type OutputFormat struct {
 	OutputMode OutputMode `json:"output_mode"`
 	Path       string     `json:"path"`
 	Heads      []string   `json:"heads"`
 }
 
 type Config struct {
-	RunInit      bool       `json:"run_init"`
-	FilterMode   FilterMode `json:"filter_mode"`
-	StrokeMax    int        `json:"stroke_max"`
-	StrokeMin    int        `json:"stroke_min"`
-	HardFilter   bool       `json:"hard_filter"`
-	FixBazi      bool       `json:"fix_bazi"`      //八字修正
-	SupplyFilter bool       `json:"supply_filter"` //过滤补八字
-	ZodiacFilter bool       `json:"zodiac_filter"` //过滤生肖
-	BaguaFilter  bool       `json:"bagua_filter"`  //过滤卦象
-	Regular      bool       `json:"regular"`       //常用
-	Database     Database   `json:"database"`
-	FileOutput   FileOutput `json:"file_output"`
+	FilterMode   FilterMode   `json:"filter_mode"`
+	StrokeMax    int          `json:"stroke_max"`
+	StrokeMin    int          `json:"stroke_min"`
+	FixBazi      bool         `json:"fix_bazi"`      //八字修正
+	SupplyFilter bool         `json:"supply_filter"` //过滤补八字
+	ZodiacFilter bool         `json:"zodiac_filter"` //过滤生肖
+	BaguaFilter  bool         `json:"bagua_filter"`  //过滤卦象
+	DayanFilter  bool         `json:"dayan_filter"`  //过滤大衍
+	Regular      bool         `json:"regular"`       //常用字过滤
+	Database     DBConfig     `json:"database"`
+	FileOutput   OutputFormat `json:"file_output"`
+	Debug        bool
 }
 
 var DefaultJSONPath = ""
@@ -89,29 +91,22 @@ func OutputConfig(config *Config) error {
 
 func DefaultConfig() *Config {
 	return &Config{
-		RunInit:      false,
+		Debug:        false,
 		FilterMode:   0,
 		StrokeMax:    18,
 		StrokeMin:    3,
-		HardFilter:   false,
+		DayanFilter:  false,
 		FixBazi:      false,
 		SupplyFilter: true,
 		ZodiacFilter: true,
 		BaguaFilter:  true,
 		Regular:      true,
-		Database: Database{
-			Addr:   "127.0.0.1:3306",
-			User:   "root",
-			Pwd:    "111111",
-			Name:   "fate",
-			Loc:    "Asia/Shanghai",
+		Database: DBConfig{
 			Driver: "mysql",
-			File:   "",
-			Dsn:    "",
-			Debug:  false,
+			DSN:    "root:111111@tcp(192.168.2.201:3306)/fate?charset=utf8\\u0026parseTime=true",
 			Log:    "",
 		},
-		FileOutput: FileOutput{
+		FileOutput: OutputFormat{
 			Heads:      DefaultHeads,
 			OutputMode: OutputModeLog,
 			Path:       "name.txt",
