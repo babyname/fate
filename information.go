@@ -57,7 +57,7 @@ func (l *logInformation) Finish() error {
 	return l.sugar.Sync()
 }
 
-func initOutputWithConfig(output config.FileOutput) Information {
+func initOutputWithConfig(output config.OutputFormat) Information {
 	switch output.OutputMode {
 	//case config.OutputModelJSON:
 	//	return jsonOutput(output.Path)
