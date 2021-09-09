@@ -3,8 +3,8 @@ package model
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
-	"net/url"
+
+	"github.com/goextension/log"
 
 	"github.com/godcong/fate/config"
 	"github.com/godcong/fate/ent"
@@ -17,27 +17,25 @@ type Model struct {
 	cfg config.DBConfig
 }
 
-func New(cfg config.DBConfig) (*Model, error) {
-	dsnPath := fmt.Sprintf(dsn, cfg.User, cfg.Pwd, cfg.Addr, cfg.Name, url.QueryEscape(cfg.Loc))
-
+func New(cfg config.Config) (*Model, error) {
 	var options []ent.Option
 	if cfg.Debug {
 		options = append(options, ent.Debug())
 	}
 
-	if cfg.Log != "" {
+	if cfg.Database.Log != "" {
 		options = append(options, ent.Log(func(i ...interface{}) {
-			//todo:
+			log.Debug(i...)
 		}))
 	}
 
-	open, err := ent.Open(cfg.Driver, dsnPath, options...)
+	open, err := ent.Open(cfg.Database.Driver, cfg.Database.DSN, options...)
 	if err != nil {
 		return nil, err
 	}
 	return &Model{
 		Client: open,
-		cfg:    cfg,
+		cfg:    cfg.Database,
 	}, nil
 }
 
