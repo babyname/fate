@@ -10,12 +10,14 @@ type Character struct {
 	ent.Schema
 }
 
-const WuXingGold = "金"
-const WuXingWood = "木"
-const WuXingWater = "水"
-const WuXingFire = "火"
-const WuXingSoil = "土"
-const WuXingNone = "无"
+const (
+	WuXingGold  = "金"
+	WuXingWood  = "木"
+	WuXingWater = "水"
+	WuXingFire  = "火"
+	WuXingSoil  = "土"
+	WuXingNone  = "无"
+)
 
 //const "大凶"
 //const "凶"
@@ -28,7 +30,7 @@ const WuXingNone = "无"
 // Fields of the Character.
 func (Character) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("hash").Unique(),
+		field.String("id").Unique(),
 		//Hash                     string   `xorm:"pk hash"`
 		field.Strings("pin_yin"),
 		//PinYin                   []string `xorm:"default() notnull pin_yin"`                               //拼音
@@ -42,11 +44,11 @@ func (Character) Fields() []ent.Field {
 		//RadicalStroke            int      `xorm:"default(0) notnull radical_stroke"`                       //部首笔画
 		field.Int8("stroke"),
 		//Stroke                   int      `xorm:"default() notnull stroke"`                                //总笔画数
-		field.Bool("is_kang_xi"),
+		field.Bool("is_kangxi"),
 		//IsKangXi                 bool     `xorm:"default(0) notnull is_kang_xi"`                           //是否康熙字典
-		field.String("kang_xi"),
+		field.String("kangxi"),
 		//KangXi                   string   `xorm:"default() notnull kang_xi"`                               //康熙
-		field.String("kang_xi_stroke"),
+		field.String("kangxi_stroke"),
 		//KangXiStroke             int      `xorm:"default(0) notnull kang_xi_stroke"`                       //康熙笔画
 		field.String("simple_radical"),
 		//SimpleRadical            string   `xorm:"default() notnull simple_radical"`                        //简体部首
