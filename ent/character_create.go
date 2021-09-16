@@ -19,12 +19,6 @@ type CharacterCreate struct {
 	hooks    []Hook
 }
 
-// SetHash sets the "hash" field.
-func (cc *CharacterCreate) SetHash(s string) *CharacterCreate {
-	cc.mutation.SetHash(s)
-	return cc
-}
-
 // SetPinYin sets the "pin_yin" field.
 func (cc *CharacterCreate) SetPinYin(s []string) *CharacterCreate {
 	cc.mutation.SetPinYin(s)
@@ -61,21 +55,21 @@ func (cc *CharacterCreate) SetStroke(i int8) *CharacterCreate {
 	return cc
 }
 
-// SetIsKangXi sets the "is_kang_xi" field.
-func (cc *CharacterCreate) SetIsKangXi(b bool) *CharacterCreate {
-	cc.mutation.SetIsKangXi(b)
+// SetIsKangxi sets the "is_kangxi" field.
+func (cc *CharacterCreate) SetIsKangxi(b bool) *CharacterCreate {
+	cc.mutation.SetIsKangxi(b)
 	return cc
 }
 
-// SetKangXi sets the "kang_xi" field.
-func (cc *CharacterCreate) SetKangXi(s string) *CharacterCreate {
-	cc.mutation.SetKangXi(s)
+// SetKangxi sets the "kangxi" field.
+func (cc *CharacterCreate) SetKangxi(s string) *CharacterCreate {
+	cc.mutation.SetKangxi(s)
 	return cc
 }
 
-// SetKangXiStroke sets the "kang_xi_stroke" field.
-func (cc *CharacterCreate) SetKangXiStroke(s string) *CharacterCreate {
-	cc.mutation.SetKangXiStroke(s)
+// SetKangxiStroke sets the "kangxi_stroke" field.
+func (cc *CharacterCreate) SetKangxiStroke(s string) *CharacterCreate {
+	cc.mutation.SetKangxiStroke(s)
 	return cc
 }
 
@@ -157,6 +151,12 @@ func (cc *CharacterCreate) SetComment(s string) *CharacterCreate {
 	return cc
 }
 
+// SetID sets the "id" field.
+func (cc *CharacterCreate) SetID(s string) *CharacterCreate {
+	cc.mutation.SetID(s)
+	return cc
+}
+
 // Mutation returns the CharacterMutation object of the builder.
 func (cc *CharacterCreate) Mutation() *CharacterMutation {
 	return cc.mutation
@@ -208,9 +208,6 @@ func (cc *CharacterCreate) SaveX(ctx context.Context) *Character {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *CharacterCreate) check() error {
-	if _, ok := cc.mutation.Hash(); !ok {
-		return &ValidationError{Name: "hash", err: errors.New("ent: missing required field \"hash\"")}
-	}
 	if _, ok := cc.mutation.PinYin(); !ok {
 		return &ValidationError{Name: "pin_yin", err: errors.New("ent: missing required field \"pin_yin\"")}
 	}
@@ -229,14 +226,14 @@ func (cc *CharacterCreate) check() error {
 	if _, ok := cc.mutation.Stroke(); !ok {
 		return &ValidationError{Name: "stroke", err: errors.New("ent: missing required field \"stroke\"")}
 	}
-	if _, ok := cc.mutation.IsKangXi(); !ok {
-		return &ValidationError{Name: "is_kang_xi", err: errors.New("ent: missing required field \"is_kang_xi\"")}
+	if _, ok := cc.mutation.IsKangxi(); !ok {
+		return &ValidationError{Name: "is_kangxi", err: errors.New("ent: missing required field \"is_kangxi\"")}
 	}
-	if _, ok := cc.mutation.KangXi(); !ok {
-		return &ValidationError{Name: "kang_xi", err: errors.New("ent: missing required field \"kang_xi\"")}
+	if _, ok := cc.mutation.Kangxi(); !ok {
+		return &ValidationError{Name: "kangxi", err: errors.New("ent: missing required field \"kangxi\"")}
 	}
-	if _, ok := cc.mutation.KangXiStroke(); !ok {
-		return &ValidationError{Name: "kang_xi_stroke", err: errors.New("ent: missing required field \"kang_xi_stroke\"")}
+	if _, ok := cc.mutation.KangxiStroke(); !ok {
+		return &ValidationError{Name: "kangxi_stroke", err: errors.New("ent: missing required field \"kangxi_stroke\"")}
 	}
 	if _, ok := cc.mutation.SimpleRadical(); !ok {
 		return &ValidationError{Name: "simple_radical", err: errors.New("ent: missing required field \"simple_radical\"")}
@@ -288,8 +285,6 @@ func (cc *CharacterCreate) sqlSave(ctx context.Context) (*Character, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -299,18 +294,14 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: character.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: character.FieldID,
 			},
 		}
 	)
-	if value, ok := cc.mutation.Hash(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: character.FieldHash,
-		})
-		_node.Hash = value
+	if id, ok := cc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
 	}
 	if value, ok := cc.mutation.PinYin(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -360,29 +351,29 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		})
 		_node.Stroke = value
 	}
-	if value, ok := cc.mutation.IsKangXi(); ok {
+	if value, ok := cc.mutation.IsKangxi(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Value:  value,
-			Column: character.FieldIsKangXi,
+			Column: character.FieldIsKangxi,
 		})
-		_node.IsKangXi = value
+		_node.IsKangxi = value
 	}
-	if value, ok := cc.mutation.KangXi(); ok {
+	if value, ok := cc.mutation.Kangxi(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: character.FieldKangXi,
+			Column: character.FieldKangxi,
 		})
-		_node.KangXi = value
+		_node.Kangxi = value
 	}
-	if value, ok := cc.mutation.KangXiStroke(); ok {
+	if value, ok := cc.mutation.KangxiStroke(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: character.FieldKangXiStroke,
+			Column: character.FieldKangxiStroke,
 		})
-		_node.KangXiStroke = value
+		_node.KangxiStroke = value
 	}
 	if value, ok := cc.mutation.SimpleRadical(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -530,8 +521,6 @@ func (ccb *CharacterCreateBulk) Save(ctx context.Context) ([]*Character, error) 
 				if err != nil {
 					return nil, err
 				}
-				id := specs[i].ID.Value.(int64)
-				nodes[i].ID = int(id)
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

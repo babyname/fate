@@ -10,17 +10,16 @@ import (
 var (
 	// CharactersColumns holds the columns for the "characters" table.
 	CharactersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "hash", Type: field.TypeString, Unique: true},
+		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "pin_yin", Type: field.TypeJSON},
 		{Name: "ch", Type: field.TypeString},
 		{Name: "science_stroke", Type: field.TypeInt8},
 		{Name: "radical", Type: field.TypeString},
 		{Name: "radical_stroke", Type: field.TypeInt8},
 		{Name: "stroke", Type: field.TypeInt8},
-		{Name: "is_kang_xi", Type: field.TypeBool},
-		{Name: "kang_xi", Type: field.TypeString},
-		{Name: "kang_xi_stroke", Type: field.TypeString},
+		{Name: "is_kangxi", Type: field.TypeBool},
+		{Name: "kangxi", Type: field.TypeString},
+		{Name: "kangxi_stroke", Type: field.TypeString},
 		{Name: "simple_radical", Type: field.TypeString},
 		{Name: "simple_radical_stroke", Type: field.TypeString},
 		{Name: "simple_total_stroke", Type: field.TypeInt8},

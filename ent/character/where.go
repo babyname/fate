@@ -8,28 +8,28 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.Character {
+func ID(id string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Character {
+func IDEQ(id string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Character {
+func IDNEQ(id string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Character {
+func IDIn(ids ...string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -46,7 +46,7 @@ func IDIn(ids ...int) predicate.Character {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Character {
+func IDNotIn(ids ...string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -63,37 +63,30 @@ func IDNotIn(ids ...int) predicate.Character {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Character {
+func IDGT(id string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Character {
+func IDGTE(id string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Character {
+func IDLT(id string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Character {
+func IDLTE(id string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
-	})
-}
-
-// Hash applies equality check predicate on the "hash" field. It's identical to HashEQ.
-func Hash(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldHash), v))
 	})
 }
 
@@ -132,24 +125,24 @@ func Stroke(v int8) predicate.Character {
 	})
 }
 
-// IsKangXi applies equality check predicate on the "is_kang_xi" field. It's identical to IsKangXiEQ.
-func IsKangXi(v bool) predicate.Character {
+// IsKangxi applies equality check predicate on the "is_kangxi" field. It's identical to IsKangxiEQ.
+func IsKangxi(v bool) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldIsKangXi), v))
+		s.Where(sql.EQ(s.C(FieldIsKangxi), v))
 	})
 }
 
-// KangXi applies equality check predicate on the "kang_xi" field. It's identical to KangXiEQ.
-func KangXi(v string) predicate.Character {
+// Kangxi applies equality check predicate on the "kangxi" field. It's identical to KangxiEQ.
+func Kangxi(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldKangXi), v))
+		s.Where(sql.EQ(s.C(FieldKangxi), v))
 	})
 }
 
-// KangXiStroke applies equality check predicate on the "kang_xi_stroke" field. It's identical to KangXiStrokeEQ.
-func KangXiStroke(v string) predicate.Character {
+// KangxiStroke applies equality check predicate on the "kangxi_stroke" field. It's identical to KangxiStrokeEQ.
+func KangxiStroke(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldKangXiStroke), v))
+		s.Where(sql.EQ(s.C(FieldKangxiStroke), v))
 	})
 }
 
@@ -227,117 +220,6 @@ func IsRegular(v bool) predicate.Character {
 func Comment(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldComment), v))
-	})
-}
-
-// HashEQ applies the EQ predicate on the "hash" field.
-func HashEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldHash), v))
-	})
-}
-
-// HashNEQ applies the NEQ predicate on the "hash" field.
-func HashNEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldHash), v))
-	})
-}
-
-// HashIn applies the In predicate on the "hash" field.
-func HashIn(vs ...string) predicate.Character {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldHash), v...))
-	})
-}
-
-// HashNotIn applies the NotIn predicate on the "hash" field.
-func HashNotIn(vs ...string) predicate.Character {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldHash), v...))
-	})
-}
-
-// HashGT applies the GT predicate on the "hash" field.
-func HashGT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldHash), v))
-	})
-}
-
-// HashGTE applies the GTE predicate on the "hash" field.
-func HashGTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldHash), v))
-	})
-}
-
-// HashLT applies the LT predicate on the "hash" field.
-func HashLT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldHash), v))
-	})
-}
-
-// HashLTE applies the LTE predicate on the "hash" field.
-func HashLTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldHash), v))
-	})
-}
-
-// HashContains applies the Contains predicate on the "hash" field.
-func HashContains(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldHash), v))
-	})
-}
-
-// HashHasPrefix applies the HasPrefix predicate on the "hash" field.
-func HashHasPrefix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldHash), v))
-	})
-}
-
-// HashHasSuffix applies the HasSuffix predicate on the "hash" field.
-func HashHasSuffix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldHash), v))
-	})
-}
-
-// HashEqualFold applies the EqualFold predicate on the "hash" field.
-func HashEqualFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldHash), v))
-	})
-}
-
-// HashContainsFold applies the ContainsFold predicate on the "hash" field.
-func HashContainsFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldHash), v))
 	})
 }
 
@@ -791,36 +673,36 @@ func StrokeLTE(v int8) predicate.Character {
 	})
 }
 
-// IsKangXiEQ applies the EQ predicate on the "is_kang_xi" field.
-func IsKangXiEQ(v bool) predicate.Character {
+// IsKangxiEQ applies the EQ predicate on the "is_kangxi" field.
+func IsKangxiEQ(v bool) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldIsKangXi), v))
+		s.Where(sql.EQ(s.C(FieldIsKangxi), v))
 	})
 }
 
-// IsKangXiNEQ applies the NEQ predicate on the "is_kang_xi" field.
-func IsKangXiNEQ(v bool) predicate.Character {
+// IsKangxiNEQ applies the NEQ predicate on the "is_kangxi" field.
+func IsKangxiNEQ(v bool) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldIsKangXi), v))
+		s.Where(sql.NEQ(s.C(FieldIsKangxi), v))
 	})
 }
 
-// KangXiEQ applies the EQ predicate on the "kang_xi" field.
-func KangXiEQ(v string) predicate.Character {
+// KangxiEQ applies the EQ predicate on the "kangxi" field.
+func KangxiEQ(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldKangXi), v))
+		s.Where(sql.EQ(s.C(FieldKangxi), v))
 	})
 }
 
-// KangXiNEQ applies the NEQ predicate on the "kang_xi" field.
-func KangXiNEQ(v string) predicate.Character {
+// KangxiNEQ applies the NEQ predicate on the "kangxi" field.
+func KangxiNEQ(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldKangXi), v))
+		s.Where(sql.NEQ(s.C(FieldKangxi), v))
 	})
 }
 
-// KangXiIn applies the In predicate on the "kang_xi" field.
-func KangXiIn(vs ...string) predicate.Character {
+// KangxiIn applies the In predicate on the "kangxi" field.
+func KangxiIn(vs ...string) predicate.Character {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -832,12 +714,12 @@ func KangXiIn(vs ...string) predicate.Character {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldKangXi), v...))
+		s.Where(sql.In(s.C(FieldKangxi), v...))
 	})
 }
 
-// KangXiNotIn applies the NotIn predicate on the "kang_xi" field.
-func KangXiNotIn(vs ...string) predicate.Character {
+// KangxiNotIn applies the NotIn predicate on the "kangxi" field.
+func KangxiNotIn(vs ...string) predicate.Character {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -849,89 +731,89 @@ func KangXiNotIn(vs ...string) predicate.Character {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldKangXi), v...))
+		s.Where(sql.NotIn(s.C(FieldKangxi), v...))
 	})
 }
 
-// KangXiGT applies the GT predicate on the "kang_xi" field.
-func KangXiGT(v string) predicate.Character {
+// KangxiGT applies the GT predicate on the "kangxi" field.
+func KangxiGT(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldKangXi), v))
+		s.Where(sql.GT(s.C(FieldKangxi), v))
 	})
 }
 
-// KangXiGTE applies the GTE predicate on the "kang_xi" field.
-func KangXiGTE(v string) predicate.Character {
+// KangxiGTE applies the GTE predicate on the "kangxi" field.
+func KangxiGTE(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldKangXi), v))
+		s.Where(sql.GTE(s.C(FieldKangxi), v))
 	})
 }
 
-// KangXiLT applies the LT predicate on the "kang_xi" field.
-func KangXiLT(v string) predicate.Character {
+// KangxiLT applies the LT predicate on the "kangxi" field.
+func KangxiLT(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldKangXi), v))
+		s.Where(sql.LT(s.C(FieldKangxi), v))
 	})
 }
 
-// KangXiLTE applies the LTE predicate on the "kang_xi" field.
-func KangXiLTE(v string) predicate.Character {
+// KangxiLTE applies the LTE predicate on the "kangxi" field.
+func KangxiLTE(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldKangXi), v))
+		s.Where(sql.LTE(s.C(FieldKangxi), v))
 	})
 }
 
-// KangXiContains applies the Contains predicate on the "kang_xi" field.
-func KangXiContains(v string) predicate.Character {
+// KangxiContains applies the Contains predicate on the "kangxi" field.
+func KangxiContains(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldKangXi), v))
+		s.Where(sql.Contains(s.C(FieldKangxi), v))
 	})
 }
 
-// KangXiHasPrefix applies the HasPrefix predicate on the "kang_xi" field.
-func KangXiHasPrefix(v string) predicate.Character {
+// KangxiHasPrefix applies the HasPrefix predicate on the "kangxi" field.
+func KangxiHasPrefix(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldKangXi), v))
+		s.Where(sql.HasPrefix(s.C(FieldKangxi), v))
 	})
 }
 
-// KangXiHasSuffix applies the HasSuffix predicate on the "kang_xi" field.
-func KangXiHasSuffix(v string) predicate.Character {
+// KangxiHasSuffix applies the HasSuffix predicate on the "kangxi" field.
+func KangxiHasSuffix(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldKangXi), v))
+		s.Where(sql.HasSuffix(s.C(FieldKangxi), v))
 	})
 }
 
-// KangXiEqualFold applies the EqualFold predicate on the "kang_xi" field.
-func KangXiEqualFold(v string) predicate.Character {
+// KangxiEqualFold applies the EqualFold predicate on the "kangxi" field.
+func KangxiEqualFold(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldKangXi), v))
+		s.Where(sql.EqualFold(s.C(FieldKangxi), v))
 	})
 }
 
-// KangXiContainsFold applies the ContainsFold predicate on the "kang_xi" field.
-func KangXiContainsFold(v string) predicate.Character {
+// KangxiContainsFold applies the ContainsFold predicate on the "kangxi" field.
+func KangxiContainsFold(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldKangXi), v))
+		s.Where(sql.ContainsFold(s.C(FieldKangxi), v))
 	})
 }
 
-// KangXiStrokeEQ applies the EQ predicate on the "kang_xi_stroke" field.
-func KangXiStrokeEQ(v string) predicate.Character {
+// KangxiStrokeEQ applies the EQ predicate on the "kangxi_stroke" field.
+func KangxiStrokeEQ(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldKangXiStroke), v))
+		s.Where(sql.EQ(s.C(FieldKangxiStroke), v))
 	})
 }
 
-// KangXiStrokeNEQ applies the NEQ predicate on the "kang_xi_stroke" field.
-func KangXiStrokeNEQ(v string) predicate.Character {
+// KangxiStrokeNEQ applies the NEQ predicate on the "kangxi_stroke" field.
+func KangxiStrokeNEQ(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldKangXiStroke), v))
+		s.Where(sql.NEQ(s.C(FieldKangxiStroke), v))
 	})
 }
 
-// KangXiStrokeIn applies the In predicate on the "kang_xi_stroke" field.
-func KangXiStrokeIn(vs ...string) predicate.Character {
+// KangxiStrokeIn applies the In predicate on the "kangxi_stroke" field.
+func KangxiStrokeIn(vs ...string) predicate.Character {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -943,12 +825,12 @@ func KangXiStrokeIn(vs ...string) predicate.Character {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldKangXiStroke), v...))
+		s.Where(sql.In(s.C(FieldKangxiStroke), v...))
 	})
 }
 
-// KangXiStrokeNotIn applies the NotIn predicate on the "kang_xi_stroke" field.
-func KangXiStrokeNotIn(vs ...string) predicate.Character {
+// KangxiStrokeNotIn applies the NotIn predicate on the "kangxi_stroke" field.
+func KangxiStrokeNotIn(vs ...string) predicate.Character {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -960,70 +842,70 @@ func KangXiStrokeNotIn(vs ...string) predicate.Character {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldKangXiStroke), v...))
+		s.Where(sql.NotIn(s.C(FieldKangxiStroke), v...))
 	})
 }
 
-// KangXiStrokeGT applies the GT predicate on the "kang_xi_stroke" field.
-func KangXiStrokeGT(v string) predicate.Character {
+// KangxiStrokeGT applies the GT predicate on the "kangxi_stroke" field.
+func KangxiStrokeGT(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldKangXiStroke), v))
+		s.Where(sql.GT(s.C(FieldKangxiStroke), v))
 	})
 }
 
-// KangXiStrokeGTE applies the GTE predicate on the "kang_xi_stroke" field.
-func KangXiStrokeGTE(v string) predicate.Character {
+// KangxiStrokeGTE applies the GTE predicate on the "kangxi_stroke" field.
+func KangxiStrokeGTE(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldKangXiStroke), v))
+		s.Where(sql.GTE(s.C(FieldKangxiStroke), v))
 	})
 }
 
-// KangXiStrokeLT applies the LT predicate on the "kang_xi_stroke" field.
-func KangXiStrokeLT(v string) predicate.Character {
+// KangxiStrokeLT applies the LT predicate on the "kangxi_stroke" field.
+func KangxiStrokeLT(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldKangXiStroke), v))
+		s.Where(sql.LT(s.C(FieldKangxiStroke), v))
 	})
 }
 
-// KangXiStrokeLTE applies the LTE predicate on the "kang_xi_stroke" field.
-func KangXiStrokeLTE(v string) predicate.Character {
+// KangxiStrokeLTE applies the LTE predicate on the "kangxi_stroke" field.
+func KangxiStrokeLTE(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldKangXiStroke), v))
+		s.Where(sql.LTE(s.C(FieldKangxiStroke), v))
 	})
 }
 
-// KangXiStrokeContains applies the Contains predicate on the "kang_xi_stroke" field.
-func KangXiStrokeContains(v string) predicate.Character {
+// KangxiStrokeContains applies the Contains predicate on the "kangxi_stroke" field.
+func KangxiStrokeContains(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldKangXiStroke), v))
+		s.Where(sql.Contains(s.C(FieldKangxiStroke), v))
 	})
 }
 
-// KangXiStrokeHasPrefix applies the HasPrefix predicate on the "kang_xi_stroke" field.
-func KangXiStrokeHasPrefix(v string) predicate.Character {
+// KangxiStrokeHasPrefix applies the HasPrefix predicate on the "kangxi_stroke" field.
+func KangxiStrokeHasPrefix(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldKangXiStroke), v))
+		s.Where(sql.HasPrefix(s.C(FieldKangxiStroke), v))
 	})
 }
 
-// KangXiStrokeHasSuffix applies the HasSuffix predicate on the "kang_xi_stroke" field.
-func KangXiStrokeHasSuffix(v string) predicate.Character {
+// KangxiStrokeHasSuffix applies the HasSuffix predicate on the "kangxi_stroke" field.
+func KangxiStrokeHasSuffix(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldKangXiStroke), v))
+		s.Where(sql.HasSuffix(s.C(FieldKangxiStroke), v))
 	})
 }
 
-// KangXiStrokeEqualFold applies the EqualFold predicate on the "kang_xi_stroke" field.
-func KangXiStrokeEqualFold(v string) predicate.Character {
+// KangxiStrokeEqualFold applies the EqualFold predicate on the "kangxi_stroke" field.
+func KangxiStrokeEqualFold(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldKangXiStroke), v))
+		s.Where(sql.EqualFold(s.C(FieldKangxiStroke), v))
 	})
 }
 
-// KangXiStrokeContainsFold applies the ContainsFold predicate on the "kang_xi_stroke" field.
-func KangXiStrokeContainsFold(v string) predicate.Character {
+// KangxiStrokeContainsFold applies the ContainsFold predicate on the "kangxi_stroke" field.
+func KangxiStrokeContainsFold(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldKangXiStroke), v))
+		s.Where(sql.ContainsFold(s.C(FieldKangxiStroke), v))
 	})
 }
 

@@ -15,9 +15,7 @@ import (
 type Character struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
-	// Hash holds the value of the "hash" field.
-	Hash string `json:"hash,omitempty"`
+	ID string `json:"id,omitempty"`
 	// PinYin holds the value of the "pin_yin" field.
 	PinYin []string `json:"pin_yin,omitempty"`
 	// Ch holds the value of the "ch" field.
@@ -30,12 +28,12 @@ type Character struct {
 	RadicalStroke int8 `json:"radical_stroke,omitempty"`
 	// Stroke holds the value of the "stroke" field.
 	Stroke int8 `json:"stroke,omitempty"`
-	// IsKangXi holds the value of the "is_kang_xi" field.
-	IsKangXi bool `json:"is_kang_xi,omitempty"`
-	// KangXi holds the value of the "kang_xi" field.
-	KangXi string `json:"kang_xi,omitempty"`
-	// KangXiStroke holds the value of the "kang_xi_stroke" field.
-	KangXiStroke string `json:"kang_xi_stroke,omitempty"`
+	// IsKangxi holds the value of the "is_kangxi" field.
+	IsKangxi bool `json:"is_kangxi,omitempty"`
+	// Kangxi holds the value of the "kangxi" field.
+	Kangxi string `json:"kangxi,omitempty"`
+	// KangxiStroke holds the value of the "kangxi_stroke" field.
+	KangxiStroke string `json:"kangxi_stroke,omitempty"`
 	// SimpleRadical holds the value of the "simple_radical" field.
 	SimpleRadical string `json:"simple_radical,omitempty"`
 	// SimpleRadicalStroke holds the value of the "simple_radical_stroke" field.
@@ -71,11 +69,11 @@ func (*Character) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case character.FieldPinYin, character.FieldTraditionalCharacter, character.FieldVariantCharacter:
 			values[i] = new([]byte)
-		case character.FieldIsKangXi, character.FieldIsNameScience, character.FieldIsRegular:
+		case character.FieldIsKangxi, character.FieldIsNameScience, character.FieldIsRegular:
 			values[i] = new(sql.NullBool)
-		case character.FieldID, character.FieldScienceStroke, character.FieldRadicalStroke, character.FieldStroke, character.FieldSimpleTotalStroke, character.FieldTraditionalRadicalStroke, character.FieldTraditionalTotalStroke:
+		case character.FieldScienceStroke, character.FieldRadicalStroke, character.FieldStroke, character.FieldSimpleTotalStroke, character.FieldTraditionalRadicalStroke, character.FieldTraditionalTotalStroke:
 			values[i] = new(sql.NullInt64)
-		case character.FieldHash, character.FieldCh, character.FieldRadical, character.FieldKangXi, character.FieldKangXiStroke, character.FieldSimpleRadical, character.FieldSimpleRadicalStroke, character.FieldTraditionalRadical, character.FieldWuXing, character.FieldLucky, character.FieldComment:
+		case character.FieldID, character.FieldCh, character.FieldRadical, character.FieldKangxi, character.FieldKangxiStroke, character.FieldSimpleRadical, character.FieldSimpleRadicalStroke, character.FieldTraditionalRadical, character.FieldWuXing, character.FieldLucky, character.FieldComment:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Character", columns[i])
@@ -93,16 +91,10 @@ func (c *Character) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case character.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
-			}
-			c.ID = int(value.Int64)
-		case character.FieldHash:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field hash", values[i])
+				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
-				c.Hash = value.String
+				c.ID = value.String
 			}
 		case character.FieldPinYin:
 
@@ -143,23 +135,23 @@ func (c *Character) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				c.Stroke = int8(value.Int64)
 			}
-		case character.FieldIsKangXi:
+		case character.FieldIsKangxi:
 			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_kang_xi", values[i])
+				return fmt.Errorf("unexpected type %T for field is_kangxi", values[i])
 			} else if value.Valid {
-				c.IsKangXi = value.Bool
+				c.IsKangxi = value.Bool
 			}
-		case character.FieldKangXi:
+		case character.FieldKangxi:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field kang_xi", values[i])
+				return fmt.Errorf("unexpected type %T for field kangxi", values[i])
 			} else if value.Valid {
-				c.KangXi = value.String
+				c.Kangxi = value.String
 			}
-		case character.FieldKangXiStroke:
+		case character.FieldKangxiStroke:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field kang_xi_stroke", values[i])
+				return fmt.Errorf("unexpected type %T for field kangxi_stroke", values[i])
 			} else if value.Valid {
-				c.KangXiStroke = value.String
+				c.KangxiStroke = value.String
 			}
 		case character.FieldSimpleRadical:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -273,8 +265,6 @@ func (c *Character) String() string {
 	var builder strings.Builder
 	builder.WriteString("Character(")
 	builder.WriteString(fmt.Sprintf("id=%v", c.ID))
-	builder.WriteString(", hash=")
-	builder.WriteString(c.Hash)
 	builder.WriteString(", pin_yin=")
 	builder.WriteString(fmt.Sprintf("%v", c.PinYin))
 	builder.WriteString(", ch=")
@@ -287,12 +277,12 @@ func (c *Character) String() string {
 	builder.WriteString(fmt.Sprintf("%v", c.RadicalStroke))
 	builder.WriteString(", stroke=")
 	builder.WriteString(fmt.Sprintf("%v", c.Stroke))
-	builder.WriteString(", is_kang_xi=")
-	builder.WriteString(fmt.Sprintf("%v", c.IsKangXi))
-	builder.WriteString(", kang_xi=")
-	builder.WriteString(c.KangXi)
-	builder.WriteString(", kang_xi_stroke=")
-	builder.WriteString(c.KangXiStroke)
+	builder.WriteString(", is_kangxi=")
+	builder.WriteString(fmt.Sprintf("%v", c.IsKangxi))
+	builder.WriteString(", kangxi=")
+	builder.WriteString(c.Kangxi)
+	builder.WriteString(", kangxi_stroke=")
+	builder.WriteString(c.KangxiStroke)
 	builder.WriteString(", simple_radical=")
 	builder.WriteString(c.SimpleRadical)
 	builder.WriteString(", simple_radical_stroke=")

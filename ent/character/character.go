@@ -7,8 +7,6 @@ const (
 	Label = "character"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldHash holds the string denoting the hash field in the database.
-	FieldHash = "hash"
 	// FieldPinYin holds the string denoting the pin_yin field in the database.
 	FieldPinYin = "pin_yin"
 	// FieldCh holds the string denoting the ch field in the database.
@@ -21,12 +19,12 @@ const (
 	FieldRadicalStroke = "radical_stroke"
 	// FieldStroke holds the string denoting the stroke field in the database.
 	FieldStroke = "stroke"
-	// FieldIsKangXi holds the string denoting the is_kang_xi field in the database.
-	FieldIsKangXi = "is_kang_xi"
-	// FieldKangXi holds the string denoting the kang_xi field in the database.
-	FieldKangXi = "kang_xi"
-	// FieldKangXiStroke holds the string denoting the kang_xi_stroke field in the database.
-	FieldKangXiStroke = "kang_xi_stroke"
+	// FieldIsKangxi holds the string denoting the is_kangxi field in the database.
+	FieldIsKangxi = "is_kangxi"
+	// FieldKangxi holds the string denoting the kangxi field in the database.
+	FieldKangxi = "kangxi"
+	// FieldKangxiStroke holds the string denoting the kangxi_stroke field in the database.
+	FieldKangxiStroke = "kangxi_stroke"
 	// FieldSimpleRadical holds the string denoting the simple_radical field in the database.
 	FieldSimpleRadical = "simple_radical"
 	// FieldSimpleRadicalStroke holds the string denoting the simple_radical_stroke field in the database.
@@ -60,16 +58,15 @@ const (
 // Columns holds all SQL columns for character fields.
 var Columns = []string{
 	FieldID,
-	FieldHash,
 	FieldPinYin,
 	FieldCh,
 	FieldScienceStroke,
 	FieldRadical,
 	FieldRadicalStroke,
 	FieldStroke,
-	FieldIsKangXi,
-	FieldKangXi,
-	FieldKangXiStroke,
+	FieldIsKangxi,
+	FieldKangxi,
+	FieldKangxiStroke,
 	FieldSimpleRadical,
 	FieldSimpleRadicalStroke,
 	FieldSimpleTotalStroke,
