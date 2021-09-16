@@ -17,30 +17,30 @@ type Model struct {
 	cfg config.DBConfig
 }
 
-func New(cfg config.Config) (*Model, error) {
+func Open(cfg config.DBConfig, debug bool) (*Model, error) {
 	var options []ent.Option
-	if cfg.Debug {
+	if debug {
 		options = append(options, ent.Debug())
 	}
 
-	if cfg.Database.Log != "" {
+	if cfg.Log != "" {
 		options = append(options, ent.Log(func(i ...interface{}) {
 			log.Debug(i...)
 		}))
 	}
 
-	open, err := ent.Open(cfg.Database.Driver, cfg.Database.DSN, options...)
+	open, err := ent.Open(cfg.Driver, cfg.DSN, options...)
 	if err != nil {
 		return nil, err
 	}
 	return &Model{
 		Client: open,
-		cfg:    cfg.Database,
+		cfg:    cfg,
 	}, nil
 }
 
-// Hash ...
-func Hash(url string) string {
+// ID ...
+func ID(name string) string {
 	s := sha256.New()
-	return hex.EncodeToString(s.Sum([]byte(url)))
+	return hex.EncodeToString(s.Sum([]byte(name)))
 }

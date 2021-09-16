@@ -1,8 +1,8 @@
 package fate
 
 import (
-	"crypto/sha256"
 	"fmt"
+
 	"github.com/xormsharp/builder"
 	"github.com/xormsharp/xorm"
 )
@@ -32,21 +32,6 @@ type Character struct {
 	TraditionalCharacter     []string `xorm:"default() notnull traditional_character"`                 //繁体字
 	VariantCharacter         []string `xorm:"default() notnull variant_character"`                     //异体字
 	Comment                  []string `xorm:"default() notnull comment"`                               //解释
-}
-
-// InsertOrUpdateCharacter ...
-func InsertOrUpdateCharacter(engine *xorm.Engine, c *Character) (i int64, e error) {
-	tmp := new(Character)
-	b, e := engine.Where("hash = ?", Hash(c.Ch)).Get(tmp)
-	if e != nil {
-		return 0, e
-	}
-	if !b {
-		i, e = engine.InsertOne(c)
-		return
-	}
-	i, e = engine.Where("ch = ?", c.Ch).Update(c)
-	return
 }
 
 func getCharacters(engine *xorm.Engine, fn func(engine *xorm.Engine) *xorm.Session) ([]*Character, error) {
@@ -94,13 +79,4 @@ func Stoker(s int, options ...CharacterOptions) func(engine *xorm.Engine) *xorm.
 		return session
 	}
 
-}
-
-// Char ...
-func Char(name string) func(engine *xorm.Engine) *xorm.Session {
-	return func(engine *xorm.Engine) *xorm.Session {
-		return engine.Where(builder.Eq{"ch": name}.
-			Or(builder.Eq{"kang_xi": name}).
-			Or(builder.Eq{"traditional_character": name}))
-	}
 }

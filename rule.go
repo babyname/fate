@@ -103,7 +103,7 @@ func RuleSetCopy(r *Rule) func(rule *Rule) {
 // @Description:
 // @param Sex
 // @return *Rule
-func DefaultRule(s Sex) *Rule {
+func DefaultRule() *Rule {
 	return &Rule{
 		sex: false,
 		rules: [5]bool{
