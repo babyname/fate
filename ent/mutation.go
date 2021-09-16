@@ -30,8 +30,7 @@ type CharacterMutation struct {
 	config
 	op                            Op
 	typ                           string
-	id                            *int
-	hash                          *string
+	id                            *string
 	pin_yin                       *[]string
 	ch                            *string
 	science_stroke                *int8
@@ -41,9 +40,9 @@ type CharacterMutation struct {
 	addradical_stroke             *int8
 	stroke                        *int8
 	addstroke                     *int8
-	is_kang_xi                    *bool
-	kang_xi                       *string
-	kang_xi_stroke                *string
+	is_kangxi                     *bool
+	kangxi                        *string
+	kangxi_stroke                 *string
 	simple_radical                *string
 	simple_radical_stroke         *string
 	simple_total_stroke           *int8
@@ -86,7 +85,7 @@ func newCharacterMutation(c config, op Op, opts ...characterOption) *CharacterMu
 }
 
 // withCharacterID sets the ID field of the mutation.
-func withCharacterID(id int) characterOption {
+func withCharacterID(id string) characterOption {
 	return func(m *CharacterMutation) {
 		var (
 			err   error
@@ -136,49 +135,19 @@ func (m CharacterMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Character entities.
+func (m *CharacterMutation) SetID(id string) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID
 // is only available if it was provided to the builder.
-func (m *CharacterMutation) ID() (id int, exists bool) {
+func (m *CharacterMutation) ID() (id string, exists bool) {
 	if m.id == nil {
 		return
 	}
 	return *m.id, true
-}
-
-// SetHash sets the "hash" field.
-func (m *CharacterMutation) SetHash(s string) {
-	m.hash = &s
-}
-
-// Hash returns the value of the "hash" field in the mutation.
-func (m *CharacterMutation) Hash() (r string, exists bool) {
-	v := m.hash
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldHash returns the old "hash" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldHash(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldHash is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldHash requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldHash: %w", err)
-	}
-	return oldValue.Hash, nil
-}
-
-// ResetHash resets all changes to the "hash" field.
-func (m *CharacterMutation) ResetHash() {
-	m.hash = nil
 }
 
 // SetPinYin sets the "pin_yin" field.
@@ -457,112 +426,112 @@ func (m *CharacterMutation) ResetStroke() {
 	m.addstroke = nil
 }
 
-// SetIsKangXi sets the "is_kang_xi" field.
-func (m *CharacterMutation) SetIsKangXi(b bool) {
-	m.is_kang_xi = &b
+// SetIsKangxi sets the "is_kangxi" field.
+func (m *CharacterMutation) SetIsKangxi(b bool) {
+	m.is_kangxi = &b
 }
 
-// IsKangXi returns the value of the "is_kang_xi" field in the mutation.
-func (m *CharacterMutation) IsKangXi() (r bool, exists bool) {
-	v := m.is_kang_xi
+// IsKangxi returns the value of the "is_kangxi" field in the mutation.
+func (m *CharacterMutation) IsKangxi() (r bool, exists bool) {
+	v := m.is_kangxi
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldIsKangXi returns the old "is_kang_xi" field's value of the Character entity.
+// OldIsKangxi returns the old "is_kangxi" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldIsKangXi(ctx context.Context) (v bool, err error) {
+func (m *CharacterMutation) OldIsKangxi(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldIsKangXi is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldIsKangxi is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldIsKangXi requires an ID field in the mutation")
+		return v, fmt.Errorf("OldIsKangxi requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsKangXi: %w", err)
+		return v, fmt.Errorf("querying old value for OldIsKangxi: %w", err)
 	}
-	return oldValue.IsKangXi, nil
+	return oldValue.IsKangxi, nil
 }
 
-// ResetIsKangXi resets all changes to the "is_kang_xi" field.
-func (m *CharacterMutation) ResetIsKangXi() {
-	m.is_kang_xi = nil
+// ResetIsKangxi resets all changes to the "is_kangxi" field.
+func (m *CharacterMutation) ResetIsKangxi() {
+	m.is_kangxi = nil
 }
 
-// SetKangXi sets the "kang_xi" field.
-func (m *CharacterMutation) SetKangXi(s string) {
-	m.kang_xi = &s
+// SetKangxi sets the "kangxi" field.
+func (m *CharacterMutation) SetKangxi(s string) {
+	m.kangxi = &s
 }
 
-// KangXi returns the value of the "kang_xi" field in the mutation.
-func (m *CharacterMutation) KangXi() (r string, exists bool) {
-	v := m.kang_xi
+// Kangxi returns the value of the "kangxi" field in the mutation.
+func (m *CharacterMutation) Kangxi() (r string, exists bool) {
+	v := m.kangxi
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldKangXi returns the old "kang_xi" field's value of the Character entity.
+// OldKangxi returns the old "kangxi" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldKangXi(ctx context.Context) (v string, err error) {
+func (m *CharacterMutation) OldKangxi(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldKangXi is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldKangxi is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldKangXi requires an ID field in the mutation")
+		return v, fmt.Errorf("OldKangxi requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldKangXi: %w", err)
+		return v, fmt.Errorf("querying old value for OldKangxi: %w", err)
 	}
-	return oldValue.KangXi, nil
+	return oldValue.Kangxi, nil
 }
 
-// ResetKangXi resets all changes to the "kang_xi" field.
-func (m *CharacterMutation) ResetKangXi() {
-	m.kang_xi = nil
+// ResetKangxi resets all changes to the "kangxi" field.
+func (m *CharacterMutation) ResetKangxi() {
+	m.kangxi = nil
 }
 
-// SetKangXiStroke sets the "kang_xi_stroke" field.
-func (m *CharacterMutation) SetKangXiStroke(s string) {
-	m.kang_xi_stroke = &s
+// SetKangxiStroke sets the "kangxi_stroke" field.
+func (m *CharacterMutation) SetKangxiStroke(s string) {
+	m.kangxi_stroke = &s
 }
 
-// KangXiStroke returns the value of the "kang_xi_stroke" field in the mutation.
-func (m *CharacterMutation) KangXiStroke() (r string, exists bool) {
-	v := m.kang_xi_stroke
+// KangxiStroke returns the value of the "kangxi_stroke" field in the mutation.
+func (m *CharacterMutation) KangxiStroke() (r string, exists bool) {
+	v := m.kangxi_stroke
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldKangXiStroke returns the old "kang_xi_stroke" field's value of the Character entity.
+// OldKangxiStroke returns the old "kangxi_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldKangXiStroke(ctx context.Context) (v string, err error) {
+func (m *CharacterMutation) OldKangxiStroke(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldKangXiStroke is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldKangxiStroke is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldKangXiStroke requires an ID field in the mutation")
+		return v, fmt.Errorf("OldKangxiStroke requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldKangXiStroke: %w", err)
+		return v, fmt.Errorf("querying old value for OldKangxiStroke: %w", err)
 	}
-	return oldValue.KangXiStroke, nil
+	return oldValue.KangxiStroke, nil
 }
 
-// ResetKangXiStroke resets all changes to the "kang_xi_stroke" field.
-func (m *CharacterMutation) ResetKangXiStroke() {
-	m.kang_xi_stroke = nil
+// ResetKangxiStroke resets all changes to the "kangxi_stroke" field.
+func (m *CharacterMutation) ResetKangxiStroke() {
+	m.kangxi_stroke = nil
 }
 
 // SetSimpleRadical sets the "simple_radical" field.
@@ -1107,10 +1076,7 @@ func (m *CharacterMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CharacterMutation) Fields() []string {
-	fields := make([]string, 0, 23)
-	if m.hash != nil {
-		fields = append(fields, character.FieldHash)
-	}
+	fields := make([]string, 0, 22)
 	if m.pin_yin != nil {
 		fields = append(fields, character.FieldPinYin)
 	}
@@ -1129,14 +1095,14 @@ func (m *CharacterMutation) Fields() []string {
 	if m.stroke != nil {
 		fields = append(fields, character.FieldStroke)
 	}
-	if m.is_kang_xi != nil {
-		fields = append(fields, character.FieldIsKangXi)
+	if m.is_kangxi != nil {
+		fields = append(fields, character.FieldIsKangxi)
 	}
-	if m.kang_xi != nil {
-		fields = append(fields, character.FieldKangXi)
+	if m.kangxi != nil {
+		fields = append(fields, character.FieldKangxi)
 	}
-	if m.kang_xi_stroke != nil {
-		fields = append(fields, character.FieldKangXiStroke)
+	if m.kangxi_stroke != nil {
+		fields = append(fields, character.FieldKangxiStroke)
 	}
 	if m.simple_radical != nil {
 		fields = append(fields, character.FieldSimpleRadical)
@@ -1185,8 +1151,6 @@ func (m *CharacterMutation) Fields() []string {
 // schema.
 func (m *CharacterMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case character.FieldHash:
-		return m.Hash()
 	case character.FieldPinYin:
 		return m.PinYin()
 	case character.FieldCh:
@@ -1199,12 +1163,12 @@ func (m *CharacterMutation) Field(name string) (ent.Value, bool) {
 		return m.RadicalStroke()
 	case character.FieldStroke:
 		return m.Stroke()
-	case character.FieldIsKangXi:
-		return m.IsKangXi()
-	case character.FieldKangXi:
-		return m.KangXi()
-	case character.FieldKangXiStroke:
-		return m.KangXiStroke()
+	case character.FieldIsKangxi:
+		return m.IsKangxi()
+	case character.FieldKangxi:
+		return m.Kangxi()
+	case character.FieldKangxiStroke:
+		return m.KangxiStroke()
 	case character.FieldSimpleRadical:
 		return m.SimpleRadical()
 	case character.FieldSimpleRadicalStroke:
@@ -1240,8 +1204,6 @@ func (m *CharacterMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *CharacterMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case character.FieldHash:
-		return m.OldHash(ctx)
 	case character.FieldPinYin:
 		return m.OldPinYin(ctx)
 	case character.FieldCh:
@@ -1254,12 +1216,12 @@ func (m *CharacterMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldRadicalStroke(ctx)
 	case character.FieldStroke:
 		return m.OldStroke(ctx)
-	case character.FieldIsKangXi:
-		return m.OldIsKangXi(ctx)
-	case character.FieldKangXi:
-		return m.OldKangXi(ctx)
-	case character.FieldKangXiStroke:
-		return m.OldKangXiStroke(ctx)
+	case character.FieldIsKangxi:
+		return m.OldIsKangxi(ctx)
+	case character.FieldKangxi:
+		return m.OldKangxi(ctx)
+	case character.FieldKangxiStroke:
+		return m.OldKangxiStroke(ctx)
 	case character.FieldSimpleRadical:
 		return m.OldSimpleRadical(ctx)
 	case character.FieldSimpleRadicalStroke:
@@ -1295,13 +1257,6 @@ func (m *CharacterMutation) OldField(ctx context.Context, name string) (ent.Valu
 // type.
 func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case character.FieldHash:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetHash(v)
-		return nil
 	case character.FieldPinYin:
 		v, ok := value.([]string)
 		if !ok {
@@ -1344,26 +1299,26 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStroke(v)
 		return nil
-	case character.FieldIsKangXi:
+	case character.FieldIsKangxi:
 		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetIsKangXi(v)
+		m.SetIsKangxi(v)
 		return nil
-	case character.FieldKangXi:
+	case character.FieldKangxi:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetKangXi(v)
+		m.SetKangxi(v)
 		return nil
-	case character.FieldKangXiStroke:
+	case character.FieldKangxiStroke:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetKangXiStroke(v)
+		m.SetKangxiStroke(v)
 		return nil
 	case character.FieldSimpleRadical:
 		v, ok := value.(string)
@@ -1580,9 +1535,6 @@ func (m *CharacterMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *CharacterMutation) ResetField(name string) error {
 	switch name {
-	case character.FieldHash:
-		m.ResetHash()
-		return nil
 	case character.FieldPinYin:
 		m.ResetPinYin()
 		return nil
@@ -1601,14 +1553,14 @@ func (m *CharacterMutation) ResetField(name string) error {
 	case character.FieldStroke:
 		m.ResetStroke()
 		return nil
-	case character.FieldIsKangXi:
-		m.ResetIsKangXi()
+	case character.FieldIsKangxi:
+		m.ResetIsKangxi()
 		return nil
-	case character.FieldKangXi:
-		m.ResetKangXi()
+	case character.FieldKangxi:
+		m.ResetKangxi()
 		return nil
-	case character.FieldKangXiStroke:
-		m.ResetKangXiStroke()
+	case character.FieldKangxiStroke:
+		m.ResetKangxiStroke()
 		return nil
 	case character.FieldSimpleRadical:
 		m.ResetSimpleRadical()

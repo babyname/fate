@@ -26,12 +26,6 @@ func (cu *CharacterUpdate) Where(ps ...predicate.Character) *CharacterUpdate {
 	return cu
 }
 
-// SetHash sets the "hash" field.
-func (cu *CharacterUpdate) SetHash(s string) *CharacterUpdate {
-	cu.mutation.SetHash(s)
-	return cu
-}
-
 // SetPinYin sets the "pin_yin" field.
 func (cu *CharacterUpdate) SetPinYin(s []string) *CharacterUpdate {
 	cu.mutation.SetPinYin(s)
@@ -89,21 +83,21 @@ func (cu *CharacterUpdate) AddStroke(i int8) *CharacterUpdate {
 	return cu
 }
 
-// SetIsKangXi sets the "is_kang_xi" field.
-func (cu *CharacterUpdate) SetIsKangXi(b bool) *CharacterUpdate {
-	cu.mutation.SetIsKangXi(b)
+// SetIsKangxi sets the "is_kangxi" field.
+func (cu *CharacterUpdate) SetIsKangxi(b bool) *CharacterUpdate {
+	cu.mutation.SetIsKangxi(b)
 	return cu
 }
 
-// SetKangXi sets the "kang_xi" field.
-func (cu *CharacterUpdate) SetKangXi(s string) *CharacterUpdate {
-	cu.mutation.SetKangXi(s)
+// SetKangxi sets the "kangxi" field.
+func (cu *CharacterUpdate) SetKangxi(s string) *CharacterUpdate {
+	cu.mutation.SetKangxi(s)
 	return cu
 }
 
-// SetKangXiStroke sets the "kang_xi_stroke" field.
-func (cu *CharacterUpdate) SetKangXiStroke(s string) *CharacterUpdate {
-	cu.mutation.SetKangXiStroke(s)
+// SetKangxiStroke sets the "kangxi_stroke" field.
+func (cu *CharacterUpdate) SetKangxiStroke(s string) *CharacterUpdate {
+	cu.mutation.SetKangxiStroke(s)
 	return cu
 }
 
@@ -268,7 +262,7 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   character.Table,
 			Columns: character.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: character.FieldID,
 			},
 		},
@@ -279,13 +273,6 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := cu.mutation.Hash(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: character.FieldHash,
-		})
 	}
 	if value, ok := cu.mutation.PinYin(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -350,25 +337,25 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: character.FieldStroke,
 		})
 	}
-	if value, ok := cu.mutation.IsKangXi(); ok {
+	if value, ok := cu.mutation.IsKangxi(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Value:  value,
-			Column: character.FieldIsKangXi,
+			Column: character.FieldIsKangxi,
 		})
 	}
-	if value, ok := cu.mutation.KangXi(); ok {
+	if value, ok := cu.mutation.Kangxi(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: character.FieldKangXi,
+			Column: character.FieldKangxi,
 		})
 	}
-	if value, ok := cu.mutation.KangXiStroke(); ok {
+	if value, ok := cu.mutation.KangxiStroke(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: character.FieldKangXiStroke,
+			Column: character.FieldKangxiStroke,
 		})
 	}
 	if value, ok := cu.mutation.SimpleRadical(); ok {
@@ -502,12 +489,6 @@ type CharacterUpdateOne struct {
 	mutation *CharacterMutation
 }
 
-// SetHash sets the "hash" field.
-func (cuo *CharacterUpdateOne) SetHash(s string) *CharacterUpdateOne {
-	cuo.mutation.SetHash(s)
-	return cuo
-}
-
 // SetPinYin sets the "pin_yin" field.
 func (cuo *CharacterUpdateOne) SetPinYin(s []string) *CharacterUpdateOne {
 	cuo.mutation.SetPinYin(s)
@@ -565,21 +546,21 @@ func (cuo *CharacterUpdateOne) AddStroke(i int8) *CharacterUpdateOne {
 	return cuo
 }
 
-// SetIsKangXi sets the "is_kang_xi" field.
-func (cuo *CharacterUpdateOne) SetIsKangXi(b bool) *CharacterUpdateOne {
-	cuo.mutation.SetIsKangXi(b)
+// SetIsKangxi sets the "is_kangxi" field.
+func (cuo *CharacterUpdateOne) SetIsKangxi(b bool) *CharacterUpdateOne {
+	cuo.mutation.SetIsKangxi(b)
 	return cuo
 }
 
-// SetKangXi sets the "kang_xi" field.
-func (cuo *CharacterUpdateOne) SetKangXi(s string) *CharacterUpdateOne {
-	cuo.mutation.SetKangXi(s)
+// SetKangxi sets the "kangxi" field.
+func (cuo *CharacterUpdateOne) SetKangxi(s string) *CharacterUpdateOne {
+	cuo.mutation.SetKangxi(s)
 	return cuo
 }
 
-// SetKangXiStroke sets the "kang_xi_stroke" field.
-func (cuo *CharacterUpdateOne) SetKangXiStroke(s string) *CharacterUpdateOne {
-	cuo.mutation.SetKangXiStroke(s)
+// SetKangxiStroke sets the "kangxi_stroke" field.
+func (cuo *CharacterUpdateOne) SetKangxiStroke(s string) *CharacterUpdateOne {
+	cuo.mutation.SetKangxiStroke(s)
 	return cuo
 }
 
@@ -751,7 +732,7 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 			Table:   character.Table,
 			Columns: character.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: character.FieldID,
 			},
 		},
@@ -779,13 +760,6 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := cuo.mutation.Hash(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: character.FieldHash,
-		})
 	}
 	if value, ok := cuo.mutation.PinYin(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -850,25 +824,25 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 			Column: character.FieldStroke,
 		})
 	}
-	if value, ok := cuo.mutation.IsKangXi(); ok {
+	if value, ok := cuo.mutation.IsKangxi(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Value:  value,
-			Column: character.FieldIsKangXi,
+			Column: character.FieldIsKangxi,
 		})
 	}
-	if value, ok := cuo.mutation.KangXi(); ok {
+	if value, ok := cuo.mutation.Kangxi(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: character.FieldKangXi,
+			Column: character.FieldKangxi,
 		})
 	}
-	if value, ok := cuo.mutation.KangXiStroke(); ok {
+	if value, ok := cuo.mutation.KangxiStroke(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: character.FieldKangXiStroke,
+			Column: character.FieldKangxiStroke,
 		})
 	}
 	if value, ok := cuo.mutation.SimpleRadical(); ok {

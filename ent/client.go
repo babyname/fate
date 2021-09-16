@@ -161,7 +161,7 @@ func (c *CharacterClient) UpdateOne(ch *Character) *CharacterUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CharacterClient) UpdateOneID(id int) *CharacterUpdateOne {
+func (c *CharacterClient) UpdateOneID(id string) *CharacterUpdateOne {
 	mutation := newCharacterMutation(c.config, OpUpdateOne, withCharacterID(id))
 	return &CharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -178,7 +178,7 @@ func (c *CharacterClient) DeleteOne(ch *Character) *CharacterDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *CharacterClient) DeleteOneID(id int) *CharacterDeleteOne {
+func (c *CharacterClient) DeleteOneID(id string) *CharacterDeleteOne {
 	builder := c.Delete().Where(character.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -193,12 +193,12 @@ func (c *CharacterClient) Query() *CharacterQuery {
 }
 
 // Get returns a Character entity by its id.
-func (c *CharacterClient) Get(ctx context.Context, id int) (*Character, error) {
+func (c *CharacterClient) Get(ctx context.Context, id string) (*Character, error) {
 	return c.Query().Where(character.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CharacterClient) GetX(ctx context.Context, id int) *Character {
+func (c *CharacterClient) GetX(ctx context.Context, id string) *Character {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
