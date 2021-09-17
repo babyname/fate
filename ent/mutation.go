@@ -33,25 +33,27 @@ type CharacterMutation struct {
 	id                            *string
 	pin_yin                       *[]string
 	ch                            *string
-	science_stroke                *int8
-	addscience_stroke             *int8
+	science_stroke                *int
+	addscience_stroke             *int
 	radical                       *string
-	radical_stroke                *int8
-	addradical_stroke             *int8
-	stroke                        *int8
-	addstroke                     *int8
+	radical_stroke                *int
+	addradical_stroke             *int
+	stroke                        *int
+	addstroke                     *int
 	is_kangxi                     *bool
 	kangxi                        *string
-	kangxi_stroke                 *string
+	kangxi_stroke                 *int
+	addkangxi_stroke              *int
 	simple_radical                *string
-	simple_radical_stroke         *string
-	simple_total_stroke           *int8
-	addsimple_total_stroke        *int8
+	simple_radical_stroke         *int
+	addsimple_radical_stroke      *int
+	simple_total_stroke           *int
+	addsimple_total_stroke        *int
 	traditional_radical           *string
-	traditional_radical_stroke    *int8
-	addtraditional_radical_stroke *int8
-	traditional_total_stroke      *int8
-	addtraditional_total_stroke   *int8
+	traditional_radical_stroke    *int
+	addtraditional_radical_stroke *int
+	traditional_total_stroke      *int
+	addtraditional_total_stroke   *int
 	is_name_science               *bool
 	wu_xing                       *string
 	lucky                         *string
@@ -223,13 +225,13 @@ func (m *CharacterMutation) ResetCh() {
 }
 
 // SetScienceStroke sets the "science_stroke" field.
-func (m *CharacterMutation) SetScienceStroke(i int8) {
+func (m *CharacterMutation) SetScienceStroke(i int) {
 	m.science_stroke = &i
 	m.addscience_stroke = nil
 }
 
 // ScienceStroke returns the value of the "science_stroke" field in the mutation.
-func (m *CharacterMutation) ScienceStroke() (r int8, exists bool) {
+func (m *CharacterMutation) ScienceStroke() (r int, exists bool) {
 	v := m.science_stroke
 	if v == nil {
 		return
@@ -240,7 +242,7 @@ func (m *CharacterMutation) ScienceStroke() (r int8, exists bool) {
 // OldScienceStroke returns the old "science_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldScienceStroke(ctx context.Context) (v int8, err error) {
+func (m *CharacterMutation) OldScienceStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldScienceStroke is only allowed on UpdateOne operations")
 	}
@@ -255,7 +257,7 @@ func (m *CharacterMutation) OldScienceStroke(ctx context.Context) (v int8, err e
 }
 
 // AddScienceStroke adds i to the "science_stroke" field.
-func (m *CharacterMutation) AddScienceStroke(i int8) {
+func (m *CharacterMutation) AddScienceStroke(i int) {
 	if m.addscience_stroke != nil {
 		*m.addscience_stroke += i
 	} else {
@@ -264,7 +266,7 @@ func (m *CharacterMutation) AddScienceStroke(i int8) {
 }
 
 // AddedScienceStroke returns the value that was added to the "science_stroke" field in this mutation.
-func (m *CharacterMutation) AddedScienceStroke() (r int8, exists bool) {
+func (m *CharacterMutation) AddedScienceStroke() (r int, exists bool) {
 	v := m.addscience_stroke
 	if v == nil {
 		return
@@ -315,13 +317,13 @@ func (m *CharacterMutation) ResetRadical() {
 }
 
 // SetRadicalStroke sets the "radical_stroke" field.
-func (m *CharacterMutation) SetRadicalStroke(i int8) {
+func (m *CharacterMutation) SetRadicalStroke(i int) {
 	m.radical_stroke = &i
 	m.addradical_stroke = nil
 }
 
 // RadicalStroke returns the value of the "radical_stroke" field in the mutation.
-func (m *CharacterMutation) RadicalStroke() (r int8, exists bool) {
+func (m *CharacterMutation) RadicalStroke() (r int, exists bool) {
 	v := m.radical_stroke
 	if v == nil {
 		return
@@ -332,7 +334,7 @@ func (m *CharacterMutation) RadicalStroke() (r int8, exists bool) {
 // OldRadicalStroke returns the old "radical_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldRadicalStroke(ctx context.Context) (v int8, err error) {
+func (m *CharacterMutation) OldRadicalStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldRadicalStroke is only allowed on UpdateOne operations")
 	}
@@ -347,7 +349,7 @@ func (m *CharacterMutation) OldRadicalStroke(ctx context.Context) (v int8, err e
 }
 
 // AddRadicalStroke adds i to the "radical_stroke" field.
-func (m *CharacterMutation) AddRadicalStroke(i int8) {
+func (m *CharacterMutation) AddRadicalStroke(i int) {
 	if m.addradical_stroke != nil {
 		*m.addradical_stroke += i
 	} else {
@@ -356,7 +358,7 @@ func (m *CharacterMutation) AddRadicalStroke(i int8) {
 }
 
 // AddedRadicalStroke returns the value that was added to the "radical_stroke" field in this mutation.
-func (m *CharacterMutation) AddedRadicalStroke() (r int8, exists bool) {
+func (m *CharacterMutation) AddedRadicalStroke() (r int, exists bool) {
 	v := m.addradical_stroke
 	if v == nil {
 		return
@@ -371,13 +373,13 @@ func (m *CharacterMutation) ResetRadicalStroke() {
 }
 
 // SetStroke sets the "stroke" field.
-func (m *CharacterMutation) SetStroke(i int8) {
+func (m *CharacterMutation) SetStroke(i int) {
 	m.stroke = &i
 	m.addstroke = nil
 }
 
 // Stroke returns the value of the "stroke" field in the mutation.
-func (m *CharacterMutation) Stroke() (r int8, exists bool) {
+func (m *CharacterMutation) Stroke() (r int, exists bool) {
 	v := m.stroke
 	if v == nil {
 		return
@@ -388,7 +390,7 @@ func (m *CharacterMutation) Stroke() (r int8, exists bool) {
 // OldStroke returns the old "stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldStroke(ctx context.Context) (v int8, err error) {
+func (m *CharacterMutation) OldStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldStroke is only allowed on UpdateOne operations")
 	}
@@ -403,7 +405,7 @@ func (m *CharacterMutation) OldStroke(ctx context.Context) (v int8, err error) {
 }
 
 // AddStroke adds i to the "stroke" field.
-func (m *CharacterMutation) AddStroke(i int8) {
+func (m *CharacterMutation) AddStroke(i int) {
 	if m.addstroke != nil {
 		*m.addstroke += i
 	} else {
@@ -412,7 +414,7 @@ func (m *CharacterMutation) AddStroke(i int8) {
 }
 
 // AddedStroke returns the value that was added to the "stroke" field in this mutation.
-func (m *CharacterMutation) AddedStroke() (r int8, exists bool) {
+func (m *CharacterMutation) AddedStroke() (r int, exists bool) {
 	v := m.addstroke
 	if v == nil {
 		return
@@ -499,12 +501,13 @@ func (m *CharacterMutation) ResetKangxi() {
 }
 
 // SetKangxiStroke sets the "kangxi_stroke" field.
-func (m *CharacterMutation) SetKangxiStroke(s string) {
-	m.kangxi_stroke = &s
+func (m *CharacterMutation) SetKangxiStroke(i int) {
+	m.kangxi_stroke = &i
+	m.addkangxi_stroke = nil
 }
 
 // KangxiStroke returns the value of the "kangxi_stroke" field in the mutation.
-func (m *CharacterMutation) KangxiStroke() (r string, exists bool) {
+func (m *CharacterMutation) KangxiStroke() (r int, exists bool) {
 	v := m.kangxi_stroke
 	if v == nil {
 		return
@@ -515,7 +518,7 @@ func (m *CharacterMutation) KangxiStroke() (r string, exists bool) {
 // OldKangxiStroke returns the old "kangxi_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldKangxiStroke(ctx context.Context) (v string, err error) {
+func (m *CharacterMutation) OldKangxiStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldKangxiStroke is only allowed on UpdateOne operations")
 	}
@@ -529,9 +532,28 @@ func (m *CharacterMutation) OldKangxiStroke(ctx context.Context) (v string, err 
 	return oldValue.KangxiStroke, nil
 }
 
+// AddKangxiStroke adds i to the "kangxi_stroke" field.
+func (m *CharacterMutation) AddKangxiStroke(i int) {
+	if m.addkangxi_stroke != nil {
+		*m.addkangxi_stroke += i
+	} else {
+		m.addkangxi_stroke = &i
+	}
+}
+
+// AddedKangxiStroke returns the value that was added to the "kangxi_stroke" field in this mutation.
+func (m *CharacterMutation) AddedKangxiStroke() (r int, exists bool) {
+	v := m.addkangxi_stroke
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetKangxiStroke resets all changes to the "kangxi_stroke" field.
 func (m *CharacterMutation) ResetKangxiStroke() {
 	m.kangxi_stroke = nil
+	m.addkangxi_stroke = nil
 }
 
 // SetSimpleRadical sets the "simple_radical" field.
@@ -571,12 +593,13 @@ func (m *CharacterMutation) ResetSimpleRadical() {
 }
 
 // SetSimpleRadicalStroke sets the "simple_radical_stroke" field.
-func (m *CharacterMutation) SetSimpleRadicalStroke(s string) {
-	m.simple_radical_stroke = &s
+func (m *CharacterMutation) SetSimpleRadicalStroke(i int) {
+	m.simple_radical_stroke = &i
+	m.addsimple_radical_stroke = nil
 }
 
 // SimpleRadicalStroke returns the value of the "simple_radical_stroke" field in the mutation.
-func (m *CharacterMutation) SimpleRadicalStroke() (r string, exists bool) {
+func (m *CharacterMutation) SimpleRadicalStroke() (r int, exists bool) {
 	v := m.simple_radical_stroke
 	if v == nil {
 		return
@@ -587,7 +610,7 @@ func (m *CharacterMutation) SimpleRadicalStroke() (r string, exists bool) {
 // OldSimpleRadicalStroke returns the old "simple_radical_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldSimpleRadicalStroke(ctx context.Context) (v string, err error) {
+func (m *CharacterMutation) OldSimpleRadicalStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldSimpleRadicalStroke is only allowed on UpdateOne operations")
 	}
@@ -601,19 +624,38 @@ func (m *CharacterMutation) OldSimpleRadicalStroke(ctx context.Context) (v strin
 	return oldValue.SimpleRadicalStroke, nil
 }
 
+// AddSimpleRadicalStroke adds i to the "simple_radical_stroke" field.
+func (m *CharacterMutation) AddSimpleRadicalStroke(i int) {
+	if m.addsimple_radical_stroke != nil {
+		*m.addsimple_radical_stroke += i
+	} else {
+		m.addsimple_radical_stroke = &i
+	}
+}
+
+// AddedSimpleRadicalStroke returns the value that was added to the "simple_radical_stroke" field in this mutation.
+func (m *CharacterMutation) AddedSimpleRadicalStroke() (r int, exists bool) {
+	v := m.addsimple_radical_stroke
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetSimpleRadicalStroke resets all changes to the "simple_radical_stroke" field.
 func (m *CharacterMutation) ResetSimpleRadicalStroke() {
 	m.simple_radical_stroke = nil
+	m.addsimple_radical_stroke = nil
 }
 
 // SetSimpleTotalStroke sets the "simple_total_stroke" field.
-func (m *CharacterMutation) SetSimpleTotalStroke(i int8) {
+func (m *CharacterMutation) SetSimpleTotalStroke(i int) {
 	m.simple_total_stroke = &i
 	m.addsimple_total_stroke = nil
 }
 
 // SimpleTotalStroke returns the value of the "simple_total_stroke" field in the mutation.
-func (m *CharacterMutation) SimpleTotalStroke() (r int8, exists bool) {
+func (m *CharacterMutation) SimpleTotalStroke() (r int, exists bool) {
 	v := m.simple_total_stroke
 	if v == nil {
 		return
@@ -624,7 +666,7 @@ func (m *CharacterMutation) SimpleTotalStroke() (r int8, exists bool) {
 // OldSimpleTotalStroke returns the old "simple_total_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldSimpleTotalStroke(ctx context.Context) (v int8, err error) {
+func (m *CharacterMutation) OldSimpleTotalStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldSimpleTotalStroke is only allowed on UpdateOne operations")
 	}
@@ -639,7 +681,7 @@ func (m *CharacterMutation) OldSimpleTotalStroke(ctx context.Context) (v int8, e
 }
 
 // AddSimpleTotalStroke adds i to the "simple_total_stroke" field.
-func (m *CharacterMutation) AddSimpleTotalStroke(i int8) {
+func (m *CharacterMutation) AddSimpleTotalStroke(i int) {
 	if m.addsimple_total_stroke != nil {
 		*m.addsimple_total_stroke += i
 	} else {
@@ -648,7 +690,7 @@ func (m *CharacterMutation) AddSimpleTotalStroke(i int8) {
 }
 
 // AddedSimpleTotalStroke returns the value that was added to the "simple_total_stroke" field in this mutation.
-func (m *CharacterMutation) AddedSimpleTotalStroke() (r int8, exists bool) {
+func (m *CharacterMutation) AddedSimpleTotalStroke() (r int, exists bool) {
 	v := m.addsimple_total_stroke
 	if v == nil {
 		return
@@ -699,13 +741,13 @@ func (m *CharacterMutation) ResetTraditionalRadical() {
 }
 
 // SetTraditionalRadicalStroke sets the "traditional_radical_stroke" field.
-func (m *CharacterMutation) SetTraditionalRadicalStroke(i int8) {
+func (m *CharacterMutation) SetTraditionalRadicalStroke(i int) {
 	m.traditional_radical_stroke = &i
 	m.addtraditional_radical_stroke = nil
 }
 
 // TraditionalRadicalStroke returns the value of the "traditional_radical_stroke" field in the mutation.
-func (m *CharacterMutation) TraditionalRadicalStroke() (r int8, exists bool) {
+func (m *CharacterMutation) TraditionalRadicalStroke() (r int, exists bool) {
 	v := m.traditional_radical_stroke
 	if v == nil {
 		return
@@ -716,7 +758,7 @@ func (m *CharacterMutation) TraditionalRadicalStroke() (r int8, exists bool) {
 // OldTraditionalRadicalStroke returns the old "traditional_radical_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldTraditionalRadicalStroke(ctx context.Context) (v int8, err error) {
+func (m *CharacterMutation) OldTraditionalRadicalStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldTraditionalRadicalStroke is only allowed on UpdateOne operations")
 	}
@@ -731,7 +773,7 @@ func (m *CharacterMutation) OldTraditionalRadicalStroke(ctx context.Context) (v 
 }
 
 // AddTraditionalRadicalStroke adds i to the "traditional_radical_stroke" field.
-func (m *CharacterMutation) AddTraditionalRadicalStroke(i int8) {
+func (m *CharacterMutation) AddTraditionalRadicalStroke(i int) {
 	if m.addtraditional_radical_stroke != nil {
 		*m.addtraditional_radical_stroke += i
 	} else {
@@ -740,7 +782,7 @@ func (m *CharacterMutation) AddTraditionalRadicalStroke(i int8) {
 }
 
 // AddedTraditionalRadicalStroke returns the value that was added to the "traditional_radical_stroke" field in this mutation.
-func (m *CharacterMutation) AddedTraditionalRadicalStroke() (r int8, exists bool) {
+func (m *CharacterMutation) AddedTraditionalRadicalStroke() (r int, exists bool) {
 	v := m.addtraditional_radical_stroke
 	if v == nil {
 		return
@@ -755,13 +797,13 @@ func (m *CharacterMutation) ResetTraditionalRadicalStroke() {
 }
 
 // SetTraditionalTotalStroke sets the "traditional_total_stroke" field.
-func (m *CharacterMutation) SetTraditionalTotalStroke(i int8) {
+func (m *CharacterMutation) SetTraditionalTotalStroke(i int) {
 	m.traditional_total_stroke = &i
 	m.addtraditional_total_stroke = nil
 }
 
 // TraditionalTotalStroke returns the value of the "traditional_total_stroke" field in the mutation.
-func (m *CharacterMutation) TraditionalTotalStroke() (r int8, exists bool) {
+func (m *CharacterMutation) TraditionalTotalStroke() (r int, exists bool) {
 	v := m.traditional_total_stroke
 	if v == nil {
 		return
@@ -772,7 +814,7 @@ func (m *CharacterMutation) TraditionalTotalStroke() (r int8, exists bool) {
 // OldTraditionalTotalStroke returns the old "traditional_total_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldTraditionalTotalStroke(ctx context.Context) (v int8, err error) {
+func (m *CharacterMutation) OldTraditionalTotalStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldTraditionalTotalStroke is only allowed on UpdateOne operations")
 	}
@@ -787,7 +829,7 @@ func (m *CharacterMutation) OldTraditionalTotalStroke(ctx context.Context) (v in
 }
 
 // AddTraditionalTotalStroke adds i to the "traditional_total_stroke" field.
-func (m *CharacterMutation) AddTraditionalTotalStroke(i int8) {
+func (m *CharacterMutation) AddTraditionalTotalStroke(i int) {
 	if m.addtraditional_total_stroke != nil {
 		*m.addtraditional_total_stroke += i
 	} else {
@@ -796,7 +838,7 @@ func (m *CharacterMutation) AddTraditionalTotalStroke(i int8) {
 }
 
 // AddedTraditionalTotalStroke returns the value that was added to the "traditional_total_stroke" field in this mutation.
-func (m *CharacterMutation) AddedTraditionalTotalStroke() (r int8, exists bool) {
+func (m *CharacterMutation) AddedTraditionalTotalStroke() (r int, exists bool) {
 	v := m.addtraditional_total_stroke
 	if v == nil {
 		return
@@ -1272,7 +1314,7 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetCh(v)
 		return nil
 	case character.FieldScienceStroke:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1286,14 +1328,14 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetRadical(v)
 		return nil
 	case character.FieldRadicalStroke:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRadicalStroke(v)
 		return nil
 	case character.FieldStroke:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1314,7 +1356,7 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetKangxi(v)
 		return nil
 	case character.FieldKangxiStroke:
-		v, ok := value.(string)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1328,14 +1370,14 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetSimpleRadical(v)
 		return nil
 	case character.FieldSimpleRadicalStroke:
-		v, ok := value.(string)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSimpleRadicalStroke(v)
 		return nil
 	case character.FieldSimpleTotalStroke:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1349,14 +1391,14 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetTraditionalRadical(v)
 		return nil
 	case character.FieldTraditionalRadicalStroke:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTraditionalRadicalStroke(v)
 		return nil
 	case character.FieldTraditionalTotalStroke:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1428,6 +1470,12 @@ func (m *CharacterMutation) AddedFields() []string {
 	if m.addstroke != nil {
 		fields = append(fields, character.FieldStroke)
 	}
+	if m.addkangxi_stroke != nil {
+		fields = append(fields, character.FieldKangxiStroke)
+	}
+	if m.addsimple_radical_stroke != nil {
+		fields = append(fields, character.FieldSimpleRadicalStroke)
+	}
 	if m.addsimple_total_stroke != nil {
 		fields = append(fields, character.FieldSimpleTotalStroke)
 	}
@@ -1451,6 +1499,10 @@ func (m *CharacterMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedRadicalStroke()
 	case character.FieldStroke:
 		return m.AddedStroke()
+	case character.FieldKangxiStroke:
+		return m.AddedKangxiStroke()
+	case character.FieldSimpleRadicalStroke:
+		return m.AddedSimpleRadicalStroke()
 	case character.FieldSimpleTotalStroke:
 		return m.AddedSimpleTotalStroke()
 	case character.FieldTraditionalRadicalStroke:
@@ -1467,42 +1519,56 @@ func (m *CharacterMutation) AddedField(name string) (ent.Value, bool) {
 func (m *CharacterMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case character.FieldScienceStroke:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddScienceStroke(v)
 		return nil
 	case character.FieldRadicalStroke:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddRadicalStroke(v)
 		return nil
 	case character.FieldStroke:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddStroke(v)
 		return nil
+	case character.FieldKangxiStroke:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddKangxiStroke(v)
+		return nil
+	case character.FieldSimpleRadicalStroke:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSimpleRadicalStroke(v)
+		return nil
 	case character.FieldSimpleTotalStroke:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddSimpleTotalStroke(v)
 		return nil
 	case character.FieldTraditionalRadicalStroke:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTraditionalRadicalStroke(v)
 		return nil
 	case character.FieldTraditionalTotalStroke:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
