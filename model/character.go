@@ -11,6 +11,9 @@ import (
 	"github.com/godcong/fate/ent/character"
 )
 
+type CharQuery func(query *ent.CharacterQuery) *ent.CharacterQuery
+type StrokeQuery func(query *ent.CharacterQuery, s int) *ent.CharacterQuery
+
 func (m Model) GetCharacter(ctx context.Context, filters ...func(query *ent.CharacterQuery) *ent.CharacterQuery) (
 	*ent.Character, error) {
 	q := m.Character.Query()
@@ -31,7 +34,6 @@ func (m Model) GetCharacters(ctx context.Context, filters ...func(query *ent.Cha
 
 // InsertOrUpdateCharacter ...
 func (m Model) InsertOrUpdateCharacter(ctx context.Context, nch *ent.Character) (ch *ent.Character, e error) {
-
 	tx, e := m.Tx(ctx)
 	if e != nil {
 		return nil, e
@@ -68,4 +70,36 @@ func Char(name string) func(query *ent.CharacterQuery) *ent.CharacterQuery {
 				sqljson.ValueContains(character.FieldTraditionalCharacter, name)
 			}))
 	}
+}
+
+// Regular ...
+func Regular() func(query *ent.CharacterQuery) *ent.CharacterQuery {
+	return func(query *ent.CharacterQuery) *ent.CharacterQuery {
+		return query.Where(character.IsRegular(true))
+	}
+}
+
+func StrokeKangxi(query *ent.CharacterQuery, s int) *ent.CharacterQuery {
+	return query.Where(character.Or(character.KangxiStrokeEQ(s)))
+}
+
+func StrokeSimpleTotal(query *ent.CharacterQuery, s int) *ent.CharacterQuery {
+	return query.Where(character.Or(character.SimpleTotalStrokeEQ(s)))
+}
+
+func StrokeTraditionalTotal(query *ent.CharacterQuery, s int) *ent.CharacterQuery {
+	return query.Where(character.Or(character.TraditionalTotalStrokeEQ(s)))
+}
+
+// Stroke ...
+func Stroke(s int, sqs ...StrokeQuery) CharQuery {
+	return func(query *ent.CharacterQuery) *ent.CharacterQuery {
+		q := query.Where(character.And(character.ScienceStrokeEQ(s), func(selector *sql.Selector) {
+		}))
+		for i := range sqs {
+			q = sqs[i](q, s)
+		}
+		return q
+	}
+
 }
