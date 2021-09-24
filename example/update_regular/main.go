@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/godcong/fate"
-	"github.com/godcong/fate/config"
-	"github.com/godcong/fate/regular"
+	"github.com/babyname/fate"
+	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/regular"
 )
 
 func main() {

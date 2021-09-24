@@ -1,4 +1,4 @@
-module github.com/godcong/fate
+module github.com/babyname/fate
 
 require (
 	github.com/go-sql-driver/mysql v1.4.1
@@ -14,4 +14,4 @@ require (
 	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5 // indirect
 )
 
-go 1.13
+go 1.16

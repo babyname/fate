@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"github.com/godcong/fate"
+	"github.com/babyname/fate"
 	"github.com/goextension/log"
 	"github.com/xormsharp/xorm"
 	"io/ioutil"

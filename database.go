@@ -3,7 +3,7 @@ package fate
 import (
 	"fmt"
 	"github.com/go-sql-driver/mysql"
-	"github.com/godcong/fate/config"
+	"github.com/babyname/fate/config"
 	"github.com/goextension/log"
 
 	"github.com/xormsharp/xorm"

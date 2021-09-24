@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/godcong/fate"
+	"github.com/babyname/fate"
 	"github.com/xormsharp/xorm"
 )
 
