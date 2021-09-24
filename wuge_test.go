@@ -2,7 +2,7 @@ package fate_test
 
 import (
 	"fmt"
-	"github.com/godcong/fate"
+	"github.com/babyname/fate"
 	"log"
 	"testing"
 )

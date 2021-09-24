@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/godcong/fate"
+	"github.com/babyname/fate"
 	"github.com/spf13/cobra"
 )
 
