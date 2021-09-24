@@ -14,7 +14,7 @@ import (
 type CharQuery func(query *ent.CharacterQuery) *ent.CharacterQuery
 type StrokeQuery func(query *ent.CharacterQuery, s int) *ent.CharacterQuery
 
-func (m Model) GetCharacter(ctx context.Context, filters ...func(query *ent.CharacterQuery) *ent.CharacterQuery) (
+func (m Model) GetCharacter(ctx context.Context, filters ...CharQuery) (
 	*ent.Character, error) {
 	q := m.Character.Query()
 	for _, filter := range filters {
@@ -23,7 +23,7 @@ func (m Model) GetCharacter(ctx context.Context, filters ...func(query *ent.Char
 	return q.First(ctx)
 }
 
-func (m Model) GetCharacters(ctx context.Context, filters ...func(query *ent.CharacterQuery) *ent.CharacterQuery) (
+func (m Model) GetCharacters(ctx context.Context, filters ...CharQuery) (
 	[]*ent.Character, error) {
 	q := m.Character.Query()
 	for _, filter := range filters {
@@ -38,6 +38,8 @@ func (m Model) InsertOrUpdateCharacter(ctx context.Context, nch *ent.Character) 
 	if e != nil {
 		return nil, e
 	}
+
+	m.Character.Create().SetPinYin([]string{})
 
 	count, e := tx.Character.Query().Where(character.ID(nch.ID)).Count(ctx)
 	if e != nil {
@@ -62,7 +64,7 @@ func (m Model) InsertOrUpdateCharacter(ctx context.Context, nch *ent.Character) 
 }
 
 // Char ...
-func Char(name string) func(query *ent.CharacterQuery) *ent.CharacterQuery {
+func Char(name string) CharQuery {
 	return func(query *ent.CharacterQuery) *ent.CharacterQuery {
 		return query.Where(character.ChEQ(name),
 			character.Or(character.KangxiEQ(name)),
