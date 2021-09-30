@@ -3,8 +3,8 @@ package fate_test
 import (
 	"context"
 	"github.com/godcong/chronos"
-	"github.com/godcong/fate"
-	"github.com/godcong/fate/config"
+	"github.com/babyname/fate"
+	"github.com/babyname/fate/config"
 	"testing"
 )
 
