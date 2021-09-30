@@ -82,7 +82,7 @@ jobs:
     
     - name: Upload Linux
       uses: actions/upload-artifact@master
-      if: (matrix.platform == 'ubuntu-latest' || (matrix.platform == 'macos-latest' && matrix.arch == `amd64`)) && env.UPLOAD_BIN_FILE
+      if: (matrix.platform == 'ubuntu-latest' || (matrix.platform == 'macos-latest' && matrix.arch == 'amd64')) && env.UPLOAD_BIN_FILE
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       with:
