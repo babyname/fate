@@ -2,10 +2,10 @@
 
 ![FATE](docs/fate.png)
 
-![Go](https://github.com/godcong/fate/workflows/Go/badge.svg)
-[![GoDoc](https://godoc.org/github.com/godcong/fate?status.svg)](http://godoc.org/github.com/godcong/fate)
-[![license](https://img.shields.io/github/license/godcong/fate.svg)](https://github.com/godcong/fate/blob/master/LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/godcong/fate)](https://goreportcard.com/report/github.com/godcong/fate)
+![Go](https://github.com/babyname/fate/workflows/Go/badge.svg)
+[![GoDoc](https://godoc.org/github.com/babyname/fate?status.svg)](http://godoc.org/github.com/babyname/fate)
+[![license](https://img.shields.io/github/license/babyname/fate.svg)](https://github.com/babyname/fate/blob/master/LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/babyname/fate)](https://goreportcard.com/report/github.com/babyname/fate)
 
 ## 现代科学取名工具(A modern science chinese name create tool)
 
