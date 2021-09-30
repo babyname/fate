@@ -5,7 +5,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"github.com/godcong/fate/config"
+	"github.com/babyname/fate/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"

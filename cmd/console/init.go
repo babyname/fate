@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/godcong/fate/config"
+	"github.com/babyname/fate/config"
 	"github.com/goextension/log"
 	"github.com/spf13/cobra"
 	"path/filepath"

@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/godcong/chronos"
-	"github.com/godcong/fate"
-	"github.com/godcong/fate/config"
+	"github.com/babyname/fate"
+	"github.com/babyname/fate/config"
 	"github.com/goextension/log"
 	"github.com/spf13/cobra"
 )

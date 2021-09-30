@@ -1,4 +1,4 @@
-module github.com/godcong/fate
+module github.com/babyname/fate
 
 require (
 	entgo.io/ent v0.8.0

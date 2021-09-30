@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/godcong/fate/config"
+	"github.com/babyname/fate/config"
 	"github.com/godcong/fate/model"
 
 	"github.com/godcong/chronos"
