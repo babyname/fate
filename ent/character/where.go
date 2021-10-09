@@ -4,7 +4,7 @@ package character
 
 import (
 	"entgo.io/ent/dialect/sql"
-	"github.com/godcong/fate/ent/predicate"
+	"github.com/babyname/fate/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
@@ -220,6 +220,20 @@ func IsRegular(v bool) predicate.Character {
 func Comment(v string) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldComment), v))
+	})
+}
+
+// PinYinIsNil applies the IsNil predicate on the "pin_yin" field.
+func PinYinIsNil() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldPinYin)))
+	})
+}
+
+// PinYinNotNil applies the NotNil predicate on the "pin_yin" field.
+func PinYinNotNil() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldPinYin)))
 	})
 }
 
@@ -1647,6 +1661,34 @@ func IsRegularEQ(v bool) predicate.Character {
 func IsRegularNEQ(v bool) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldIsRegular), v))
+	})
+}
+
+// TraditionalCharacterIsNil applies the IsNil predicate on the "traditional_character" field.
+func TraditionalCharacterIsNil() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldTraditionalCharacter)))
+	})
+}
+
+// TraditionalCharacterNotNil applies the NotNil predicate on the "traditional_character" field.
+func TraditionalCharacterNotNil() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldTraditionalCharacter)))
+	})
+}
+
+// VariantCharacterIsNil applies the IsNil predicate on the "variant_character" field.
+func VariantCharacterIsNil() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldVariantCharacter)))
+	})
+}
+
+// VariantCharacterNotNil applies the NotNil predicate on the "variant_character" field.
+func VariantCharacterNotNil() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldVariantCharacter)))
 	})
 }
 

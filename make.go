@@ -11,8 +11,8 @@ import (
 	"github.com/godcong/chronos"
 	"github.com/goextension/log"
 
-	"github.com/godcong/fate/ent"
-	"github.com/godcong/fate/model"
+	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/model"
 )
 
 var ErrLastNameNotInput = errors.New("last name was not inputted")
