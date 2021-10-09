@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/godcong/fate/ent/migrate"
+	"github.com/babyname/fate/ent/migrate"
 
-	"github.com/godcong/fate/ent/character"
+	"github.com/babyname/fate/ent/character"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"

@@ -7,8 +7,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqljson"
 
-	"github.com/godcong/fate/ent"
-	"github.com/godcong/fate/ent/character"
+	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/ent/character"
 )
 
 type CharQuery func(query *ent.CharacterQuery) *ent.CharacterQuery
@@ -39,15 +39,18 @@ func (m Model) InsertOrUpdateCharacter(ctx context.Context, nch *ent.Character) 
 		return nil, e
 	}
 
-	m.Character.Create().SetPinYin([]string{})
-
 	count, e := tx.Character.Query().Where(character.ID(nch.ID)).Count(ctx)
 	if e != nil {
 		return nil, fmt.Errorf("error updating character: %v,rollback: %v", e, tx.Rollback())
 	}
 
 	if count > 0 {
-		ch, e = tx.Character.UpdateOne(nch).Save(ctx)
+		ch, e = tx.Character.UpdateOne(nch).
+			SetCharacter(nch).
+			SetPinYin(nch.PinYin).
+			SetTraditionalCharacter(nch.TraditionalCharacter).
+			SetVariantCharacter(nch.VariantCharacter).
+			Save(ctx)
 		if e != nil {
 			return nil, fmt.Errorf("error updating character: %v,rollback: %v", e, tx.Rollback())
 
@@ -55,7 +58,13 @@ func (m Model) InsertOrUpdateCharacter(ctx context.Context, nch *ent.Character) 
 		return ch, tx.Commit()
 	}
 
-	ch, e = tx.Character.Create().Save(ctx)
+	ch, e = tx.Character.Create().
+		SetID(nch.ID).
+		SetCharacter(nch).
+		SetPinYin(nch.PinYin).
+		SetTraditionalCharacter(nch.TraditionalCharacter).
+		SetVariantCharacter(nch.VariantCharacter).
+		Save(ctx)
 	if e != nil {
 		return nil, fmt.Errorf("error updating character: %v,rollback: %v", e, tx.Rollback())
 
