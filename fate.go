@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/babyname/fate/config"
-	"github.com/godcong/fate/model"
+	"github.com/babyname/fate/model"
 
 	"github.com/godcong/chronos"
 )
@@ -15,7 +15,7 @@ import (
 type HandleOutputFunc func(name Name)
 
 // HelpContent ...
-const HelpContent = "正在使用Fate生成姓名列表，如遇到问题请访问项目地址：https://github.com/godcong/fate获取帮助!"
+const HelpContent = "正在使用Fate生成姓名列表，如遇到问题请访问项目地址：https://github.com/babyname/fate获取帮助!"
 
 // Fate ...
 type Fate interface {
