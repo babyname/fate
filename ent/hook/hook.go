@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/godcong/fate/ent"
+	"github.com/babyname/fate/ent"
 )
 
 // The CharacterFunc type is an adapter to allow the use of ordinary

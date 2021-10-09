@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/godcong/fate/ent/character"
+	"github.com/babyname/fate/ent/character"
 )
 
 // CharacterCreate is the builder for creating a Character entity.
@@ -183,11 +183,17 @@ func (cc *CharacterCreate) Save(ctx context.Context) (*Character, error) {
 				return nil, err
 			}
 			cc.mutation = mutation
-			node, err = cc.sqlSave(ctx)
+			if node, err = cc.sqlSave(ctx); err != nil {
+				return nil, err
+			}
+			mutation.id = &node.ID
 			mutation.done = true
 			return node, err
 		})
 		for i := len(cc.hooks) - 1; i >= 0; i-- {
+			if cc.hooks[i] == nil {
+				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
+			}
 			mut = cc.hooks[i](mut)
 		}
 		if _, err := mut.Mutate(ctx, cc.mutation); err != nil {
@@ -206,73 +212,77 @@ func (cc *CharacterCreate) SaveX(ctx context.Context) *Character {
 	return v
 }
 
+// Exec executes the query.
+func (cc *CharacterCreate) Exec(ctx context.Context) error {
+	_, err := cc.Save(ctx)
+	return err
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (cc *CharacterCreate) ExecX(ctx context.Context) {
+	if err := cc.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cc *CharacterCreate) check() error {
-	if _, ok := cc.mutation.PinYin(); !ok {
-		return &ValidationError{Name: "pin_yin", err: errors.New("ent: missing required field \"pin_yin\"")}
-	}
 	if _, ok := cc.mutation.Ch(); !ok {
-		return &ValidationError{Name: "ch", err: errors.New("ent: missing required field \"ch\"")}
+		return &ValidationError{Name: "ch", err: errors.New(`ent: missing required field "ch"`)}
 	}
 	if _, ok := cc.mutation.ScienceStroke(); !ok {
-		return &ValidationError{Name: "science_stroke", err: errors.New("ent: missing required field \"science_stroke\"")}
+		return &ValidationError{Name: "science_stroke", err: errors.New(`ent: missing required field "science_stroke"`)}
 	}
 	if _, ok := cc.mutation.Radical(); !ok {
-		return &ValidationError{Name: "radical", err: errors.New("ent: missing required field \"radical\"")}
+		return &ValidationError{Name: "radical", err: errors.New(`ent: missing required field "radical"`)}
 	}
 	if _, ok := cc.mutation.RadicalStroke(); !ok {
-		return &ValidationError{Name: "radical_stroke", err: errors.New("ent: missing required field \"radical_stroke\"")}
+		return &ValidationError{Name: "radical_stroke", err: errors.New(`ent: missing required field "radical_stroke"`)}
 	}
 	if _, ok := cc.mutation.Stroke(); !ok {
-		return &ValidationError{Name: "stroke", err: errors.New("ent: missing required field \"stroke\"")}
+		return &ValidationError{Name: "stroke", err: errors.New(`ent: missing required field "stroke"`)}
 	}
 	if _, ok := cc.mutation.IsKangxi(); !ok {
-		return &ValidationError{Name: "is_kangxi", err: errors.New("ent: missing required field \"is_kangxi\"")}
+		return &ValidationError{Name: "is_kangxi", err: errors.New(`ent: missing required field "is_kangxi"`)}
 	}
 	if _, ok := cc.mutation.Kangxi(); !ok {
-		return &ValidationError{Name: "kangxi", err: errors.New("ent: missing required field \"kangxi\"")}
+		return &ValidationError{Name: "kangxi", err: errors.New(`ent: missing required field "kangxi"`)}
 	}
 	if _, ok := cc.mutation.KangxiStroke(); !ok {
-		return &ValidationError{Name: "kangxi_stroke", err: errors.New("ent: missing required field \"kangxi_stroke\"")}
+		return &ValidationError{Name: "kangxi_stroke", err: errors.New(`ent: missing required field "kangxi_stroke"`)}
 	}
 	if _, ok := cc.mutation.SimpleRadical(); !ok {
-		return &ValidationError{Name: "simple_radical", err: errors.New("ent: missing required field \"simple_radical\"")}
+		return &ValidationError{Name: "simple_radical", err: errors.New(`ent: missing required field "simple_radical"`)}
 	}
 	if _, ok := cc.mutation.SimpleRadicalStroke(); !ok {
-		return &ValidationError{Name: "simple_radical_stroke", err: errors.New("ent: missing required field \"simple_radical_stroke\"")}
+		return &ValidationError{Name: "simple_radical_stroke", err: errors.New(`ent: missing required field "simple_radical_stroke"`)}
 	}
 	if _, ok := cc.mutation.SimpleTotalStroke(); !ok {
-		return &ValidationError{Name: "simple_total_stroke", err: errors.New("ent: missing required field \"simple_total_stroke\"")}
+		return &ValidationError{Name: "simple_total_stroke", err: errors.New(`ent: missing required field "simple_total_stroke"`)}
 	}
 	if _, ok := cc.mutation.TraditionalRadical(); !ok {
-		return &ValidationError{Name: "traditional_radical", err: errors.New("ent: missing required field \"traditional_radical\"")}
+		return &ValidationError{Name: "traditional_radical", err: errors.New(`ent: missing required field "traditional_radical"`)}
 	}
 	if _, ok := cc.mutation.TraditionalRadicalStroke(); !ok {
-		return &ValidationError{Name: "traditional_radical_stroke", err: errors.New("ent: missing required field \"traditional_radical_stroke\"")}
+		return &ValidationError{Name: "traditional_radical_stroke", err: errors.New(`ent: missing required field "traditional_radical_stroke"`)}
 	}
 	if _, ok := cc.mutation.TraditionalTotalStroke(); !ok {
-		return &ValidationError{Name: "traditional_total_stroke", err: errors.New("ent: missing required field \"traditional_total_stroke\"")}
+		return &ValidationError{Name: "traditional_total_stroke", err: errors.New(`ent: missing required field "traditional_total_stroke"`)}
 	}
 	if _, ok := cc.mutation.IsNameScience(); !ok {
-		return &ValidationError{Name: "is_name_science", err: errors.New("ent: missing required field \"is_name_science\"")}
+		return &ValidationError{Name: "is_name_science", err: errors.New(`ent: missing required field "is_name_science"`)}
 	}
 	if _, ok := cc.mutation.WuXing(); !ok {
-		return &ValidationError{Name: "wu_xing", err: errors.New("ent: missing required field \"wu_xing\"")}
+		return &ValidationError{Name: "wu_xing", err: errors.New(`ent: missing required field "wu_xing"`)}
 	}
 	if _, ok := cc.mutation.Lucky(); !ok {
-		return &ValidationError{Name: "lucky", err: errors.New("ent: missing required field \"lucky\"")}
+		return &ValidationError{Name: "lucky", err: errors.New(`ent: missing required field "lucky"`)}
 	}
 	if _, ok := cc.mutation.IsRegular(); !ok {
-		return &ValidationError{Name: "is_regular", err: errors.New("ent: missing required field \"is_regular\"")}
-	}
-	if _, ok := cc.mutation.TraditionalCharacter(); !ok {
-		return &ValidationError{Name: "traditional_character", err: errors.New("ent: missing required field \"traditional_character\"")}
-	}
-	if _, ok := cc.mutation.VariantCharacter(); !ok {
-		return &ValidationError{Name: "variant_character", err: errors.New("ent: missing required field \"variant_character\"")}
+		return &ValidationError{Name: "is_regular", err: errors.New(`ent: missing required field "is_regular"`)}
 	}
 	if _, ok := cc.mutation.Comment(); !ok {
-		return &ValidationError{Name: "comment", err: errors.New("ent: missing required field \"comment\"")}
+		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required field "comment"`)}
 	}
 	return nil
 }
@@ -280,10 +290,13 @@ func (cc *CharacterCreate) check() error {
 func (cc *CharacterCreate) sqlSave(ctx context.Context) (*Character, error) {
 	_node, _spec := cc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, cc.driver, _spec); err != nil {
-		if cerr, ok := isSQLConstraintError(err); ok {
-			err = cerr
+		if sqlgraph.IsConstraintError(err) {
+			err = &ConstraintError{err.Error(), err}
 		}
 		return nil, err
+	}
+	if _spec.ID.Value != nil {
+		_node.ID = _spec.ID.Value.(string)
 	}
 	return _node, nil
 }
@@ -510,17 +523,19 @@ func (ccb *CharacterCreateBulk) Save(ctx context.Context) ([]*Character, error) 
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
 				} else {
+					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, ccb.driver, &sqlgraph.BatchCreateSpec{Nodes: specs}); err != nil {
-						if cerr, ok := isSQLConstraintError(err); ok {
-							err = cerr
+					if err = sqlgraph.BatchCreate(ctx, ccb.driver, spec); err != nil {
+						if sqlgraph.IsConstraintError(err) {
+							err = &ConstraintError{err.Error(), err}
 						}
 					}
 				}
-				mutation.done = true
 				if err != nil {
 					return nil, err
 				}
+				mutation.id = &nodes[i].ID
+				mutation.done = true
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {
@@ -544,4 +559,17 @@ func (ccb *CharacterCreateBulk) SaveX(ctx context.Context) []*Character {
 		panic(err)
 	}
 	return v
+}
+
+// Exec executes the query.
+func (ccb *CharacterCreateBulk) Exec(ctx context.Context) error {
+	_, err := ccb.Save(ctx)
+	return err
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (ccb *CharacterCreateBulk) ExecX(ctx context.Context) {
+	if err := ccb.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

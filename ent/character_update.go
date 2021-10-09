@@ -9,8 +9,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/godcong/fate/ent/character"
-	"github.com/godcong/fate/ent/predicate"
+	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/ent/predicate"
 )
 
 // CharacterUpdate is the builder for updating Character entities.
@@ -20,15 +20,21 @@ type CharacterUpdate struct {
 	mutation *CharacterMutation
 }
 
-// Where adds a new predicate for the CharacterUpdate builder.
+// Where appends a list predicates to the CharacterUpdate builder.
 func (cu *CharacterUpdate) Where(ps ...predicate.Character) *CharacterUpdate {
-	cu.mutation.predicates = append(cu.mutation.predicates, ps...)
+	cu.mutation.Where(ps...)
 	return cu
 }
 
 // SetPinYin sets the "pin_yin" field.
 func (cu *CharacterUpdate) SetPinYin(s []string) *CharacterUpdate {
 	cu.mutation.SetPinYin(s)
+	return cu
+}
+
+// ClearPinYin clears the value of the "pin_yin" field.
+func (cu *CharacterUpdate) ClearPinYin() *CharacterUpdate {
+	cu.mutation.ClearPinYin()
 	return cu
 }
 
@@ -202,9 +208,21 @@ func (cu *CharacterUpdate) SetTraditionalCharacter(s []string) *CharacterUpdate 
 	return cu
 }
 
+// ClearTraditionalCharacter clears the value of the "traditional_character" field.
+func (cu *CharacterUpdate) ClearTraditionalCharacter() *CharacterUpdate {
+	cu.mutation.ClearTraditionalCharacter()
+	return cu
+}
+
 // SetVariantCharacter sets the "variant_character" field.
 func (cu *CharacterUpdate) SetVariantCharacter(s []string) *CharacterUpdate {
 	cu.mutation.SetVariantCharacter(s)
+	return cu
+}
+
+// ClearVariantCharacter clears the value of the "variant_character" field.
+func (cu *CharacterUpdate) ClearVariantCharacter() *CharacterUpdate {
+	cu.mutation.ClearVariantCharacter()
 	return cu
 }
 
@@ -239,6 +257,9 @@ func (cu *CharacterUpdate) Save(ctx context.Context) (int, error) {
 			return affected, err
 		})
 		for i := len(cu.hooks) - 1; i >= 0; i-- {
+			if cu.hooks[i] == nil {
+				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
+			}
 			mut = cu.hooks[i](mut)
 		}
 		if _, err := mut.Mutate(ctx, cu.mutation); err != nil {
@@ -292,6 +313,12 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
 			Value:  value,
+			Column: character.FieldPinYin,
+		})
+	}
+	if cu.mutation.PinYinCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
 			Column: character.FieldPinYin,
 		})
 	}
@@ -484,10 +511,22 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: character.FieldTraditionalCharacter,
 		})
 	}
+	if cu.mutation.TraditionalCharacterCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Column: character.FieldTraditionalCharacter,
+		})
+	}
 	if value, ok := cu.mutation.VariantCharacter(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
 			Value:  value,
+			Column: character.FieldVariantCharacter,
+		})
+	}
+	if cu.mutation.VariantCharacterCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
 			Column: character.FieldVariantCharacter,
 		})
 	}
@@ -501,8 +540,8 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{character.Label}
-		} else if cerr, ok := isSQLConstraintError(err); ok {
-			err = cerr
+		} else if sqlgraph.IsConstraintError(err) {
+			err = &ConstraintError{err.Error(), err}
 		}
 		return 0, err
 	}
@@ -520,6 +559,12 @@ type CharacterUpdateOne struct {
 // SetPinYin sets the "pin_yin" field.
 func (cuo *CharacterUpdateOne) SetPinYin(s []string) *CharacterUpdateOne {
 	cuo.mutation.SetPinYin(s)
+	return cuo
+}
+
+// ClearPinYin clears the value of the "pin_yin" field.
+func (cuo *CharacterUpdateOne) ClearPinYin() *CharacterUpdateOne {
+	cuo.mutation.ClearPinYin()
 	return cuo
 }
 
@@ -693,9 +738,21 @@ func (cuo *CharacterUpdateOne) SetTraditionalCharacter(s []string) *CharacterUpd
 	return cuo
 }
 
+// ClearTraditionalCharacter clears the value of the "traditional_character" field.
+func (cuo *CharacterUpdateOne) ClearTraditionalCharacter() *CharacterUpdateOne {
+	cuo.mutation.ClearTraditionalCharacter()
+	return cuo
+}
+
 // SetVariantCharacter sets the "variant_character" field.
 func (cuo *CharacterUpdateOne) SetVariantCharacter(s []string) *CharacterUpdateOne {
 	cuo.mutation.SetVariantCharacter(s)
+	return cuo
+}
+
+// ClearVariantCharacter clears the value of the "variant_character" field.
+func (cuo *CharacterUpdateOne) ClearVariantCharacter() *CharacterUpdateOne {
+	cuo.mutation.ClearVariantCharacter()
 	return cuo
 }
 
@@ -737,6 +794,9 @@ func (cuo *CharacterUpdateOne) Save(ctx context.Context) (*Character, error) {
 			return node, err
 		})
 		for i := len(cuo.hooks) - 1; i >= 0; i-- {
+			if cuo.hooks[i] == nil {
+				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
+			}
 			mut = cuo.hooks[i](mut)
 		}
 		if _, err := mut.Mutate(ctx, cuo.mutation); err != nil {
@@ -807,6 +867,12 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
 			Value:  value,
+			Column: character.FieldPinYin,
+		})
+	}
+	if cuo.mutation.PinYinCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
 			Column: character.FieldPinYin,
 		})
 	}
@@ -999,10 +1065,22 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 			Column: character.FieldTraditionalCharacter,
 		})
 	}
+	if cuo.mutation.TraditionalCharacterCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Column: character.FieldTraditionalCharacter,
+		})
+	}
 	if value, ok := cuo.mutation.VariantCharacter(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
 			Value:  value,
+			Column: character.FieldVariantCharacter,
+		})
+	}
+	if cuo.mutation.VariantCharacterCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
 			Column: character.FieldVariantCharacter,
 		})
 	}
@@ -1019,8 +1097,8 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 	if err = sqlgraph.UpdateNode(ctx, cuo.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{character.Label}
-		} else if cerr, ok := isSQLConstraintError(err); ok {
-			err = cerr
+		} else if sqlgraph.IsConstraintError(err) {
+			err = &ConstraintError{err.Error(), err}
 		}
 		return nil, err
 	}

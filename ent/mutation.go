@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/godcong/fate/ent/character"
-	"github.com/godcong/fate/ent/predicate"
+	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/ent/predicate"
 
 	"entgo.io/ent"
 )
@@ -143,8 +143,8 @@ func (m *CharacterMutation) SetID(id string) {
 	m.id = &id
 }
 
-// ID returns the ID value in the mutation. Note that the ID
-// is only available if it was provided to the builder.
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
 func (m *CharacterMutation) ID() (id string, exists bool) {
 	if m.id == nil {
 		return
@@ -183,9 +183,22 @@ func (m *CharacterMutation) OldPinYin(ctx context.Context) (v []string, err erro
 	return oldValue.PinYin, nil
 }
 
+// ClearPinYin clears the value of the "pin_yin" field.
+func (m *CharacterMutation) ClearPinYin() {
+	m.pin_yin = nil
+	m.clearedFields[character.FieldPinYin] = struct{}{}
+}
+
+// PinYinCleared returns if the "pin_yin" field was cleared in this mutation.
+func (m *CharacterMutation) PinYinCleared() bool {
+	_, ok := m.clearedFields[character.FieldPinYin]
+	return ok
+}
+
 // ResetPinYin resets all changes to the "pin_yin" field.
 func (m *CharacterMutation) ResetPinYin() {
 	m.pin_yin = nil
+	delete(m.clearedFields, character.FieldPinYin)
 }
 
 // SetCh sets the "ch" field.
@@ -1027,9 +1040,22 @@ func (m *CharacterMutation) OldTraditionalCharacter(ctx context.Context) (v []st
 	return oldValue.TraditionalCharacter, nil
 }
 
+// ClearTraditionalCharacter clears the value of the "traditional_character" field.
+func (m *CharacterMutation) ClearTraditionalCharacter() {
+	m.traditional_character = nil
+	m.clearedFields[character.FieldTraditionalCharacter] = struct{}{}
+}
+
+// TraditionalCharacterCleared returns if the "traditional_character" field was cleared in this mutation.
+func (m *CharacterMutation) TraditionalCharacterCleared() bool {
+	_, ok := m.clearedFields[character.FieldTraditionalCharacter]
+	return ok
+}
+
 // ResetTraditionalCharacter resets all changes to the "traditional_character" field.
 func (m *CharacterMutation) ResetTraditionalCharacter() {
 	m.traditional_character = nil
+	delete(m.clearedFields, character.FieldTraditionalCharacter)
 }
 
 // SetVariantCharacter sets the "variant_character" field.
@@ -1063,9 +1089,22 @@ func (m *CharacterMutation) OldVariantCharacter(ctx context.Context) (v []string
 	return oldValue.VariantCharacter, nil
 }
 
+// ClearVariantCharacter clears the value of the "variant_character" field.
+func (m *CharacterMutation) ClearVariantCharacter() {
+	m.variant_character = nil
+	m.clearedFields[character.FieldVariantCharacter] = struct{}{}
+}
+
+// VariantCharacterCleared returns if the "variant_character" field was cleared in this mutation.
+func (m *CharacterMutation) VariantCharacterCleared() bool {
+	_, ok := m.clearedFields[character.FieldVariantCharacter]
+	return ok
+}
+
 // ResetVariantCharacter resets all changes to the "variant_character" field.
 func (m *CharacterMutation) ResetVariantCharacter() {
 	m.variant_character = nil
+	delete(m.clearedFields, character.FieldVariantCharacter)
 }
 
 // SetComment sets the "comment" field.
@@ -1102,6 +1141,11 @@ func (m *CharacterMutation) OldComment(ctx context.Context) (v string, err error
 // ResetComment resets all changes to the "comment" field.
 func (m *CharacterMutation) ResetComment() {
 	m.comment = nil
+}
+
+// Where appends a list predicates to the CharacterMutation builder.
+func (m *CharacterMutation) Where(ps ...predicate.Character) {
+	m.predicates = append(m.predicates, ps...)
 }
 
 // Op returns the operation name.
@@ -1581,7 +1625,17 @@ func (m *CharacterMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *CharacterMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(character.FieldPinYin) {
+		fields = append(fields, character.FieldPinYin)
+	}
+	if m.FieldCleared(character.FieldTraditionalCharacter) {
+		fields = append(fields, character.FieldTraditionalCharacter)
+	}
+	if m.FieldCleared(character.FieldVariantCharacter) {
+		fields = append(fields, character.FieldVariantCharacter)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1594,6 +1648,17 @@ func (m *CharacterMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *CharacterMutation) ClearField(name string) error {
+	switch name {
+	case character.FieldPinYin:
+		m.ClearPinYin()
+		return nil
+	case character.FieldTraditionalCharacter:
+		m.ClearTraditionalCharacter()
+		return nil
+	case character.FieldVariantCharacter:
+		m.ClearVariantCharacter()
+		return nil
+	}
 	return fmt.Errorf("unknown Character nullable field %s", name)
 }
 

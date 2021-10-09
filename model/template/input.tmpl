@@ -1,0 +1,128 @@
+{{/* The line below tells Intellij/GoLand to enable the autocompletion based on the *gen.Graph type. */}}
+{{/* gotype: entgo.io/ent/entc/gen.Graph */}}
+
+{{ define "template" }}
+    {{/* ... */}}
+{{ end }}
+
+{{ define "input" }}
+
+    {{/* Add the base header for the generated file */}}
+    {{ $pkg := base $.Config.Package }}
+    {{ template "header" $ }}
+
+    {{ range $n := $.Nodes }}
+        {{ $creater := $n.CreateName }}
+        {{ $createReceiver := receiver $creater }}
+
+        func ({{ $createReceiver }} *{{ $creater }}) Set{{ $n.Name }}(input *{{ $n.Name }}) *{{ $creater }} {
+        {{- range $f := $n.Fields }}
+            {{- if ne $f.StructField "DeletedUnix"}}
+                {{- if not $f.Optional}}
+                    {{- if $f.Nillable}}
+                        {{"if"}} input.{{ $f.StructField }} {{"!= nil {"}}
+                        {{- $setter := print "Set" $f.StructField }}
+                        {{ $createReceiver }}.{{ $setter }}(*input.{{ $f.StructField }})
+                        {{"}"}}
+                    {{- else}}
+                        {{- $setter := print "Set" $f.StructField }}
+                        {{ $createReceiver }}.{{ $setter }}(input.{{ $f.StructField }})
+                    {{- end}}
+                {{- end}}
+            {{- end}}
+        {{- end }}
+        return {{ $createReceiver }}
+        }
+
+        {{- range $f := $n.Fields }}
+            {{- if eq $f.StructField "DeletedUnix"}}
+                func ({{ $createReceiver }} *{{ $creater }}) SoftDelete() *{{ $creater }} {
+                {{- $setter := print "Set" $f.StructField }}
+                {{ $createReceiver }}.{{ $setter }}(time.Now().Unix())
+                return {{ $createReceiver }}
+                }
+            {{- end}}
+        {{- end }}
+
+        {{ $updateOner := $n.UpdateOneName }}
+        {{ $updateOneReceiver := receiver $updateOner }}
+
+        {{- range $f := $n.Fields }}
+            {{- if eq $f.StructField "DeletedUnix"}}
+                func ({{ $updateOneReceiver }} *{{ $updateOner }}) SoftDelete() *{{ $updateOner }} {
+                {{- $setter := print "Set" $f.StructField }}
+                {{ $updateOneReceiver }}.{{ $setter }}(time.Now().Unix())
+                return {{ $updateOneReceiver }}
+                }
+            {{- end}}
+        {{- end }}
+
+        func ({{ $updateOneReceiver }} *{{ $updateOner }}) Set{{ $n.Name }}(input *{{ $n.Name }}) *{{ $updateOner }} {
+        {{- range $f := $n.Fields }}
+            {{- if eq $f.StructField "DeletedUnix" "CreatedUnix" }}
+            {{- else}}
+                {{- if not $f.Optional}}
+                    {{- if $f.Nillable}}
+                        {{"if"}} input.{{ $f.StructField }} {{"!= nil {"}}
+                        {{- $setter := print "Set" $f.StructField }}
+                        {{ $updateOneReceiver }}.{{ $setter }}(*input.{{ $f.StructField }})
+                        {{"}"}}
+                    {{- else}}
+                        {{- $setter := print "Set" $f.StructField }}
+                        {{ $updateOneReceiver }}.{{ $setter }}(input.{{ $f.StructField }})
+                    {{- end}}
+                {{- end}}
+            {{- end}}
+        {{- end }}
+        return {{ $updateOneReceiver }}
+        }
+
+
+        {{ $updater := $n.UpdateName }}
+        {{ $updateReceiver := receiver $updater }}
+
+        {{- range $f := $n.Fields }}
+            {{- if eq $f.StructField "DeletedUnix"}}
+                func ({{ $updateReceiver }} *{{ $updater }}) SoftDelete() *{{ $updater }} {
+                {{- $setter := print "Set" $f.StructField }}
+                {{ $updateReceiver }}.{{ $setter }}(time.Now().Unix())
+                return {{ $updateReceiver }}
+                }
+            {{- end}}
+        {{- end }}
+
+        func ({{ $updateReceiver }} *{{ $updater }}) Set{{ $n.Name }}(input *{{ $n.Name }}) *{{ $updater }} {
+        {{- range $f := $n.Fields }}
+            {{- if eq $f.StructField "DeletedUnix" "CreatedUnix" }}
+            {{- else}}
+                {{- if not $f.Optional}}
+                    {{- if $f.Nillable}}
+                        {{"if"}} input.{{ $f.StructField }} {{"!= nil {"}}
+                        {{- $setter := print "Set" $f.StructField }}
+                        {{ $updateReceiver }}.{{ $setter }}(*input.{{ $f.StructField }})
+                        {{"}"}}
+                    {{- else}}
+                        {{- $setter := print "Set" $f.StructField }}
+                        {{ $updateReceiver }}.{{ $setter }}(input.{{ $f.StructField }})
+                    {{- end}}
+                {{- end}}
+            {{- end}}
+        {{- end }}
+        return {{ $updateReceiver }}
+        }
+
+
+
+        {{ $querier := $n.QueryName }}
+        {{ $queryReceiver := receiver $querier }}
+        {{- range $f := $n.Fields }}
+            {{- if eq $f.StructField "DeletedUnix"}}
+                func ({{ $queryReceiver }} *{{ $querier }}) SoftDelete() *{{ $querier }} {
+                {{- $setter := print  $f.StructField "IsNil"}}
+                return {{ $queryReceiver }}.Where({{$n.Package}}.{{ $setter }}())
+                }
+            {{- end}}
+        {{- end }}
+
+    {{ end }}
+{{ end }}

@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/godcong/fate/ent/character"
+	"github.com/babyname/fate/ent/character"
 )
 
 // Character is the model entity for the Character schema.
@@ -97,7 +97,6 @@ func (c *Character) assignValues(columns []string, values []interface{}) error {
 				c.ID = value.String
 			}
 		case character.FieldPinYin:
-
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field pin_yin", values[i])
 			} else if value != nil && len(*value) > 0 {
@@ -214,7 +213,6 @@ func (c *Character) assignValues(columns []string, values []interface{}) error {
 				c.IsRegular = value.Bool
 			}
 		case character.FieldTraditionalCharacter:
-
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field traditional_character", values[i])
 			} else if value != nil && len(*value) > 0 {
@@ -223,7 +221,6 @@ func (c *Character) assignValues(columns []string, values []interface{}) error {
 				}
 			}
 		case character.FieldVariantCharacter:
-
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field variant_character", values[i])
 			} else if value != nil && len(*value) > 0 {

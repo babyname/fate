@@ -5,9 +5,9 @@ package enttest
 import (
 	"context"
 
-	"github.com/godcong/fate/ent"
+	"github.com/babyname/fate/ent"
 	// required by schema hooks.
-	_ "github.com/godcong/fate/ent/runtime"
+	_ "github.com/babyname/fate/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

@@ -1,13 +1,13 @@
 package model
 
 import (
-	"crypto/sha256"
+	"crypto/md5"
 	"encoding/hex"
 
 	"github.com/goextension/log"
 
-	"github.com/godcong/fate/config"
-	"github.com/godcong/fate/ent"
+	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/ent"
 )
 
 const dsn = "%s:%s@tcp(%s)/%s?loc=%s&charset=utf8mb4&parseTime=true"
@@ -41,6 +41,6 @@ func Open(cfg config.DBConfig, debug bool) (*Model, error) {
 
 // ID ...
 func ID(name string) string {
-	s := sha256.New()
+	s := md5.New()
 	return hex.EncodeToString(s.Sum([]byte(name)))
 }

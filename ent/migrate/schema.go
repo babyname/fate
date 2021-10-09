@@ -11,7 +11,7 @@ var (
 	// CharactersColumns holds the columns for the "characters" table.
 	CharactersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "pin_yin", Type: field.TypeJSON},
+		{Name: "pin_yin", Type: field.TypeJSON, Nullable: true},
 		{Name: "ch", Type: field.TypeString},
 		{Name: "science_stroke", Type: field.TypeInt},
 		{Name: "radical", Type: field.TypeString},
@@ -30,16 +30,15 @@ var (
 		{Name: "wu_xing", Type: field.TypeString},
 		{Name: "lucky", Type: field.TypeString},
 		{Name: "is_regular", Type: field.TypeBool},
-		{Name: "traditional_character", Type: field.TypeJSON},
-		{Name: "variant_character", Type: field.TypeJSON},
+		{Name: "traditional_character", Type: field.TypeJSON, Nullable: true},
+		{Name: "variant_character", Type: field.TypeJSON, Nullable: true},
 		{Name: "comment", Type: field.TypeString, Size: 2147483647},
 	}
 	// CharactersTable holds the schema information for the "characters" table.
 	CharactersTable = &schema.Table{
-		Name:        "characters",
-		Columns:     CharactersColumns,
-		PrimaryKey:  []*schema.Column{CharactersColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{},
+		Name:       "characters",
+		Columns:    CharactersColumns,
+		PrimaryKey: []*schema.Column{CharactersColumns[0]},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{

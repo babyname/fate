@@ -32,7 +32,7 @@ func (Character) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").Unique(),
 		//Hash                     string   `xorm:"pk hash"`
-		field.Strings("pin_yin"),
+		field.Strings("pin_yin").Optional(),
 		//PinYin                   []string `xorm:"default() notnull pin_yin"`                               //拼音
 		field.String("ch"),
 		//Ch                       string   `xorm:"default() notnull ch"`                                    //字符
@@ -70,9 +70,9 @@ func (Character) Fields() []ent.Field {
 		//Lucky                    string   `xorm:"default() notnull lucky"`                                 //吉凶寓意
 		field.Bool("is_regular"),
 		//Regular                  bool     `xorm:"default(0) notnull regular"`                              //常用
-		field.Strings("traditional_character"),
+		field.Strings("traditional_character").Optional(),
 		//TraditionalCharacter     []string `xorm:"default() notnull traditional_character"`                 //繁体字
-		field.Strings("variant_character"),
+		field.Strings("variant_character").Optional(),
 		//VariantCharacter         []string `xorm:"default() notnull variant_character"`                     //异体字
 		field.Text("comment"),
 		//Comment                  []string `xorm:"default() notnull comment"`                               //解释
