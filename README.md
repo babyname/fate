@@ -23,9 +23,9 @@ Github第一个开源的中文取名项目(The first chinese name create tool in
 ## 关于版本：
 
 除非稳定版本会单独出release,以后每次提交都会生成二进制文件的pre_release提供下载.  
-【[最新自编译版本](https://github.com/godcong/fate/releases/tag/auto_build)】
-【[最新数据库文件:20200331](https://github.com/godcong/fate/releases/download/v3.5.1/fate_db_200331.7z)】
-【[v3.5.2下载](https://github.com/godcong/fate/releases/tag/v3.5.2)】
+【[最新自编译版本](https://github.com/babyname/fate/releases/tag/auto_build)】
+【[最新数据库文件:20200331](https://github.com/babyname/fate/releases/download/v3.5.1/fate_db_200331.7z)】
+【[v3.5.2下载](https://github.com/babyname/fate/releases/tag/v3.5.2)】
 
 ## 关于起名算法 ##
 
@@ -62,7 +62,7 @@ FATE使用了以下算法,按照每种算法的准确度,使用程度也有高�
 
 ### 针对没有安装Go环境的用户,使用二进制文件在运行前务必把zoneinfo.zip下载并和二进制文件放在一起(不要解压),不然会报错.
 
-### [zoneinfo文件](https://github.com/godcong/fate/blob/master/zoneinfo.zip)
+### [zoneinfo文件](https://github.com/babyname/fate/blob/master/zoneinfo.zip)
 
 ## 二进制可执行文件生成姓名 ##
 
@@ -81,7 +81,7 @@ FATE使用了以下算法,按照每种算法的准确度,使用程度也有高�
    A: zoneinfo缺失导致的时间转换失败问题(一般发生在windows环境下),
         下载上面的zoneinfo文件并放到执行文件相同的目录下即可解决.
         最新版会检查根目录,已无需重新init.
-        地址:https://github.com/godcong/fate/blob/master/zoneinfo.zip
+        地址:https://github.com/babyname/fate/blob/master/zoneinfo.zip
 
 2. Q: 如何导入数据
    A: 
