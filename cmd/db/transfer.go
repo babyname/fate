@@ -74,6 +74,7 @@ func runTransfer(p string) error {
 
 func openOldDatabase(dsn string, f From) (*xorm.Engine, error) {
 	dbURL := fmt.Sprintf(dsn, f.User, f.Pwd, f.Host+":"+f.Port, f.DBName, url.QueryEscape("Asia/Shanghai"))
+	fmt.Println("old dsn:", dbURL)
 	dbEngine, err := xorm.NewEngine(f.Driver, dbURL)
 	if err != nil {
 		return nil, err
