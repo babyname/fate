@@ -1,7 +1,9 @@
 module github.com/babyname/fate
 
 require (
-	entgo.io/ent v0.9.1
+	ariga.io/entimport v0.0.0-20211011171115-c0191a8783cc // indirect
+	entgo.io/ent v0.9.2-0.20211011110952-058e40abcf61
+	github.com/go-bindata/go-bindata v1.0.1-0.20190711162640-ee3c2418e368 // indirect
 	github.com/go-sql-driver/mysql v1.5.1-0.20200311113236-681ffa848bae
 	github.com/godcong/chronos v0.0.3
 	github.com/godcong/yi v1.0.2
@@ -13,7 +15,7 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/xormsharp/builder v0.3.6
 	github.com/xormsharp/xorm v1.0.0
-	go.uber.org/zap v1.13.0
+	go.uber.org/zap v1.16.0
 )
 
 go 1.16
