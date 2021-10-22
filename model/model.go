@@ -41,6 +41,6 @@ func Open(cfg config.DBConfig, debug bool) (*Model, error) {
 
 // ID ...
 func ID(name string) string {
-	s := md5.New()
-	return hex.EncodeToString(s.Sum([]byte(name)))
+	sum := md5.Sum([]byte(name))
+	return hex.EncodeToString(sum[:])
 }
