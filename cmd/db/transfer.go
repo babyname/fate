@@ -29,9 +29,18 @@ func runTransfer(p string) error {
 		return err
 	}
 	defer newdb.Close()
+
 	var total int64
+	if total, err = transferCharacter(olddb, newdb); err != nil {
+		return err
+	}
+
+	fmt.Println("Finished reading total character:", total)
+	return nil
+}
+
+func transferCharacter(olddb *xorm.Engine, newdb *model.Model) (total int64, err error) {
 	total, err = olddata.RangeCharacters(olddb, func(c *olddata.Character) bool {
-		//fmt.Printf("get character:%+v", c)
 		ch := &ent.Character{
 			ID:                       model.ID(c.Ch),
 			PinYin:                   c.PinYin,
@@ -65,11 +74,7 @@ func runTransfer(p string) error {
 		fmt.Println("character:", character.Ch, " id:", character.ID)
 		return e == nil
 	})
-	if err != nil {
-		return err
-	}
-	fmt.Println("Finished reading total character:", total)
-	return nil
+	return
 }
 
 func openOldDatabase(dsn string, f From) (*xorm.Engine, error) {
