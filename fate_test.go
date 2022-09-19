@@ -2,10 +2,12 @@ package fate_test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/godcong/chronos"
+
 	"github.com/babyname/fate"
 	"github.com/babyname/fate/config"
-	"testing"
 )
 
 func init() {
@@ -28,7 +30,7 @@ func TestFate_RunMakeName(t *testing.T) {
 		OutputMode: config.OutputModeLog,
 		Path:       "name.log",
 	}
-	cfg.Database = config.DBConfig{
+	cfg.Database = config.Database{
 		Host:         "localhost",
 		Port:         "3306",
 		User:         "root",

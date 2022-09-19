@@ -88,7 +88,7 @@ func openOldDatabase(dsn string, f From) (*xorm.Engine, error) {
 }
 
 func openNewDatabase(dsn string, t To) (*model.Model, error) {
-	open, err := model.Open(config.DBConfig{
+	open, err := model.Open(config.Database{
 		Driver: "sqlite3",
 		DSN:    dsn,
 	}, false)

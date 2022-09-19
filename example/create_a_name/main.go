@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+
 	"github.com/godcong/chronos"
+
 	"github.com/babyname/fate"
 	"github.com/babyname/fate/config"
 )
@@ -25,7 +27,7 @@ func main() {
 	//	//周易八卦过滤
 	//	BaguaFilter: true,
 	//	//连接DB：
-	//	DBConfig: config.DBConfig{
+	//	Database: config.Database{
 	//		Host:         "localhost",
 	//		Port:         "3306",
 	//		User:         "root",
@@ -51,7 +53,7 @@ func main() {
 	cfg.DayanFilter = true
 	cfg.StrokeMin = 3
 	cfg.StrokeMax = 24
-	cfg.Database = config.DBConfig{
+	cfg.Database = config.Database{
 		Host:         "localhost",
 		Port:         "3306",
 		User:         "root",
