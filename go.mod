@@ -3,6 +3,7 @@ module github.com/babyname/fate
 require (
 	entgo.io/ent v0.9.2-0.20211011110952-058e40abcf61
 	github.com/6tail/lunar-go v1.2.18
+	github.com/cespare/xxhash/v2 v2.1.2
 	github.com/go-sql-driver/mysql v1.5.1-0.20200311113236-681ffa848bae
 	github.com/godcong/chronos v0.0.3
 	github.com/godcong/yi v1.0.2
