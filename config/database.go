@@ -1,7 +1,6 @@
 package config
 
-type DBConfig struct {
+type Database struct {
 	Driver string `json:"driver"`
 	DSN    string `json:"dsn"`
-	Log    string `json:"log"`
 }
