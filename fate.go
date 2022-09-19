@@ -7,8 +7,6 @@ import (
 
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/model"
-
-	"github.com/godcong/chronos"
 )
 
 // HandleOutputFunc ...
@@ -19,27 +17,18 @@ const HelpContent = "正在使用Fate生成姓名列表，如遇到问题请访�
 
 // Fate ...
 type Fate interface {
-	Initialize(ctx context.Context) error
-	LoadRules(rules ...RuleOption) Maker
+	//Initialize(ctx context.Context) error
+	//LoadRules(rules ...RuleOption) Maker
+	Context() context.Context
 	Debug() bool
 	DB() *model.Model
+	ApplyRules(rules ...RuleOption) Generator
 }
 
 type fateImpl struct {
-	cfg      *config.Config
-	db       *model.Model
-	rule     *Rule
-	out      Information
-	born     chronos.Calendar
-	last     []string
-	lastChar []*Character
-	names    []*Name
-	nameType int
-	sex      Sex
-	debug    bool
-	baZi     *BaZi
-	zodiac   *Zodiac
-	handle   HandleOutputFunc
+	cfg    *config.Config
+	db     *model.Model
+	handle HandleOutputFunc
 }
 
 func (f *fateImpl) Debug() bool {
@@ -54,7 +43,7 @@ func (f *fateImpl) LoadRules(rules ...RuleOption) Maker {
 	return newMaker(f, rule)
 }
 
-func (f *fateImpl) DB() *model.Model {
+func (f *fateImpl) Query() *model.Model {
 	return f.db
 }
 
