@@ -30,7 +30,7 @@ const (
 // Fields of the Character.
 func (Character) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").Unique(),
+		field.Uint64("id").Unique(),
 		//拼音
 		field.Strings("pin_yin").Optional(),
 		//字符
@@ -46,21 +46,21 @@ func (Character) Fields() []ent.Field {
 		//是否康熙字典
 		field.Bool("is_kangxi"),
 		//康熙
-		field.String("kangxi"),
+		//field.String("kangxi"),
 		//康熙笔画
-		field.Int("kangxi_stroke"),
+		//field.Int("kangxi_stroke"),
 		//简体部首
-		field.String("simple_radical"),
+		//field.String("simple_radical"),
 		//简体部首笔画
-		field.Int("simple_radical_stroke"),
+		//field.Int("simple_radical_stroke"),
 		//简体笔画
-		field.Int("simple_total_stroke"),
+		//field.Int("simple_total_stroke"),
 		//繁体部首
-		field.String("traditional_radical"),
+		//field.String("traditional_radical"),
 		//繁体部首笔画
-		field.Int("traditional_radical_stroke"),
+		//field.Int("traditional_radical_stroke"),
 		//繁体部首笔画
-		field.Int("traditional_total_stroke"),
+		//field.Int("traditional_total_stroke"),
 		//姓名学
 		field.Bool("is_name_science"),
 		//五行
@@ -77,11 +77,13 @@ func (Character) Fields() []ent.Field {
 		//常用
 		field.Bool("is_regular"),
 		//繁体字
-		field.Strings("traditional_character").Optional(),
+		//field.Strings("traditional_character").Optional(), -> ch
 		//异体字
-		field.Strings("variant_character").Optional(),
+		//field.Strings("variant_character").Optional(), -> ch
 		//说明
 		field.Strings("comment"),
+		//关联字
+		field.Uint64("relate"),
 	}
 }
 

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/godcong/chronos"
+	//"github.com/godcong/chronos"
 	"github.com/goextension/log"
 
 	"github.com/babyname/fate/ent"
@@ -17,33 +18,40 @@ import (
 
 var ErrLastNameNotInput = errors.New("last name was not inputted")
 
-type Maker interface {
-	Generate(ctx context.Context, lastName string, born time.Time) error
+type Generator interface {
+	Run(ctx context.Context, lastName string, born time.Time) error
+	Wait() <-chan Name
 }
 
-type makeImpl struct {
+type generateImpl struct {
 	Fate
 	strokeChars struct {
 		sync.RWMutex
 		c map[int][]*ent.Character
 	}
 	last []string
-	born chronos.Calendar
+	born *Calendar
 	rule *Rule
 }
 
-func newMaker(fate Fate, rule *Rule) Maker {
-	return &makeImpl{
+func (i *generateImpl) Run(ctx context.Context, lastName string, born time.Time) error {
+	i.born = NewCalendar(born)
+	return nil
+}
+
+func (i *generateImpl) Wait() <-chan Name {
+	//TODO implement me
+	panic("implement me")
+}
+
+func newGenerator(fate Fate, rule *Rule) Generator {
+	return &generateImpl{
 		Fate: fate,
 		rule: rule,
-		strokeChars: struct {
-			sync.RWMutex
-			c map[int][]*ent.Character
-		}{c: make(map[int][]*ent.Character)},
 	}
 }
 
-func (i *makeImpl) getLastCharacter(ctx context.Context, lastName string) ([]*ent.Character, error) {
+func (i *generateImpl) getLastCharacter(ctx context.Context, lastName string) ([]*ent.Character, error) {
 	last := strings.Split(lastName, "")
 	size := len(last)
 	switch size {
@@ -57,7 +65,7 @@ func (i *makeImpl) getLastCharacter(ctx context.Context, lastName string) ([]*en
 
 	lastChar := make([]*ent.Character, len(last))
 	for idx, c := range i.last {
-		character, e := i.DB().GetCharacter(ctx, model.Char(c))
+		character, e := i.Query().GetCharacter(ctx, model.Char(c))
 		if e != nil {
 			return nil, e
 		}
@@ -66,7 +74,7 @@ func (i *makeImpl) getLastCharacter(ctx context.Context, lastName string) ([]*en
 	return lastChar, nil
 }
 
-func (i *makeImpl) Generate(ctx context.Context, lastName string, born time.Time) error {
+func (i *generateImpl) Generate(ctx context.Context, lastName string, born time.Time) error {
 	last, err := i.getLastCharacter(ctx, lastName)
 	if err != nil {
 		return err
@@ -82,7 +90,7 @@ func (i *makeImpl) Generate(ctx context.Context, lastName string, born time.Time
 
 	log.Info(HelpContent)
 
-	//name := make(chan *Name)
+	//name := generate(chan *Name)
 	//go func() {
 	//	e := f.getWugeName(name)
 	//	if e != nil {
@@ -176,4 +184,4 @@ func (i *makeImpl) Generate(ctx context.Context, lastName string, born time.Time
 	return nil
 }
 
-var _ Maker = (*makeImpl)(nil)
+var _ generater = (*generateImpl)(nil)
