@@ -1,13 +1,18 @@
 package config
 
 import (
-	"encoding/json"
 	"os"
+
+	"github.com/tikafog/jsongs"
 )
 
 type Config struct {
-	Database Database `json:"database"`
+	Database database `json:"database"`
 	Debug    bool     `json:"debug"`
+}
+
+func (c Config) GetDatabase() Database {
+	return &c.Database
 }
 
 func LoadConfig(path string) (c *Config) {
@@ -18,19 +23,43 @@ func LoadConfig(path string) (c *Config) {
 	if e != nil {
 		return def
 	}
-	e = json.Unmarshal(bys, &c)
+	e = jsongs.Unmarshal(bys, &c)
 	if e != nil {
 		return def
 	}
 	return c
 }
 
+func SaveConfig(path string, config *Config) error {
+	bytes, e := jsongs.MarshalIndent(config, "", " ")
+	if e != nil {
+		return e
+	}
+	return os.WriteFile(path, bytes, 0644)
+}
+
 func DefaultConfig() *Config {
 	return &Config{
 		Debug: false,
-		Database: Database{
-			Driver: "mysql",
-			DSN:    "root:111111@tcp(127.0.0.1:3306)/fate?charset=utf8\\u0026parseTime=true",
+		Database: database{
+			driver: "mysql",
+			dsn:    mysqlDSN,
+			host:   "localhost",
+			port:   "3306",
+			user:   "root",
+			pwd:    "root",
+			dbName: "fate",
+		},
+	}
+}
+
+func DefaultSqliteConfig() *Config {
+	return &Config{
+		Debug: false,
+		Database: database{
+			driver: "sqlite3",
+			dsn:    sqlite3DSN,
+			dbName: "fate",
 		},
 	}
 }
