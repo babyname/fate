@@ -7,7 +7,9 @@ import (
 )
 
 type Config interface {
+	//jsongs.Marshaler
 	Database() Database
+	JSON() []byte
 	Save(path string) error
 }
 
@@ -15,6 +17,16 @@ type config struct {
 	database database `json:"database" json-getter:"GetDatabase"`
 	Debug    bool     `json:"debug"`
 }
+
+func (c *config) JSON() []byte {
+	d, _ := jsongs.MarshalIndent(c, "", " ")
+	return d
+}
+
+//func (c *config) MarshalJSON() ([]byte, error) {
+//	TODO implement me
+//	panic("implement me")
+//}
 
 func (c *config) Save(path string) error {
 	return saveConfig(path, c)
@@ -40,11 +52,17 @@ func LoadConfig(path string) (c Config) {
 	if e != nil {
 		return d
 	}
-	e = jsongs.Unmarshal(bys, &c)
+	e = jsongs.Unmarshal(bys, c)
 	if e != nil {
 		return d
 	}
 	return c
+}
+
+func LoadFromBytes(data []byte) (Config, error) {
+	c := &config{}
+	err := jsongs.Unmarshal(data, c)
+	return c, err
 }
 
 func saveConfig(path string, config *config) error {

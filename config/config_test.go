@@ -32,7 +32,7 @@ func TestLoadConfig(t *testing.T) {
 func TestSaveConfig(t *testing.T) {
 	type args struct {
 		path   string
-		config *Config
+		config Config
 	}
 	tests := []struct {
 		name    string
@@ -58,7 +58,7 @@ func TestSaveConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := SaveConfig(tt.args.path, tt.args.config); (err != nil) != tt.wantErr {
+			if err := tt.args.config.Save(tt.args.path); (err != nil) != tt.wantErr {
 				t.Errorf("SaveConfig() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
