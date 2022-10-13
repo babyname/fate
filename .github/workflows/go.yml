@@ -74,7 +74,7 @@ jobs:
       run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
-          export CGO_ENABLED=1
+          set CGO_ENABLED=1
           echo "::set-env name=FATENAME::fate_windows_386"
           
           echo "buiding"
