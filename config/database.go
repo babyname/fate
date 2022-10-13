@@ -6,7 +6,7 @@ import (
 	"github.com/babyname/fate/ent"
 )
 
-const mysqlDSN = "mysql://%v:%v@tcp(%v:%v)/%v?charset=utf8&parseTime=true"
+const mysqlDSN = "%v:%v@tcp(%v:%v)/%v?charset=utf8&parseTime=true"
 const sqlite3DSN = "file:%v?cache=shared&_journal=WAL&_fk=1"
 
 type BuildFunc func(*database) (*ent.Client, error)
@@ -25,7 +25,9 @@ func buildSqlite3(database *database) (*ent.Client, error) {
 	if database.dsn != "" {
 		dsn = database.dsn
 	}
-	return ent.Open(database.driver, fmt.Sprintf(dsn, database.DBName))
+	link := fmt.Sprintf(dsn, database.dbName)
+	fmt.Println("open:", link)
+	return ent.Open(database.driver, link)
 }
 
 func buildMysql(database *database) (*ent.Client, error) {
@@ -33,7 +35,9 @@ func buildMysql(database *database) (*ent.Client, error) {
 	if database.dsn != "" {
 		dsn = database.dsn
 	}
-	return ent.Open(database.driver, fmt.Sprintf(dsn, database.User, database.Pwd, database.Host, database.Port, database.DBName))
+	link := fmt.Sprintf(dsn, database.user, database.pwd, database.host, database.port, database.dbName)
+	fmt.Println("open:", link)
+	return ent.Open(database.driver, link)
 }
 
 type database struct {
