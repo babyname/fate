@@ -38,6 +38,7 @@ jobs:
       run: |
           ${GOROOT}/bin/go mod tidy
           export GOARCH=${{ matrix.arch }}
+          export CGO_ENABLED=1
           echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
           
           echo "$(go env GOOS) $(go env GOARCH)"
@@ -56,6 +57,7 @@ jobs:
       run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
+          export CGO_ENABLED=1
           echo "::set-env name=FATENAME::fate_windows_amd64"
           
           echo "buiding"
@@ -72,6 +74,7 @@ jobs:
       run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
+          export CGO_ENABLED=1
           echo "::set-env name=FATENAME::fate_windows_386"
           
           echo "buiding"
