@@ -62,7 +62,7 @@ jobs:
         run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
-          export CGO_ENABLED=1
+          set CGO_ENABLED=1
           echo "::set-env name=FATENAME::fate_windows_amd64"
           echo "FATENAME=fate_windows_amd64" >> $GITHUB_ENV
           echo "buiding"
