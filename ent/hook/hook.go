@@ -22,6 +22,19 @@ func (f CharacterFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return f(ctx, mv)
 }
 
+// The VersionFunc type is an adapter to allow the use of ordinary
+// function as Version mutator.
+type VersionFunc func(context.Context, *ent.VersionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f VersionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.VersionMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.VersionMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The WuGeLuckyFunc type is an adapter to allow the use of ordinary
 // function as WuGeLucky mutator.
 type WuGeLuckyFunc func(context.Context, *ent.WuGeLuckyMutation) (ent.Value, error)
