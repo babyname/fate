@@ -46,16 +46,19 @@ jobs:
           echo "$(go env GOOS) $(go env GOARCH)"
           
           echo "buiding"
-          ${GOROOT}/bin/go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
+          go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
           
           echo "compress"
           tar -zcvf fate_$(go env GOOS)_$(go env GOARCH).tar.gz ./fate_$(go env GOOS)_$(go env GOARCH)
 
-      - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+      - name: Build ${{ matrix.platform }} ${{ matrix.arch }} with Go
         if: matrix.platform == 'windows-latest' && matrix.arch == 'amd64' && env.UPLOAD_BIN_FILE
         id: build_windows_amd64
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
         run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
@@ -68,11 +71,14 @@ jobs:
           echo "compress"
           Compress-Archive -Path fate_windows_amd64.exe -DestinationPath fate_windows_amd64.zip
 
-      - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+      - name: Build ${{ matrix.platform }} ${{ matrix.arch }} with Go
         if: matrix.platform == 'windows-latest' && matrix.arch == '386' && env.UPLOAD_BIN_FILE
         id: build_windows_386
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
         run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
