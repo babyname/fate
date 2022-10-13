@@ -63,7 +63,7 @@ jobs:
           go mod tidy
           set GOARCH=${{ matrix.arch }}
           set CGO_ENABLED=1
-          echo "FATENAME=fate_windows_amd64" >> $GITHUB_ENV
+          echo "FATENAME=fate_windows_amd64" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "buiding"
           go build -o fate_windows_amd64.exe -v ./cmd/console
           
@@ -79,7 +79,7 @@ jobs:
           go mod tidy
           set GOARCH=${{ matrix.arch }}
           set CGO_ENABLED=1
-          echo "FATENAME=fate_windows_386" >> $GITHUB_ENV
+          echo "FATENAME=fate_windows_386" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "buiding"
           go build -o fate_windows_386.exe -v ./cmd/console
           
