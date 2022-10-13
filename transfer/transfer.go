@@ -38,6 +38,13 @@ func (t transferDatabase) Start(ctx context.Context) error {
 			return err
 		}
 	}
+	fmt.Println("finished")
+	if err := t.Source.Close(); err != nil {
+		return err
+	}
+	if err := t.Target.Close(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -51,7 +58,7 @@ func (t transferDatabase) transferWuGeLucky(ctx context.Context) error {
 	}
 
 	for i := 0; i < c; i += MaxLimit {
-		fmt.Println("insert database wugelucky:", i, "total", c)
+		fmt.Println("insert wugelucky to database:", i, "total", c)
 		luckies, err := t.Source.WuGeLucky.Query().Limit(MaxLimit).Offset(i).All(ctx)
 		if err != nil {
 			return err
@@ -82,7 +89,7 @@ func (t transferDatabase) transferCharacter(ctx context.Context) error {
 	}
 
 	for i := 0; i < c; i += MaxLimit {
-		fmt.Println("insert database character:", i, "total", c)
+		fmt.Println("insert character to database:", i, "total", c)
 		characters, err := t.Source.Character.Query().Limit(MaxLimit).Offset(i).All(ctx)
 		if err != nil {
 			return err
@@ -113,7 +120,7 @@ func (t transferDatabase) transferWuXing(ctx context.Context) error {
 	}
 
 	for i := 0; i < c; i += MaxLimit {
-		fmt.Println("insert database wuxing:", i, "total", c)
+		fmt.Println("insert wuxing to database:", i, "total", c)
 		wuxings, err := t.Source.WuXing.Query().Limit(MaxLimit).Offset(i).All(ctx)
 		if err != nil {
 			return err
