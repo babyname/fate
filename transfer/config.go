@@ -15,6 +15,7 @@ type DatabaseConfig struct {
 	TargetRaw json.RawMessage `json:"target"`
 	Target    config.Config   `json:"-"`
 	Tables    []string
+	Limit     int `json:"max"`
 }
 
 func ReadTransferConfig(p string) (*DatabaseConfig, error) {
