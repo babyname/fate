@@ -14,35 +14,36 @@ jobs:
     name: Build
     strategy:
       matrix:
-        go-version: [1.19.x]
-        platform: [ windows-latest, ubuntu-latest, macos-latest]
-        arch: [amd64]
+        go-version: [ 1.19.x ]
+        platform: [ windows-latest, ubuntu-latest, macos-latest ]
+        arch: [ 386, amd64]
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Cleanup pre-installed tools
-      run: |
-        # This is a fix for https://github.com/actions/virtual-environments/issues/1918
-        sudo rm -rf /usr/share/dotnet
-        sudo rm -rf /opt/ghc
-        sudo rm -rf "/usr/local/share/boost"
-        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-    - name: Set up Go 1.19
-      uses: actions/setup-go@v3
-      with:
-       #GOARCH: ${{ matrix.arch }}
-        go-version: ${{ matrix.go-version }}
-      id: go
+      - name: Cleanup pre-installed tools
+        run: |
+          # This is a fix for https://github.com/actions/virtual-environments/issues/1918
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+      - name: Set up Go 1.19
+        uses: actions/setup-go@v3
+        with:
+          #GOARCH: ${{ matrix.arch }}
+          go-version: ${{ matrix.go-version }}
+        id: go
 
-    - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
-      if: matrix.platform == 'ubuntu-latest' || (matrix.platform == 'macos-latest' && matrix.arch == 'amd64')
-      id: build_linux
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-      run: |
-          ${GOROOT}/bin/go mod tidy
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
+
+      - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+        if: matrix.platform == 'ubuntu-latest' || (matrix.platform == 'macos-latest' && matrix.arch == 'amd64')
+        id: build_linux
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        run: |
+          go mod tidy
           export GOARCH=${{ matrix.arch }}
           export CGO_ENABLED=1
           echo "FATENAME=fate_$(go env GOOS)_$(go env GOARCH)" >> $GITHUB_ENV
@@ -54,12 +55,12 @@ jobs:
           echo "compress"
           tar -zcvf fate_$(go env GOOS)_$(go env GOARCH).tar.gz ./fate_$(go env GOOS)_$(go env GOARCH)
 
-    - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
-      if: matrix.platform == 'windows-latest' && matrix.arch == 'amd64'
-      id: build_windows_amd64
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-      run: |
+      - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+        if: matrix.platform == 'windows-latest' && matrix.arch == 'amd64' && env.UPLOAD_BIN_FILE
+        id: build_windows_amd64
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
           export CGO_ENABLED=1
@@ -71,12 +72,12 @@ jobs:
           echo "compress"
           Compress-Archive -Path fate_windows_amd64.exe -DestinationPath fate_windows_amd64.zip
 
-    - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
-      if: matrix.platform == 'windows-latest' && matrix.arch == '386'
-      id: build_windows_386
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-      run: |
+      - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+        if: matrix.platform == 'windows-latest' && matrix.arch == '386' && env.UPLOAD_BIN_FILE
+        id: build_windows_386
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
           set CGO_ENABLED=1
@@ -87,60 +88,60 @@ jobs:
           echo "compress"
           Compress-Archive -Path fate_windows_386.exe -DestinationPath fate_windows_386.zip
 
-    - name: Upload Linux
-      uses: actions/upload-artifact@master
-      if: (matrix.platform == 'ubuntu-latest' || (matrix.platform == 'macos-latest' && matrix.arch == 'amd64')) && env.UPLOAD_BIN_FILE
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-      with:
-        name: ${{ env.FATENAME }}.tar.gz
-        path: ${{ env.FATENAME }}.tar.gz
+      - name: Upload Linux
+        uses: actions/upload-artifact@master
+        if: (matrix.platform == 'ubuntu-latest' || (matrix.platform == 'macos-latest' && matrix.arch == 'amd64')) && env.UPLOAD_BIN_FILE
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        with:
+          name: ${{ env.FATENAME }}.tar.gz
+          path: ${{ env.FATENAME }}.tar.gz
 
-    - name: Upload Windows
-      uses: actions/upload-artifact@master
-      if: matrix.platform == 'windows-latest' && env.UPLOAD_BIN_FILE
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-      with:
-        name: ${{ env.FATENAME }}.zip
-        path: ${{ env.FATENAME }}.zip
+      - name: Upload Windows
+        uses: actions/upload-artifact@master
+        if: matrix.platform == 'windows-latest' && env.UPLOAD_BIN_FILE
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        with:
+          name: ${{ env.FATENAME }}.zip
+          path: ${{ env.FATENAME }}.zip
 
 
-    - name: Create Release
-      id: create_release_windows
-      if: matrix.platform == 'windows-latest' && env.UPLOAD_BIN_FILE
-      uses: ncipollo/release-action@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-      with:
-        artifacts: "${{ env.FATENAME }}.zip"
-        allowUpdates: true
-        commit: master
-        tag: auto_build
-        body: |
-          this is only a latest build from master
-          version: https://github.com/godcong/fate/commit/${{ github.sha }}
-        token: ${{ secrets.GITHUB_TOKEN }}
-        draft: false
-        prerelease: false
+      - name: Create Release
+        id: create_release_windows
+        if: matrix.platform == 'windows-latest' && env.UPLOAD_BIN_FILE
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        with:
+          artifacts: "${{ env.FATENAME }}.zip"
+          allowUpdates: true
+          commit: master
+          tag: auto_build
+          body: |
+            this is only a latest build from master
+            version: https://github.com/godcong/fate/commit/${{ github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: false
+          prerelease: false
 
-    - name: Create Release
-      id: create_release_linux
-      if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && env.UPLOAD_BIN_FILE
-      uses: ncipollo/release-action@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-      with:
-        artifacts: "${{ env.FATENAME }}.tar.gz"
-        allowUpdates: true
-        commit: master
-        tag: auto_build
-        body: |
-          this is only a latest build from master
-          version: https://github.com/godcong/fate/commit/${{ github.sha }}
-        token: ${{ secrets.GITHUB_TOKEN }}
-        draft: false
-        prerelease: false
+      - name: Create Release
+        id: create_release_linux
+        if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && env.UPLOAD_BIN_FILE
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        with:
+          artifacts: "${{ env.FATENAME }}.tar.gz"
+          allowUpdates: true
+          commit: master
+          tag: auto_build
+          body: |
+            this is only a latest build from master
+            version: https://github.com/godcong/fate/commit/${{ github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: false
+          prerelease: false
         
