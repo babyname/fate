@@ -141,7 +141,7 @@ jobs:
           tag: auto_build
           body: |
             this is only a latest build from master
-            version: https://github.com/godcong/fate/commit/${{ github.sha }}
+            version: https://github.com/babyname/fate/commit/${{ github.sha }}
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: false
           prerelease: false
@@ -160,7 +160,7 @@ jobs:
           tag: auto_build
           body: |
             this is only a latest build from master
-            version: https://github.com/godcong/fate/commit/${{ github.sha }}
+            version: https://github.com/babyname/fate/commit/${{ github.sha }}
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: false
           prerelease: false
