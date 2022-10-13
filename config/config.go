@@ -7,7 +7,7 @@ import (
 )
 
 type Config interface {
-	//jsongs.Marshaler
+	Debug() bool
 	Database() Database
 	JSON() []byte
 	Save(path string) error
@@ -15,7 +15,15 @@ type Config interface {
 
 type config struct {
 	database database `json:"database" json-getter:"GetDatabase"`
-	Debug    bool     `json:"debug"`
+	debug    bool     `json:"debug"`
+}
+
+func (c *config) SetDebug(debug bool) {
+	c.debug = debug
+}
+
+func (c *config) Debug() bool {
+	return c.debug
 }
 
 func (c *config) JSON() []byte {
@@ -75,7 +83,7 @@ func saveConfig(path string, config *config) error {
 
 func DefaultConfig() Config {
 	return &config{
-		Debug: false,
+		debug: false,
 		database: database{
 			driver: "mysql",
 			dsn:    mysqlDSN,
@@ -90,7 +98,7 @@ func DefaultConfig() Config {
 
 func DefaultSqliteConfig() Config {
 	return &config{
-		Debug: false,
+		debug: false,
 		database: database{
 			driver: "sqlite3",
 			dsn:    sqlite3DSN,
