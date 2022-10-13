@@ -27,21 +27,17 @@ jobs:
           sudo rm -rf "/usr/local/share/boost"
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
-      - name: Set up Go 1.19
-        uses: actions/setup-go@v3
-        with:
-          #GOARCH: ${{ matrix.arch }}
-          go-version: ${{ matrix.go-version }}
-        id: go
-
       - name: Check out code into the Go module directory
         uses: actions/checkout@v3
 
-      - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+      - name: Build ${{ matrix.platform }} ${{ matrix.arch }} with Go
         if: matrix.platform == 'ubuntu-latest' || (matrix.platform == 'macos-latest' && matrix.arch == 'amd64')
         id: build_linux
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
         run: |
           go mod tidy
           export GOARCH=${{ matrix.arch }}
