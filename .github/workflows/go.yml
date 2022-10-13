@@ -16,7 +16,7 @@ jobs:
       matrix:
         go-version: [ 1.19.x ]
         platform: [ windows-latest, ubuntu-latest, macos-latest ]
-        arch: [ 386, amd64]
+        arch: [ 386, amd64 ]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Cleanup pre-installed tools
@@ -30,14 +30,16 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v3
 
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+
       - name: Build ${{ matrix.platform }} ${{ matrix.arch }} with Go
         if: matrix.platform == 'ubuntu-latest' || (matrix.platform == 'macos-latest' && matrix.arch == 'amd64')
         id: build_linux
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ matrix.go-version }}
         run: |
           go mod tidy
           export GOARCH=${{ matrix.arch }}
@@ -56,9 +58,6 @@ jobs:
         id: build_windows_amd64
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ matrix.go-version }}
         run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
@@ -76,9 +75,6 @@ jobs:
         id: build_windows_386
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ matrix.go-version }}
         run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
