@@ -1,4 +1,8 @@
-package fate
+package dayan
+
+import (
+	"fmt"
+)
 
 // Sex ...
 type Sex bool
@@ -9,7 +13,19 @@ const (
 	SexGirl Sex = true
 )
 
-var daYanList = [81]DaYan{
+// DaYan ...
+type DaYan struct {
+	Number  int
+	Lucky   string
+	Max     bool
+	Sex     Sex //male(false),female(true)
+	SkyNine string
+	Comment string
+}
+
+const Max = 81
+
+var daYanList = [Max]DaYan{
 	{Number: 1, Lucky: "吉", SkyNine: "太极之数", Comment: "太极之数，万物开泰，生发无穷，利禄亨通。"},
 	{Number: 2, Lucky: "凶", SkyNine: "两仪之数", Comment: "两仪之数，混沌未开，进退保守，志望难达。"},
 	{Number: 3, Lucky: "吉", SkyNine: "三才之数", Comment: "三才之数，天地人和，大事大业，繁荣昌隆。"},
@@ -93,31 +109,21 @@ var daYanList = [81]DaYan{
 	{Number: 81, Lucky: "吉", SkyNine: "万物回春", Comment: "最吉之数，还本归元，吉祥重叠，富贵尊荣。"},
 }
 
-// DaYan ...
-type DaYan struct {
-	Number  int
-	Lucky   string
-	Max     bool
-	Sex     Sex //male(false),female(true)
-	SkyNine string
-	Comment string
-}
-
-//IsNotSuitableSex 女性不宜此数
+// IsNotSuitableSex 女性不宜此数
 func (dy DaYan) IsNotSuitableSex() bool {
 	return dy.Sex == SexGirl
 }
 
-//IsMax 是否最大好运数
+// IsMax 是否最大好运数
 func (dy DaYan) IsMax() bool {
 	return dy.Max
 }
 
-//GetDaYan 获取大衍之数
-func GetDaYan(idx int) DaYan {
-	if idx <= 0 {
-		panic("wrong idx")
+// Find 获取大衍之数
+func Find(number int) DaYan {
+	if number <= 0 {
+		panic(fmt.Sprintf("the number %v is negative", number))
 	}
-	i := (idx - 1) % 81
+	i := (number - 1) % 81
 	return daYanList[i]
 }
