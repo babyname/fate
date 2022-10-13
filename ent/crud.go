@@ -132,6 +132,36 @@ func (cu *CharacterUpdate) SetCharacterWithOptional(input *Character) *Character
 	return cu
 }
 
+func (vc *VersionCreate) SetVersion(input *Version) *VersionCreate {
+	vc.SetVersion(input.Version)
+	vc.SetUpdatedUnix(input.UpdatedUnix)
+	return vc
+}
+
+func (vc *VersionCreate) SetVersionWithOptional(input *Version) *VersionCreate {
+	vc.SetVersion(input.Version)
+	vc.SetUpdatedUnix(input.UpdatedUnix)
+	return vc
+}
+
+func (vuo *VersionUpdateOne) SetVersion(input *Version) *VersionUpdateOne {
+	vuo.SetVersion(input.Version)
+	vuo.SetUpdatedUnix(input.UpdatedUnix)
+	return vuo
+}
+
+func (vu *VersionUpdate) SetVersion(input *Version) *VersionUpdate {
+	vu.SetVersion(input.Version)
+	vu.SetUpdatedUnix(input.UpdatedUnix)
+	return vu
+}
+
+func (vu *VersionUpdate) SetVersionWithOptional(input *Version) *VersionUpdate {
+	vu.SetVersion(input.Version)
+	vu.SetUpdatedUnix(input.UpdatedUnix)
+	return vu
+}
+
 func (wglc *WuGeLuckyCreate) SetWuGeLucky(input *WuGeLucky) *WuGeLuckyCreate {
 	return wglc
 }
