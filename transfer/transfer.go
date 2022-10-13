@@ -97,7 +97,6 @@ func (t transferDatabase) transferCharacter(ctx context.Context) error {
 		}
 		var bluks []*ent.CharacterCreate
 		for x := range characters {
-			fmt.Println("character is", characters[x].Ch)
 			character := t.Target.Character.Create().SetID(characters[x].ID).SetCharacterWithOptional(characters[x])
 			bluks = append(bluks, character)
 		}
