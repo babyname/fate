@@ -1,5 +1,9 @@
 package fate
 
+import (
+	"github.com/babyname/fate/dayan"
+)
+
 type RuleIndex int
 
 const (
@@ -12,7 +16,7 @@ const (
 )
 
 type Rule struct {
-	sex   Sex
+	sex   dayan.Sex
 	rules [RuleIndexMax]bool
 }
 
@@ -83,7 +87,7 @@ func RuleFilterSupply(b bool) func(rule *Rule) {
 // @Description: set sex to rule
 // @param Sex
 // @return func(rule *Rule)
-func RuleSetSex(s Sex) func(rule *Rule) {
+func RuleSetSex(s dayan.Sex) func(rule *Rule) {
 	return func(rule *Rule) {
 		rule.sex = s
 	}

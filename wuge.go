@@ -4,6 +4,8 @@ import (
 	"github.com/goextension/log"
 	"github.com/google/uuid"
 	"github.com/xormsharp/xorm"
+
+	"github.com/babyname/fate/dayan"
 )
 
 // WuGe ...
@@ -40,7 +42,7 @@ func (ge *WuGe) TianGe() int {
 	return ge.tianGe
 }
 
-//CalcWuGe 计算五格
+// CalcWuGe 计算五格
 func CalcWuGe(l1, l2, f1, f2 int) *WuGe {
 	return &WuGe{
 		tianGe: tianGe(l1, l2, f1, f2),
@@ -51,9 +53,9 @@ func CalcWuGe(l1, l2, f1, f2 int) *WuGe {
 	}
 }
 
-//tianGe input the ScienceStrokes with last name
-//天格（复姓）姓的笔画相加
-//天格（单姓）姓的笔画上加一
+// tianGe input the ScienceStrokes with last name
+// 天格（复姓）姓的笔画相加
+// 天格（单姓）姓的笔画上加一
 func tianGe(l1, l2, _, _ int) int {
 	if l2 == 0 {
 		return l1 + 1
@@ -61,11 +63,11 @@ func tianGe(l1, l2, _, _ int) int {
 	return l1 + l2
 }
 
-//renGe input the ScienceStrokes with name
-//人格（复姓）姓氏的第二字的笔画加名的第一字
-//人格（复姓单名）姓的第二字加名
-//人格（单姓单名）姓加名
-// 人格（单姓复名）姓加名的第一字
+// renGe input the ScienceStrokes with name
+// 人格（复姓）姓氏的第二字的笔画加名的第一字
+// 人格（复姓单名）姓的第二字加名
+// 人格（单姓单名）姓加名
+//  人格（单姓复名）姓加名的第一字
 func renGe(l1, l2, f1, _ int) int {
 	//人格（复姓）姓氏的第二字的笔画加名的第一字
 	//人格（复姓单名）姓的第二字加名
@@ -75,9 +77,9 @@ func renGe(l1, l2, f1, _ int) int {
 	return l1 + f1
 }
 
-//diGe input the ScienceStrokes with name
-//地格（复姓复名，单姓复名）名字相加
-//地格（复姓单名，单姓单名）名字+1
+// diGe input the ScienceStrokes with name
+// 地格（复姓复名，单姓复名）名字相加
+// 地格（复姓单名，单姓单名）名字+1
 func diGe(_, _, f1, f2 int) int {
 	if f2 == 0 {
 		return f1 + 1
@@ -85,11 +87,11 @@ func diGe(_, _, f1, f2 int) int {
 	return f1 + f2
 }
 
-//waiGe input the ScienceStrokes with name
-//外格（复姓单名）姓的第一字加笔画数一
-//外格（复姓复名）姓的第一字和名的最后一定相加的笔画数
-//外格（单姓复名）一加名的最后一个字
-//外格（单姓单名）一加一
+// waiGe input the ScienceStrokes with name
+// 外格（复姓单名）姓的第一字加笔画数一
+// 外格（复姓复名）姓的第一字和名的最后一定相加的笔画数
+// 外格（单姓复名）一加名的最后一个字
+// 外格（单姓单名）一加一
 func waiGe(l1, l2, _, f2 int) (n int) {
 	//单姓单名
 	if l2 == 0 && f2 == 0 {
@@ -110,8 +112,8 @@ func waiGe(l1, l2, _, f2 int) (n int) {
 	return n
 }
 
-//zongGe input the ScienceStrokes with name
-//总格，姓加名的笔画总数  数理五行分类
+// zongGe input the ScienceStrokes with name
+// 总格，姓加名的笔画总数  数理五行分类
 func zongGe(l1, l2, f1, f2 int) int {
 	//归1
 	zg := (l1 + l2 + f1 + f2) - 1
@@ -121,17 +123,17 @@ func zongGe(l1, l2, f1, f2 int) int {
 	return zg%81 + 1
 }
 
-//Check 格检查
+// Check 格检查
 func (ge *WuGe) Check(ss ...string) bool {
 	v := map[string]bool{}
 	if ss == nil {
 		ss = append(ss, "吉", "半吉")
 	}
 	//ignore:tianGe
-	v[GetDaYan(ge.diGe).Lucky] = false
-	v[GetDaYan(ge.renGe).Lucky] = false
-	v[GetDaYan(ge.waiGe).Lucky] = false
-	v[GetDaYan(ge.zongGe).Lucky] = false
+	v[dayan.Find(ge.diGe).Lucky] = false
+	v[dayan.Find(ge.renGe).Lucky] = false
+	v[dayan.Find(ge.waiGe).Lucky] = false
+	v[dayan.Find(ge.zongGe).Lucky] = false
 
 	for l := range v {
 		for i := range ss {
@@ -150,7 +152,7 @@ func (ge *WuGe) Check(ss ...string) bool {
 
 }
 
-//WuGeLucky ...
+// WuGeLucky ...
 type WuGeLucky struct {
 	ID           string `xorm:"id pk"`
 	LastStroke1  int    `xorm:"last_stroke_1"`
@@ -219,18 +221,18 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 						FirstStroke1: f1,
 						FirstStroke2: f2,
 						TianGe:       wuge.tianGe,
-						TianDaYan:    GetDaYan(wuge.tianGe).Lucky,
+						TianDaYan:    dayan.Find(wuge.tianGe).Lucky,
 						RenGe:        wuge.renGe,
-						RenDaYan:     GetDaYan(wuge.renGe).Lucky,
+						RenDaYan:     dayan.Find(wuge.renGe).Lucky,
 						DiGe:         wuge.diGe,
-						DiDaYan:      GetDaYan(wuge.diGe).Lucky,
+						DiDaYan:      dayan.Find(wuge.diGe).Lucky,
 						WaiGe:        wuge.waiGe,
-						WaiDaYan:     GetDaYan(wuge.waiGe).Lucky,
+						WaiDaYan:     dayan.Find(wuge.waiGe).Lucky,
 						ZongGe:       wuge.zongGe,
-						ZongDaYan:    GetDaYan(wuge.zongGe).Lucky,
+						ZongDaYan:    dayan.Find(wuge.zongGe).Lucky,
 						ZongLucky:    wuge.Check(),
 						ZongSex:      isSex(wuge.zongGe, wuge.waiGe, wuge.renGe, wuge.diGe),
-						ZongMax:      GetDaYan(wuge.zongGe).IsMax(),
+						ZongMax:      dayan.Find(wuge.zongGe).IsMax(),
 					}
 				}
 			}
@@ -255,7 +257,7 @@ func getStroke(character *Character) int {
 
 func isSex(dys ...int) bool {
 	for _, dy := range dys {
-		if GetDaYan(dy).Sex {
+		if dayan.Find(dy).Sex {
 			return true
 		}
 	}
