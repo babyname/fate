@@ -6,7 +6,7 @@ import (
 	"github.com/babyname/fate/ent"
 )
 
-const mysqlDSN = "%v:%v@tcp(%v:%v)/%v?charset=utf8&parseTime=true"
+const mysqlDSN = "%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=true"
 const sqlite3DSN = "file:%v?cache=shared&_journal=WAL&_fk=1"
 
 type BuildFunc func(*database) (*ent.Client, error)
