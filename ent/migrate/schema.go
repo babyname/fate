@@ -44,7 +44,7 @@ var (
 	// VersionsColumns holds the columns for the "versions" table.
 	VersionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "version", Type: field.TypeInt},
+		{Name: "current_version", Type: field.TypeInt},
 		{Name: "updated_unix", Type: field.TypeInt64},
 	}
 	// VersionsTable holds the schema information for the "versions" table.

@@ -1754,17 +1754,17 @@ func (m *CharacterMutation) ResetEdge(name string) error {
 // VersionMutation represents an operation that mutates the Version nodes in the graph.
 type VersionMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	version         *int
-	addversion      *int
-	_UpdatedUnix    *int64
-	add_UpdatedUnix *int64
-	clearedFields   map[string]struct{}
-	done            bool
-	oldValue        func(context.Context) (*Version, error)
-	predicates      []predicate.Version
+	op                 Op
+	typ                string
+	id                 *int
+	current_version    *int
+	addcurrent_version *int
+	updated_unix       *int64
+	addupdated_unix    *int64
+	clearedFields      map[string]struct{}
+	done               bool
+	oldValue           func(context.Context) (*Version, error)
+	predicates         []predicate.Version
 }
 
 var _ ent.Mutation = (*VersionMutation)(nil)
@@ -1865,78 +1865,78 @@ func (m *VersionMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetVersion sets the "version" field.
-func (m *VersionMutation) SetVersion(i int) {
-	m.version = &i
-	m.addversion = nil
+// SetCurrentVersion sets the "current_version" field.
+func (m *VersionMutation) SetCurrentVersion(i int) {
+	m.current_version = &i
+	m.addcurrent_version = nil
 }
 
-// Version returns the value of the "version" field in the mutation.
-func (m *VersionMutation) Version() (r int, exists bool) {
-	v := m.version
+// CurrentVersion returns the value of the "current_version" field in the mutation.
+func (m *VersionMutation) CurrentVersion() (r int, exists bool) {
+	v := m.current_version
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldVersion returns the old "version" field's value of the Version entity.
+// OldCurrentVersion returns the old "current_version" field's value of the Version entity.
 // If the Version object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *VersionMutation) OldVersion(ctx context.Context) (v int, err error) {
+func (m *VersionMutation) OldCurrentVersion(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldVersion is only allowed on UpdateOne operations")
+		return v, errors.New("OldCurrentVersion is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldVersion requires an ID field in the mutation")
+		return v, errors.New("OldCurrentVersion requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldVersion: %w", err)
+		return v, fmt.Errorf("querying old value for OldCurrentVersion: %w", err)
 	}
-	return oldValue.Version, nil
+	return oldValue.CurrentVersion, nil
 }
 
-// AddVersion adds i to the "version" field.
-func (m *VersionMutation) AddVersion(i int) {
-	if m.addversion != nil {
-		*m.addversion += i
+// AddCurrentVersion adds i to the "current_version" field.
+func (m *VersionMutation) AddCurrentVersion(i int) {
+	if m.addcurrent_version != nil {
+		*m.addcurrent_version += i
 	} else {
-		m.addversion = &i
+		m.addcurrent_version = &i
 	}
 }
 
-// AddedVersion returns the value that was added to the "version" field in this mutation.
-func (m *VersionMutation) AddedVersion() (r int, exists bool) {
-	v := m.addversion
+// AddedCurrentVersion returns the value that was added to the "current_version" field in this mutation.
+func (m *VersionMutation) AddedCurrentVersion() (r int, exists bool) {
+	v := m.addcurrent_version
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetVersion resets all changes to the "version" field.
-func (m *VersionMutation) ResetVersion() {
-	m.version = nil
-	m.addversion = nil
+// ResetCurrentVersion resets all changes to the "current_version" field.
+func (m *VersionMutation) ResetCurrentVersion() {
+	m.current_version = nil
+	m.addcurrent_version = nil
 }
 
-// SetUpdatedUnix sets the "UpdatedUnix" field.
+// SetUpdatedUnix sets the "updated_unix" field.
 func (m *VersionMutation) SetUpdatedUnix(i int64) {
-	m._UpdatedUnix = &i
-	m.add_UpdatedUnix = nil
+	m.updated_unix = &i
+	m.addupdated_unix = nil
 }
 
-// UpdatedUnix returns the value of the "UpdatedUnix" field in the mutation.
+// UpdatedUnix returns the value of the "updated_unix" field in the mutation.
 func (m *VersionMutation) UpdatedUnix() (r int64, exists bool) {
-	v := m._UpdatedUnix
+	v := m.updated_unix
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldUpdatedUnix returns the old "UpdatedUnix" field's value of the Version entity.
+// OldUpdatedUnix returns the old "updated_unix" field's value of the Version entity.
 // If the Version object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *VersionMutation) OldUpdatedUnix(ctx context.Context) (v int64, err error) {
@@ -1953,28 +1953,28 @@ func (m *VersionMutation) OldUpdatedUnix(ctx context.Context) (v int64, err erro
 	return oldValue.UpdatedUnix, nil
 }
 
-// AddUpdatedUnix adds i to the "UpdatedUnix" field.
+// AddUpdatedUnix adds i to the "updated_unix" field.
 func (m *VersionMutation) AddUpdatedUnix(i int64) {
-	if m.add_UpdatedUnix != nil {
-		*m.add_UpdatedUnix += i
+	if m.addupdated_unix != nil {
+		*m.addupdated_unix += i
 	} else {
-		m.add_UpdatedUnix = &i
+		m.addupdated_unix = &i
 	}
 }
 
-// AddedUpdatedUnix returns the value that was added to the "UpdatedUnix" field in this mutation.
+// AddedUpdatedUnix returns the value that was added to the "updated_unix" field in this mutation.
 func (m *VersionMutation) AddedUpdatedUnix() (r int64, exists bool) {
-	v := m.add_UpdatedUnix
+	v := m.addupdated_unix
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetUpdatedUnix resets all changes to the "UpdatedUnix" field.
+// ResetUpdatedUnix resets all changes to the "updated_unix" field.
 func (m *VersionMutation) ResetUpdatedUnix() {
-	m._UpdatedUnix = nil
-	m.add_UpdatedUnix = nil
+	m.updated_unix = nil
+	m.addupdated_unix = nil
 }
 
 // Where appends a list predicates to the VersionMutation builder.
@@ -1997,10 +1997,10 @@ func (m *VersionMutation) Type() string {
 // AddedFields().
 func (m *VersionMutation) Fields() []string {
 	fields := make([]string, 0, 2)
-	if m.version != nil {
-		fields = append(fields, version.FieldVersion)
+	if m.current_version != nil {
+		fields = append(fields, version.FieldCurrentVersion)
 	}
-	if m._UpdatedUnix != nil {
+	if m.updated_unix != nil {
 		fields = append(fields, version.FieldUpdatedUnix)
 	}
 	return fields
@@ -2011,8 +2011,8 @@ func (m *VersionMutation) Fields() []string {
 // schema.
 func (m *VersionMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case version.FieldVersion:
-		return m.Version()
+	case version.FieldCurrentVersion:
+		return m.CurrentVersion()
 	case version.FieldUpdatedUnix:
 		return m.UpdatedUnix()
 	}
@@ -2024,8 +2024,8 @@ func (m *VersionMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *VersionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case version.FieldVersion:
-		return m.OldVersion(ctx)
+	case version.FieldCurrentVersion:
+		return m.OldCurrentVersion(ctx)
 	case version.FieldUpdatedUnix:
 		return m.OldUpdatedUnix(ctx)
 	}
@@ -2037,12 +2037,12 @@ func (m *VersionMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *VersionMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case version.FieldVersion:
+	case version.FieldCurrentVersion:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetVersion(v)
+		m.SetCurrentVersion(v)
 		return nil
 	case version.FieldUpdatedUnix:
 		v, ok := value.(int64)
@@ -2059,10 +2059,10 @@ func (m *VersionMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *VersionMutation) AddedFields() []string {
 	var fields []string
-	if m.addversion != nil {
-		fields = append(fields, version.FieldVersion)
+	if m.addcurrent_version != nil {
+		fields = append(fields, version.FieldCurrentVersion)
 	}
-	if m.add_UpdatedUnix != nil {
+	if m.addupdated_unix != nil {
 		fields = append(fields, version.FieldUpdatedUnix)
 	}
 	return fields
@@ -2073,8 +2073,8 @@ func (m *VersionMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *VersionMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case version.FieldVersion:
-		return m.AddedVersion()
+	case version.FieldCurrentVersion:
+		return m.AddedCurrentVersion()
 	case version.FieldUpdatedUnix:
 		return m.AddedUpdatedUnix()
 	}
@@ -2086,12 +2086,12 @@ func (m *VersionMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *VersionMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case version.FieldVersion:
+	case version.FieldCurrentVersion:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddVersion(v)
+		m.AddCurrentVersion(v)
 		return nil
 	case version.FieldUpdatedUnix:
 		v, ok := value.(int64)
@@ -2127,8 +2127,8 @@ func (m *VersionMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *VersionMutation) ResetField(name string) error {
 	switch name {
-	case version.FieldVersion:
-		m.ResetVersion()
+	case version.FieldCurrentVersion:
+		m.ResetCurrentVersion()
 		return nil
 	case version.FieldUpdatedUnix:
 		m.ResetUpdatedUnix()

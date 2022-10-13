@@ -21,13 +21,13 @@ type VersionCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// SetVersion sets the "version" field.
-func (vc *VersionCreate) SetVersion(i int) *VersionCreate {
-	vc.mutation.SetVersion(i)
+// SetCurrentVersion sets the "current_version" field.
+func (vc *VersionCreate) SetCurrentVersion(i int) *VersionCreate {
+	vc.mutation.SetCurrentVersion(i)
 	return vc
 }
 
-// SetUpdatedUnix sets the "UpdatedUnix" field.
+// SetUpdatedUnix sets the "updated_unix" field.
 func (vc *VersionCreate) SetUpdatedUnix(i int64) *VersionCreate {
 	vc.mutation.SetUpdatedUnix(i)
 	return vc
@@ -103,11 +103,11 @@ func (vc *VersionCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (vc *VersionCreate) check() error {
-	if _, ok := vc.mutation.Version(); !ok {
-		return &ValidationError{Name: "version", err: errors.New(`ent: missing required field "Version.version"`)}
+	if _, ok := vc.mutation.CurrentVersion(); !ok {
+		return &ValidationError{Name: "current_version", err: errors.New(`ent: missing required field "Version.current_version"`)}
 	}
 	if _, ok := vc.mutation.UpdatedUnix(); !ok {
-		return &ValidationError{Name: "UpdatedUnix", err: errors.New(`ent: missing required field "Version.UpdatedUnix"`)}
+		return &ValidationError{Name: "updated_unix", err: errors.New(`ent: missing required field "Version.updated_unix"`)}
 	}
 	return nil
 }
@@ -137,13 +137,13 @@ func (vc *VersionCreate) createSpec() (*Version, *sqlgraph.CreateSpec) {
 		}
 	)
 	_spec.OnConflict = vc.conflict
-	if value, ok := vc.mutation.Version(); ok {
+	if value, ok := vc.mutation.CurrentVersion(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: version.FieldVersion,
+			Column: version.FieldCurrentVersion,
 		})
-		_node.Version = value
+		_node.CurrentVersion = value
 	}
 	if value, ok := vc.mutation.UpdatedUnix(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -160,7 +160,7 @@ func (vc *VersionCreate) createSpec() (*Version, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Version.Create().
-//		SetVersion(v).
+//		SetCurrentVersion(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -169,7 +169,7 @@ func (vc *VersionCreate) createSpec() (*Version, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.VersionUpsert) {
-//			SetVersion(v+v).
+//			SetCurrentVersion(v+v).
 //		}).
 //		Exec(ctx)
 func (vc *VersionCreate) OnConflict(opts ...sql.ConflictOption) *VersionUpsertOne {
@@ -205,37 +205,37 @@ type (
 	}
 )
 
-// SetVersion sets the "version" field.
-func (u *VersionUpsert) SetVersion(v int) *VersionUpsert {
-	u.Set(version.FieldVersion, v)
+// SetCurrentVersion sets the "current_version" field.
+func (u *VersionUpsert) SetCurrentVersion(v int) *VersionUpsert {
+	u.Set(version.FieldCurrentVersion, v)
 	return u
 }
 
-// UpdateVersion sets the "version" field to the value that was provided on create.
-func (u *VersionUpsert) UpdateVersion() *VersionUpsert {
-	u.SetExcluded(version.FieldVersion)
+// UpdateCurrentVersion sets the "current_version" field to the value that was provided on create.
+func (u *VersionUpsert) UpdateCurrentVersion() *VersionUpsert {
+	u.SetExcluded(version.FieldCurrentVersion)
 	return u
 }
 
-// AddVersion adds v to the "version" field.
-func (u *VersionUpsert) AddVersion(v int) *VersionUpsert {
-	u.Add(version.FieldVersion, v)
+// AddCurrentVersion adds v to the "current_version" field.
+func (u *VersionUpsert) AddCurrentVersion(v int) *VersionUpsert {
+	u.Add(version.FieldCurrentVersion, v)
 	return u
 }
 
-// SetUpdatedUnix sets the "UpdatedUnix" field.
+// SetUpdatedUnix sets the "updated_unix" field.
 func (u *VersionUpsert) SetUpdatedUnix(v int64) *VersionUpsert {
 	u.Set(version.FieldUpdatedUnix, v)
 	return u
 }
 
-// UpdateUpdatedUnix sets the "UpdatedUnix" field to the value that was provided on create.
+// UpdateUpdatedUnix sets the "updated_unix" field to the value that was provided on create.
 func (u *VersionUpsert) UpdateUpdatedUnix() *VersionUpsert {
 	u.SetExcluded(version.FieldUpdatedUnix)
 	return u
 }
 
-// AddUpdatedUnix adds v to the "UpdatedUnix" field.
+// AddUpdatedUnix adds v to the "updated_unix" field.
 func (u *VersionUpsert) AddUpdatedUnix(v int64) *VersionUpsert {
 	u.Add(version.FieldUpdatedUnix, v)
 	return u
@@ -281,42 +281,42 @@ func (u *VersionUpsertOne) Update(set func(*VersionUpsert)) *VersionUpsertOne {
 	return u
 }
 
-// SetVersion sets the "version" field.
-func (u *VersionUpsertOne) SetVersion(v int) *VersionUpsertOne {
+// SetCurrentVersion sets the "current_version" field.
+func (u *VersionUpsertOne) SetCurrentVersion(v int) *VersionUpsertOne {
 	return u.Update(func(s *VersionUpsert) {
-		s.SetVersion(v)
+		s.SetCurrentVersion(v)
 	})
 }
 
-// AddVersion adds v to the "version" field.
-func (u *VersionUpsertOne) AddVersion(v int) *VersionUpsertOne {
+// AddCurrentVersion adds v to the "current_version" field.
+func (u *VersionUpsertOne) AddCurrentVersion(v int) *VersionUpsertOne {
 	return u.Update(func(s *VersionUpsert) {
-		s.AddVersion(v)
+		s.AddCurrentVersion(v)
 	})
 }
 
-// UpdateVersion sets the "version" field to the value that was provided on create.
-func (u *VersionUpsertOne) UpdateVersion() *VersionUpsertOne {
+// UpdateCurrentVersion sets the "current_version" field to the value that was provided on create.
+func (u *VersionUpsertOne) UpdateCurrentVersion() *VersionUpsertOne {
 	return u.Update(func(s *VersionUpsert) {
-		s.UpdateVersion()
+		s.UpdateCurrentVersion()
 	})
 }
 
-// SetUpdatedUnix sets the "UpdatedUnix" field.
+// SetUpdatedUnix sets the "updated_unix" field.
 func (u *VersionUpsertOne) SetUpdatedUnix(v int64) *VersionUpsertOne {
 	return u.Update(func(s *VersionUpsert) {
 		s.SetUpdatedUnix(v)
 	})
 }
 
-// AddUpdatedUnix adds v to the "UpdatedUnix" field.
+// AddUpdatedUnix adds v to the "updated_unix" field.
 func (u *VersionUpsertOne) AddUpdatedUnix(v int64) *VersionUpsertOne {
 	return u.Update(func(s *VersionUpsert) {
 		s.AddUpdatedUnix(v)
 	})
 }
 
-// UpdateUpdatedUnix sets the "UpdatedUnix" field to the value that was provided on create.
+// UpdateUpdatedUnix sets the "updated_unix" field to the value that was provided on create.
 func (u *VersionUpsertOne) UpdateUpdatedUnix() *VersionUpsertOne {
 	return u.Update(func(s *VersionUpsert) {
 		s.UpdateUpdatedUnix()
@@ -453,7 +453,7 @@ func (vcb *VersionCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.VersionUpsert) {
-//			SetVersion(v+v).
+//			SetCurrentVersion(v+v).
 //		}).
 //		Exec(ctx)
 func (vcb *VersionCreateBulk) OnConflict(opts ...sql.ConflictOption) *VersionUpsertBulk {
@@ -522,42 +522,42 @@ func (u *VersionUpsertBulk) Update(set func(*VersionUpsert)) *VersionUpsertBulk 
 	return u
 }
 
-// SetVersion sets the "version" field.
-func (u *VersionUpsertBulk) SetVersion(v int) *VersionUpsertBulk {
+// SetCurrentVersion sets the "current_version" field.
+func (u *VersionUpsertBulk) SetCurrentVersion(v int) *VersionUpsertBulk {
 	return u.Update(func(s *VersionUpsert) {
-		s.SetVersion(v)
+		s.SetCurrentVersion(v)
 	})
 }
 
-// AddVersion adds v to the "version" field.
-func (u *VersionUpsertBulk) AddVersion(v int) *VersionUpsertBulk {
+// AddCurrentVersion adds v to the "current_version" field.
+func (u *VersionUpsertBulk) AddCurrentVersion(v int) *VersionUpsertBulk {
 	return u.Update(func(s *VersionUpsert) {
-		s.AddVersion(v)
+		s.AddCurrentVersion(v)
 	})
 }
 
-// UpdateVersion sets the "version" field to the value that was provided on create.
-func (u *VersionUpsertBulk) UpdateVersion() *VersionUpsertBulk {
+// UpdateCurrentVersion sets the "current_version" field to the value that was provided on create.
+func (u *VersionUpsertBulk) UpdateCurrentVersion() *VersionUpsertBulk {
 	return u.Update(func(s *VersionUpsert) {
-		s.UpdateVersion()
+		s.UpdateCurrentVersion()
 	})
 }
 
-// SetUpdatedUnix sets the "UpdatedUnix" field.
+// SetUpdatedUnix sets the "updated_unix" field.
 func (u *VersionUpsertBulk) SetUpdatedUnix(v int64) *VersionUpsertBulk {
 	return u.Update(func(s *VersionUpsert) {
 		s.SetUpdatedUnix(v)
 	})
 }
 
-// AddUpdatedUnix adds v to the "UpdatedUnix" field.
+// AddUpdatedUnix adds v to the "updated_unix" field.
 func (u *VersionUpsertBulk) AddUpdatedUnix(v int64) *VersionUpsertBulk {
 	return u.Update(func(s *VersionUpsert) {
 		s.AddUpdatedUnix(v)
 	})
 }
 
-// UpdateUpdatedUnix sets the "UpdatedUnix" field to the value that was provided on create.
+// UpdateUpdatedUnix sets the "updated_unix" field to the value that was provided on create.
 func (u *VersionUpsertBulk) UpdateUpdatedUnix() *VersionUpsertBulk {
 	return u.Update(func(s *VersionUpsert) {
 		s.UpdateUpdatedUnix()

@@ -133,31 +133,31 @@ func (cu *CharacterUpdate) SetCharacterWithOptional(input *Character) *Character
 }
 
 func (vc *VersionCreate) SetVersion(input *Version) *VersionCreate {
-	vc.SetVersion(input.Version)
+	vc.SetCurrentVersion(input.CurrentVersion)
 	vc.SetUpdatedUnix(input.UpdatedUnix)
 	return vc
 }
 
 func (vc *VersionCreate) SetVersionWithOptional(input *Version) *VersionCreate {
-	vc.SetVersion(input.Version)
+	vc.SetCurrentVersion(input.CurrentVersion)
 	vc.SetUpdatedUnix(input.UpdatedUnix)
 	return vc
 }
 
 func (vuo *VersionUpdateOne) SetVersion(input *Version) *VersionUpdateOne {
-	vuo.SetVersion(input.Version)
+	vuo.SetCurrentVersion(input.CurrentVersion)
 	vuo.SetUpdatedUnix(input.UpdatedUnix)
 	return vuo
 }
 
 func (vu *VersionUpdate) SetVersion(input *Version) *VersionUpdate {
-	vu.SetVersion(input.Version)
+	vu.SetCurrentVersion(input.CurrentVersion)
 	vu.SetUpdatedUnix(input.UpdatedUnix)
 	return vu
 }
 
 func (vu *VersionUpdate) SetVersionWithOptional(input *Version) *VersionUpdate {
-	vu.SetVersion(input.Version)
+	vu.SetCurrentVersion(input.CurrentVersion)
 	vu.SetUpdatedUnix(input.UpdatedUnix)
 	return vu
 }
