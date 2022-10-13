@@ -38,13 +38,35 @@ jobs:
 
       - name: Build ${{ matrix.platform }} ${{ matrix.arch }} with Go
         if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && matrix.arch == 'amd64' && env.UPLOAD_BIN_FILE
-        id: build_linux
+        id: build_linux_amd64
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         run: |
           go mod tidy
           export GOARCH=${{ matrix.arch }}
           export CGO_ENABLED=1
+          echo "FATENAME=fate_$(go env GOOS)_$(go env GOARCH)" >> $GITHUB_ENV
+          echo "$(go env GOOS) $(go env GOARCH)"
+          
+          echo "buiding"
+          go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
+          
+          echo "compress"
+          tar -zcvf fate_$(go env GOOS)_$(go env GOARCH).tar.gz ./fate_$(go env GOOS)_$(go env GOARCH)
+
+      - name: Build ${{ matrix.platform }} ${{ matrix.arch }} with Go
+        if: matrix.platform == 'ubuntu-latest' && matrix.arch == '386' && env.UPLOAD_BIN_FILE
+        id: build_linux_386
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        run: |
+          go mod tidy
+          export GOARCH=${{ matrix.arch }}
+          export CGO_ENABLED=1
+          sudo apt-get install -y gcc-i686-linux-gnu g++-i686-linux-gnu
+          export AR="/usr/bin/i686-linux-gnu-ar -m32"
+          export CXX="/usr/bin/i686-linux-gnu-cpp -m32"
+          export CC="/usr/bin/i686-linux-gnu-gcc -m32"
           echo "FATENAME=fate_$(go env GOOS)_$(go env GOARCH)" >> $GITHUB_ENV
           echo "$(go env GOOS) $(go env GOARCH)"
           
@@ -88,7 +110,7 @@ jobs:
 
       - name: Upload Linux
         uses: actions/upload-artifact@master
-        if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && matrix.arch == '386' && env.UPLOAD_BIN_FILE && false
+        if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && env.UPLOAD_BIN_FILE
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         with:
