@@ -37,7 +37,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Build ${{ matrix.platform }} ${{ matrix.arch }} with Go
-        if: matrix.platform == 'ubuntu-latest' || (matrix.platform == 'macos-latest' && matrix.arch == 'amd64')
+        if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && matrix.arch == 'amd64' && env.UPLOAD_BIN_FILE
         id: build_linux
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
@@ -89,7 +89,7 @@ jobs:
 
       - name: Upload Linux
         uses: actions/upload-artifact@master
-        if: (matrix.platform == 'ubuntu-latest' || (matrix.platform == 'macos-latest' && matrix.arch == 'amd64')) && env.UPLOAD_BIN_FILE
+        if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && matrix.arch == '386' && env.UPLOAD_BIN_FILE && false
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         with:
