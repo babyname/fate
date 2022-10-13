@@ -15,8 +15,8 @@ type Version struct {
 // Fields of the Version.
 func (Version) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("version"),
-		field.Int64("UpdatedUnix"),
+		field.Int("current_version"),
+		field.Int64("updated_unix"),
 	}
 }
 
