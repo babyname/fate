@@ -2,18 +2,23 @@ package fate
 
 import (
 	"fmt"
+	"net/url"
+
 	"github.com/go-sql-driver/mysql"
-	"github.com/babyname/fate/config"
 	"github.com/goextension/log"
+	"github.com/mattn/go-sqlite3"
+
+	"github.com/babyname/fate/config"
 
 	"github.com/xormsharp/xorm"
-	"net/url"
 )
 
 const mysqlSource = "%s:%s@tcp(%s)/%s?loc=%s&charset=utf8mb4&parseTime=true"
+const sqliteSource = "file:%v?cache=shared\u0026_journal=WAL\u0026_fk=1"
 const createDatabase = "CREATE DATABASE `%s` CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_bin'"
 
-var _ = mysql.Config{}
+var _ = mysql.MySQLDriver{}
+var _ = sqlite3.SQLiteDriver{}
 
 // DefaultTableName ...
 var DefaultTableName = "fate"
@@ -80,22 +85,37 @@ func initDatabaseWithConfig(db config.Database) Database {
 	}
 }
 
+func databaseLink(database config.Database, schema bool) string {
+	name := database.Name
+	if !schema && database.Name != "" {
+		name = database.Name
+	}
+	switch database.Driver {
+	case "mysql":
+		return fmt.Sprintf(mysqlSource, database.User, database.Pwd, database.Addr(), name, url.QueryEscape("Asia/Shanghai"))
+	case "sqlite3":
+		return fmt.Sprintf(sqliteSource, name)
+	default:
+		panic("unsupported database")
+	}
+}
+
 func initSQL(database config.Database) *xorm.Engine {
-	dbURL := fmt.Sprintf(mysqlSource, database.User, database.Pwd, database.Addr(), "", url.QueryEscape("Asia/Shanghai"))
-	dbEngine, e := xorm.NewEngine(database.Driver, dbURL)
+	link := databaseLink(database, true)
+	dbEngine, e := xorm.NewEngine(database.Driver, link)
 	if e != nil {
 		log.Panicw("connect database failed", "error", e)
 	}
-	defer dbEngine.Close()
-
 	sql := fmt.Sprintf(createDatabase, database.Name)
-
 	_, e = dbEngine.DB().Exec(sql)
 	if e == nil {
 		log.Infow("create database failed", "database", DefaultTableName)
+		dbEngine.Close()
+		return nil
 	}
-	u := fmt.Sprintf(mysqlSource, database.User, database.Pwd, database.Addr(), database.Name, url.QueryEscape("Asia/Shanghai"))
-	eng, e := xorm.NewEngine(database.Driver, u)
+	dbEngine.Close()
+	link = databaseLink(database, false)
+	eng, e := xorm.NewEngine(database.Driver, link)
 	if e != nil {
 		log.Panicw("connect table failed", "error", e)
 	}
