@@ -11,6 +11,7 @@ import (
 
 	"github.com/babyname/fate/ent/character"
 	"github.com/babyname/fate/ent/predicate"
+	"github.com/babyname/fate/ent/version"
 	"github.com/babyname/fate/ent/wugelucky"
 	"github.com/babyname/fate/ent/wuxing"
 
@@ -27,6 +28,7 @@ const (
 
 	// Node types.
 	TypeCharacter = "Character"
+	TypeVersion   = "Version"
 	TypeWuGeLucky = "WuGeLucky"
 	TypeWuXing    = "WuXing"
 )
@@ -1747,6 +1749,440 @@ func (m *CharacterMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *CharacterMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Character edge %s", name)
+}
+
+// VersionMutation represents an operation that mutates the Version nodes in the graph.
+type VersionMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *int
+	version         *int
+	addversion      *int
+	_UpdatedUnix    *int64
+	add_UpdatedUnix *int64
+	clearedFields   map[string]struct{}
+	done            bool
+	oldValue        func(context.Context) (*Version, error)
+	predicates      []predicate.Version
+}
+
+var _ ent.Mutation = (*VersionMutation)(nil)
+
+// versionOption allows management of the mutation configuration using functional options.
+type versionOption func(*VersionMutation)
+
+// newVersionMutation creates new mutation for the Version entity.
+func newVersionMutation(c config, op Op, opts ...versionOption) *VersionMutation {
+	m := &VersionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeVersion,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withVersionID sets the ID field of the mutation.
+func withVersionID(id int) versionOption {
+	return func(m *VersionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Version
+		)
+		m.oldValue = func(ctx context.Context) (*Version, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Version.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withVersion sets the old Version of the mutation.
+func withVersion(node *Version) versionOption {
+	return func(m *VersionMutation) {
+		m.oldValue = func(context.Context) (*Version, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m VersionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m VersionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *VersionMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *VersionMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Version.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetVersion sets the "version" field.
+func (m *VersionMutation) SetVersion(i int) {
+	m.version = &i
+	m.addversion = nil
+}
+
+// Version returns the value of the "version" field in the mutation.
+func (m *VersionMutation) Version() (r int, exists bool) {
+	v := m.version
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVersion returns the old "version" field's value of the Version entity.
+// If the Version object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VersionMutation) OldVersion(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVersion is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVersion requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVersion: %w", err)
+	}
+	return oldValue.Version, nil
+}
+
+// AddVersion adds i to the "version" field.
+func (m *VersionMutation) AddVersion(i int) {
+	if m.addversion != nil {
+		*m.addversion += i
+	} else {
+		m.addversion = &i
+	}
+}
+
+// AddedVersion returns the value that was added to the "version" field in this mutation.
+func (m *VersionMutation) AddedVersion() (r int, exists bool) {
+	v := m.addversion
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetVersion resets all changes to the "version" field.
+func (m *VersionMutation) ResetVersion() {
+	m.version = nil
+	m.addversion = nil
+}
+
+// SetUpdatedUnix sets the "UpdatedUnix" field.
+func (m *VersionMutation) SetUpdatedUnix(i int64) {
+	m._UpdatedUnix = &i
+	m.add_UpdatedUnix = nil
+}
+
+// UpdatedUnix returns the value of the "UpdatedUnix" field in the mutation.
+func (m *VersionMutation) UpdatedUnix() (r int64, exists bool) {
+	v := m._UpdatedUnix
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedUnix returns the old "UpdatedUnix" field's value of the Version entity.
+// If the Version object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VersionMutation) OldUpdatedUnix(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedUnix is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedUnix requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedUnix: %w", err)
+	}
+	return oldValue.UpdatedUnix, nil
+}
+
+// AddUpdatedUnix adds i to the "UpdatedUnix" field.
+func (m *VersionMutation) AddUpdatedUnix(i int64) {
+	if m.add_UpdatedUnix != nil {
+		*m.add_UpdatedUnix += i
+	} else {
+		m.add_UpdatedUnix = &i
+	}
+}
+
+// AddedUpdatedUnix returns the value that was added to the "UpdatedUnix" field in this mutation.
+func (m *VersionMutation) AddedUpdatedUnix() (r int64, exists bool) {
+	v := m.add_UpdatedUnix
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpdatedUnix resets all changes to the "UpdatedUnix" field.
+func (m *VersionMutation) ResetUpdatedUnix() {
+	m._UpdatedUnix = nil
+	m.add_UpdatedUnix = nil
+}
+
+// Where appends a list predicates to the VersionMutation builder.
+func (m *VersionMutation) Where(ps ...predicate.Version) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *VersionMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Version).
+func (m *VersionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *VersionMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.version != nil {
+		fields = append(fields, version.FieldVersion)
+	}
+	if m._UpdatedUnix != nil {
+		fields = append(fields, version.FieldUpdatedUnix)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *VersionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case version.FieldVersion:
+		return m.Version()
+	case version.FieldUpdatedUnix:
+		return m.UpdatedUnix()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *VersionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case version.FieldVersion:
+		return m.OldVersion(ctx)
+	case version.FieldUpdatedUnix:
+		return m.OldUpdatedUnix(ctx)
+	}
+	return nil, fmt.Errorf("unknown Version field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *VersionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case version.FieldVersion:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVersion(v)
+		return nil
+	case version.FieldUpdatedUnix:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedUnix(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Version field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *VersionMutation) AddedFields() []string {
+	var fields []string
+	if m.addversion != nil {
+		fields = append(fields, version.FieldVersion)
+	}
+	if m.add_UpdatedUnix != nil {
+		fields = append(fields, version.FieldUpdatedUnix)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *VersionMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case version.FieldVersion:
+		return m.AddedVersion()
+	case version.FieldUpdatedUnix:
+		return m.AddedUpdatedUnix()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *VersionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case version.FieldVersion:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddVersion(v)
+		return nil
+	case version.FieldUpdatedUnix:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdatedUnix(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Version numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *VersionMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *VersionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *VersionMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Version nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *VersionMutation) ResetField(name string) error {
+	switch name {
+	case version.FieldVersion:
+		m.ResetVersion()
+		return nil
+	case version.FieldUpdatedUnix:
+		m.ResetUpdatedUnix()
+		return nil
+	}
+	return fmt.Errorf("unknown Version field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *VersionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *VersionMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *VersionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *VersionMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *VersionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *VersionMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *VersionMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Version unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *VersionMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Version edge %s", name)
 }
 
 // WuGeLuckyMutation represents an operation that mutates the WuGeLucky nodes in the graph.

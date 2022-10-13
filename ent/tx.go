@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Character is the client for interacting with the Character builders.
 	Character *CharacterClient
+	// Version is the client for interacting with the Version builders.
+	Version *VersionClient
 	// WuGeLucky is the client for interacting with the WuGeLucky builders.
 	WuGeLucky *WuGeLuckyClient
 	// WuXing is the client for interacting with the WuXing builders.
@@ -154,6 +156,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Character = NewCharacterClient(tx.config)
+	tx.Version = NewVersionClient(tx.config)
 	tx.WuGeLucky = NewWuGeLuckyClient(tx.config)
 	tx.WuXing = NewWuXingClient(tx.config)
 }

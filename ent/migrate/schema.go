@@ -41,6 +41,18 @@ var (
 		Columns:    CharacterColumns,
 		PrimaryKey: []*schema.Column{CharacterColumns[0]},
 	}
+	// VersionsColumns holds the columns for the "versions" table.
+	VersionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "version", Type: field.TypeInt},
+		{Name: "updated_unix", Type: field.TypeInt64},
+	}
+	// VersionsTable holds the schema information for the "versions" table.
+	VersionsTable = &schema.Table{
+		Name:       "versions",
+		Columns:    VersionsColumns,
+		PrimaryKey: []*schema.Column{VersionsColumns[0]},
+	}
 	// WuGeLuckyColumns holds the columns for the "wu_ge_lucky" table.
 	WuGeLuckyColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
@@ -89,6 +101,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CharacterTable,
+		VersionsTable,
 		WuGeLuckyTable,
 		WuXingTable,
 	}

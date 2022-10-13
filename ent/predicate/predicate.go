@@ -9,6 +9,9 @@ import (
 // Character is the predicate function for character builders.
 type Character func(*sql.Selector)
 
+// Version is the predicate function for version builders.
+type Version func(*sql.Selector)
+
 // WuGeLucky is the predicate function for wugelucky builders.
 type WuGeLucky func(*sql.Selector)
 
