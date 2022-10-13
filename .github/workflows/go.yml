@@ -45,6 +45,7 @@ jobs:
           go mod tidy
           export GOARCH=${{ matrix.arch }}
           export CGO_ENABLED=1
+#          echo "::set-env name=FATENAME::fate_$(go env GOOS)_$(go env GOARCH)"
           echo "FATENAME=fate_$(go env GOOS)_$(go env GOARCH)" >> $GITHUB_ENV
           echo "$(go env GOOS) $(go env GOARCH)"
           
@@ -63,7 +64,7 @@ jobs:
           go mod tidy
           set GOARCH=${{ matrix.arch }}
           set CGO_ENABLED=1
-          echo "::set-env name=FATENAME::fate_windows_amd64"
+#          echo "::set-env name=FATENAME::fate_windows_amd64"
           echo "FATENAME=fate_windows_amd64" >> $GITHUB_ENV
           echo "buiding"
           go build -o fate_windows_amd64.exe -v ./cmd/console
@@ -80,6 +81,7 @@ jobs:
           go mod tidy
           set GOARCH=${{ matrix.arch }}
           set CGO_ENABLED=1
+#          echo "::set-env name=FATENAME::fate_windows_386"
           echo "FATENAME=fate_windows_386" >> $GITHUB_ENV
           echo "buiding"
           go build -o fate_windows_386.exe -v ./cmd/console
