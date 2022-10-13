@@ -15,10 +15,10 @@ type Version struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Version holds the value of the "version" field.
-	Version int `json:"version,omitempty"`
-	// UpdatedUnix holds the value of the "UpdatedUnix" field.
-	UpdatedUnix int64 `json:"UpdatedUnix,omitempty"`
+	// CurrentVersion holds the value of the "current_version" field.
+	CurrentVersion int `json:"current_version,omitempty"`
+	// UpdatedUnix holds the value of the "updated_unix" field.
+	UpdatedUnix int64 `json:"updated_unix,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -26,7 +26,7 @@ func (*Version) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case version.FieldID, version.FieldVersion, version.FieldUpdatedUnix:
+		case version.FieldID, version.FieldCurrentVersion, version.FieldUpdatedUnix:
 			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Version", columns[i])
@@ -49,15 +49,15 @@ func (v *Version) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			v.ID = int(value.Int64)
-		case version.FieldVersion:
+		case version.FieldCurrentVersion:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field version", values[i])
+				return fmt.Errorf("unexpected type %T for field current_version", values[i])
 			} else if value.Valid {
-				v.Version = int(value.Int64)
+				v.CurrentVersion = int(value.Int64)
 			}
 		case version.FieldUpdatedUnix:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field UpdatedUnix", values[i])
+				return fmt.Errorf("unexpected type %T for field updated_unix", values[i])
 			} else if value.Valid {
 				v.UpdatedUnix = value.Int64
 			}
@@ -89,9 +89,9 @@ func (v *Version) String() string {
 	var builder strings.Builder
 	builder.WriteString("Version(")
 	builder.WriteString(fmt.Sprintf("id=%v", v.ID))
-	builder.WriteString(", version=")
-	builder.WriteString(fmt.Sprintf("%v", v.Version))
-	builder.WriteString(", UpdatedUnix=")
+	builder.WriteString(", current_version=")
+	builder.WriteString(fmt.Sprintf("%v", v.CurrentVersion))
+	builder.WriteString(", updated_unix=")
 	builder.WriteString(fmt.Sprintf("%v", v.UpdatedUnix))
 	builder.WriteByte(')')
 	return builder.String()
