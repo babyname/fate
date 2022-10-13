@@ -48,7 +48,7 @@ jobs:
           tar -zcvf fate_$(go env GOOS)_$(go env GOARCH).tar.gz ./fate_$(go env GOOS)_$(go env GOARCH)
 
       - name: Build ${{ matrix.platform }} ${{ matrix.arch }}
-        if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && matrix.arch == '386'
+        if: (matrix.platform == 'ubuntu-latest') && matrix.arch == '386'
         id: build_linux_386
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
@@ -60,9 +60,9 @@ jobs:
           echo "$(go env GOOS) $(go env GOARCH)"
           
           echo "building fate_$(go env GOOS)_$(go env GOARCH)"
-          export AR="$(go env AR) -m32"
-          export CXX="$(go env CXX) -m32"
-          export CC="$(go env CC) -m32"
+#          export AR="$(go env AR) -m32"
+#          export CXX="$(go env CXX) -m32"
+#          export CC="$(go env CC) -m32"
           echo "$(go env)"
           ${GOROOT}/bin/go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
           
@@ -98,9 +98,9 @@ jobs:
           echo "::set-env name=FATENAME::fate_windows_386"
           
           echo "building fate_windows_386.exe"
-          export AR="$(go env AR) -m32"
-          export CXX="$(go env CXX) -m32"
-          export CC="$(go env CC) -m32"
+#          export AR="$(go env AR) -m32"
+#          export CXX="$(go env CXX) -m32"
+#          export CC="$(go env CC) -m32"
           echo "$(go env)"
           go build -o fate_windows_386.exe -v ./cmd/console
           
