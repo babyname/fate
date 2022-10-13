@@ -59,22 +59,23 @@ func (t transferDatabase) transferWuGeLucky(ctx context.Context) error {
 	}
 
 	for i := 0; i < c; i += t.Limit {
-		fmt.Println("insert wugelucky to database:", i, "total", c)
 		luckies, err := t.Source.WuGeLucky.Query().Limit(t.Limit).Offset(i).All(ctx)
 		if err != nil {
 			return err
 		}
-		var luckyBluks []*ent.WuGeLuckyCreate
+		var bluks []*ent.WuGeLuckyCreate
 		for x := range luckies {
-			lucky := t.Target.WuGeLucky.Create().SetWuGeLuckyWithOptional(luckies[x])
-			luckyBluks = append(luckyBluks, lucky)
+			lucky := t.Target.WuGeLucky.Create().SetID(luckies[x].ID).SetWuGeLuckyWithOptional(luckies[x])
+			bluks = append(bluks, lucky)
+			//fmt.Println("insert wugelucky to database:", i, "total", c, "updated", lucky)
 		}
 
-		if len(luckyBluks) != 0 {
-			_, err = t.Target.WuGeLucky.CreateBulk(luckyBluks...).Save(ctx)
+		if len(bluks) != 0 {
+			saved, err := t.Target.WuGeLucky.CreateBulk(bluks...).Save(ctx)
 			if err != nil {
 				return err
 			}
+			fmt.Println("insert wugelucky to database:", i, "total", c, "updated", len(saved))
 		}
 	}
 	return nil
@@ -90,22 +91,23 @@ func (t transferDatabase) transferCharacter(ctx context.Context) error {
 	}
 
 	for i := 0; i < c; i += t.Limit {
-		fmt.Println("insert character to database:", i, "total", c)
 		characters, err := t.Source.Character.Query().Limit(t.Limit).Offset(i).All(ctx)
 		if err != nil {
 			return err
 		}
 		var bluks []*ent.CharacterCreate
 		for x := range characters {
-			character := t.Target.Character.Create().SetCharacterWithOptional(characters[x])
+			fmt.Println("character is", characters[x].Ch)
+			character := t.Target.Character.Create().SetID(characters[x].ID).SetCharacterWithOptional(characters[x])
 			bluks = append(bluks, character)
 		}
 
 		if len(bluks) != 0 {
-			_, err = t.Target.Character.CreateBulk(bluks...).Save(ctx)
+			saved, err := t.Target.Character.CreateBulk(bluks...).Save(ctx)
 			if err != nil {
 				return err
 			}
+			fmt.Println("insert character to database:", i, "total", c, "updated", len(saved))
 		}
 	}
 	return nil
@@ -121,22 +123,23 @@ func (t transferDatabase) transferWuXing(ctx context.Context) error {
 	}
 
 	for i := 0; i < c; i += t.Limit {
-		fmt.Println("insert wuxing to database:", i, "total", c)
 		wuxings, err := t.Source.WuXing.Query().Limit(t.Limit).Offset(i).All(ctx)
 		if err != nil {
 			return err
 		}
 		var bluks []*ent.WuXingCreate
 		for x := range wuxings {
-			wuxing := t.Target.WuXing.Create().SetWuXingWithOptional(wuxings[x])
+			wuxing := t.Target.WuXing.Create().SetID(wuxings[x].ID).SetWuXingWithOptional(wuxings[x])
 			bluks = append(bluks, wuxing)
+			//fmt.Println("insert wuxing to database:", i, "total", c, "updated", wuxing)
 		}
 
 		if len(bluks) != 0 {
-			_, err = t.Target.WuXing.CreateBulk(bluks...).Save(ctx)
+			saved, err := t.Target.WuXing.CreateBulk(bluks...).Save(ctx)
 			if err != nil {
 				return err
 			}
+			fmt.Println("insert wuxing to database:", i, "total", c, "updated", len(saved))
 		}
 	}
 	return nil
