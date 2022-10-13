@@ -90,36 +90,36 @@ func IDLTE(id int) predicate.Version {
 	})
 }
 
-// Version applies equality check predicate on the "version" field. It's identical to VersionEQ.
-func Version(v int) predicate.Version {
+// CurrentVersion applies equality check predicate on the "current_version" field. It's identical to CurrentVersionEQ.
+func CurrentVersion(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldVersion), v))
+		s.Where(sql.EQ(s.C(FieldCurrentVersion), v))
 	})
 }
 
-// UpdatedUnix applies equality check predicate on the "UpdatedUnix" field. It's identical to UpdatedUnixEQ.
+// UpdatedUnix applies equality check predicate on the "updated_unix" field. It's identical to UpdatedUnixEQ.
 func UpdatedUnix(v int64) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldUpdatedUnix), v))
 	})
 }
 
-// VersionEQ applies the EQ predicate on the "version" field.
-func VersionEQ(v int) predicate.Version {
+// CurrentVersionEQ applies the EQ predicate on the "current_version" field.
+func CurrentVersionEQ(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldVersion), v))
+		s.Where(sql.EQ(s.C(FieldCurrentVersion), v))
 	})
 }
 
-// VersionNEQ applies the NEQ predicate on the "version" field.
-func VersionNEQ(v int) predicate.Version {
+// CurrentVersionNEQ applies the NEQ predicate on the "current_version" field.
+func CurrentVersionNEQ(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldVersion), v))
+		s.Where(sql.NEQ(s.C(FieldCurrentVersion), v))
 	})
 }
 
-// VersionIn applies the In predicate on the "version" field.
-func VersionIn(vs ...int) predicate.Version {
+// CurrentVersionIn applies the In predicate on the "current_version" field.
+func CurrentVersionIn(vs ...int) predicate.Version {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -131,12 +131,12 @@ func VersionIn(vs ...int) predicate.Version {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldVersion), v...))
+		s.Where(sql.In(s.C(FieldCurrentVersion), v...))
 	})
 }
 
-// VersionNotIn applies the NotIn predicate on the "version" field.
-func VersionNotIn(vs ...int) predicate.Version {
+// CurrentVersionNotIn applies the NotIn predicate on the "current_version" field.
+func CurrentVersionNotIn(vs ...int) predicate.Version {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -148,53 +148,53 @@ func VersionNotIn(vs ...int) predicate.Version {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldVersion), v...))
+		s.Where(sql.NotIn(s.C(FieldCurrentVersion), v...))
 	})
 }
 
-// VersionGT applies the GT predicate on the "version" field.
-func VersionGT(v int) predicate.Version {
+// CurrentVersionGT applies the GT predicate on the "current_version" field.
+func CurrentVersionGT(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldVersion), v))
+		s.Where(sql.GT(s.C(FieldCurrentVersion), v))
 	})
 }
 
-// VersionGTE applies the GTE predicate on the "version" field.
-func VersionGTE(v int) predicate.Version {
+// CurrentVersionGTE applies the GTE predicate on the "current_version" field.
+func CurrentVersionGTE(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldVersion), v))
+		s.Where(sql.GTE(s.C(FieldCurrentVersion), v))
 	})
 }
 
-// VersionLT applies the LT predicate on the "version" field.
-func VersionLT(v int) predicate.Version {
+// CurrentVersionLT applies the LT predicate on the "current_version" field.
+func CurrentVersionLT(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldVersion), v))
+		s.Where(sql.LT(s.C(FieldCurrentVersion), v))
 	})
 }
 
-// VersionLTE applies the LTE predicate on the "version" field.
-func VersionLTE(v int) predicate.Version {
+// CurrentVersionLTE applies the LTE predicate on the "current_version" field.
+func CurrentVersionLTE(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldVersion), v))
+		s.Where(sql.LTE(s.C(FieldCurrentVersion), v))
 	})
 }
 
-// UpdatedUnixEQ applies the EQ predicate on the "UpdatedUnix" field.
+// UpdatedUnixEQ applies the EQ predicate on the "updated_unix" field.
 func UpdatedUnixEQ(v int64) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldUpdatedUnix), v))
 	})
 }
 
-// UpdatedUnixNEQ applies the NEQ predicate on the "UpdatedUnix" field.
+// UpdatedUnixNEQ applies the NEQ predicate on the "updated_unix" field.
 func UpdatedUnixNEQ(v int64) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldUpdatedUnix), v))
 	})
 }
 
-// UpdatedUnixIn applies the In predicate on the "UpdatedUnix" field.
+// UpdatedUnixIn applies the In predicate on the "updated_unix" field.
 func UpdatedUnixIn(vs ...int64) predicate.Version {
 	v := make([]interface{}, len(vs))
 	for i := range v {
@@ -211,7 +211,7 @@ func UpdatedUnixIn(vs ...int64) predicate.Version {
 	})
 }
 
-// UpdatedUnixNotIn applies the NotIn predicate on the "UpdatedUnix" field.
+// UpdatedUnixNotIn applies the NotIn predicate on the "updated_unix" field.
 func UpdatedUnixNotIn(vs ...int64) predicate.Version {
 	v := make([]interface{}, len(vs))
 	for i := range v {
@@ -228,28 +228,28 @@ func UpdatedUnixNotIn(vs ...int64) predicate.Version {
 	})
 }
 
-// UpdatedUnixGT applies the GT predicate on the "UpdatedUnix" field.
+// UpdatedUnixGT applies the GT predicate on the "updated_unix" field.
 func UpdatedUnixGT(v int64) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldUpdatedUnix), v))
 	})
 }
 
-// UpdatedUnixGTE applies the GTE predicate on the "UpdatedUnix" field.
+// UpdatedUnixGTE applies the GTE predicate on the "updated_unix" field.
 func UpdatedUnixGTE(v int64) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldUpdatedUnix), v))
 	})
 }
 
-// UpdatedUnixLT applies the LT predicate on the "UpdatedUnix" field.
+// UpdatedUnixLT applies the LT predicate on the "updated_unix" field.
 func UpdatedUnixLT(v int64) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldUpdatedUnix), v))
 	})
 }
 
-// UpdatedUnixLTE applies the LTE predicate on the "UpdatedUnix" field.
+// UpdatedUnixLTE applies the LTE predicate on the "updated_unix" field.
 func UpdatedUnixLTE(v int64) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldUpdatedUnix), v))

@@ -255,12 +255,12 @@ func (vq *VersionQuery) Clone() *VersionQuery {
 // Example:
 //
 //	var v []struct {
-//		Version int `json:"version,omitempty"`
+//		CurrentVersion int `json:"current_version,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Version.Query().
-//		GroupBy(version.FieldVersion).
+//		GroupBy(version.FieldCurrentVersion).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (vq *VersionQuery) GroupBy(field string, fields ...string) *VersionGroupBy {
@@ -283,11 +283,11 @@ func (vq *VersionQuery) GroupBy(field string, fields ...string) *VersionGroupBy 
 // Example:
 //
 //	var v []struct {
-//		Version int `json:"version,omitempty"`
+//		CurrentVersion int `json:"current_version,omitempty"`
 //	}
 //
 //	client.Version.Query().
-//		Select(version.FieldVersion).
+//		Select(version.FieldCurrentVersion).
 //		Scan(ctx, &v)
 func (vq *VersionQuery) Select(fields ...string) *VersionSelect {
 	vq.fields = append(vq.fields, fields...)

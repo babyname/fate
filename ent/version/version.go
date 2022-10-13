@@ -7,9 +7,9 @@ const (
 	Label = "version"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldVersion holds the string denoting the version field in the database.
-	FieldVersion = "version"
-	// FieldUpdatedUnix holds the string denoting the updatedunix field in the database.
+	// FieldCurrentVersion holds the string denoting the current_version field in the database.
+	FieldCurrentVersion = "current_version"
+	// FieldUpdatedUnix holds the string denoting the updated_unix field in the database.
 	FieldUpdatedUnix = "updated_unix"
 	// Table holds the table name of the version in the database.
 	Table = "versions"
@@ -18,7 +18,7 @@ const (
 // Columns holds all SQL columns for version fields.
 var Columns = []string{
 	FieldID,
-	FieldVersion,
+	FieldCurrentVersion,
 	FieldUpdatedUnix,
 }
 

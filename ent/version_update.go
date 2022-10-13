@@ -27,27 +27,27 @@ func (vu *VersionUpdate) Where(ps ...predicate.Version) *VersionUpdate {
 	return vu
 }
 
-// SetVersion sets the "version" field.
-func (vu *VersionUpdate) SetVersion(i int) *VersionUpdate {
-	vu.mutation.ResetVersion()
-	vu.mutation.SetVersion(i)
+// SetCurrentVersion sets the "current_version" field.
+func (vu *VersionUpdate) SetCurrentVersion(i int) *VersionUpdate {
+	vu.mutation.ResetCurrentVersion()
+	vu.mutation.SetCurrentVersion(i)
 	return vu
 }
 
-// AddVersion adds i to the "version" field.
-func (vu *VersionUpdate) AddVersion(i int) *VersionUpdate {
-	vu.mutation.AddVersion(i)
+// AddCurrentVersion adds i to the "current_version" field.
+func (vu *VersionUpdate) AddCurrentVersion(i int) *VersionUpdate {
+	vu.mutation.AddCurrentVersion(i)
 	return vu
 }
 
-// SetUpdatedUnix sets the "UpdatedUnix" field.
+// SetUpdatedUnix sets the "updated_unix" field.
 func (vu *VersionUpdate) SetUpdatedUnix(i int64) *VersionUpdate {
 	vu.mutation.ResetUpdatedUnix()
 	vu.mutation.SetUpdatedUnix(i)
 	return vu
 }
 
-// AddUpdatedUnix adds i to the "UpdatedUnix" field.
+// AddUpdatedUnix adds i to the "updated_unix" field.
 func (vu *VersionUpdate) AddUpdatedUnix(i int64) *VersionUpdate {
 	vu.mutation.AddUpdatedUnix(i)
 	return vu
@@ -130,18 +130,18 @@ func (vu *VersionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := vu.mutation.Version(); ok {
+	if value, ok := vu.mutation.CurrentVersion(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: version.FieldVersion,
+			Column: version.FieldCurrentVersion,
 		})
 	}
-	if value, ok := vu.mutation.AddedVersion(); ok {
+	if value, ok := vu.mutation.AddedCurrentVersion(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: version.FieldVersion,
+			Column: version.FieldCurrentVersion,
 		})
 	}
 	if value, ok := vu.mutation.UpdatedUnix(); ok {
@@ -177,27 +177,27 @@ type VersionUpdateOne struct {
 	mutation *VersionMutation
 }
 
-// SetVersion sets the "version" field.
-func (vuo *VersionUpdateOne) SetVersion(i int) *VersionUpdateOne {
-	vuo.mutation.ResetVersion()
-	vuo.mutation.SetVersion(i)
+// SetCurrentVersion sets the "current_version" field.
+func (vuo *VersionUpdateOne) SetCurrentVersion(i int) *VersionUpdateOne {
+	vuo.mutation.ResetCurrentVersion()
+	vuo.mutation.SetCurrentVersion(i)
 	return vuo
 }
 
-// AddVersion adds i to the "version" field.
-func (vuo *VersionUpdateOne) AddVersion(i int) *VersionUpdateOne {
-	vuo.mutation.AddVersion(i)
+// AddCurrentVersion adds i to the "current_version" field.
+func (vuo *VersionUpdateOne) AddCurrentVersion(i int) *VersionUpdateOne {
+	vuo.mutation.AddCurrentVersion(i)
 	return vuo
 }
 
-// SetUpdatedUnix sets the "UpdatedUnix" field.
+// SetUpdatedUnix sets the "updated_unix" field.
 func (vuo *VersionUpdateOne) SetUpdatedUnix(i int64) *VersionUpdateOne {
 	vuo.mutation.ResetUpdatedUnix()
 	vuo.mutation.SetUpdatedUnix(i)
 	return vuo
 }
 
-// AddUpdatedUnix adds i to the "UpdatedUnix" field.
+// AddUpdatedUnix adds i to the "updated_unix" field.
 func (vuo *VersionUpdateOne) AddUpdatedUnix(i int64) *VersionUpdateOne {
 	vuo.mutation.AddUpdatedUnix(i)
 	return vuo
@@ -304,18 +304,18 @@ func (vuo *VersionUpdateOne) sqlSave(ctx context.Context) (_node *Version, err e
 			}
 		}
 	}
-	if value, ok := vuo.mutation.Version(); ok {
+	if value, ok := vuo.mutation.CurrentVersion(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: version.FieldVersion,
+			Column: version.FieldCurrentVersion,
 		})
 	}
-	if value, ok := vuo.mutation.AddedVersion(); ok {
+	if value, ok := vuo.mutation.AddedCurrentVersion(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
-			Column: version.FieldVersion,
+			Column: version.FieldCurrentVersion,
 		})
 	}
 	if value, ok := vuo.mutation.UpdatedUnix(); ok {
