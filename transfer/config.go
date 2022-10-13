@@ -1,6 +1,7 @@
 package transfer
 
 import (
+	"encoding/json"
 	"os"
 
 	"github.com/tikafog/jsongs"
@@ -9,12 +10,14 @@ import (
 )
 
 type DatabaseConfig struct {
-	Source *config.Config `json:"source"`
-	Target *config.Config `json:"target"`
-	Tables []string
+	SourceRaw json.RawMessage `json:"source"`
+	Source    config.Config   `json:"-"`
+	TargetRaw json.RawMessage `json:"target"`
+	Target    config.Config   `json:"-"`
+	Tables    []string
 }
 
-func readConfig(p string) (*DatabaseConfig, error) {
+func ReadTransferConfig(p string) (*DatabaseConfig, error) {
 	bytes, err := os.ReadFile(p)
 	if err != nil {
 		return nil, err
@@ -24,10 +27,15 @@ func readConfig(p string) (*DatabaseConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+	db.Source, err = config.LoadFromBytes(db.SourceRaw)
+	if err != nil {
+		return nil, err
+	}
+	db.Target, err = config.LoadFromBytes(db.TargetRaw)
 	return &db, nil
 }
 
-func writeConfig(p string, db *DatabaseConfig) error {
+func WriteTransferConfig(p string, db *DatabaseConfig) error {
 	marshal, err := jsongs.MarshalIndent(db, "", " ")
 	if err != nil {
 		return err
