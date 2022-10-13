@@ -20,6 +20,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Cleanup pre-installed tools
+        if: matrix.platform != 'windows-latest'
         run: |
           # This is a fix for https://github.com/actions/virtual-environments/issues/1918
           sudo rm -rf /usr/share/dotnet
