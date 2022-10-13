@@ -1,4 +1,4 @@
-# 命运(Fate)
+# 命运起名(Fate)
 
 ![FATE](docs/fate.png)
 
@@ -24,10 +24,11 @@ Github第一个开源的中文取名项目(The first chinese name create tool in
 
 ## 关于版本：
 
-除非稳定版本会单独出release,以后每次提交都会生成二进制文件的pre_release提供下载.
-【[最新自编译版本](https://github.com/godcong/fate/releases/tag/auto_build)】
-【[最新数据库文件:20200331](https://github.com/godcong/fate/releases/download/v3.5.1/fate_db_200331.7z)】
-【[v3.5.2下载](https://github.com/godcong/fate/releases/tag/v3.5.2)】
+除非稳定版本会单独出release,以后每次提交都会生成二进制文件的pre_release提供下载.  
+【[最新自编译版本](https://github.com/babyname/fate/releases/tag/auto_build)】
+【[最新数据库文件:20200331](https://github.com/babyname/fate/releases/download/v3.5.1/fate_db_200331.7z)】
+【[v3.5.2下载](https://github.com/babyname/fate/releases/tag/v3.5.2)】
+【[Sqlite3数据库](https://github.com/babyname/fate/releases/download/auto_build/fate_sqlite3_database.zip)】
 
 ## 关于起名算法 ##
 
@@ -62,9 +63,10 @@ t.Fatal(e)
 }
 ```
 
-### 针对没有安装Go环境的用户,使用二进制文件在运行前务必把zoneinfo.zip下载并和二进制文件放在一起(不要解压),不然会报错.
+### ~~针对没有安装Go环境的用户,使用二进制文件在运行前务必把zoneinfo.zip下载并和二进制文件放在一起(不要解压)
+,不然会报错.~~
 
-### [zoneinfo文件](https://github.com/godcong/fate/blob/master/zoneinfo.zip)
+### ~~[zoneinfo文件](https://github.com/babyname/fate/blob/master/zoneinfo.zip)~~
 
 ## 二进制可执行文件生成姓名 ##
 
@@ -78,23 +80,25 @@ fate.exe name -l 张 -b "2020/02/06 15:04"
 
 ## 常见问题:
 
-```
-1. Q: count total error:The system cannot find the path specified
-A: zoneinfo缺失导致的时间转换失败问题(一般发生在windows环境下),
-下载上面的zoneinfo文件并放到执行文件相同的目录下即可解决.
-最新版会检查根目录,已无需重新init.
-地址:https://github.com/godcong/fate/blob/master/zoneinfo.zip
+1. 报错: count total error:The system cannot find the path specified
+   ```docs 
+   zoneinfo缺失导致的时间转换失败问题(一般发生在windows环境下),
+   下载上面的zoneinfo文件并放到执行文件相同的目录下即可解决.
+   最新版会检查根目录,已无需重新init.
+   地址:https://github.com/babyname/fate/blob/master/zoneinfo.zip
+   ```
 
-2. Q: 如何导入数据
-A:
-//链接到mysql数据库
-mysql -u用户名 -p密码
-//创建数据库
-CREATE schema `fate` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-//使用fate数据库
-use fate;
-//导入数据库文件
-source /path/to/sql/file;
+2. 如何导入数据
+
+  ```docs   
+  //链接到mysql数据库
+  mysql -u用户名 -p密码
+  //创建数据库
+  CREATE schema `fate` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+  //使用fate数据库
+  use fate;
+  //导入数据库文件
+  source /path/to/sql/file;
 PS:建议使用Navicat等工具导入,导入速度较快
 ```
 
