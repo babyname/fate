@@ -7,7 +7,7 @@ import (
 	"github.com/babyname/fate/ent"
 )
 
-const MaxLimit = 1000
+const LimitMax = 1000
 
 type Transfer interface {
 	Start(ctx context.Context) error
@@ -17,6 +17,7 @@ type transferDatabase struct {
 	Source *ent.Client
 	Target *ent.Client
 	Tables []string
+	Limit  int
 }
 
 func (t transferDatabase) Start(ctx context.Context) error {
@@ -57,9 +58,9 @@ func (t transferDatabase) transferWuGeLucky(ctx context.Context) error {
 		return nil
 	}
 
-	for i := 0; i < c; i += MaxLimit {
+	for i := 0; i < c; i += t.Limit {
 		fmt.Println("insert wugelucky to database:", i, "total", c)
-		luckies, err := t.Source.WuGeLucky.Query().Limit(MaxLimit).Offset(i).All(ctx)
+		luckies, err := t.Source.WuGeLucky.Query().Limit(t.Limit).Offset(i).All(ctx)
 		if err != nil {
 			return err
 		}
@@ -88,9 +89,9 @@ func (t transferDatabase) transferCharacter(ctx context.Context) error {
 		return nil
 	}
 
-	for i := 0; i < c; i += MaxLimit {
+	for i := 0; i < c; i += t.Limit {
 		fmt.Println("insert character to database:", i, "total", c)
-		characters, err := t.Source.Character.Query().Limit(MaxLimit).Offset(i).All(ctx)
+		characters, err := t.Source.Character.Query().Limit(t.Limit).Offset(i).All(ctx)
 		if err != nil {
 			return err
 		}
@@ -119,9 +120,9 @@ func (t transferDatabase) transferWuXing(ctx context.Context) error {
 		return nil
 	}
 
-	for i := 0; i < c; i += MaxLimit {
+	for i := 0; i < c; i += t.Limit {
 		fmt.Println("insert wuxing to database:", i, "total", c)
-		wuxings, err := t.Source.WuXing.Query().Limit(MaxLimit).Offset(i).All(ctx)
+		wuxings, err := t.Source.WuXing.Query().Limit(t.Limit).Offset(i).All(ctx)
 		if err != nil {
 			return err
 		}
@@ -150,10 +151,14 @@ func newTransfer(c *DatabaseConfig) (*transferDatabase, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not open target database: %v", err)
 	}
+	if c.Limit <= 0 || c.Limit >= LimitMax {
+		c.Limit = LimitMax
+	}
 	return &transferDatabase{
 		Tables: c.Tables,
 		Source: source,
 		Target: target,
+		Limit:  c.Limit,
 	}, nil
 }
 
