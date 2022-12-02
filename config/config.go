@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -67,7 +66,7 @@ func LoadConfig() (c *Config) {
 	c = &Config{}
 	def := DefaultConfig()
 	f := filepath.Join(DefaultJSONPath, JSONName)
-	bys, e := ioutil.ReadFile(f)
+	bys, e := os.ReadFile(f)
 	if e != nil {
 		return def
 	}
@@ -84,7 +83,7 @@ func OutputConfig(config *Config) error {
 		return e
 	}
 
-	return ioutil.WriteFile(filepath.Join(DefaultJSONPath, JSONName), bys, 0755)
+	return os.WriteFile(filepath.Join(DefaultJSONPath, JSONName), bys, 0755)
 }
 
 func DefaultConfig() *Config {
@@ -100,16 +99,10 @@ func DefaultConfig() *Config {
 		BaguaFilter:  true,
 		Regular:      true,
 		Database: Database{
-			Host:         "127.0.0.1",
-			Port:         "3306",
-			User:         "root",
-			Pwd:          "111111",
 			Name:         "fate",
 			MaxIdleCon:   0,
 			MaxOpenCon:   0,
-			Driver:       "mysql",
-			File:         "",
-			Dsn:          "",
+			Driver:       "sqlite3",
 			ShowSQL:      false,
 			ShowExecTime: false,
 		},
