@@ -22,9 +22,10 @@ Github上第一个开源的中文取名项目(The first chinese name create tool
 
 ### 关于版本
 
-除非稳定版本会单独出release,以后每次提交都会生成二进制文件的pre_release提供下载.  
+特定版本会单独出release,以后每次提交都会生成二进制文件的pre_release提供下载.  
 最新版使用Sqlite3数据库,不在需要导入数据库文件了. 直接下载下面的Sqlite3数据库到本地就能使用.
-【[v3.5.4下载](https://github.com/babyname/fate/releases/tag/v3.5.4)】
+
+【[v3.5.5下载](https://github.com/babyname/fate/releases/tag/v3.5.5)】
 【[Sqlite3数据库](https://github.com/babyname/fate/releases/download/auto_build/fate_sqlite3_database.zip)】
 
 【[最新自编译版本](https://github.com/babyname/fate/releases/tag/auto_build)】
