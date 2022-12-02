@@ -70,16 +70,16 @@ Github上第一个开源的中文取名项目(The first chinese name create tool
 
 1. 报错: count total error:The system cannot find the path specified
 
-   ```docs
-   zoneinfo缺失导致的时间转换失败问题(一般发生在windows环境下),
-   下载上面的zoneinfo文件并放到执行文件相同的目录下即可解决.
-   最新版会检查根目录,已无需重新init.
-   地址:https://github.com/babyname/fate/blob/master/zoneinfo.zip
-   ```
+    ```docs
+    zoneinfo缺失导致的时间转换失败问题(一般发生在windows环境下),
+    下载上面的zoneinfo文件并放到执行文件相同的目录下即可解决.
+    最新版会检查根目录,已无需重新init.
+    地址:https://github.com/babyname/fate/blob/master/zoneinfo.zip
+    ```
 
 2. 如何导入数据(Mysql)
 
-  ```docs
+    ```docs
     //链接到mysql数据库
     mysql -u用户名 -p密码
     //创建数据库
@@ -89,7 +89,41 @@ Github上第一个开源的中文取名项目(The first chinese name create tool
     //导入数据库文件
     source /path/to/sql/file;
     PS:建议使用Navicat等工具导入,导入速度较快
-  ```
+    ```
+
+3. 数据库配置, 替换config.json中相关部分
+   - MYSQL配置:
+     - host填写mysql数据库的地址
+     - user填写mysql数据库的用户名
+     - pwd填写mysql数据库的密码
+     - name填写mysql数据库的库名
+
+   ```json
+    "database": {
+      "host": "127.0.0.1",
+      "port": "3306",
+      "user": "root",
+      "pwd": "111111",
+      "name": "fate",
+      "max_idle_con": 0,
+      "max_open_con": 0,
+      "driver": "sqlite3",
+      "file": "",
+      "dsn": "",
+      "show_sql": false,
+      "show_exec_time": false
+    },   
+   ```
+
+   - SQLITE3配置:
+     - name填写本地sqlite的数据库名字, 放在fate同一目录下
+
+   ```json
+    "database": {
+      "name": "fate",
+      "driver": "sqlite3",
+    },
+   ```
 
 ## 版本计划
 
