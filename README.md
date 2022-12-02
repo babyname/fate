@@ -24,17 +24,18 @@ Github上第一个开源的中文取名项目(The first chinese name create tool
 
 除非稳定版本会单独出release,以后每次提交都会生成二进制文件的pre_release提供下载.  
 最新版使用Sqlite3数据库,不在需要导入数据库文件了. 直接下载下面的Sqlite3数据库到本地就能使用.
-【[v3.5.2下载](https://github.com/babyname/fate/releases/tag/v3.5.2)】
+【[v3.5.4下载](https://github.com/babyname/fate/releases/tag/v3.5.4)】
 【[Sqlite3数据库](https://github.com/babyname/fate/releases/download/auto_build/fate_sqlite3_database.zip)】
+
 【[最新自编译版本](https://github.com/babyname/fate/releases/tag/auto_build)】
-【[SQL数据库文件:20200331](https://github.com/babyname/fate/releases/download/v3.5.1/fate_db_200331.7z)】
+【[旧版SQL数据库文件:20200331](https://github.com/babyname/fate/releases/download/v3.5.1/fate_db_200331.7z)】
 
 ### 使用方法
 
 1. 编写运行go代码,接口调用生成姓名
 
     ```go
-    使用前请导入database的数据（测试字库已基本完善, 保险起见生成姓名后可以去一些测名网站验证下）
+    //使用前请导入database的数据（测试字库已基本完善, 保险起见生成姓名后可以去一些测名网站验证下）
     //加载配置（具体参数参考example/create_a_name）
     cfg := config.Default()
     //生日：
@@ -54,10 +55,10 @@ Github上第一个开源的中文取名项目(The first chinese name create tool
 2. 使用预编译二进制文件生成姓名
 
     ```shell
-    //没有安装go环境的请下载master下的zoneinfo文件和fate二进制文件放一起
-    //生成配置文件(可修改数据库, 及一些基本参数)：
+    #没有安装go环境的请下载master下的zoneinfo文件和fate二进制文件放一起
+    #生成配置文件, 可修改数据库, 及一些基本参数
     fate.exe init
-    //输出姓名：
+    #输出姓名
     fate.exe name -l 张 -b "2020/02/06 15:04"
     ```
 
