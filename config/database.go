@@ -1,115 +1,29 @@
 package config
 
-import (
-	"fmt"
-
-	"github.com/babyname/fate/ent"
-)
-
-const mysqlDSN = "%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=true"
-const sqlite3DSN = "file:%v?cache=shared&_journal=WAL&_fk=1"
-
-type BuildFunc func(*database) (*ent.Client, error)
-
-type Database interface {
-	BuildClient() (*ent.Client, error)
+type DBConfig struct {
+	Driver string `json:"driver,omitempty"`
+	DSN    string `json:"dsn,omitempty"`
+	Host   string `json:"host,omitempty"`
+	Port   string `json:"port,omitempty"`
+	User   string `json:"user,omitempty"`
+	Pwd    string `json:"pwd,omitempty"`
+	Name   string `json:"name,omitempty"`
 }
 
-var driverDSN = map[string]BuildFunc{
-	"sqlite3": buildSqlite3,
-	"mysql":   buildMysql,
-}
-
-func buildSqlite3(database *database) (*ent.Client, error) {
-	dsn := sqlite3DSN
-	if database.dsn != "" {
-		dsn = database.dsn
+func defaultSqlite3() DBConfig {
+	return DBConfig{
+		Name:   "fate",
+		Driver: "sqlite3",
 	}
-	link := fmt.Sprintf(dsn, database.dbName)
-	fmt.Println("open:", link)
-	return ent.Open(database.driver, link)
 }
 
-func buildMysql(database *database) (*ent.Client, error) {
-	dsn := mysqlDSN
-	if database.dsn != "" {
-		dsn = database.dsn
+func defaultMysql() DBConfig {
+	return DBConfig{
+		Host:   "127.0.0.1",
+		Port:   "3306",
+		User:   "root",
+		Pwd:    "111111",
+		Name:   "fate",
+		Driver: "mysql",
 	}
-	link := fmt.Sprintf(dsn, database.user, database.pwd, database.host, database.port, database.dbName)
-	fmt.Println("open:", link)
-	return ent.Open(database.driver, link)
-}
-
-type database struct {
-	driver string `json:"driver"`
-	dsn    string `json:"dsn,omitempty" json-getter:"DSN" json-setter:"SetDSN"`
-	host   string `json:"host,omitempty"`
-	port   string `json:"port,omitempty"`
-	user   string `json:"user,omitempty"`
-	pwd    string `json:"pwd,omitempty"`
-	dbName string `json:"dbname,omitempty" json-getter:"DBName" json-setter:"SetDBName"`
-}
-
-func (d *database) Driver() string {
-	return d.driver
-}
-
-func (d *database) SetDriver(driver string) {
-	d.driver = driver
-}
-
-func (d *database) DSN() string {
-	return d.dsn
-}
-
-func (d *database) SetDSN(dSN string) {
-	d.dsn = dSN
-}
-
-func (d *database) Host() string {
-	return d.host
-}
-
-func (d *database) SetHost(host string) {
-	d.host = host
-}
-
-func (d *database) Port() string {
-	return d.port
-}
-
-func (d *database) SetPort(port string) {
-	d.port = port
-}
-
-func (d *database) User() string {
-	return d.user
-}
-
-func (d *database) SetUser(user string) {
-	d.user = user
-}
-
-func (d *database) Pwd() string {
-	return d.pwd
-}
-
-func (d *database) SetPwd(pwd string) {
-	d.pwd = pwd
-}
-
-func (d *database) DBName() string {
-	return d.dbName
-}
-
-func (d *database) SetDBName(db_name string) {
-	d.dbName = db_name
-}
-
-func (d *database) BuildClient() (*ent.Client, error) {
-	fn, ok := driverDSN[d.driver]
-	if !ok {
-		return nil, fmt.Errorf("the driver of %v is not supported", d.driver)
-	}
-	return fn(d)
 }
