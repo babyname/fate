@@ -9,7 +9,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/rakyll/statik v0.1.6
 	github.com/spf13/cobra v0.0.5
-	github.com/xormsharp/builder v0.3.6
+	github.com/xormsharp/builder v0.3.8
 	github.com/xormsharp/xorm v1.0.0
 	go.uber.org/zap v1.13.0
 	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5 // indirect
