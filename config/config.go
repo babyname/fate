@@ -1,108 +1,115 @@
 package config
 
 import (
+	"encoding/json"
 	"os"
-
-	"github.com/tikafog/jsongs"
+	"path/filepath"
 )
 
-type Config interface {
-	Debug() bool
-	Database() Database
-	JSON() []byte
-	Save(path string) error
+const JSONName = "config.json"
+
+type FilterMode int
+
+const (
+	FilterModeNormal FilterMode = iota
+	FilterModeHard
+	FilterModeCustom
+)
+
+type OutputMode int
+
+const (
+	OutputModeLog OutputMode = iota
+	OutputModeCSV
+	OutputModelJSON
+)
+
+type FileOutput struct {
+	OutputMode OutputMode `json:"output_mode"`
+	Path       string     `json:"path"`
+	Heads      []string   `json:"heads"`
 }
 
-type config struct {
-	database database `json:"database" json-getter:"GetDatabase"`
-	debug    bool     `json:"debug"`
+type Config struct {
+	RunInit      bool       `json:"run_init"`
+	FilterMode   FilterMode `json:"filter_mode"`
+	StrokeMax    int        `json:"stroke_max"`
+	StrokeMin    int        `json:"stroke_min"`
+	HardFilter   bool       `json:"hard_filter"`
+	FixBazi      bool       `json:"fix_bazi"`      //八字修正
+	SupplyFilter bool       `json:"supply_filter"` //过滤补八字
+	ZodiacFilter bool       `json:"zodiac_filter"` //过滤生肖
+	BaguaFilter  bool       `json:"bagua_filter"`  //过滤卦象
+	Regular      bool       `json:"regular"`       //常用
+	Database     Database   `json:"database"`
+	FileOutput   FileOutput `json:"file_output"`
 }
 
-func (c *config) SetDebug(debug bool) {
-	c.debug = debug
-}
+var DefaultJSONPath = ""
+var DefaultHeads = []string{"姓名", "笔画", "拼音", "喜用神", "八字"}
 
-func (c *config) Debug() bool {
-	return c.debug
-}
-
-func (c *config) JSON() []byte {
-	d, _ := jsongs.MarshalIndent(c, "", " ")
-	return d
-}
-
-//func (c *config) MarshalJSON() ([]byte, error) {
-//	TODO implement me
-//	panic("implement me")
-//}
-
-func (c *config) Save(path string) error {
-	return saveConfig(path, c)
-}
-
-func (c *config) SetDatabase(database database) {
-	c.database = database
-}
-
-func (c *config) Database() Database {
-	return &c.database
-}
-
-func (c *config) GetDatabase() database {
-	return c.database
-}
-
-func LoadConfig(path string) (c Config) {
-	c = &config{}
-	d := DefaultConfig()
-
-	bys, e := os.ReadFile(path)
-	if e != nil {
-		return d
+func init() {
+	if DefaultJSONPath == "" {
+		dir, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+		s, err := filepath.Abs(dir)
+		if err != nil {
+			panic(err)
+		}
+		DefaultJSONPath = s
 	}
-	e = jsongs.Unmarshal(bys, c)
+}
+
+func LoadConfig() (c *Config) {
+	c = &Config{}
+	def := DefaultConfig()
+	f := filepath.Join(DefaultJSONPath, JSONName)
+	bys, e := os.ReadFile(f)
 	if e != nil {
-		return d
+		return def
+	}
+	e = json.Unmarshal(bys, &c)
+	if e != nil {
+		return def
 	}
 	return c
 }
 
-func LoadFromBytes(data []byte) (Config, error) {
-	c := &config{}
-	err := jsongs.Unmarshal(data, c)
-	return c, err
-}
-
-func saveConfig(path string, config *config) error {
-	bytes, e := jsongs.MarshalIndent(config, "", " ")
+func OutputConfig(config *Config) error {
+	bys, e := json.MarshalIndent(config, "", " ")
 	if e != nil {
 		return e
 	}
-	return os.WriteFile(path, bytes, 0644)
+
+	return os.WriteFile(filepath.Join(DefaultJSONPath, JSONName), bys, 0755)
 }
 
-func DefaultConfig() Config {
-	return &config{
-		debug: false,
-		database: database{
-			driver: "mysql",
-			dsn:    mysqlDSN,
-			host:   "localhost",
-			port:   "3306",
-			user:   "root",
-			pwd:    "root",
-			dbName: "fate",
+func DefaultConfig() *Config {
+	return &Config{
+		RunInit:      false,
+		FilterMode:   0,
+		StrokeMax:    18,
+		StrokeMin:    3,
+		HardFilter:   false,
+		FixBazi:      false,
+		SupplyFilter: true,
+		ZodiacFilter: true,
+		BaguaFilter:  true,
+		Regular:      true,
+		Database: Database{
+			Name:         "fate",
+			MaxIdleCon:   0,
+			MaxOpenCon:   0,
+			Driver:       "sqlite3",
+			ShowSQL:      false,
+			ShowExecTime: false,
 		},
-	}
-}
-
-func DefaultSqliteConfig() Config {
-	return &config{
-		debug: false,
-		database: database{
-			driver: "sqlite3",
-			dsn:    sqlite3DSN,
-			dbName: "fate",
+		FileOutput: FileOutput{
+			Heads:      DefaultHeads,
+			OutputMode: OutputModeLog,
+			Path:       "name.txt",
 		},
 	}
 }
