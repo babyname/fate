@@ -41,7 +41,7 @@ type Config struct {
 	ZodiacFilter bool       `json:"zodiac_filter"` //过滤生肖
 	BaguaFilter  bool       `json:"bagua_filter"`  //过滤卦象
 	Regular      bool       `json:"regular"`       //常用
-	Database     Database   `json:"database"`
+	Database     DBConfig   `json:"database"`
 	FileOutput   FileOutput `json:"file_output"`
 }
 
@@ -98,14 +98,7 @@ func DefaultConfig() *Config {
 		ZodiacFilter: true,
 		BaguaFilter:  true,
 		Regular:      true,
-		Database: Database{
-			Name:         "fate",
-			MaxIdleCon:   0,
-			MaxOpenCon:   0,
-			Driver:       "sqlite3",
-			ShowSQL:      false,
-			ShowExecTime: false,
-		},
+		Database:     defaultSqlite3(),
 		FileOutput: FileOutput{
 			Heads:      DefaultHeads,
 			OutputMode: OutputModeLog,
