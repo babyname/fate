@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/rakyll/statik v0.1.6
-	github.com/spf13/cobra v0.0.5
+	github.com/spf13/cobra v1.6.1
 	github.com/xormsharp/builder v0.3.8
 	github.com/xormsharp/xorm v1.0.4
 	go.uber.org/zap v1.13.0
