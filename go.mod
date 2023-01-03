@@ -7,7 +7,7 @@ require (
 	github.com/goextension/log v0.0.2
 	github.com/google/uuid v1.1.1
 	github.com/mattn/go-sqlite3 v1.14.15
-	github.com/rakyll/statik v0.1.6
+	github.com/rakyll/statik v0.1.7
 	github.com/spf13/cobra v0.0.5
 	github.com/xormsharp/builder v0.3.8
 	github.com/xormsharp/xorm v1.0.0
