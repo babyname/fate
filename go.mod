@@ -11,7 +11,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/xormsharp/builder v0.3.8
 	github.com/xormsharp/xorm v1.0.4
-	go.uber.org/zap v1.13.0
+	go.uber.org/zap v1.24.0
 )
 
 go 1.16
