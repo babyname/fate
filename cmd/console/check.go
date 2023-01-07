@@ -3,11 +3,12 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/goextension/log"
-	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
 	"runtime"
+
+	"github.com/goextension/log"
+	"github.com/spf13/cobra"
 )
 
 func cmdCheck() *cobra.Command {

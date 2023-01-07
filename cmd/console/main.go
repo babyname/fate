@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
-import "github.com/spf13/cobra"
+import (
+	"fmt"
+	_ "time/tzdata"
+
+	"github.com/spf13/cobra"
+)
 
 const programName = `fate`
 const fateVersion = `0.0.2`
@@ -18,7 +22,7 @@ var rootCmd = &cobra.Command{
 }
 
 func main() {
-	rootCmd.AddCommand(cmdInit(), cmdName(), cmdCheck(), versionCMD())
+	rootCmd.AddCommand(cmdInit(), cmdName(), versionCMD())
 	e := rootCmd.Execute()
 	if e != nil {
 		panic(e)
