@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-func New(cfg config.Logger) *slog.Logger {
+func New(cfg config.LogConfig) *slog.Logger {
 	output := io.Writer(os.Stderr)
 	if cfg.Path != "" {
 		file, err := openPathFile(cfg.Path)
@@ -17,8 +17,13 @@ func New(cfg config.Logger) *slog.Logger {
 		}
 	}
 	opts := slog.HandlerOptions{AddSource: cfg.ShowSource}
+	var logger *slog.Logger
+	if cfg.LogType != "json" {
+		logger = slog.New(opts.NewTextHandler(output))
+	} else {
+		logger = slog.New(opts.NewJSONHandler(output))
+	}
 
-	logger := slog.New(opts.NewJSONHandler(output))
 	if cfg.Level != "" {
 		logger.Enabled(enableLevel(cfg.Level))
 	}
@@ -40,7 +45,7 @@ func enableLevel(l string) slog.Level {
 	case "WARN":
 		return slog.LevelWarn
 	case "ERROR":
-		return slog.LevelDebug
+		return slog.LevelError
 	default:
 		return slog.LevelDebug
 	}

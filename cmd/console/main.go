@@ -2,19 +2,31 @@ package main
 
 import (
 	"fmt"
-
+	"github.com/babyname/fate/config"
 	"github.com/spf13/cobra"
 )
 
-const programName = `fate`
-const fateVersion = `0.0.2`
+const (
+	programName = `fate`
+	fateVersion = `4.0.0`
+)
+
+var (
+	flagConfigPath = rootCmd.Flags().String("config", "", "set a config file path")
+)
 
 var rootCmd = &cobra.Command{
 	Use:     programName,
-	Short:   "call fate command to make name",
+	Short:   "run fate command to generate some baby name",
 	Version: fateVersion,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("arguments [command] was not inputted")
+	},
+	PreRun: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Fate running")
+
+		c := config.LoadConfig(*flagConfigPath)
+		fmt.Println(c)
 	},
 	DisableSuggestions:         false,
 	SuggestionsMinimumDistance: 1,

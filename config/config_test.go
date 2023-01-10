@@ -29,37 +29,37 @@ func TestLoadConfig(t *testing.T) {
 	}
 }
 
-func TestSaveConfig(t *testing.T) {
+func TestGetPath(t *testing.T) {
 	type args struct {
-		path   string
-		config Config
+		root  string
+		paths []string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		name string
+		args args
+		want string
 	}{
 		{
 			name: "",
 			args: args{
-				path:   "test.mysql.config",
-				config: DefaultConfig(),
+				root:  "E:\\",
+				paths: []string{"test", "fate"},
 			},
-			wantErr: false,
+			want: `E:\test\fate`,
 		},
 		{
 			name: "",
 			args: args{
-				path:   "test.sqlite.config",
-				config: DefaultSqliteConfig(),
+				root:  "",
+				paths: []string{"test", "fate"},
 			},
-			wantErr: false,
+			want: "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.args.config.Save(tt.args.path); (err != nil) != tt.wantErr {
-				t.Errorf("SaveConfig() error = %v, wantErr %v", err, tt.wantErr)
+			if got := GetPath(tt.args.root, tt.args.paths...); got != tt.want {
+				t.Errorf("GetPath() = %v, want %v", got, tt.want)
 			}
 		})
 	}
