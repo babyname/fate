@@ -8,6 +8,16 @@ import (
 	"path/filepath"
 )
 
+var logger Logger
+
+func init() {
+	logger = slog.Default()
+}
+
+func SetOutput(log *slog.Logger) {
+	logger = log
+}
+
 func New(cfg config.LogConfig) *slog.Logger {
 	output := io.Writer(os.Stderr)
 	if cfg.Path != "" {
