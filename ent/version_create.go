@@ -26,7 +26,7 @@ func (vc *VersionCreate) SetCurrentVersion(i int) *VersionCreate {
 }
 
 // SetUpdatedUnix sets the "updated_unix" field.
-func (vc *VersionCreate) SetUpdatedUnix(i int64) *VersionCreate {
+func (vc *VersionCreate) SetUpdatedUnix(i int) *VersionCreate {
 	vc.mutation.SetUpdatedUnix(i)
 	return vc
 }
@@ -145,7 +145,7 @@ func (vc *VersionCreate) createSpec() (*Version, *sqlgraph.CreateSpec) {
 		_node.CurrentVersion = value
 	}
 	if value, ok := vc.mutation.UpdatedUnix(); ok {
-		_spec.SetField(version.FieldUpdatedUnix, field.TypeInt64, value)
+		_spec.SetField(version.FieldUpdatedUnix, field.TypeInt, value)
 		_node.UpdatedUnix = value
 	}
 	return _node, _spec

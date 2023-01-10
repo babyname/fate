@@ -22,27 +22,27 @@ type Character struct {
 	// Radical holds the value of the "radical" field.
 	Radical string `json:"radical,omitempty"`
 	// RadicalStroke holds the value of the "radical_stroke" field.
-	RadicalStroke int32 `json:"radical_stroke,omitempty"`
+	RadicalStroke int `json:"radical_stroke,omitempty"`
 	// Stroke holds the value of the "stroke" field.
-	Stroke int32 `json:"stroke,omitempty"`
+	Stroke int `json:"stroke,omitempty"`
 	// IsKangXi holds the value of the "is_kang_xi" field.
 	IsKangXi bool `json:"is_kang_xi,omitempty"`
 	// KangXi holds the value of the "kang_xi" field.
 	KangXi string `json:"kang_xi,omitempty"`
 	// KangXiStroke holds the value of the "kang_xi_stroke" field.
-	KangXiStroke int32 `json:"kang_xi_stroke,omitempty"`
+	KangXiStroke int `json:"kang_xi_stroke,omitempty"`
 	// SimpleRadical holds the value of the "simple_radical" field.
 	SimpleRadical string `json:"simple_radical,omitempty"`
 	// SimpleRadicalStroke holds the value of the "simple_radical_stroke" field.
-	SimpleRadicalStroke int32 `json:"simple_radical_stroke,omitempty"`
+	SimpleRadicalStroke int `json:"simple_radical_stroke,omitempty"`
 	// SimpleTotalStroke holds the value of the "simple_total_stroke" field.
-	SimpleTotalStroke int32 `json:"simple_total_stroke,omitempty"`
+	SimpleTotalStroke int `json:"simple_total_stroke,omitempty"`
 	// TraditionalRadical holds the value of the "traditional_radical" field.
 	TraditionalRadical string `json:"traditional_radical,omitempty"`
 	// TraditionalRadicalStroke holds the value of the "traditional_radical_stroke" field.
-	TraditionalRadicalStroke int32 `json:"traditional_radical_stroke,omitempty"`
+	TraditionalRadicalStroke int `json:"traditional_radical_stroke,omitempty"`
 	// TraditionalTotalStroke holds the value of the "traditional_total_stroke" field.
-	TraditionalTotalStroke int32 `json:"traditional_total_stroke,omitempty"`
+	TraditionalTotalStroke int `json:"traditional_total_stroke,omitempty"`
 	// NameScience holds the value of the "name_science" field.
 	NameScience bool `json:"name_science,omitempty"`
 	// WuXing holds the value of the "wu_xing" field.
@@ -58,7 +58,7 @@ type Character struct {
 	// Comment holds the value of the "comment" field.
 	Comment string `json:"comment,omitempty"`
 	// ScienceStroke holds the value of the "science_stroke" field.
-	ScienceStroke int32 `json:"science_stroke,omitempty"`
+	ScienceStroke int `json:"science_stroke,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -115,13 +115,13 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field radical_stroke", values[i])
 			} else if value.Valid {
-				c.RadicalStroke = int32(value.Int64)
+				c.RadicalStroke = int(value.Int64)
 			}
 		case character.FieldStroke:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field stroke", values[i])
 			} else if value.Valid {
-				c.Stroke = int32(value.Int64)
+				c.Stroke = int(value.Int64)
 			}
 		case character.FieldIsKangXi:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -139,7 +139,7 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field kang_xi_stroke", values[i])
 			} else if value.Valid {
-				c.KangXiStroke = int32(value.Int64)
+				c.KangXiStroke = int(value.Int64)
 			}
 		case character.FieldSimpleRadical:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -151,13 +151,13 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field simple_radical_stroke", values[i])
 			} else if value.Valid {
-				c.SimpleRadicalStroke = int32(value.Int64)
+				c.SimpleRadicalStroke = int(value.Int64)
 			}
 		case character.FieldSimpleTotalStroke:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field simple_total_stroke", values[i])
 			} else if value.Valid {
-				c.SimpleTotalStroke = int32(value.Int64)
+				c.SimpleTotalStroke = int(value.Int64)
 			}
 		case character.FieldTraditionalRadical:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -169,13 +169,13 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field traditional_radical_stroke", values[i])
 			} else if value.Valid {
-				c.TraditionalRadicalStroke = int32(value.Int64)
+				c.TraditionalRadicalStroke = int(value.Int64)
 			}
 		case character.FieldTraditionalTotalStroke:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field traditional_total_stroke", values[i])
 			} else if value.Valid {
-				c.TraditionalTotalStroke = int32(value.Int64)
+				c.TraditionalTotalStroke = int(value.Int64)
 			}
 		case character.FieldNameScience:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -223,7 +223,7 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field science_stroke", values[i])
 			} else if value.Valid {
-				c.ScienceStroke = int32(value.Int64)
+				c.ScienceStroke = int(value.Int64)
 			}
 		}
 	}

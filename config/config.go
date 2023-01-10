@@ -58,7 +58,7 @@ var DefaultHeads = []string{"姓名", "笔画", "拼音", "喜用神", "八字"}
 func LoadConfig(path string) (c *Config) {
 	c = &Config{}
 	def := DefaultConfig()
-	f := filepath.Join(defaultConfigPath, JSONName)
+	f := GetPath(path)
 	bys, e := os.ReadFile(f)
 	if e != nil {
 		return def

@@ -89,14 +89,14 @@ func (wxu *WuXingUpdate) ClearDeleted() *WuXingUpdate {
 }
 
 // SetVersion sets the "version" field.
-func (wxu *WuXingUpdate) SetVersion(i int32) *WuXingUpdate {
+func (wxu *WuXingUpdate) SetVersion(i int) *WuXingUpdate {
 	wxu.mutation.ResetVersion()
 	wxu.mutation.SetVersion(i)
 	return wxu
 }
 
 // SetNillableVersion sets the "version" field if the given value is not nil.
-func (wxu *WuXingUpdate) SetNillableVersion(i *int32) *WuXingUpdate {
+func (wxu *WuXingUpdate) SetNillableVersion(i *int) *WuXingUpdate {
 	if i != nil {
 		wxu.SetVersion(*i)
 	}
@@ -104,7 +104,7 @@ func (wxu *WuXingUpdate) SetNillableVersion(i *int32) *WuXingUpdate {
 }
 
 // AddVersion adds i to the "version" field.
-func (wxu *WuXingUpdate) AddVersion(i int32) *WuXingUpdate {
+func (wxu *WuXingUpdate) AddVersion(i int) *WuXingUpdate {
 	wxu.mutation.AddVersion(i)
 	return wxu
 }
@@ -291,13 +291,13 @@ func (wxu *WuXingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.ClearField(wuxing.FieldDeleted, field.TypeTime)
 	}
 	if value, ok := wxu.mutation.Version(); ok {
-		_spec.SetField(wuxing.FieldVersion, field.TypeInt32, value)
+		_spec.SetField(wuxing.FieldVersion, field.TypeInt, value)
 	}
 	if value, ok := wxu.mutation.AddedVersion(); ok {
-		_spec.AddField(wuxing.FieldVersion, field.TypeInt32, value)
+		_spec.AddField(wuxing.FieldVersion, field.TypeInt, value)
 	}
 	if wxu.mutation.VersionCleared() {
-		_spec.ClearField(wuxing.FieldVersion, field.TypeInt32)
+		_spec.ClearField(wuxing.FieldVersion, field.TypeInt)
 	}
 	if value, ok := wxu.mutation.First(); ok {
 		_spec.SetField(wuxing.FieldFirst, field.TypeString, value)
@@ -403,14 +403,14 @@ func (wxuo *WuXingUpdateOne) ClearDeleted() *WuXingUpdateOne {
 }
 
 // SetVersion sets the "version" field.
-func (wxuo *WuXingUpdateOne) SetVersion(i int32) *WuXingUpdateOne {
+func (wxuo *WuXingUpdateOne) SetVersion(i int) *WuXingUpdateOne {
 	wxuo.mutation.ResetVersion()
 	wxuo.mutation.SetVersion(i)
 	return wxuo
 }
 
 // SetNillableVersion sets the "version" field if the given value is not nil.
-func (wxuo *WuXingUpdateOne) SetNillableVersion(i *int32) *WuXingUpdateOne {
+func (wxuo *WuXingUpdateOne) SetNillableVersion(i *int) *WuXingUpdateOne {
 	if i != nil {
 		wxuo.SetVersion(*i)
 	}
@@ -418,7 +418,7 @@ func (wxuo *WuXingUpdateOne) SetNillableVersion(i *int32) *WuXingUpdateOne {
 }
 
 // AddVersion adds i to the "version" field.
-func (wxuo *WuXingUpdateOne) AddVersion(i int32) *WuXingUpdateOne {
+func (wxuo *WuXingUpdateOne) AddVersion(i int) *WuXingUpdateOne {
 	wxuo.mutation.AddVersion(i)
 	return wxuo
 }
@@ -635,13 +635,13 @@ func (wxuo *WuXingUpdateOne) sqlSave(ctx context.Context) (_node *WuXing, err er
 		_spec.ClearField(wuxing.FieldDeleted, field.TypeTime)
 	}
 	if value, ok := wxuo.mutation.Version(); ok {
-		_spec.SetField(wuxing.FieldVersion, field.TypeInt32, value)
+		_spec.SetField(wuxing.FieldVersion, field.TypeInt, value)
 	}
 	if value, ok := wxuo.mutation.AddedVersion(); ok {
-		_spec.AddField(wuxing.FieldVersion, field.TypeInt32, value)
+		_spec.AddField(wuxing.FieldVersion, field.TypeInt, value)
 	}
 	if wxuo.mutation.VersionCleared() {
-		_spec.ClearField(wuxing.FieldVersion, field.TypeInt32)
+		_spec.ClearField(wuxing.FieldVersion, field.TypeInt)
 	}
 	if value, ok := wxuo.mutation.First(); ok {
 		_spec.SetField(wuxing.FieldFirst, field.TypeString, value)

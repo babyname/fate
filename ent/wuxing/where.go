@@ -102,7 +102,7 @@ func Deleted(v time.Time) predicate.WuXing {
 }
 
 // Version applies equality check predicate on the "version" field. It's identical to VersionEQ.
-func Version(v int32) predicate.WuXing {
+func Version(v int) predicate.WuXing {
 	return predicate.WuXing(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldVersion), v))
 	})
@@ -371,21 +371,21 @@ func DeletedNotNil() predicate.WuXing {
 }
 
 // VersionEQ applies the EQ predicate on the "version" field.
-func VersionEQ(v int32) predicate.WuXing {
+func VersionEQ(v int) predicate.WuXing {
 	return predicate.WuXing(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldVersion), v))
 	})
 }
 
 // VersionNEQ applies the NEQ predicate on the "version" field.
-func VersionNEQ(v int32) predicate.WuXing {
+func VersionNEQ(v int) predicate.WuXing {
 	return predicate.WuXing(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldVersion), v))
 	})
 }
 
 // VersionIn applies the In predicate on the "version" field.
-func VersionIn(vs ...int32) predicate.WuXing {
+func VersionIn(vs ...int) predicate.WuXing {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -396,7 +396,7 @@ func VersionIn(vs ...int32) predicate.WuXing {
 }
 
 // VersionNotIn applies the NotIn predicate on the "version" field.
-func VersionNotIn(vs ...int32) predicate.WuXing {
+func VersionNotIn(vs ...int) predicate.WuXing {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -407,28 +407,28 @@ func VersionNotIn(vs ...int32) predicate.WuXing {
 }
 
 // VersionGT applies the GT predicate on the "version" field.
-func VersionGT(v int32) predicate.WuXing {
+func VersionGT(v int) predicate.WuXing {
 	return predicate.WuXing(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldVersion), v))
 	})
 }
 
 // VersionGTE applies the GTE predicate on the "version" field.
-func VersionGTE(v int32) predicate.WuXing {
+func VersionGTE(v int) predicate.WuXing {
 	return predicate.WuXing(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldVersion), v))
 	})
 }
 
 // VersionLT applies the LT predicate on the "version" field.
-func VersionLT(v int32) predicate.WuXing {
+func VersionLT(v int) predicate.WuXing {
 	return predicate.WuXing(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldVersion), v))
 	})
 }
 
 // VersionLTE applies the LTE predicate on the "version" field.
-func VersionLTE(v int32) predicate.WuXing {
+func VersionLTE(v int) predicate.WuXing {
 	return predicate.WuXing(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldVersion), v))
 	})

@@ -41,14 +41,14 @@ func (vu *VersionUpdate) AddCurrentVersion(i int) *VersionUpdate {
 }
 
 // SetUpdatedUnix sets the "updated_unix" field.
-func (vu *VersionUpdate) SetUpdatedUnix(i int64) *VersionUpdate {
+func (vu *VersionUpdate) SetUpdatedUnix(i int) *VersionUpdate {
 	vu.mutation.ResetUpdatedUnix()
 	vu.mutation.SetUpdatedUnix(i)
 	return vu
 }
 
 // AddUpdatedUnix adds i to the "updated_unix" field.
-func (vu *VersionUpdate) AddUpdatedUnix(i int64) *VersionUpdate {
+func (vu *VersionUpdate) AddUpdatedUnix(i int) *VersionUpdate {
 	vu.mutation.AddUpdatedUnix(i)
 	return vu
 }
@@ -137,10 +137,10 @@ func (vu *VersionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.AddField(version.FieldCurrentVersion, field.TypeInt, value)
 	}
 	if value, ok := vu.mutation.UpdatedUnix(); ok {
-		_spec.SetField(version.FieldUpdatedUnix, field.TypeInt64, value)
+		_spec.SetField(version.FieldUpdatedUnix, field.TypeInt, value)
 	}
 	if value, ok := vu.mutation.AddedUpdatedUnix(); ok {
-		_spec.AddField(version.FieldUpdatedUnix, field.TypeInt64, value)
+		_spec.AddField(version.FieldUpdatedUnix, field.TypeInt, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, vu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -175,14 +175,14 @@ func (vuo *VersionUpdateOne) AddCurrentVersion(i int) *VersionUpdateOne {
 }
 
 // SetUpdatedUnix sets the "updated_unix" field.
-func (vuo *VersionUpdateOne) SetUpdatedUnix(i int64) *VersionUpdateOne {
+func (vuo *VersionUpdateOne) SetUpdatedUnix(i int) *VersionUpdateOne {
 	vuo.mutation.ResetUpdatedUnix()
 	vuo.mutation.SetUpdatedUnix(i)
 	return vuo
 }
 
 // AddUpdatedUnix adds i to the "updated_unix" field.
-func (vuo *VersionUpdateOne) AddUpdatedUnix(i int64) *VersionUpdateOne {
+func (vuo *VersionUpdateOne) AddUpdatedUnix(i int) *VersionUpdateOne {
 	vuo.mutation.AddUpdatedUnix(i)
 	return vuo
 }
@@ -301,10 +301,10 @@ func (vuo *VersionUpdateOne) sqlSave(ctx context.Context) (_node *Version, err e
 		_spec.AddField(version.FieldCurrentVersion, field.TypeInt, value)
 	}
 	if value, ok := vuo.mutation.UpdatedUnix(); ok {
-		_spec.SetField(version.FieldUpdatedUnix, field.TypeInt64, value)
+		_spec.SetField(version.FieldUpdatedUnix, field.TypeInt, value)
 	}
 	if value, ok := vuo.mutation.AddedUpdatedUnix(); ok {
-		_spec.AddField(version.FieldUpdatedUnix, field.TypeInt64, value)
+		_spec.AddField(version.FieldUpdatedUnix, field.TypeInt, value)
 	}
 	_node = &Version{config: vuo.config}
 	_spec.Assign = _node.assignValues

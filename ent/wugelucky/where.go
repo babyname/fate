@@ -8,28 +8,28 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id string) predicate.WuGeLucky {
+func ID(id int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id string) predicate.WuGeLucky {
+func IDEQ(id int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id string) predicate.WuGeLucky {
+func IDNEQ(id int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...string) predicate.WuGeLucky {
+func IDIn(ids ...int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		v := make([]any, len(ids))
 		for i := range v {
@@ -40,7 +40,7 @@ func IDIn(ids ...string) predicate.WuGeLucky {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...string) predicate.WuGeLucky {
+func IDNotIn(ids ...int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		v := make([]any, len(ids))
 		for i := range v {
@@ -51,63 +51,63 @@ func IDNotIn(ids ...string) predicate.WuGeLucky {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id string) predicate.WuGeLucky {
+func IDGT(id int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id string) predicate.WuGeLucky {
+func IDGTE(id int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id string) predicate.WuGeLucky {
+func IDLT(id int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id string) predicate.WuGeLucky {
+func IDLTE(id int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
 }
 
 // LastStroke1 applies equality check predicate on the "last_stroke_1" field. It's identical to LastStroke1EQ.
-func LastStroke1(v int32) predicate.WuGeLucky {
+func LastStroke1(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldLastStroke1), v))
 	})
 }
 
 // LastStroke2 applies equality check predicate on the "last_stroke_2" field. It's identical to LastStroke2EQ.
-func LastStroke2(v int32) predicate.WuGeLucky {
+func LastStroke2(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldLastStroke2), v))
 	})
 }
 
 // FirstStroke1 applies equality check predicate on the "first_stroke_1" field. It's identical to FirstStroke1EQ.
-func FirstStroke1(v int32) predicate.WuGeLucky {
+func FirstStroke1(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldFirstStroke1), v))
 	})
 }
 
 // FirstStroke2 applies equality check predicate on the "first_stroke_2" field. It's identical to FirstStroke2EQ.
-func FirstStroke2(v int32) predicate.WuGeLucky {
+func FirstStroke2(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldFirstStroke2), v))
 	})
 }
 
 // TianGe applies equality check predicate on the "tian_ge" field. It's identical to TianGeEQ.
-func TianGe(v int32) predicate.WuGeLucky {
+func TianGe(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldTianGe), v))
 	})
@@ -121,7 +121,7 @@ func TianDaYan(v string) predicate.WuGeLucky {
 }
 
 // RenGe applies equality check predicate on the "ren_ge" field. It's identical to RenGeEQ.
-func RenGe(v int32) predicate.WuGeLucky {
+func RenGe(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldRenGe), v))
 	})
@@ -135,7 +135,7 @@ func RenDaYan(v string) predicate.WuGeLucky {
 }
 
 // DiGe applies equality check predicate on the "di_ge" field. It's identical to DiGeEQ.
-func DiGe(v int32) predicate.WuGeLucky {
+func DiGe(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldDiGe), v))
 	})
@@ -149,7 +149,7 @@ func DiDaYan(v string) predicate.WuGeLucky {
 }
 
 // WaiGe applies equality check predicate on the "wai_ge" field. It's identical to WaiGeEQ.
-func WaiGe(v int32) predicate.WuGeLucky {
+func WaiGe(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldWaiGe), v))
 	})
@@ -163,7 +163,7 @@ func WaiDaYan(v string) predicate.WuGeLucky {
 }
 
 // ZongGe applies equality check predicate on the "zong_ge" field. It's identical to ZongGeEQ.
-func ZongGe(v int32) predicate.WuGeLucky {
+func ZongGe(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldZongGe), v))
 	})
@@ -198,21 +198,21 @@ func ZongMax(v bool) predicate.WuGeLucky {
 }
 
 // LastStroke1EQ applies the EQ predicate on the "last_stroke_1" field.
-func LastStroke1EQ(v int32) predicate.WuGeLucky {
+func LastStroke1EQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldLastStroke1), v))
 	})
 }
 
 // LastStroke1NEQ applies the NEQ predicate on the "last_stroke_1" field.
-func LastStroke1NEQ(v int32) predicate.WuGeLucky {
+func LastStroke1NEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldLastStroke1), v))
 	})
 }
 
 // LastStroke1In applies the In predicate on the "last_stroke_1" field.
-func LastStroke1In(vs ...int32) predicate.WuGeLucky {
+func LastStroke1In(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -223,7 +223,7 @@ func LastStroke1In(vs ...int32) predicate.WuGeLucky {
 }
 
 // LastStroke1NotIn applies the NotIn predicate on the "last_stroke_1" field.
-func LastStroke1NotIn(vs ...int32) predicate.WuGeLucky {
+func LastStroke1NotIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -234,63 +234,49 @@ func LastStroke1NotIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // LastStroke1GT applies the GT predicate on the "last_stroke_1" field.
-func LastStroke1GT(v int32) predicate.WuGeLucky {
+func LastStroke1GT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldLastStroke1), v))
 	})
 }
 
 // LastStroke1GTE applies the GTE predicate on the "last_stroke_1" field.
-func LastStroke1GTE(v int32) predicate.WuGeLucky {
+func LastStroke1GTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldLastStroke1), v))
 	})
 }
 
 // LastStroke1LT applies the LT predicate on the "last_stroke_1" field.
-func LastStroke1LT(v int32) predicate.WuGeLucky {
+func LastStroke1LT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldLastStroke1), v))
 	})
 }
 
 // LastStroke1LTE applies the LTE predicate on the "last_stroke_1" field.
-func LastStroke1LTE(v int32) predicate.WuGeLucky {
+func LastStroke1LTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldLastStroke1), v))
 	})
 }
 
-// LastStroke1IsNil applies the IsNil predicate on the "last_stroke_1" field.
-func LastStroke1IsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldLastStroke1)))
-	})
-}
-
-// LastStroke1NotNil applies the NotNil predicate on the "last_stroke_1" field.
-func LastStroke1NotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldLastStroke1)))
-	})
-}
-
 // LastStroke2EQ applies the EQ predicate on the "last_stroke_2" field.
-func LastStroke2EQ(v int32) predicate.WuGeLucky {
+func LastStroke2EQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldLastStroke2), v))
 	})
 }
 
 // LastStroke2NEQ applies the NEQ predicate on the "last_stroke_2" field.
-func LastStroke2NEQ(v int32) predicate.WuGeLucky {
+func LastStroke2NEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldLastStroke2), v))
 	})
 }
 
 // LastStroke2In applies the In predicate on the "last_stroke_2" field.
-func LastStroke2In(vs ...int32) predicate.WuGeLucky {
+func LastStroke2In(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -301,7 +287,7 @@ func LastStroke2In(vs ...int32) predicate.WuGeLucky {
 }
 
 // LastStroke2NotIn applies the NotIn predicate on the "last_stroke_2" field.
-func LastStroke2NotIn(vs ...int32) predicate.WuGeLucky {
+func LastStroke2NotIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -312,63 +298,49 @@ func LastStroke2NotIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // LastStroke2GT applies the GT predicate on the "last_stroke_2" field.
-func LastStroke2GT(v int32) predicate.WuGeLucky {
+func LastStroke2GT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldLastStroke2), v))
 	})
 }
 
 // LastStroke2GTE applies the GTE predicate on the "last_stroke_2" field.
-func LastStroke2GTE(v int32) predicate.WuGeLucky {
+func LastStroke2GTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldLastStroke2), v))
 	})
 }
 
 // LastStroke2LT applies the LT predicate on the "last_stroke_2" field.
-func LastStroke2LT(v int32) predicate.WuGeLucky {
+func LastStroke2LT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldLastStroke2), v))
 	})
 }
 
 // LastStroke2LTE applies the LTE predicate on the "last_stroke_2" field.
-func LastStroke2LTE(v int32) predicate.WuGeLucky {
+func LastStroke2LTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldLastStroke2), v))
 	})
 }
 
-// LastStroke2IsNil applies the IsNil predicate on the "last_stroke_2" field.
-func LastStroke2IsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldLastStroke2)))
-	})
-}
-
-// LastStroke2NotNil applies the NotNil predicate on the "last_stroke_2" field.
-func LastStroke2NotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldLastStroke2)))
-	})
-}
-
 // FirstStroke1EQ applies the EQ predicate on the "first_stroke_1" field.
-func FirstStroke1EQ(v int32) predicate.WuGeLucky {
+func FirstStroke1EQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldFirstStroke1), v))
 	})
 }
 
 // FirstStroke1NEQ applies the NEQ predicate on the "first_stroke_1" field.
-func FirstStroke1NEQ(v int32) predicate.WuGeLucky {
+func FirstStroke1NEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldFirstStroke1), v))
 	})
 }
 
 // FirstStroke1In applies the In predicate on the "first_stroke_1" field.
-func FirstStroke1In(vs ...int32) predicate.WuGeLucky {
+func FirstStroke1In(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -379,7 +351,7 @@ func FirstStroke1In(vs ...int32) predicate.WuGeLucky {
 }
 
 // FirstStroke1NotIn applies the NotIn predicate on the "first_stroke_1" field.
-func FirstStroke1NotIn(vs ...int32) predicate.WuGeLucky {
+func FirstStroke1NotIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -390,63 +362,49 @@ func FirstStroke1NotIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // FirstStroke1GT applies the GT predicate on the "first_stroke_1" field.
-func FirstStroke1GT(v int32) predicate.WuGeLucky {
+func FirstStroke1GT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldFirstStroke1), v))
 	})
 }
 
 // FirstStroke1GTE applies the GTE predicate on the "first_stroke_1" field.
-func FirstStroke1GTE(v int32) predicate.WuGeLucky {
+func FirstStroke1GTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldFirstStroke1), v))
 	})
 }
 
 // FirstStroke1LT applies the LT predicate on the "first_stroke_1" field.
-func FirstStroke1LT(v int32) predicate.WuGeLucky {
+func FirstStroke1LT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldFirstStroke1), v))
 	})
 }
 
 // FirstStroke1LTE applies the LTE predicate on the "first_stroke_1" field.
-func FirstStroke1LTE(v int32) predicate.WuGeLucky {
+func FirstStroke1LTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldFirstStroke1), v))
 	})
 }
 
-// FirstStroke1IsNil applies the IsNil predicate on the "first_stroke_1" field.
-func FirstStroke1IsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldFirstStroke1)))
-	})
-}
-
-// FirstStroke1NotNil applies the NotNil predicate on the "first_stroke_1" field.
-func FirstStroke1NotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldFirstStroke1)))
-	})
-}
-
 // FirstStroke2EQ applies the EQ predicate on the "first_stroke_2" field.
-func FirstStroke2EQ(v int32) predicate.WuGeLucky {
+func FirstStroke2EQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldFirstStroke2), v))
 	})
 }
 
 // FirstStroke2NEQ applies the NEQ predicate on the "first_stroke_2" field.
-func FirstStroke2NEQ(v int32) predicate.WuGeLucky {
+func FirstStroke2NEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldFirstStroke2), v))
 	})
 }
 
 // FirstStroke2In applies the In predicate on the "first_stroke_2" field.
-func FirstStroke2In(vs ...int32) predicate.WuGeLucky {
+func FirstStroke2In(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -457,7 +415,7 @@ func FirstStroke2In(vs ...int32) predicate.WuGeLucky {
 }
 
 // FirstStroke2NotIn applies the NotIn predicate on the "first_stroke_2" field.
-func FirstStroke2NotIn(vs ...int32) predicate.WuGeLucky {
+func FirstStroke2NotIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -468,63 +426,49 @@ func FirstStroke2NotIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // FirstStroke2GT applies the GT predicate on the "first_stroke_2" field.
-func FirstStroke2GT(v int32) predicate.WuGeLucky {
+func FirstStroke2GT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldFirstStroke2), v))
 	})
 }
 
 // FirstStroke2GTE applies the GTE predicate on the "first_stroke_2" field.
-func FirstStroke2GTE(v int32) predicate.WuGeLucky {
+func FirstStroke2GTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldFirstStroke2), v))
 	})
 }
 
 // FirstStroke2LT applies the LT predicate on the "first_stroke_2" field.
-func FirstStroke2LT(v int32) predicate.WuGeLucky {
+func FirstStroke2LT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldFirstStroke2), v))
 	})
 }
 
 // FirstStroke2LTE applies the LTE predicate on the "first_stroke_2" field.
-func FirstStroke2LTE(v int32) predicate.WuGeLucky {
+func FirstStroke2LTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldFirstStroke2), v))
 	})
 }
 
-// FirstStroke2IsNil applies the IsNil predicate on the "first_stroke_2" field.
-func FirstStroke2IsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldFirstStroke2)))
-	})
-}
-
-// FirstStroke2NotNil applies the NotNil predicate on the "first_stroke_2" field.
-func FirstStroke2NotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldFirstStroke2)))
-	})
-}
-
 // TianGeEQ applies the EQ predicate on the "tian_ge" field.
-func TianGeEQ(v int32) predicate.WuGeLucky {
+func TianGeEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldTianGe), v))
 	})
 }
 
 // TianGeNEQ applies the NEQ predicate on the "tian_ge" field.
-func TianGeNEQ(v int32) predicate.WuGeLucky {
+func TianGeNEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldTianGe), v))
 	})
 }
 
 // TianGeIn applies the In predicate on the "tian_ge" field.
-func TianGeIn(vs ...int32) predicate.WuGeLucky {
+func TianGeIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -535,7 +479,7 @@ func TianGeIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // TianGeNotIn applies the NotIn predicate on the "tian_ge" field.
-func TianGeNotIn(vs ...int32) predicate.WuGeLucky {
+func TianGeNotIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -546,44 +490,30 @@ func TianGeNotIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // TianGeGT applies the GT predicate on the "tian_ge" field.
-func TianGeGT(v int32) predicate.WuGeLucky {
+func TianGeGT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldTianGe), v))
 	})
 }
 
 // TianGeGTE applies the GTE predicate on the "tian_ge" field.
-func TianGeGTE(v int32) predicate.WuGeLucky {
+func TianGeGTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldTianGe), v))
 	})
 }
 
 // TianGeLT applies the LT predicate on the "tian_ge" field.
-func TianGeLT(v int32) predicate.WuGeLucky {
+func TianGeLT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldTianGe), v))
 	})
 }
 
 // TianGeLTE applies the LTE predicate on the "tian_ge" field.
-func TianGeLTE(v int32) predicate.WuGeLucky {
+func TianGeLTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldTianGe), v))
-	})
-}
-
-// TianGeIsNil applies the IsNil predicate on the "tian_ge" field.
-func TianGeIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldTianGe)))
-	})
-}
-
-// TianGeNotNil applies the NotNil predicate on the "tian_ge" field.
-func TianGeNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldTianGe)))
 	})
 }
 
@@ -672,20 +602,6 @@ func TianDaYanHasSuffix(v string) predicate.WuGeLucky {
 	})
 }
 
-// TianDaYanIsNil applies the IsNil predicate on the "tian_da_yan" field.
-func TianDaYanIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldTianDaYan)))
-	})
-}
-
-// TianDaYanNotNil applies the NotNil predicate on the "tian_da_yan" field.
-func TianDaYanNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldTianDaYan)))
-	})
-}
-
 // TianDaYanEqualFold applies the EqualFold predicate on the "tian_da_yan" field.
 func TianDaYanEqualFold(v string) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
@@ -701,21 +617,21 @@ func TianDaYanContainsFold(v string) predicate.WuGeLucky {
 }
 
 // RenGeEQ applies the EQ predicate on the "ren_ge" field.
-func RenGeEQ(v int32) predicate.WuGeLucky {
+func RenGeEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldRenGe), v))
 	})
 }
 
 // RenGeNEQ applies the NEQ predicate on the "ren_ge" field.
-func RenGeNEQ(v int32) predicate.WuGeLucky {
+func RenGeNEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldRenGe), v))
 	})
 }
 
 // RenGeIn applies the In predicate on the "ren_ge" field.
-func RenGeIn(vs ...int32) predicate.WuGeLucky {
+func RenGeIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -726,7 +642,7 @@ func RenGeIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // RenGeNotIn applies the NotIn predicate on the "ren_ge" field.
-func RenGeNotIn(vs ...int32) predicate.WuGeLucky {
+func RenGeNotIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -737,44 +653,30 @@ func RenGeNotIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // RenGeGT applies the GT predicate on the "ren_ge" field.
-func RenGeGT(v int32) predicate.WuGeLucky {
+func RenGeGT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldRenGe), v))
 	})
 }
 
 // RenGeGTE applies the GTE predicate on the "ren_ge" field.
-func RenGeGTE(v int32) predicate.WuGeLucky {
+func RenGeGTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldRenGe), v))
 	})
 }
 
 // RenGeLT applies the LT predicate on the "ren_ge" field.
-func RenGeLT(v int32) predicate.WuGeLucky {
+func RenGeLT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldRenGe), v))
 	})
 }
 
 // RenGeLTE applies the LTE predicate on the "ren_ge" field.
-func RenGeLTE(v int32) predicate.WuGeLucky {
+func RenGeLTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldRenGe), v))
-	})
-}
-
-// RenGeIsNil applies the IsNil predicate on the "ren_ge" field.
-func RenGeIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldRenGe)))
-	})
-}
-
-// RenGeNotNil applies the NotNil predicate on the "ren_ge" field.
-func RenGeNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldRenGe)))
 	})
 }
 
@@ -863,20 +765,6 @@ func RenDaYanHasSuffix(v string) predicate.WuGeLucky {
 	})
 }
 
-// RenDaYanIsNil applies the IsNil predicate on the "ren_da_yan" field.
-func RenDaYanIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldRenDaYan)))
-	})
-}
-
-// RenDaYanNotNil applies the NotNil predicate on the "ren_da_yan" field.
-func RenDaYanNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldRenDaYan)))
-	})
-}
-
 // RenDaYanEqualFold applies the EqualFold predicate on the "ren_da_yan" field.
 func RenDaYanEqualFold(v string) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
@@ -892,21 +780,21 @@ func RenDaYanContainsFold(v string) predicate.WuGeLucky {
 }
 
 // DiGeEQ applies the EQ predicate on the "di_ge" field.
-func DiGeEQ(v int32) predicate.WuGeLucky {
+func DiGeEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldDiGe), v))
 	})
 }
 
 // DiGeNEQ applies the NEQ predicate on the "di_ge" field.
-func DiGeNEQ(v int32) predicate.WuGeLucky {
+func DiGeNEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldDiGe), v))
 	})
 }
 
 // DiGeIn applies the In predicate on the "di_ge" field.
-func DiGeIn(vs ...int32) predicate.WuGeLucky {
+func DiGeIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -917,7 +805,7 @@ func DiGeIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // DiGeNotIn applies the NotIn predicate on the "di_ge" field.
-func DiGeNotIn(vs ...int32) predicate.WuGeLucky {
+func DiGeNotIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -928,44 +816,30 @@ func DiGeNotIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // DiGeGT applies the GT predicate on the "di_ge" field.
-func DiGeGT(v int32) predicate.WuGeLucky {
+func DiGeGT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldDiGe), v))
 	})
 }
 
 // DiGeGTE applies the GTE predicate on the "di_ge" field.
-func DiGeGTE(v int32) predicate.WuGeLucky {
+func DiGeGTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldDiGe), v))
 	})
 }
 
 // DiGeLT applies the LT predicate on the "di_ge" field.
-func DiGeLT(v int32) predicate.WuGeLucky {
+func DiGeLT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldDiGe), v))
 	})
 }
 
 // DiGeLTE applies the LTE predicate on the "di_ge" field.
-func DiGeLTE(v int32) predicate.WuGeLucky {
+func DiGeLTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldDiGe), v))
-	})
-}
-
-// DiGeIsNil applies the IsNil predicate on the "di_ge" field.
-func DiGeIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldDiGe)))
-	})
-}
-
-// DiGeNotNil applies the NotNil predicate on the "di_ge" field.
-func DiGeNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldDiGe)))
 	})
 }
 
@@ -1054,20 +928,6 @@ func DiDaYanHasSuffix(v string) predicate.WuGeLucky {
 	})
 }
 
-// DiDaYanIsNil applies the IsNil predicate on the "di_da_yan" field.
-func DiDaYanIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldDiDaYan)))
-	})
-}
-
-// DiDaYanNotNil applies the NotNil predicate on the "di_da_yan" field.
-func DiDaYanNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldDiDaYan)))
-	})
-}
-
 // DiDaYanEqualFold applies the EqualFold predicate on the "di_da_yan" field.
 func DiDaYanEqualFold(v string) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
@@ -1083,21 +943,21 @@ func DiDaYanContainsFold(v string) predicate.WuGeLucky {
 }
 
 // WaiGeEQ applies the EQ predicate on the "wai_ge" field.
-func WaiGeEQ(v int32) predicate.WuGeLucky {
+func WaiGeEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldWaiGe), v))
 	})
 }
 
 // WaiGeNEQ applies the NEQ predicate on the "wai_ge" field.
-func WaiGeNEQ(v int32) predicate.WuGeLucky {
+func WaiGeNEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldWaiGe), v))
 	})
 }
 
 // WaiGeIn applies the In predicate on the "wai_ge" field.
-func WaiGeIn(vs ...int32) predicate.WuGeLucky {
+func WaiGeIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1108,7 +968,7 @@ func WaiGeIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // WaiGeNotIn applies the NotIn predicate on the "wai_ge" field.
-func WaiGeNotIn(vs ...int32) predicate.WuGeLucky {
+func WaiGeNotIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1119,44 +979,30 @@ func WaiGeNotIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // WaiGeGT applies the GT predicate on the "wai_ge" field.
-func WaiGeGT(v int32) predicate.WuGeLucky {
+func WaiGeGT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldWaiGe), v))
 	})
 }
 
 // WaiGeGTE applies the GTE predicate on the "wai_ge" field.
-func WaiGeGTE(v int32) predicate.WuGeLucky {
+func WaiGeGTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldWaiGe), v))
 	})
 }
 
 // WaiGeLT applies the LT predicate on the "wai_ge" field.
-func WaiGeLT(v int32) predicate.WuGeLucky {
+func WaiGeLT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldWaiGe), v))
 	})
 }
 
 // WaiGeLTE applies the LTE predicate on the "wai_ge" field.
-func WaiGeLTE(v int32) predicate.WuGeLucky {
+func WaiGeLTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldWaiGe), v))
-	})
-}
-
-// WaiGeIsNil applies the IsNil predicate on the "wai_ge" field.
-func WaiGeIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldWaiGe)))
-	})
-}
-
-// WaiGeNotNil applies the NotNil predicate on the "wai_ge" field.
-func WaiGeNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldWaiGe)))
 	})
 }
 
@@ -1245,20 +1091,6 @@ func WaiDaYanHasSuffix(v string) predicate.WuGeLucky {
 	})
 }
 
-// WaiDaYanIsNil applies the IsNil predicate on the "wai_da_yan" field.
-func WaiDaYanIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldWaiDaYan)))
-	})
-}
-
-// WaiDaYanNotNil applies the NotNil predicate on the "wai_da_yan" field.
-func WaiDaYanNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldWaiDaYan)))
-	})
-}
-
 // WaiDaYanEqualFold applies the EqualFold predicate on the "wai_da_yan" field.
 func WaiDaYanEqualFold(v string) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
@@ -1274,21 +1106,21 @@ func WaiDaYanContainsFold(v string) predicate.WuGeLucky {
 }
 
 // ZongGeEQ applies the EQ predicate on the "zong_ge" field.
-func ZongGeEQ(v int32) predicate.WuGeLucky {
+func ZongGeEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldZongGe), v))
 	})
 }
 
 // ZongGeNEQ applies the NEQ predicate on the "zong_ge" field.
-func ZongGeNEQ(v int32) predicate.WuGeLucky {
+func ZongGeNEQ(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldZongGe), v))
 	})
 }
 
 // ZongGeIn applies the In predicate on the "zong_ge" field.
-func ZongGeIn(vs ...int32) predicate.WuGeLucky {
+func ZongGeIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1299,7 +1131,7 @@ func ZongGeIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // ZongGeNotIn applies the NotIn predicate on the "zong_ge" field.
-func ZongGeNotIn(vs ...int32) predicate.WuGeLucky {
+func ZongGeNotIn(vs ...int) predicate.WuGeLucky {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1310,44 +1142,30 @@ func ZongGeNotIn(vs ...int32) predicate.WuGeLucky {
 }
 
 // ZongGeGT applies the GT predicate on the "zong_ge" field.
-func ZongGeGT(v int32) predicate.WuGeLucky {
+func ZongGeGT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldZongGe), v))
 	})
 }
 
 // ZongGeGTE applies the GTE predicate on the "zong_ge" field.
-func ZongGeGTE(v int32) predicate.WuGeLucky {
+func ZongGeGTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldZongGe), v))
 	})
 }
 
 // ZongGeLT applies the LT predicate on the "zong_ge" field.
-func ZongGeLT(v int32) predicate.WuGeLucky {
+func ZongGeLT(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldZongGe), v))
 	})
 }
 
 // ZongGeLTE applies the LTE predicate on the "zong_ge" field.
-func ZongGeLTE(v int32) predicate.WuGeLucky {
+func ZongGeLTE(v int) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldZongGe), v))
-	})
-}
-
-// ZongGeIsNil applies the IsNil predicate on the "zong_ge" field.
-func ZongGeIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldZongGe)))
-	})
-}
-
-// ZongGeNotNil applies the NotNil predicate on the "zong_ge" field.
-func ZongGeNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldZongGe)))
 	})
 }
 
@@ -1436,20 +1254,6 @@ func ZongDaYanHasSuffix(v string) predicate.WuGeLucky {
 	})
 }
 
-// ZongDaYanIsNil applies the IsNil predicate on the "zong_da_yan" field.
-func ZongDaYanIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldZongDaYan)))
-	})
-}
-
-// ZongDaYanNotNil applies the NotNil predicate on the "zong_da_yan" field.
-func ZongDaYanNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldZongDaYan)))
-	})
-}
-
 // ZongDaYanEqualFold applies the EqualFold predicate on the "zong_da_yan" field.
 func ZongDaYanEqualFold(v string) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
@@ -1478,20 +1282,6 @@ func ZongLuckyNEQ(v bool) predicate.WuGeLucky {
 	})
 }
 
-// ZongLuckyIsNil applies the IsNil predicate on the "zong_lucky" field.
-func ZongLuckyIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldZongLucky)))
-	})
-}
-
-// ZongLuckyNotNil applies the NotNil predicate on the "zong_lucky" field.
-func ZongLuckyNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldZongLucky)))
-	})
-}
-
 // ZongSexEQ applies the EQ predicate on the "zong_sex" field.
 func ZongSexEQ(v bool) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
@@ -1506,20 +1296,6 @@ func ZongSexNEQ(v bool) predicate.WuGeLucky {
 	})
 }
 
-// ZongSexIsNil applies the IsNil predicate on the "zong_sex" field.
-func ZongSexIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldZongSex)))
-	})
-}
-
-// ZongSexNotNil applies the NotNil predicate on the "zong_sex" field.
-func ZongSexNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldZongSex)))
-	})
-}
-
 // ZongMaxEQ applies the EQ predicate on the "zong_max" field.
 func ZongMaxEQ(v bool) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
@@ -1531,20 +1307,6 @@ func ZongMaxEQ(v bool) predicate.WuGeLucky {
 func ZongMaxNEQ(v bool) predicate.WuGeLucky {
 	return predicate.WuGeLucky(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldZongMax), v))
-	})
-}
-
-// ZongMaxIsNil applies the IsNil predicate on the "zong_max" field.
-func ZongMaxIsNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldZongMax)))
-	})
-}
-
-// ZongMaxNotNil applies the NotNil predicate on the "zong_max" field.
-func ZongMaxNotNil() predicate.WuGeLucky {
-	return predicate.WuGeLucky(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldZongMax)))
 	})
 }
 

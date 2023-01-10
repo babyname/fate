@@ -38,13 +38,13 @@ func (cc *CharacterCreate) SetRadical(s string) *CharacterCreate {
 }
 
 // SetRadicalStroke sets the "radical_stroke" field.
-func (cc *CharacterCreate) SetRadicalStroke(i int32) *CharacterCreate {
+func (cc *CharacterCreate) SetRadicalStroke(i int) *CharacterCreate {
 	cc.mutation.SetRadicalStroke(i)
 	return cc
 }
 
 // SetStroke sets the "stroke" field.
-func (cc *CharacterCreate) SetStroke(i int32) *CharacterCreate {
+func (cc *CharacterCreate) SetStroke(i int) *CharacterCreate {
 	cc.mutation.SetStroke(i)
 	return cc
 }
@@ -62,7 +62,7 @@ func (cc *CharacterCreate) SetKangXi(s string) *CharacterCreate {
 }
 
 // SetKangXiStroke sets the "kang_xi_stroke" field.
-func (cc *CharacterCreate) SetKangXiStroke(i int32) *CharacterCreate {
+func (cc *CharacterCreate) SetKangXiStroke(i int) *CharacterCreate {
 	cc.mutation.SetKangXiStroke(i)
 	return cc
 }
@@ -74,13 +74,13 @@ func (cc *CharacterCreate) SetSimpleRadical(s string) *CharacterCreate {
 }
 
 // SetSimpleRadicalStroke sets the "simple_radical_stroke" field.
-func (cc *CharacterCreate) SetSimpleRadicalStroke(i int32) *CharacterCreate {
+func (cc *CharacterCreate) SetSimpleRadicalStroke(i int) *CharacterCreate {
 	cc.mutation.SetSimpleRadicalStroke(i)
 	return cc
 }
 
 // SetSimpleTotalStroke sets the "simple_total_stroke" field.
-func (cc *CharacterCreate) SetSimpleTotalStroke(i int32) *CharacterCreate {
+func (cc *CharacterCreate) SetSimpleTotalStroke(i int) *CharacterCreate {
 	cc.mutation.SetSimpleTotalStroke(i)
 	return cc
 }
@@ -92,13 +92,13 @@ func (cc *CharacterCreate) SetTraditionalRadical(s string) *CharacterCreate {
 }
 
 // SetTraditionalRadicalStroke sets the "traditional_radical_stroke" field.
-func (cc *CharacterCreate) SetTraditionalRadicalStroke(i int32) *CharacterCreate {
+func (cc *CharacterCreate) SetTraditionalRadicalStroke(i int) *CharacterCreate {
 	cc.mutation.SetTraditionalRadicalStroke(i)
 	return cc
 }
 
 // SetTraditionalTotalStroke sets the "traditional_total_stroke" field.
-func (cc *CharacterCreate) SetTraditionalTotalStroke(i int32) *CharacterCreate {
+func (cc *CharacterCreate) SetTraditionalTotalStroke(i int) *CharacterCreate {
 	cc.mutation.SetTraditionalTotalStroke(i)
 	return cc
 }
@@ -146,7 +146,7 @@ func (cc *CharacterCreate) SetComment(s string) *CharacterCreate {
 }
 
 // SetScienceStroke sets the "science_stroke" field.
-func (cc *CharacterCreate) SetScienceStroke(i int32) *CharacterCreate {
+func (cc *CharacterCreate) SetScienceStroke(i int) *CharacterCreate {
 	cc.mutation.SetScienceStroke(i)
 	return cc
 }
@@ -348,11 +348,11 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		_node.Radical = value
 	}
 	if value, ok := cc.mutation.RadicalStroke(); ok {
-		_spec.SetField(character.FieldRadicalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldRadicalStroke, field.TypeInt, value)
 		_node.RadicalStroke = value
 	}
 	if value, ok := cc.mutation.Stroke(); ok {
-		_spec.SetField(character.FieldStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldStroke, field.TypeInt, value)
 		_node.Stroke = value
 	}
 	if value, ok := cc.mutation.IsKangXi(); ok {
@@ -364,7 +364,7 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		_node.KangXi = value
 	}
 	if value, ok := cc.mutation.KangXiStroke(); ok {
-		_spec.SetField(character.FieldKangXiStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldKangXiStroke, field.TypeInt, value)
 		_node.KangXiStroke = value
 	}
 	if value, ok := cc.mutation.SimpleRadical(); ok {
@@ -372,11 +372,11 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		_node.SimpleRadical = value
 	}
 	if value, ok := cc.mutation.SimpleRadicalStroke(); ok {
-		_spec.SetField(character.FieldSimpleRadicalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldSimpleRadicalStroke, field.TypeInt, value)
 		_node.SimpleRadicalStroke = value
 	}
 	if value, ok := cc.mutation.SimpleTotalStroke(); ok {
-		_spec.SetField(character.FieldSimpleTotalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldSimpleTotalStroke, field.TypeInt, value)
 		_node.SimpleTotalStroke = value
 	}
 	if value, ok := cc.mutation.TraditionalRadical(); ok {
@@ -384,11 +384,11 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		_node.TraditionalRadical = value
 	}
 	if value, ok := cc.mutation.TraditionalRadicalStroke(); ok {
-		_spec.SetField(character.FieldTraditionalRadicalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldTraditionalRadicalStroke, field.TypeInt, value)
 		_node.TraditionalRadicalStroke = value
 	}
 	if value, ok := cc.mutation.TraditionalTotalStroke(); ok {
-		_spec.SetField(character.FieldTraditionalTotalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldTraditionalTotalStroke, field.TypeInt, value)
 		_node.TraditionalTotalStroke = value
 	}
 	if value, ok := cc.mutation.NameScience(); ok {
@@ -420,7 +420,7 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		_node.Comment = value
 	}
 	if value, ok := cc.mutation.ScienceStroke(); ok {
-		_spec.SetField(character.FieldScienceStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldScienceStroke, field.TypeInt, value)
 		_node.ScienceStroke = value
 	}
 	return _node, _spec

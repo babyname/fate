@@ -14,33 +14,33 @@ import (
 type WuGeLucky struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
+	ID int `json:"id,omitempty"`
 	// LastStroke1 holds the value of the "last_stroke_1" field.
-	LastStroke1 int32 `json:"last_stroke_1,omitempty"`
+	LastStroke1 int `json:"last_stroke_1,omitempty"`
 	// LastStroke2 holds the value of the "last_stroke_2" field.
-	LastStroke2 int32 `json:"last_stroke_2,omitempty"`
+	LastStroke2 int `json:"last_stroke_2,omitempty"`
 	// FirstStroke1 holds the value of the "first_stroke_1" field.
-	FirstStroke1 int32 `json:"first_stroke_1,omitempty"`
+	FirstStroke1 int `json:"first_stroke_1,omitempty"`
 	// FirstStroke2 holds the value of the "first_stroke_2" field.
-	FirstStroke2 int32 `json:"first_stroke_2,omitempty"`
+	FirstStroke2 int `json:"first_stroke_2,omitempty"`
 	// TianGe holds the value of the "tian_ge" field.
-	TianGe int32 `json:"tian_ge,omitempty"`
+	TianGe int `json:"tian_ge,omitempty"`
 	// TianDaYan holds the value of the "tian_da_yan" field.
 	TianDaYan string `json:"tian_da_yan,omitempty"`
 	// RenGe holds the value of the "ren_ge" field.
-	RenGe int32 `json:"ren_ge,omitempty"`
+	RenGe int `json:"ren_ge,omitempty"`
 	// RenDaYan holds the value of the "ren_da_yan" field.
 	RenDaYan string `json:"ren_da_yan,omitempty"`
 	// DiGe holds the value of the "di_ge" field.
-	DiGe int32 `json:"di_ge,omitempty"`
+	DiGe int `json:"di_ge,omitempty"`
 	// DiDaYan holds the value of the "di_da_yan" field.
 	DiDaYan string `json:"di_da_yan,omitempty"`
 	// WaiGe holds the value of the "wai_ge" field.
-	WaiGe int32 `json:"wai_ge,omitempty"`
+	WaiGe int `json:"wai_ge,omitempty"`
 	// WaiDaYan holds the value of the "wai_da_yan" field.
 	WaiDaYan string `json:"wai_da_yan,omitempty"`
 	// ZongGe holds the value of the "zong_ge" field.
-	ZongGe int32 `json:"zong_ge,omitempty"`
+	ZongGe int `json:"zong_ge,omitempty"`
 	// ZongDaYan holds the value of the "zong_da_yan" field.
 	ZongDaYan string `json:"zong_da_yan,omitempty"`
 	// ZongLucky holds the value of the "zong_lucky" field.
@@ -58,9 +58,9 @@ func (*WuGeLucky) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case wugelucky.FieldZongLucky, wugelucky.FieldZongSex, wugelucky.FieldZongMax:
 			values[i] = new(sql.NullBool)
-		case wugelucky.FieldLastStroke1, wugelucky.FieldLastStroke2, wugelucky.FieldFirstStroke1, wugelucky.FieldFirstStroke2, wugelucky.FieldTianGe, wugelucky.FieldRenGe, wugelucky.FieldDiGe, wugelucky.FieldWaiGe, wugelucky.FieldZongGe:
+		case wugelucky.FieldID, wugelucky.FieldLastStroke1, wugelucky.FieldLastStroke2, wugelucky.FieldFirstStroke1, wugelucky.FieldFirstStroke2, wugelucky.FieldTianGe, wugelucky.FieldRenGe, wugelucky.FieldDiGe, wugelucky.FieldWaiGe, wugelucky.FieldZongGe:
 			values[i] = new(sql.NullInt64)
-		case wugelucky.FieldID, wugelucky.FieldTianDaYan, wugelucky.FieldRenDaYan, wugelucky.FieldDiDaYan, wugelucky.FieldWaiDaYan, wugelucky.FieldZongDaYan:
+		case wugelucky.FieldTianDaYan, wugelucky.FieldRenDaYan, wugelucky.FieldDiDaYan, wugelucky.FieldWaiDaYan, wugelucky.FieldZongDaYan:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type WuGeLucky", columns[i])
@@ -78,40 +78,40 @@ func (wgl *WuGeLucky) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case wugelucky.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				wgl.ID = value.String
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
 			}
+			wgl.ID = int(value.Int64)
 		case wugelucky.FieldLastStroke1:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field last_stroke_1", values[i])
 			} else if value.Valid {
-				wgl.LastStroke1 = int32(value.Int64)
+				wgl.LastStroke1 = int(value.Int64)
 			}
 		case wugelucky.FieldLastStroke2:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field last_stroke_2", values[i])
 			} else if value.Valid {
-				wgl.LastStroke2 = int32(value.Int64)
+				wgl.LastStroke2 = int(value.Int64)
 			}
 		case wugelucky.FieldFirstStroke1:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field first_stroke_1", values[i])
 			} else if value.Valid {
-				wgl.FirstStroke1 = int32(value.Int64)
+				wgl.FirstStroke1 = int(value.Int64)
 			}
 		case wugelucky.FieldFirstStroke2:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field first_stroke_2", values[i])
 			} else if value.Valid {
-				wgl.FirstStroke2 = int32(value.Int64)
+				wgl.FirstStroke2 = int(value.Int64)
 			}
 		case wugelucky.FieldTianGe:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tian_ge", values[i])
 			} else if value.Valid {
-				wgl.TianGe = int32(value.Int64)
+				wgl.TianGe = int(value.Int64)
 			}
 		case wugelucky.FieldTianDaYan:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -123,7 +123,7 @@ func (wgl *WuGeLucky) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field ren_ge", values[i])
 			} else if value.Valid {
-				wgl.RenGe = int32(value.Int64)
+				wgl.RenGe = int(value.Int64)
 			}
 		case wugelucky.FieldRenDaYan:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -135,7 +135,7 @@ func (wgl *WuGeLucky) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field di_ge", values[i])
 			} else if value.Valid {
-				wgl.DiGe = int32(value.Int64)
+				wgl.DiGe = int(value.Int64)
 			}
 		case wugelucky.FieldDiDaYan:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -147,7 +147,7 @@ func (wgl *WuGeLucky) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field wai_ge", values[i])
 			} else if value.Valid {
-				wgl.WaiGe = int32(value.Int64)
+				wgl.WaiGe = int(value.Int64)
 			}
 		case wugelucky.FieldWaiDaYan:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -159,7 +159,7 @@ func (wgl *WuGeLucky) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field zong_ge", values[i])
 			} else if value.Valid {
-				wgl.ZongGe = int32(value.Int64)
+				wgl.ZongGe = int(value.Int64)
 			}
 		case wugelucky.FieldZongDaYan:
 			if value, ok := values[i].(*sql.NullString); !ok {

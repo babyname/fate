@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -19,72 +20,32 @@ type WuGeLuckyCreate struct {
 }
 
 // SetLastStroke1 sets the "last_stroke_1" field.
-func (wglc *WuGeLuckyCreate) SetLastStroke1(i int32) *WuGeLuckyCreate {
+func (wglc *WuGeLuckyCreate) SetLastStroke1(i int) *WuGeLuckyCreate {
 	wglc.mutation.SetLastStroke1(i)
 	return wglc
 }
 
-// SetNillableLastStroke1 sets the "last_stroke_1" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableLastStroke1(i *int32) *WuGeLuckyCreate {
-	if i != nil {
-		wglc.SetLastStroke1(*i)
-	}
-	return wglc
-}
-
 // SetLastStroke2 sets the "last_stroke_2" field.
-func (wglc *WuGeLuckyCreate) SetLastStroke2(i int32) *WuGeLuckyCreate {
+func (wglc *WuGeLuckyCreate) SetLastStroke2(i int) *WuGeLuckyCreate {
 	wglc.mutation.SetLastStroke2(i)
 	return wglc
 }
 
-// SetNillableLastStroke2 sets the "last_stroke_2" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableLastStroke2(i *int32) *WuGeLuckyCreate {
-	if i != nil {
-		wglc.SetLastStroke2(*i)
-	}
-	return wglc
-}
-
 // SetFirstStroke1 sets the "first_stroke_1" field.
-func (wglc *WuGeLuckyCreate) SetFirstStroke1(i int32) *WuGeLuckyCreate {
+func (wglc *WuGeLuckyCreate) SetFirstStroke1(i int) *WuGeLuckyCreate {
 	wglc.mutation.SetFirstStroke1(i)
 	return wglc
 }
 
-// SetNillableFirstStroke1 sets the "first_stroke_1" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableFirstStroke1(i *int32) *WuGeLuckyCreate {
-	if i != nil {
-		wglc.SetFirstStroke1(*i)
-	}
-	return wglc
-}
-
 // SetFirstStroke2 sets the "first_stroke_2" field.
-func (wglc *WuGeLuckyCreate) SetFirstStroke2(i int32) *WuGeLuckyCreate {
+func (wglc *WuGeLuckyCreate) SetFirstStroke2(i int) *WuGeLuckyCreate {
 	wglc.mutation.SetFirstStroke2(i)
 	return wglc
 }
 
-// SetNillableFirstStroke2 sets the "first_stroke_2" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableFirstStroke2(i *int32) *WuGeLuckyCreate {
-	if i != nil {
-		wglc.SetFirstStroke2(*i)
-	}
-	return wglc
-}
-
 // SetTianGe sets the "tian_ge" field.
-func (wglc *WuGeLuckyCreate) SetTianGe(i int32) *WuGeLuckyCreate {
+func (wglc *WuGeLuckyCreate) SetTianGe(i int) *WuGeLuckyCreate {
 	wglc.mutation.SetTianGe(i)
-	return wglc
-}
-
-// SetNillableTianGe sets the "tian_ge" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableTianGe(i *int32) *WuGeLuckyCreate {
-	if i != nil {
-		wglc.SetTianGe(*i)
-	}
 	return wglc
 }
 
@@ -94,25 +55,9 @@ func (wglc *WuGeLuckyCreate) SetTianDaYan(s string) *WuGeLuckyCreate {
 	return wglc
 }
 
-// SetNillableTianDaYan sets the "tian_da_yan" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableTianDaYan(s *string) *WuGeLuckyCreate {
-	if s != nil {
-		wglc.SetTianDaYan(*s)
-	}
-	return wglc
-}
-
 // SetRenGe sets the "ren_ge" field.
-func (wglc *WuGeLuckyCreate) SetRenGe(i int32) *WuGeLuckyCreate {
+func (wglc *WuGeLuckyCreate) SetRenGe(i int) *WuGeLuckyCreate {
 	wglc.mutation.SetRenGe(i)
-	return wglc
-}
-
-// SetNillableRenGe sets the "ren_ge" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableRenGe(i *int32) *WuGeLuckyCreate {
-	if i != nil {
-		wglc.SetRenGe(*i)
-	}
 	return wglc
 }
 
@@ -122,25 +67,9 @@ func (wglc *WuGeLuckyCreate) SetRenDaYan(s string) *WuGeLuckyCreate {
 	return wglc
 }
 
-// SetNillableRenDaYan sets the "ren_da_yan" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableRenDaYan(s *string) *WuGeLuckyCreate {
-	if s != nil {
-		wglc.SetRenDaYan(*s)
-	}
-	return wglc
-}
-
 // SetDiGe sets the "di_ge" field.
-func (wglc *WuGeLuckyCreate) SetDiGe(i int32) *WuGeLuckyCreate {
+func (wglc *WuGeLuckyCreate) SetDiGe(i int) *WuGeLuckyCreate {
 	wglc.mutation.SetDiGe(i)
-	return wglc
-}
-
-// SetNillableDiGe sets the "di_ge" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableDiGe(i *int32) *WuGeLuckyCreate {
-	if i != nil {
-		wglc.SetDiGe(*i)
-	}
 	return wglc
 }
 
@@ -150,25 +79,9 @@ func (wglc *WuGeLuckyCreate) SetDiDaYan(s string) *WuGeLuckyCreate {
 	return wglc
 }
 
-// SetNillableDiDaYan sets the "di_da_yan" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableDiDaYan(s *string) *WuGeLuckyCreate {
-	if s != nil {
-		wglc.SetDiDaYan(*s)
-	}
-	return wglc
-}
-
 // SetWaiGe sets the "wai_ge" field.
-func (wglc *WuGeLuckyCreate) SetWaiGe(i int32) *WuGeLuckyCreate {
+func (wglc *WuGeLuckyCreate) SetWaiGe(i int) *WuGeLuckyCreate {
 	wglc.mutation.SetWaiGe(i)
-	return wglc
-}
-
-// SetNillableWaiGe sets the "wai_ge" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableWaiGe(i *int32) *WuGeLuckyCreate {
-	if i != nil {
-		wglc.SetWaiGe(*i)
-	}
 	return wglc
 }
 
@@ -178,25 +91,9 @@ func (wglc *WuGeLuckyCreate) SetWaiDaYan(s string) *WuGeLuckyCreate {
 	return wglc
 }
 
-// SetNillableWaiDaYan sets the "wai_da_yan" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableWaiDaYan(s *string) *WuGeLuckyCreate {
-	if s != nil {
-		wglc.SetWaiDaYan(*s)
-	}
-	return wglc
-}
-
 // SetZongGe sets the "zong_ge" field.
-func (wglc *WuGeLuckyCreate) SetZongGe(i int32) *WuGeLuckyCreate {
+func (wglc *WuGeLuckyCreate) SetZongGe(i int) *WuGeLuckyCreate {
 	wglc.mutation.SetZongGe(i)
-	return wglc
-}
-
-// SetNillableZongGe sets the "zong_ge" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableZongGe(i *int32) *WuGeLuckyCreate {
-	if i != nil {
-		wglc.SetZongGe(*i)
-	}
 	return wglc
 }
 
@@ -206,25 +103,9 @@ func (wglc *WuGeLuckyCreate) SetZongDaYan(s string) *WuGeLuckyCreate {
 	return wglc
 }
 
-// SetNillableZongDaYan sets the "zong_da_yan" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableZongDaYan(s *string) *WuGeLuckyCreate {
-	if s != nil {
-		wglc.SetZongDaYan(*s)
-	}
-	return wglc
-}
-
 // SetZongLucky sets the "zong_lucky" field.
 func (wglc *WuGeLuckyCreate) SetZongLucky(b bool) *WuGeLuckyCreate {
 	wglc.mutation.SetZongLucky(b)
-	return wglc
-}
-
-// SetNillableZongLucky sets the "zong_lucky" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableZongLucky(b *bool) *WuGeLuckyCreate {
-	if b != nil {
-		wglc.SetZongLucky(*b)
-	}
 	return wglc
 }
 
@@ -234,31 +115,15 @@ func (wglc *WuGeLuckyCreate) SetZongSex(b bool) *WuGeLuckyCreate {
 	return wglc
 }
 
-// SetNillableZongSex sets the "zong_sex" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableZongSex(b *bool) *WuGeLuckyCreate {
-	if b != nil {
-		wglc.SetZongSex(*b)
-	}
-	return wglc
-}
-
 // SetZongMax sets the "zong_max" field.
 func (wglc *WuGeLuckyCreate) SetZongMax(b bool) *WuGeLuckyCreate {
 	wglc.mutation.SetZongMax(b)
 	return wglc
 }
 
-// SetNillableZongMax sets the "zong_max" field if the given value is not nil.
-func (wglc *WuGeLuckyCreate) SetNillableZongMax(b *bool) *WuGeLuckyCreate {
-	if b != nil {
-		wglc.SetZongMax(*b)
-	}
-	return wglc
-}
-
 // SetID sets the "id" field.
-func (wglc *WuGeLuckyCreate) SetID(s string) *WuGeLuckyCreate {
-	wglc.mutation.SetID(s)
+func (wglc *WuGeLuckyCreate) SetID(i int) *WuGeLuckyCreate {
+	wglc.mutation.SetID(i)
 	return wglc
 }
 
@@ -338,6 +203,57 @@ func (wglc *WuGeLuckyCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (wglc *WuGeLuckyCreate) check() error {
+	if _, ok := wglc.mutation.LastStroke1(); !ok {
+		return &ValidationError{Name: "last_stroke_1", err: errors.New(`ent: missing required field "WuGeLucky.last_stroke_1"`)}
+	}
+	if _, ok := wglc.mutation.LastStroke2(); !ok {
+		return &ValidationError{Name: "last_stroke_2", err: errors.New(`ent: missing required field "WuGeLucky.last_stroke_2"`)}
+	}
+	if _, ok := wglc.mutation.FirstStroke1(); !ok {
+		return &ValidationError{Name: "first_stroke_1", err: errors.New(`ent: missing required field "WuGeLucky.first_stroke_1"`)}
+	}
+	if _, ok := wglc.mutation.FirstStroke2(); !ok {
+		return &ValidationError{Name: "first_stroke_2", err: errors.New(`ent: missing required field "WuGeLucky.first_stroke_2"`)}
+	}
+	if _, ok := wglc.mutation.TianGe(); !ok {
+		return &ValidationError{Name: "tian_ge", err: errors.New(`ent: missing required field "WuGeLucky.tian_ge"`)}
+	}
+	if _, ok := wglc.mutation.TianDaYan(); !ok {
+		return &ValidationError{Name: "tian_da_yan", err: errors.New(`ent: missing required field "WuGeLucky.tian_da_yan"`)}
+	}
+	if _, ok := wglc.mutation.RenGe(); !ok {
+		return &ValidationError{Name: "ren_ge", err: errors.New(`ent: missing required field "WuGeLucky.ren_ge"`)}
+	}
+	if _, ok := wglc.mutation.RenDaYan(); !ok {
+		return &ValidationError{Name: "ren_da_yan", err: errors.New(`ent: missing required field "WuGeLucky.ren_da_yan"`)}
+	}
+	if _, ok := wglc.mutation.DiGe(); !ok {
+		return &ValidationError{Name: "di_ge", err: errors.New(`ent: missing required field "WuGeLucky.di_ge"`)}
+	}
+	if _, ok := wglc.mutation.DiDaYan(); !ok {
+		return &ValidationError{Name: "di_da_yan", err: errors.New(`ent: missing required field "WuGeLucky.di_da_yan"`)}
+	}
+	if _, ok := wglc.mutation.WaiGe(); !ok {
+		return &ValidationError{Name: "wai_ge", err: errors.New(`ent: missing required field "WuGeLucky.wai_ge"`)}
+	}
+	if _, ok := wglc.mutation.WaiDaYan(); !ok {
+		return &ValidationError{Name: "wai_da_yan", err: errors.New(`ent: missing required field "WuGeLucky.wai_da_yan"`)}
+	}
+	if _, ok := wglc.mutation.ZongGe(); !ok {
+		return &ValidationError{Name: "zong_ge", err: errors.New(`ent: missing required field "WuGeLucky.zong_ge"`)}
+	}
+	if _, ok := wglc.mutation.ZongDaYan(); !ok {
+		return &ValidationError{Name: "zong_da_yan", err: errors.New(`ent: missing required field "WuGeLucky.zong_da_yan"`)}
+	}
+	if _, ok := wglc.mutation.ZongLucky(); !ok {
+		return &ValidationError{Name: "zong_lucky", err: errors.New(`ent: missing required field "WuGeLucky.zong_lucky"`)}
+	}
+	if _, ok := wglc.mutation.ZongSex(); !ok {
+		return &ValidationError{Name: "zong_sex", err: errors.New(`ent: missing required field "WuGeLucky.zong_sex"`)}
+	}
+	if _, ok := wglc.mutation.ZongMax(); !ok {
+		return &ValidationError{Name: "zong_max", err: errors.New(`ent: missing required field "WuGeLucky.zong_max"`)}
+	}
 	return nil
 }
 
@@ -349,12 +265,9 @@ func (wglc *WuGeLuckyCreate) sqlSave(ctx context.Context) (*WuGeLucky, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected WuGeLucky.ID type: %T", _spec.ID.Value)
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
 	}
 	return _node, nil
 }
@@ -365,7 +278,7 @@ func (wglc *WuGeLuckyCreate) createSpec() (*WuGeLucky, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: wugelucky.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeInt,
 				Column: wugelucky.FieldID,
 			},
 		}
@@ -375,23 +288,23 @@ func (wglc *WuGeLuckyCreate) createSpec() (*WuGeLucky, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = id
 	}
 	if value, ok := wglc.mutation.LastStroke1(); ok {
-		_spec.SetField(wugelucky.FieldLastStroke1, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldLastStroke1, field.TypeInt, value)
 		_node.LastStroke1 = value
 	}
 	if value, ok := wglc.mutation.LastStroke2(); ok {
-		_spec.SetField(wugelucky.FieldLastStroke2, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldLastStroke2, field.TypeInt, value)
 		_node.LastStroke2 = value
 	}
 	if value, ok := wglc.mutation.FirstStroke1(); ok {
-		_spec.SetField(wugelucky.FieldFirstStroke1, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldFirstStroke1, field.TypeInt, value)
 		_node.FirstStroke1 = value
 	}
 	if value, ok := wglc.mutation.FirstStroke2(); ok {
-		_spec.SetField(wugelucky.FieldFirstStroke2, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldFirstStroke2, field.TypeInt, value)
 		_node.FirstStroke2 = value
 	}
 	if value, ok := wglc.mutation.TianGe(); ok {
-		_spec.SetField(wugelucky.FieldTianGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldTianGe, field.TypeInt, value)
 		_node.TianGe = value
 	}
 	if value, ok := wglc.mutation.TianDaYan(); ok {
@@ -399,7 +312,7 @@ func (wglc *WuGeLuckyCreate) createSpec() (*WuGeLucky, *sqlgraph.CreateSpec) {
 		_node.TianDaYan = value
 	}
 	if value, ok := wglc.mutation.RenGe(); ok {
-		_spec.SetField(wugelucky.FieldRenGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldRenGe, field.TypeInt, value)
 		_node.RenGe = value
 	}
 	if value, ok := wglc.mutation.RenDaYan(); ok {
@@ -407,7 +320,7 @@ func (wglc *WuGeLuckyCreate) createSpec() (*WuGeLucky, *sqlgraph.CreateSpec) {
 		_node.RenDaYan = value
 	}
 	if value, ok := wglc.mutation.DiGe(); ok {
-		_spec.SetField(wugelucky.FieldDiGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldDiGe, field.TypeInt, value)
 		_node.DiGe = value
 	}
 	if value, ok := wglc.mutation.DiDaYan(); ok {
@@ -415,7 +328,7 @@ func (wglc *WuGeLuckyCreate) createSpec() (*WuGeLucky, *sqlgraph.CreateSpec) {
 		_node.DiDaYan = value
 	}
 	if value, ok := wglc.mutation.WaiGe(); ok {
-		_spec.SetField(wugelucky.FieldWaiGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldWaiGe, field.TypeInt, value)
 		_node.WaiGe = value
 	}
 	if value, ok := wglc.mutation.WaiDaYan(); ok {
@@ -423,7 +336,7 @@ func (wglc *WuGeLuckyCreate) createSpec() (*WuGeLucky, *sqlgraph.CreateSpec) {
 		_node.WaiDaYan = value
 	}
 	if value, ok := wglc.mutation.ZongGe(); ok {
-		_spec.SetField(wugelucky.FieldZongGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldZongGe, field.TypeInt, value)
 		_node.ZongGe = value
 	}
 	if value, ok := wglc.mutation.ZongDaYan(); ok {
@@ -485,6 +398,10 @@ func (wglcb *WuGeLuckyCreateBulk) Save(ctx context.Context) ([]*WuGeLucky, error
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})

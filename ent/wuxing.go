@@ -23,7 +23,7 @@ type WuXing struct {
 	// Deleted holds the value of the "deleted" field.
 	Deleted time.Time `json:"deleted,omitempty"`
 	// Version holds the value of the "version" field.
-	Version int32 `json:"version,omitempty"`
+	Version int `json:"version,omitempty"`
 	// First holds the value of the "first" field.
 	First string `json:"first,omitempty"`
 	// Second holds the value of the "second" field.
@@ -88,7 +88,7 @@ func (wx *WuXing) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field version", values[i])
 			} else if value.Valid {
-				wx.Version = int32(value.Int64)
+				wx.Version = int(value.Int64)
 			}
 		case wuxing.FieldFirst:
 			if value, ok := values[i].(*sql.NullString); !ok {

@@ -17,17 +17,17 @@ func (Character) Fields() []ent.Field {
 		field.String("pin_yin"),
 		field.String("ch"),
 		field.String("radical"),
-		field.Int32("radical_stroke"),
-		field.Int32("stroke"),
+		field.Int("radical_stroke"),
+		field.Int("stroke"),
 		field.Bool("is_kang_xi"),
 		field.String("kang_xi"),
-		field.Int32("kang_xi_stroke"),
+		field.Int("kang_xi_stroke"),
 		field.String("simple_radical"),
-		field.Int32("simple_radical_stroke"),
-		field.Int32("simple_total_stroke"),
+		field.Int("simple_radical_stroke"),
+		field.Int("simple_total_stroke"),
 		field.String("traditional_radical"),
-		field.Int32("traditional_radical_stroke"),
-		field.Int32("traditional_total_stroke"),
+		field.Int("traditional_radical_stroke"),
+		field.Int("traditional_total_stroke"),
 		field.Bool("name_science"),
 		field.String("wu_xing"),
 		field.String("lucky"),
@@ -35,7 +35,7 @@ func (Character) Fields() []ent.Field {
 		field.String("traditional_character"),
 		field.String("variant_character"),
 		field.String("comment"),
-		field.Int32("science_stroke")}
+		field.Int("science_stroke")}
 }
 func (Character) Edges() []ent.Edge {
 	return nil

@@ -72,7 +72,7 @@ func (wgld *WuGeLuckyDelete) sqlExec(ctx context.Context) (int, error) {
 		Node: &sqlgraph.NodeSpec{
 			Table: wugelucky.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeInt,
 				Column: wugelucky.FieldID,
 			},
 		},

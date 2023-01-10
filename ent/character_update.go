@@ -46,27 +46,27 @@ func (cu *CharacterUpdate) SetRadical(s string) *CharacterUpdate {
 }
 
 // SetRadicalStroke sets the "radical_stroke" field.
-func (cu *CharacterUpdate) SetRadicalStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) SetRadicalStroke(i int) *CharacterUpdate {
 	cu.mutation.ResetRadicalStroke()
 	cu.mutation.SetRadicalStroke(i)
 	return cu
 }
 
 // AddRadicalStroke adds i to the "radical_stroke" field.
-func (cu *CharacterUpdate) AddRadicalStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) AddRadicalStroke(i int) *CharacterUpdate {
 	cu.mutation.AddRadicalStroke(i)
 	return cu
 }
 
 // SetStroke sets the "stroke" field.
-func (cu *CharacterUpdate) SetStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) SetStroke(i int) *CharacterUpdate {
 	cu.mutation.ResetStroke()
 	cu.mutation.SetStroke(i)
 	return cu
 }
 
 // AddStroke adds i to the "stroke" field.
-func (cu *CharacterUpdate) AddStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) AddStroke(i int) *CharacterUpdate {
 	cu.mutation.AddStroke(i)
 	return cu
 }
@@ -84,14 +84,14 @@ func (cu *CharacterUpdate) SetKangXi(s string) *CharacterUpdate {
 }
 
 // SetKangXiStroke sets the "kang_xi_stroke" field.
-func (cu *CharacterUpdate) SetKangXiStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) SetKangXiStroke(i int) *CharacterUpdate {
 	cu.mutation.ResetKangXiStroke()
 	cu.mutation.SetKangXiStroke(i)
 	return cu
 }
 
 // AddKangXiStroke adds i to the "kang_xi_stroke" field.
-func (cu *CharacterUpdate) AddKangXiStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) AddKangXiStroke(i int) *CharacterUpdate {
 	cu.mutation.AddKangXiStroke(i)
 	return cu
 }
@@ -103,27 +103,27 @@ func (cu *CharacterUpdate) SetSimpleRadical(s string) *CharacterUpdate {
 }
 
 // SetSimpleRadicalStroke sets the "simple_radical_stroke" field.
-func (cu *CharacterUpdate) SetSimpleRadicalStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) SetSimpleRadicalStroke(i int) *CharacterUpdate {
 	cu.mutation.ResetSimpleRadicalStroke()
 	cu.mutation.SetSimpleRadicalStroke(i)
 	return cu
 }
 
 // AddSimpleRadicalStroke adds i to the "simple_radical_stroke" field.
-func (cu *CharacterUpdate) AddSimpleRadicalStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) AddSimpleRadicalStroke(i int) *CharacterUpdate {
 	cu.mutation.AddSimpleRadicalStroke(i)
 	return cu
 }
 
 // SetSimpleTotalStroke sets the "simple_total_stroke" field.
-func (cu *CharacterUpdate) SetSimpleTotalStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) SetSimpleTotalStroke(i int) *CharacterUpdate {
 	cu.mutation.ResetSimpleTotalStroke()
 	cu.mutation.SetSimpleTotalStroke(i)
 	return cu
 }
 
 // AddSimpleTotalStroke adds i to the "simple_total_stroke" field.
-func (cu *CharacterUpdate) AddSimpleTotalStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) AddSimpleTotalStroke(i int) *CharacterUpdate {
 	cu.mutation.AddSimpleTotalStroke(i)
 	return cu
 }
@@ -135,27 +135,27 @@ func (cu *CharacterUpdate) SetTraditionalRadical(s string) *CharacterUpdate {
 }
 
 // SetTraditionalRadicalStroke sets the "traditional_radical_stroke" field.
-func (cu *CharacterUpdate) SetTraditionalRadicalStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) SetTraditionalRadicalStroke(i int) *CharacterUpdate {
 	cu.mutation.ResetTraditionalRadicalStroke()
 	cu.mutation.SetTraditionalRadicalStroke(i)
 	return cu
 }
 
 // AddTraditionalRadicalStroke adds i to the "traditional_radical_stroke" field.
-func (cu *CharacterUpdate) AddTraditionalRadicalStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) AddTraditionalRadicalStroke(i int) *CharacterUpdate {
 	cu.mutation.AddTraditionalRadicalStroke(i)
 	return cu
 }
 
 // SetTraditionalTotalStroke sets the "traditional_total_stroke" field.
-func (cu *CharacterUpdate) SetTraditionalTotalStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) SetTraditionalTotalStroke(i int) *CharacterUpdate {
 	cu.mutation.ResetTraditionalTotalStroke()
 	cu.mutation.SetTraditionalTotalStroke(i)
 	return cu
 }
 
 // AddTraditionalTotalStroke adds i to the "traditional_total_stroke" field.
-func (cu *CharacterUpdate) AddTraditionalTotalStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) AddTraditionalTotalStroke(i int) *CharacterUpdate {
 	cu.mutation.AddTraditionalTotalStroke(i)
 	return cu
 }
@@ -203,14 +203,14 @@ func (cu *CharacterUpdate) SetComment(s string) *CharacterUpdate {
 }
 
 // SetScienceStroke sets the "science_stroke" field.
-func (cu *CharacterUpdate) SetScienceStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) SetScienceStroke(i int) *CharacterUpdate {
 	cu.mutation.ResetScienceStroke()
 	cu.mutation.SetScienceStroke(i)
 	return cu
 }
 
 // AddScienceStroke adds i to the "science_stroke" field.
-func (cu *CharacterUpdate) AddScienceStroke(i int32) *CharacterUpdate {
+func (cu *CharacterUpdate) AddScienceStroke(i int) *CharacterUpdate {
 	cu.mutation.AddScienceStroke(i)
 	return cu
 }
@@ -302,16 +302,16 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(character.FieldRadical, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.RadicalStroke(); ok {
-		_spec.SetField(character.FieldRadicalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedRadicalStroke(); ok {
-		_spec.AddField(character.FieldRadicalStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.Stroke(); ok {
-		_spec.SetField(character.FieldStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedStroke(); ok {
-		_spec.AddField(character.FieldStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.IsKangXi(); ok {
 		_spec.SetField(character.FieldIsKangXi, field.TypeBool, value)
@@ -320,40 +320,40 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(character.FieldKangXi, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.KangXiStroke(); ok {
-		_spec.SetField(character.FieldKangXiStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldKangXiStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedKangXiStroke(); ok {
-		_spec.AddField(character.FieldKangXiStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldKangXiStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.SimpleRadical(); ok {
 		_spec.SetField(character.FieldSimpleRadical, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.SimpleRadicalStroke(); ok {
-		_spec.SetField(character.FieldSimpleRadicalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldSimpleRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedSimpleRadicalStroke(); ok {
-		_spec.AddField(character.FieldSimpleRadicalStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldSimpleRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.SimpleTotalStroke(); ok {
-		_spec.SetField(character.FieldSimpleTotalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldSimpleTotalStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedSimpleTotalStroke(); ok {
-		_spec.AddField(character.FieldSimpleTotalStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldSimpleTotalStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.TraditionalRadical(); ok {
 		_spec.SetField(character.FieldTraditionalRadical, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.TraditionalRadicalStroke(); ok {
-		_spec.SetField(character.FieldTraditionalRadicalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldTraditionalRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedTraditionalRadicalStroke(); ok {
-		_spec.AddField(character.FieldTraditionalRadicalStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldTraditionalRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.TraditionalTotalStroke(); ok {
-		_spec.SetField(character.FieldTraditionalTotalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldTraditionalTotalStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedTraditionalTotalStroke(); ok {
-		_spec.AddField(character.FieldTraditionalTotalStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldTraditionalTotalStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.NameScience(); ok {
 		_spec.SetField(character.FieldNameScience, field.TypeBool, value)
@@ -377,10 +377,10 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(character.FieldComment, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.ScienceStroke(); ok {
-		_spec.SetField(character.FieldScienceStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldScienceStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedScienceStroke(); ok {
-		_spec.AddField(character.FieldScienceStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldScienceStroke, field.TypeInt, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -420,27 +420,27 @@ func (cuo *CharacterUpdateOne) SetRadical(s string) *CharacterUpdateOne {
 }
 
 // SetRadicalStroke sets the "radical_stroke" field.
-func (cuo *CharacterUpdateOne) SetRadicalStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) SetRadicalStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.ResetRadicalStroke()
 	cuo.mutation.SetRadicalStroke(i)
 	return cuo
 }
 
 // AddRadicalStroke adds i to the "radical_stroke" field.
-func (cuo *CharacterUpdateOne) AddRadicalStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) AddRadicalStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.AddRadicalStroke(i)
 	return cuo
 }
 
 // SetStroke sets the "stroke" field.
-func (cuo *CharacterUpdateOne) SetStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) SetStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.ResetStroke()
 	cuo.mutation.SetStroke(i)
 	return cuo
 }
 
 // AddStroke adds i to the "stroke" field.
-func (cuo *CharacterUpdateOne) AddStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) AddStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.AddStroke(i)
 	return cuo
 }
@@ -458,14 +458,14 @@ func (cuo *CharacterUpdateOne) SetKangXi(s string) *CharacterUpdateOne {
 }
 
 // SetKangXiStroke sets the "kang_xi_stroke" field.
-func (cuo *CharacterUpdateOne) SetKangXiStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) SetKangXiStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.ResetKangXiStroke()
 	cuo.mutation.SetKangXiStroke(i)
 	return cuo
 }
 
 // AddKangXiStroke adds i to the "kang_xi_stroke" field.
-func (cuo *CharacterUpdateOne) AddKangXiStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) AddKangXiStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.AddKangXiStroke(i)
 	return cuo
 }
@@ -477,27 +477,27 @@ func (cuo *CharacterUpdateOne) SetSimpleRadical(s string) *CharacterUpdateOne {
 }
 
 // SetSimpleRadicalStroke sets the "simple_radical_stroke" field.
-func (cuo *CharacterUpdateOne) SetSimpleRadicalStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) SetSimpleRadicalStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.ResetSimpleRadicalStroke()
 	cuo.mutation.SetSimpleRadicalStroke(i)
 	return cuo
 }
 
 // AddSimpleRadicalStroke adds i to the "simple_radical_stroke" field.
-func (cuo *CharacterUpdateOne) AddSimpleRadicalStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) AddSimpleRadicalStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.AddSimpleRadicalStroke(i)
 	return cuo
 }
 
 // SetSimpleTotalStroke sets the "simple_total_stroke" field.
-func (cuo *CharacterUpdateOne) SetSimpleTotalStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) SetSimpleTotalStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.ResetSimpleTotalStroke()
 	cuo.mutation.SetSimpleTotalStroke(i)
 	return cuo
 }
 
 // AddSimpleTotalStroke adds i to the "simple_total_stroke" field.
-func (cuo *CharacterUpdateOne) AddSimpleTotalStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) AddSimpleTotalStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.AddSimpleTotalStroke(i)
 	return cuo
 }
@@ -509,27 +509,27 @@ func (cuo *CharacterUpdateOne) SetTraditionalRadical(s string) *CharacterUpdateO
 }
 
 // SetTraditionalRadicalStroke sets the "traditional_radical_stroke" field.
-func (cuo *CharacterUpdateOne) SetTraditionalRadicalStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) SetTraditionalRadicalStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.ResetTraditionalRadicalStroke()
 	cuo.mutation.SetTraditionalRadicalStroke(i)
 	return cuo
 }
 
 // AddTraditionalRadicalStroke adds i to the "traditional_radical_stroke" field.
-func (cuo *CharacterUpdateOne) AddTraditionalRadicalStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) AddTraditionalRadicalStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.AddTraditionalRadicalStroke(i)
 	return cuo
 }
 
 // SetTraditionalTotalStroke sets the "traditional_total_stroke" field.
-func (cuo *CharacterUpdateOne) SetTraditionalTotalStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) SetTraditionalTotalStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.ResetTraditionalTotalStroke()
 	cuo.mutation.SetTraditionalTotalStroke(i)
 	return cuo
 }
 
 // AddTraditionalTotalStroke adds i to the "traditional_total_stroke" field.
-func (cuo *CharacterUpdateOne) AddTraditionalTotalStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) AddTraditionalTotalStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.AddTraditionalTotalStroke(i)
 	return cuo
 }
@@ -577,14 +577,14 @@ func (cuo *CharacterUpdateOne) SetComment(s string) *CharacterUpdateOne {
 }
 
 // SetScienceStroke sets the "science_stroke" field.
-func (cuo *CharacterUpdateOne) SetScienceStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) SetScienceStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.ResetScienceStroke()
 	cuo.mutation.SetScienceStroke(i)
 	return cuo
 }
 
 // AddScienceStroke adds i to the "science_stroke" field.
-func (cuo *CharacterUpdateOne) AddScienceStroke(i int32) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) AddScienceStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.AddScienceStroke(i)
 	return cuo
 }
@@ -706,16 +706,16 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 		_spec.SetField(character.FieldRadical, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.RadicalStroke(); ok {
-		_spec.SetField(character.FieldRadicalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedRadicalStroke(); ok {
-		_spec.AddField(character.FieldRadicalStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.Stroke(); ok {
-		_spec.SetField(character.FieldStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedStroke(); ok {
-		_spec.AddField(character.FieldStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.IsKangXi(); ok {
 		_spec.SetField(character.FieldIsKangXi, field.TypeBool, value)
@@ -724,40 +724,40 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 		_spec.SetField(character.FieldKangXi, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.KangXiStroke(); ok {
-		_spec.SetField(character.FieldKangXiStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldKangXiStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedKangXiStroke(); ok {
-		_spec.AddField(character.FieldKangXiStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldKangXiStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.SimpleRadical(); ok {
 		_spec.SetField(character.FieldSimpleRadical, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.SimpleRadicalStroke(); ok {
-		_spec.SetField(character.FieldSimpleRadicalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldSimpleRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedSimpleRadicalStroke(); ok {
-		_spec.AddField(character.FieldSimpleRadicalStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldSimpleRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.SimpleTotalStroke(); ok {
-		_spec.SetField(character.FieldSimpleTotalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldSimpleTotalStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedSimpleTotalStroke(); ok {
-		_spec.AddField(character.FieldSimpleTotalStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldSimpleTotalStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.TraditionalRadical(); ok {
 		_spec.SetField(character.FieldTraditionalRadical, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.TraditionalRadicalStroke(); ok {
-		_spec.SetField(character.FieldTraditionalRadicalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldTraditionalRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedTraditionalRadicalStroke(); ok {
-		_spec.AddField(character.FieldTraditionalRadicalStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldTraditionalRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.TraditionalTotalStroke(); ok {
-		_spec.SetField(character.FieldTraditionalTotalStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldTraditionalTotalStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedTraditionalTotalStroke(); ok {
-		_spec.AddField(character.FieldTraditionalTotalStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldTraditionalTotalStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.NameScience(); ok {
 		_spec.SetField(character.FieldNameScience, field.TypeBool, value)
@@ -781,10 +781,10 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 		_spec.SetField(character.FieldComment, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.ScienceStroke(); ok {
-		_spec.SetField(character.FieldScienceStroke, field.TypeInt32, value)
+		_spec.SetField(character.FieldScienceStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedScienceStroke(); ok {
-		_spec.AddField(character.FieldScienceStroke, field.TypeInt32, value)
+		_spec.AddField(character.FieldScienceStroke, field.TypeInt, value)
 	}
 	_node = &Character{config: cuo.config}
 	_spec.Assign = _node.assignValues
