@@ -89,7 +89,7 @@ jobs:
           commit: master
           tag: auto_build
           body: |
-            this is only a latest build from master
+            This is only a latest build from master
             **Version: https://github.com/babyname/fate/commit/${{ github.sha }}**
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: false
