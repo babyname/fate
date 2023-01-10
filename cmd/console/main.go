@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/babyname/fate"
 	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -38,6 +39,7 @@ var rootCmd = &cobra.Command{
 			fmt.Println("Loading config file from: ", flagConfigPath)
 		}
 		cfg = config.LoadConfig(flagConfigPath)
+		logger.SetOutput(logger.New(cfg.Log))
 	},
 	DisableSuggestions: false,
 	CompletionOptions: cobra.CompletionOptions{
