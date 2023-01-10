@@ -26,7 +26,7 @@ Github上第一个开源的中文取名项目(The first chinese name create tool
 最新版使用Sqlite3数据库,不在需要导入数据库文件了. 直接下载下面的Sqlite3数据库到本地就能使用.
 
 【[v3.5.5下载](https://github.com/babyname/fate/releases/tag/v3.5.5)】
-【[Sqlite3数据库](https://github.com/babyname/fate/releases/download/auto_build/fate_sqlite3_database.zip)】
+【[Sqlite3数据库](https://github.com/babyname/fate/releases/download/v3.5.4/fate_sqlite3_database.zip)】
 
 【[最新自编译版本](https://github.com/babyname/fate/releases/tag/auto_build)】
 【[旧版SQL数据库文件:20200331](https://github.com/babyname/fate/releases/download/v3.5.1/fate_db_200331.7z)】
@@ -108,7 +108,7 @@ Github上第一个开源的中文取名项目(The first chinese name create tool
       "name": "fate",
       "max_idle_con": 0,
       "max_open_con": 0,
-      "driver": "sqlite3",
+      "driver": "mysql",
       "file": "",
       "dsn": "",
       "show_sql": false,
