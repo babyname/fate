@@ -2,38 +2,57 @@ package main
 
 import (
 	"fmt"
+	"github.com/babyname/fate"
 	"github.com/babyname/fate/config"
 	"github.com/spf13/cobra"
 )
 
 const (
 	programName = `fate`
-	fateVersion = `4.0.0`
+
+	// helpContent ...
+	helpContent = "正在使用Fate生成姓名列表，如遇到问题请访问项目地址：https://github.com/babyname/fate获取帮助!"
 )
 
 var (
-	flagConfigPath = rootCmd.Flags().String("config", "", "set a config file path")
+	flagConfigPath = ""
+)
+
+var (
+	cfg *config.Config
 )
 
 var rootCmd = &cobra.Command{
 	Use:     programName,
-	Short:   "run fate command to generate some baby name",
-	Version: fateVersion,
+	Short:   "生成姓名列表",
+	Version: fate.Version,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("arguments [command] was not inputted")
+		fmt.Println(helpContent)
+		err := cmd.Help()
+		if err != nil {
+			return
+		}
 	},
-	PreRun: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Fate running")
-
-		c := config.LoadConfig(*flagConfigPath)
-		fmt.Println(c)
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		if flagConfigPath != "" {
+			fmt.Println("Loading config file from: ", flagConfigPath)
+		}
+		cfg = config.LoadConfig(flagConfigPath)
 	},
-	DisableSuggestions:         false,
+	DisableSuggestions: false,
+	CompletionOptions: cobra.CompletionOptions{
+		DisableDefaultCmd:   true,
+		DisableNoDescFlag:   true,
+		DisableDescriptions: true,
+		HiddenDefaultCmd:    true,
+	},
 	SuggestionsMinimumDistance: 1,
 }
 
 func main() {
-	rootCmd.AddCommand(cmdInit(), cmdName(), cmdCheck(), versionCMD())
+	rootCmd.PersistentFlags().StringVarP(&flagConfigPath, "config", "c", "", "set a config file path")
+
+	rootCmd.AddCommand(cmdInit(), cmdName())
 	e := rootCmd.Execute()
 	if e != nil {
 		panic(e)
