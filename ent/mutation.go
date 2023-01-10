@@ -42,24 +42,24 @@ type CharacterMutation struct {
 	pin_yin                       *string
 	ch                            *string
 	radical                       *string
-	radical_stroke                *int32
-	addradical_stroke             *int32
-	stroke                        *int32
-	addstroke                     *int32
+	radical_stroke                *int
+	addradical_stroke             *int
+	stroke                        *int
+	addstroke                     *int
 	is_kang_xi                    *bool
 	kang_xi                       *string
-	kang_xi_stroke                *int32
-	addkang_xi_stroke             *int32
+	kang_xi_stroke                *int
+	addkang_xi_stroke             *int
 	simple_radical                *string
-	simple_radical_stroke         *int32
-	addsimple_radical_stroke      *int32
-	simple_total_stroke           *int32
-	addsimple_total_stroke        *int32
+	simple_radical_stroke         *int
+	addsimple_radical_stroke      *int
+	simple_total_stroke           *int
+	addsimple_total_stroke        *int
 	traditional_radical           *string
-	traditional_radical_stroke    *int32
-	addtraditional_radical_stroke *int32
-	traditional_total_stroke      *int32
-	addtraditional_total_stroke   *int32
+	traditional_radical_stroke    *int
+	addtraditional_radical_stroke *int
+	traditional_total_stroke      *int
+	addtraditional_total_stroke   *int
 	name_science                  *bool
 	wu_xing                       *string
 	lucky                         *string
@@ -67,8 +67,8 @@ type CharacterMutation struct {
 	traditional_character         *string
 	variant_character             *string
 	comment                       *string
-	science_stroke                *int32
-	addscience_stroke             *int32
+	science_stroke                *int
+	addscience_stroke             *int
 	clearedFields                 map[string]struct{}
 	done                          bool
 	oldValue                      func(context.Context) (*Character, error)
@@ -288,13 +288,13 @@ func (m *CharacterMutation) ResetRadical() {
 }
 
 // SetRadicalStroke sets the "radical_stroke" field.
-func (m *CharacterMutation) SetRadicalStroke(i int32) {
+func (m *CharacterMutation) SetRadicalStroke(i int) {
 	m.radical_stroke = &i
 	m.addradical_stroke = nil
 }
 
 // RadicalStroke returns the value of the "radical_stroke" field in the mutation.
-func (m *CharacterMutation) RadicalStroke() (r int32, exists bool) {
+func (m *CharacterMutation) RadicalStroke() (r int, exists bool) {
 	v := m.radical_stroke
 	if v == nil {
 		return
@@ -305,7 +305,7 @@ func (m *CharacterMutation) RadicalStroke() (r int32, exists bool) {
 // OldRadicalStroke returns the old "radical_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldRadicalStroke(ctx context.Context) (v int32, err error) {
+func (m *CharacterMutation) OldRadicalStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRadicalStroke is only allowed on UpdateOne operations")
 	}
@@ -320,7 +320,7 @@ func (m *CharacterMutation) OldRadicalStroke(ctx context.Context) (v int32, err 
 }
 
 // AddRadicalStroke adds i to the "radical_stroke" field.
-func (m *CharacterMutation) AddRadicalStroke(i int32) {
+func (m *CharacterMutation) AddRadicalStroke(i int) {
 	if m.addradical_stroke != nil {
 		*m.addradical_stroke += i
 	} else {
@@ -329,7 +329,7 @@ func (m *CharacterMutation) AddRadicalStroke(i int32) {
 }
 
 // AddedRadicalStroke returns the value that was added to the "radical_stroke" field in this mutation.
-func (m *CharacterMutation) AddedRadicalStroke() (r int32, exists bool) {
+func (m *CharacterMutation) AddedRadicalStroke() (r int, exists bool) {
 	v := m.addradical_stroke
 	if v == nil {
 		return
@@ -344,13 +344,13 @@ func (m *CharacterMutation) ResetRadicalStroke() {
 }
 
 // SetStroke sets the "stroke" field.
-func (m *CharacterMutation) SetStroke(i int32) {
+func (m *CharacterMutation) SetStroke(i int) {
 	m.stroke = &i
 	m.addstroke = nil
 }
 
 // Stroke returns the value of the "stroke" field in the mutation.
-func (m *CharacterMutation) Stroke() (r int32, exists bool) {
+func (m *CharacterMutation) Stroke() (r int, exists bool) {
 	v := m.stroke
 	if v == nil {
 		return
@@ -361,7 +361,7 @@ func (m *CharacterMutation) Stroke() (r int32, exists bool) {
 // OldStroke returns the old "stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldStroke(ctx context.Context) (v int32, err error) {
+func (m *CharacterMutation) OldStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStroke is only allowed on UpdateOne operations")
 	}
@@ -376,7 +376,7 @@ func (m *CharacterMutation) OldStroke(ctx context.Context) (v int32, err error) 
 }
 
 // AddStroke adds i to the "stroke" field.
-func (m *CharacterMutation) AddStroke(i int32) {
+func (m *CharacterMutation) AddStroke(i int) {
 	if m.addstroke != nil {
 		*m.addstroke += i
 	} else {
@@ -385,7 +385,7 @@ func (m *CharacterMutation) AddStroke(i int32) {
 }
 
 // AddedStroke returns the value that was added to the "stroke" field in this mutation.
-func (m *CharacterMutation) AddedStroke() (r int32, exists bool) {
+func (m *CharacterMutation) AddedStroke() (r int, exists bool) {
 	v := m.addstroke
 	if v == nil {
 		return
@@ -472,13 +472,13 @@ func (m *CharacterMutation) ResetKangXi() {
 }
 
 // SetKangXiStroke sets the "kang_xi_stroke" field.
-func (m *CharacterMutation) SetKangXiStroke(i int32) {
+func (m *CharacterMutation) SetKangXiStroke(i int) {
 	m.kang_xi_stroke = &i
 	m.addkang_xi_stroke = nil
 }
 
 // KangXiStroke returns the value of the "kang_xi_stroke" field in the mutation.
-func (m *CharacterMutation) KangXiStroke() (r int32, exists bool) {
+func (m *CharacterMutation) KangXiStroke() (r int, exists bool) {
 	v := m.kang_xi_stroke
 	if v == nil {
 		return
@@ -489,7 +489,7 @@ func (m *CharacterMutation) KangXiStroke() (r int32, exists bool) {
 // OldKangXiStroke returns the old "kang_xi_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldKangXiStroke(ctx context.Context) (v int32, err error) {
+func (m *CharacterMutation) OldKangXiStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldKangXiStroke is only allowed on UpdateOne operations")
 	}
@@ -504,7 +504,7 @@ func (m *CharacterMutation) OldKangXiStroke(ctx context.Context) (v int32, err e
 }
 
 // AddKangXiStroke adds i to the "kang_xi_stroke" field.
-func (m *CharacterMutation) AddKangXiStroke(i int32) {
+func (m *CharacterMutation) AddKangXiStroke(i int) {
 	if m.addkang_xi_stroke != nil {
 		*m.addkang_xi_stroke += i
 	} else {
@@ -513,7 +513,7 @@ func (m *CharacterMutation) AddKangXiStroke(i int32) {
 }
 
 // AddedKangXiStroke returns the value that was added to the "kang_xi_stroke" field in this mutation.
-func (m *CharacterMutation) AddedKangXiStroke() (r int32, exists bool) {
+func (m *CharacterMutation) AddedKangXiStroke() (r int, exists bool) {
 	v := m.addkang_xi_stroke
 	if v == nil {
 		return
@@ -564,13 +564,13 @@ func (m *CharacterMutation) ResetSimpleRadical() {
 }
 
 // SetSimpleRadicalStroke sets the "simple_radical_stroke" field.
-func (m *CharacterMutation) SetSimpleRadicalStroke(i int32) {
+func (m *CharacterMutation) SetSimpleRadicalStroke(i int) {
 	m.simple_radical_stroke = &i
 	m.addsimple_radical_stroke = nil
 }
 
 // SimpleRadicalStroke returns the value of the "simple_radical_stroke" field in the mutation.
-func (m *CharacterMutation) SimpleRadicalStroke() (r int32, exists bool) {
+func (m *CharacterMutation) SimpleRadicalStroke() (r int, exists bool) {
 	v := m.simple_radical_stroke
 	if v == nil {
 		return
@@ -581,7 +581,7 @@ func (m *CharacterMutation) SimpleRadicalStroke() (r int32, exists bool) {
 // OldSimpleRadicalStroke returns the old "simple_radical_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldSimpleRadicalStroke(ctx context.Context) (v int32, err error) {
+func (m *CharacterMutation) OldSimpleRadicalStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSimpleRadicalStroke is only allowed on UpdateOne operations")
 	}
@@ -596,7 +596,7 @@ func (m *CharacterMutation) OldSimpleRadicalStroke(ctx context.Context) (v int32
 }
 
 // AddSimpleRadicalStroke adds i to the "simple_radical_stroke" field.
-func (m *CharacterMutation) AddSimpleRadicalStroke(i int32) {
+func (m *CharacterMutation) AddSimpleRadicalStroke(i int) {
 	if m.addsimple_radical_stroke != nil {
 		*m.addsimple_radical_stroke += i
 	} else {
@@ -605,7 +605,7 @@ func (m *CharacterMutation) AddSimpleRadicalStroke(i int32) {
 }
 
 // AddedSimpleRadicalStroke returns the value that was added to the "simple_radical_stroke" field in this mutation.
-func (m *CharacterMutation) AddedSimpleRadicalStroke() (r int32, exists bool) {
+func (m *CharacterMutation) AddedSimpleRadicalStroke() (r int, exists bool) {
 	v := m.addsimple_radical_stroke
 	if v == nil {
 		return
@@ -620,13 +620,13 @@ func (m *CharacterMutation) ResetSimpleRadicalStroke() {
 }
 
 // SetSimpleTotalStroke sets the "simple_total_stroke" field.
-func (m *CharacterMutation) SetSimpleTotalStroke(i int32) {
+func (m *CharacterMutation) SetSimpleTotalStroke(i int) {
 	m.simple_total_stroke = &i
 	m.addsimple_total_stroke = nil
 }
 
 // SimpleTotalStroke returns the value of the "simple_total_stroke" field in the mutation.
-func (m *CharacterMutation) SimpleTotalStroke() (r int32, exists bool) {
+func (m *CharacterMutation) SimpleTotalStroke() (r int, exists bool) {
 	v := m.simple_total_stroke
 	if v == nil {
 		return
@@ -637,7 +637,7 @@ func (m *CharacterMutation) SimpleTotalStroke() (r int32, exists bool) {
 // OldSimpleTotalStroke returns the old "simple_total_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldSimpleTotalStroke(ctx context.Context) (v int32, err error) {
+func (m *CharacterMutation) OldSimpleTotalStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSimpleTotalStroke is only allowed on UpdateOne operations")
 	}
@@ -652,7 +652,7 @@ func (m *CharacterMutation) OldSimpleTotalStroke(ctx context.Context) (v int32, 
 }
 
 // AddSimpleTotalStroke adds i to the "simple_total_stroke" field.
-func (m *CharacterMutation) AddSimpleTotalStroke(i int32) {
+func (m *CharacterMutation) AddSimpleTotalStroke(i int) {
 	if m.addsimple_total_stroke != nil {
 		*m.addsimple_total_stroke += i
 	} else {
@@ -661,7 +661,7 @@ func (m *CharacterMutation) AddSimpleTotalStroke(i int32) {
 }
 
 // AddedSimpleTotalStroke returns the value that was added to the "simple_total_stroke" field in this mutation.
-func (m *CharacterMutation) AddedSimpleTotalStroke() (r int32, exists bool) {
+func (m *CharacterMutation) AddedSimpleTotalStroke() (r int, exists bool) {
 	v := m.addsimple_total_stroke
 	if v == nil {
 		return
@@ -712,13 +712,13 @@ func (m *CharacterMutation) ResetTraditionalRadical() {
 }
 
 // SetTraditionalRadicalStroke sets the "traditional_radical_stroke" field.
-func (m *CharacterMutation) SetTraditionalRadicalStroke(i int32) {
+func (m *CharacterMutation) SetTraditionalRadicalStroke(i int) {
 	m.traditional_radical_stroke = &i
 	m.addtraditional_radical_stroke = nil
 }
 
 // TraditionalRadicalStroke returns the value of the "traditional_radical_stroke" field in the mutation.
-func (m *CharacterMutation) TraditionalRadicalStroke() (r int32, exists bool) {
+func (m *CharacterMutation) TraditionalRadicalStroke() (r int, exists bool) {
 	v := m.traditional_radical_stroke
 	if v == nil {
 		return
@@ -729,7 +729,7 @@ func (m *CharacterMutation) TraditionalRadicalStroke() (r int32, exists bool) {
 // OldTraditionalRadicalStroke returns the old "traditional_radical_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldTraditionalRadicalStroke(ctx context.Context) (v int32, err error) {
+func (m *CharacterMutation) OldTraditionalRadicalStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTraditionalRadicalStroke is only allowed on UpdateOne operations")
 	}
@@ -744,7 +744,7 @@ func (m *CharacterMutation) OldTraditionalRadicalStroke(ctx context.Context) (v 
 }
 
 // AddTraditionalRadicalStroke adds i to the "traditional_radical_stroke" field.
-func (m *CharacterMutation) AddTraditionalRadicalStroke(i int32) {
+func (m *CharacterMutation) AddTraditionalRadicalStroke(i int) {
 	if m.addtraditional_radical_stroke != nil {
 		*m.addtraditional_radical_stroke += i
 	} else {
@@ -753,7 +753,7 @@ func (m *CharacterMutation) AddTraditionalRadicalStroke(i int32) {
 }
 
 // AddedTraditionalRadicalStroke returns the value that was added to the "traditional_radical_stroke" field in this mutation.
-func (m *CharacterMutation) AddedTraditionalRadicalStroke() (r int32, exists bool) {
+func (m *CharacterMutation) AddedTraditionalRadicalStroke() (r int, exists bool) {
 	v := m.addtraditional_radical_stroke
 	if v == nil {
 		return
@@ -768,13 +768,13 @@ func (m *CharacterMutation) ResetTraditionalRadicalStroke() {
 }
 
 // SetTraditionalTotalStroke sets the "traditional_total_stroke" field.
-func (m *CharacterMutation) SetTraditionalTotalStroke(i int32) {
+func (m *CharacterMutation) SetTraditionalTotalStroke(i int) {
 	m.traditional_total_stroke = &i
 	m.addtraditional_total_stroke = nil
 }
 
 // TraditionalTotalStroke returns the value of the "traditional_total_stroke" field in the mutation.
-func (m *CharacterMutation) TraditionalTotalStroke() (r int32, exists bool) {
+func (m *CharacterMutation) TraditionalTotalStroke() (r int, exists bool) {
 	v := m.traditional_total_stroke
 	if v == nil {
 		return
@@ -785,7 +785,7 @@ func (m *CharacterMutation) TraditionalTotalStroke() (r int32, exists bool) {
 // OldTraditionalTotalStroke returns the old "traditional_total_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldTraditionalTotalStroke(ctx context.Context) (v int32, err error) {
+func (m *CharacterMutation) OldTraditionalTotalStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTraditionalTotalStroke is only allowed on UpdateOne operations")
 	}
@@ -800,7 +800,7 @@ func (m *CharacterMutation) OldTraditionalTotalStroke(ctx context.Context) (v in
 }
 
 // AddTraditionalTotalStroke adds i to the "traditional_total_stroke" field.
-func (m *CharacterMutation) AddTraditionalTotalStroke(i int32) {
+func (m *CharacterMutation) AddTraditionalTotalStroke(i int) {
 	if m.addtraditional_total_stroke != nil {
 		*m.addtraditional_total_stroke += i
 	} else {
@@ -809,7 +809,7 @@ func (m *CharacterMutation) AddTraditionalTotalStroke(i int32) {
 }
 
 // AddedTraditionalTotalStroke returns the value that was added to the "traditional_total_stroke" field in this mutation.
-func (m *CharacterMutation) AddedTraditionalTotalStroke() (r int32, exists bool) {
+func (m *CharacterMutation) AddedTraditionalTotalStroke() (r int, exists bool) {
 	v := m.addtraditional_total_stroke
 	if v == nil {
 		return
@@ -1076,13 +1076,13 @@ func (m *CharacterMutation) ResetComment() {
 }
 
 // SetScienceStroke sets the "science_stroke" field.
-func (m *CharacterMutation) SetScienceStroke(i int32) {
+func (m *CharacterMutation) SetScienceStroke(i int) {
 	m.science_stroke = &i
 	m.addscience_stroke = nil
 }
 
 // ScienceStroke returns the value of the "science_stroke" field in the mutation.
-func (m *CharacterMutation) ScienceStroke() (r int32, exists bool) {
+func (m *CharacterMutation) ScienceStroke() (r int, exists bool) {
 	v := m.science_stroke
 	if v == nil {
 		return
@@ -1093,7 +1093,7 @@ func (m *CharacterMutation) ScienceStroke() (r int32, exists bool) {
 // OldScienceStroke returns the old "science_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldScienceStroke(ctx context.Context) (v int32, err error) {
+func (m *CharacterMutation) OldScienceStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldScienceStroke is only allowed on UpdateOne operations")
 	}
@@ -1108,7 +1108,7 @@ func (m *CharacterMutation) OldScienceStroke(ctx context.Context) (v int32, err 
 }
 
 // AddScienceStroke adds i to the "science_stroke" field.
-func (m *CharacterMutation) AddScienceStroke(i int32) {
+func (m *CharacterMutation) AddScienceStroke(i int) {
 	if m.addscience_stroke != nil {
 		*m.addscience_stroke += i
 	} else {
@@ -1117,7 +1117,7 @@ func (m *CharacterMutation) AddScienceStroke(i int32) {
 }
 
 // AddedScienceStroke returns the value that was added to the "science_stroke" field in this mutation.
-func (m *CharacterMutation) AddedScienceStroke() (r int32, exists bool) {
+func (m *CharacterMutation) AddedScienceStroke() (r int, exists bool) {
 	v := m.addscience_stroke
 	if v == nil {
 		return
@@ -1353,14 +1353,14 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetRadical(v)
 		return nil
 	case character.FieldRadicalStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRadicalStroke(v)
 		return nil
 	case character.FieldStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1381,7 +1381,7 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetKangXi(v)
 		return nil
 	case character.FieldKangXiStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1395,14 +1395,14 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetSimpleRadical(v)
 		return nil
 	case character.FieldSimpleRadicalStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSimpleRadicalStroke(v)
 		return nil
 	case character.FieldSimpleTotalStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1416,14 +1416,14 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetTraditionalRadical(v)
 		return nil
 	case character.FieldTraditionalRadicalStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTraditionalRadicalStroke(v)
 		return nil
 	case character.FieldTraditionalTotalStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1479,7 +1479,7 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetComment(v)
 		return nil
 	case character.FieldScienceStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1551,56 +1551,56 @@ func (m *CharacterMutation) AddedField(name string) (ent.Value, bool) {
 func (m *CharacterMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case character.FieldRadicalStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddRadicalStroke(v)
 		return nil
 	case character.FieldStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddStroke(v)
 		return nil
 	case character.FieldKangXiStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddKangXiStroke(v)
 		return nil
 	case character.FieldSimpleRadicalStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddSimpleRadicalStroke(v)
 		return nil
 	case character.FieldSimpleTotalStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddSimpleTotalStroke(v)
 		return nil
 	case character.FieldTraditionalRadicalStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTraditionalRadicalStroke(v)
 		return nil
 	case character.FieldTraditionalTotalStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTraditionalTotalStroke(v)
 		return nil
 	case character.FieldScienceStroke:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1759,8 +1759,8 @@ type VersionMutation struct {
 	id                 *int
 	current_version    *int
 	addcurrent_version *int
-	updated_unix       *int64
-	addupdated_unix    *int64
+	updated_unix       *int
+	addupdated_unix    *int
 	clearedFields      map[string]struct{}
 	done               bool
 	oldValue           func(context.Context) (*Version, error)
@@ -1922,13 +1922,13 @@ func (m *VersionMutation) ResetCurrentVersion() {
 }
 
 // SetUpdatedUnix sets the "updated_unix" field.
-func (m *VersionMutation) SetUpdatedUnix(i int64) {
+func (m *VersionMutation) SetUpdatedUnix(i int) {
 	m.updated_unix = &i
 	m.addupdated_unix = nil
 }
 
 // UpdatedUnix returns the value of the "updated_unix" field in the mutation.
-func (m *VersionMutation) UpdatedUnix() (r int64, exists bool) {
+func (m *VersionMutation) UpdatedUnix() (r int, exists bool) {
 	v := m.updated_unix
 	if v == nil {
 		return
@@ -1939,7 +1939,7 @@ func (m *VersionMutation) UpdatedUnix() (r int64, exists bool) {
 // OldUpdatedUnix returns the old "updated_unix" field's value of the Version entity.
 // If the Version object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *VersionMutation) OldUpdatedUnix(ctx context.Context) (v int64, err error) {
+func (m *VersionMutation) OldUpdatedUnix(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedUnix is only allowed on UpdateOne operations")
 	}
@@ -1954,7 +1954,7 @@ func (m *VersionMutation) OldUpdatedUnix(ctx context.Context) (v int64, err erro
 }
 
 // AddUpdatedUnix adds i to the "updated_unix" field.
-func (m *VersionMutation) AddUpdatedUnix(i int64) {
+func (m *VersionMutation) AddUpdatedUnix(i int) {
 	if m.addupdated_unix != nil {
 		*m.addupdated_unix += i
 	} else {
@@ -1963,7 +1963,7 @@ func (m *VersionMutation) AddUpdatedUnix(i int64) {
 }
 
 // AddedUpdatedUnix returns the value that was added to the "updated_unix" field in this mutation.
-func (m *VersionMutation) AddedUpdatedUnix() (r int64, exists bool) {
+func (m *VersionMutation) AddedUpdatedUnix() (r int, exists bool) {
 	v := m.addupdated_unix
 	if v == nil {
 		return
@@ -2045,7 +2045,7 @@ func (m *VersionMutation) SetField(name string, value ent.Value) error {
 		m.SetCurrentVersion(v)
 		return nil
 	case version.FieldUpdatedUnix:
-		v, ok := value.(int64)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -2094,7 +2094,7 @@ func (m *VersionMutation) AddField(name string, value ent.Value) error {
 		m.AddCurrentVersion(v)
 		return nil
 	case version.FieldUpdatedUnix:
-		v, ok := value.(int64)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -2190,29 +2190,29 @@ type WuGeLuckyMutation struct {
 	config
 	op                Op
 	typ               string
-	id                *string
-	last_stroke_1     *int32
-	addlast_stroke_1  *int32
-	last_stroke_2     *int32
-	addlast_stroke_2  *int32
-	first_stroke_1    *int32
-	addfirst_stroke_1 *int32
-	first_stroke_2    *int32
-	addfirst_stroke_2 *int32
-	tian_ge           *int32
-	addtian_ge        *int32
+	id                *int
+	last_stroke_1     *int
+	addlast_stroke_1  *int
+	last_stroke_2     *int
+	addlast_stroke_2  *int
+	first_stroke_1    *int
+	addfirst_stroke_1 *int
+	first_stroke_2    *int
+	addfirst_stroke_2 *int
+	tian_ge           *int
+	addtian_ge        *int
 	tian_da_yan       *string
-	ren_ge            *int32
-	addren_ge         *int32
+	ren_ge            *int
+	addren_ge         *int
 	ren_da_yan        *string
-	di_ge             *int32
-	adddi_ge          *int32
+	di_ge             *int
+	adddi_ge          *int
 	di_da_yan         *string
-	wai_ge            *int32
-	addwai_ge         *int32
+	wai_ge            *int
+	addwai_ge         *int
 	wai_da_yan        *string
-	zong_ge           *int32
-	addzong_ge        *int32
+	zong_ge           *int
+	addzong_ge        *int
 	zong_da_yan       *string
 	zong_lucky        *bool
 	zong_sex          *bool
@@ -2243,7 +2243,7 @@ func newWuGeLuckyMutation(c config, op Op, opts ...wugeluckyOption) *WuGeLuckyMu
 }
 
 // withWuGeLuckyID sets the ID field of the mutation.
-func withWuGeLuckyID(id string) wugeluckyOption {
+func withWuGeLuckyID(id int) wugeluckyOption {
 	return func(m *WuGeLuckyMutation) {
 		var (
 			err   error
@@ -2295,13 +2295,13 @@ func (m WuGeLuckyMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of WuGeLucky entities.
-func (m *WuGeLuckyMutation) SetID(id string) {
+func (m *WuGeLuckyMutation) SetID(id int) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *WuGeLuckyMutation) ID() (id string, exists bool) {
+func (m *WuGeLuckyMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -2312,12 +2312,12 @@ func (m *WuGeLuckyMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *WuGeLuckyMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *WuGeLuckyMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []string{id}, nil
+			return []int{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -2328,13 +2328,13 @@ func (m *WuGeLuckyMutation) IDs(ctx context.Context) ([]string, error) {
 }
 
 // SetLastStroke1 sets the "last_stroke_1" field.
-func (m *WuGeLuckyMutation) SetLastStroke1(i int32) {
+func (m *WuGeLuckyMutation) SetLastStroke1(i int) {
 	m.last_stroke_1 = &i
 	m.addlast_stroke_1 = nil
 }
 
 // LastStroke1 returns the value of the "last_stroke_1" field in the mutation.
-func (m *WuGeLuckyMutation) LastStroke1() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) LastStroke1() (r int, exists bool) {
 	v := m.last_stroke_1
 	if v == nil {
 		return
@@ -2345,7 +2345,7 @@ func (m *WuGeLuckyMutation) LastStroke1() (r int32, exists bool) {
 // OldLastStroke1 returns the old "last_stroke_1" field's value of the WuGeLucky entity.
 // If the WuGeLucky object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WuGeLuckyMutation) OldLastStroke1(ctx context.Context) (v int32, err error) {
+func (m *WuGeLuckyMutation) OldLastStroke1(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldLastStroke1 is only allowed on UpdateOne operations")
 	}
@@ -2360,7 +2360,7 @@ func (m *WuGeLuckyMutation) OldLastStroke1(ctx context.Context) (v int32, err er
 }
 
 // AddLastStroke1 adds i to the "last_stroke_1" field.
-func (m *WuGeLuckyMutation) AddLastStroke1(i int32) {
+func (m *WuGeLuckyMutation) AddLastStroke1(i int) {
 	if m.addlast_stroke_1 != nil {
 		*m.addlast_stroke_1 += i
 	} else {
@@ -2369,7 +2369,7 @@ func (m *WuGeLuckyMutation) AddLastStroke1(i int32) {
 }
 
 // AddedLastStroke1 returns the value that was added to the "last_stroke_1" field in this mutation.
-func (m *WuGeLuckyMutation) AddedLastStroke1() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) AddedLastStroke1() (r int, exists bool) {
 	v := m.addlast_stroke_1
 	if v == nil {
 		return
@@ -2377,34 +2377,20 @@ func (m *WuGeLuckyMutation) AddedLastStroke1() (r int32, exists bool) {
 	return *v, true
 }
 
-// ClearLastStroke1 clears the value of the "last_stroke_1" field.
-func (m *WuGeLuckyMutation) ClearLastStroke1() {
-	m.last_stroke_1 = nil
-	m.addlast_stroke_1 = nil
-	m.clearedFields[wugelucky.FieldLastStroke1] = struct{}{}
-}
-
-// LastStroke1Cleared returns if the "last_stroke_1" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) LastStroke1Cleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldLastStroke1]
-	return ok
-}
-
 // ResetLastStroke1 resets all changes to the "last_stroke_1" field.
 func (m *WuGeLuckyMutation) ResetLastStroke1() {
 	m.last_stroke_1 = nil
 	m.addlast_stroke_1 = nil
-	delete(m.clearedFields, wugelucky.FieldLastStroke1)
 }
 
 // SetLastStroke2 sets the "last_stroke_2" field.
-func (m *WuGeLuckyMutation) SetLastStroke2(i int32) {
+func (m *WuGeLuckyMutation) SetLastStroke2(i int) {
 	m.last_stroke_2 = &i
 	m.addlast_stroke_2 = nil
 }
 
 // LastStroke2 returns the value of the "last_stroke_2" field in the mutation.
-func (m *WuGeLuckyMutation) LastStroke2() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) LastStroke2() (r int, exists bool) {
 	v := m.last_stroke_2
 	if v == nil {
 		return
@@ -2415,7 +2401,7 @@ func (m *WuGeLuckyMutation) LastStroke2() (r int32, exists bool) {
 // OldLastStroke2 returns the old "last_stroke_2" field's value of the WuGeLucky entity.
 // If the WuGeLucky object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WuGeLuckyMutation) OldLastStroke2(ctx context.Context) (v int32, err error) {
+func (m *WuGeLuckyMutation) OldLastStroke2(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldLastStroke2 is only allowed on UpdateOne operations")
 	}
@@ -2430,7 +2416,7 @@ func (m *WuGeLuckyMutation) OldLastStroke2(ctx context.Context) (v int32, err er
 }
 
 // AddLastStroke2 adds i to the "last_stroke_2" field.
-func (m *WuGeLuckyMutation) AddLastStroke2(i int32) {
+func (m *WuGeLuckyMutation) AddLastStroke2(i int) {
 	if m.addlast_stroke_2 != nil {
 		*m.addlast_stroke_2 += i
 	} else {
@@ -2439,7 +2425,7 @@ func (m *WuGeLuckyMutation) AddLastStroke2(i int32) {
 }
 
 // AddedLastStroke2 returns the value that was added to the "last_stroke_2" field in this mutation.
-func (m *WuGeLuckyMutation) AddedLastStroke2() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) AddedLastStroke2() (r int, exists bool) {
 	v := m.addlast_stroke_2
 	if v == nil {
 		return
@@ -2447,34 +2433,20 @@ func (m *WuGeLuckyMutation) AddedLastStroke2() (r int32, exists bool) {
 	return *v, true
 }
 
-// ClearLastStroke2 clears the value of the "last_stroke_2" field.
-func (m *WuGeLuckyMutation) ClearLastStroke2() {
-	m.last_stroke_2 = nil
-	m.addlast_stroke_2 = nil
-	m.clearedFields[wugelucky.FieldLastStroke2] = struct{}{}
-}
-
-// LastStroke2Cleared returns if the "last_stroke_2" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) LastStroke2Cleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldLastStroke2]
-	return ok
-}
-
 // ResetLastStroke2 resets all changes to the "last_stroke_2" field.
 func (m *WuGeLuckyMutation) ResetLastStroke2() {
 	m.last_stroke_2 = nil
 	m.addlast_stroke_2 = nil
-	delete(m.clearedFields, wugelucky.FieldLastStroke2)
 }
 
 // SetFirstStroke1 sets the "first_stroke_1" field.
-func (m *WuGeLuckyMutation) SetFirstStroke1(i int32) {
+func (m *WuGeLuckyMutation) SetFirstStroke1(i int) {
 	m.first_stroke_1 = &i
 	m.addfirst_stroke_1 = nil
 }
 
 // FirstStroke1 returns the value of the "first_stroke_1" field in the mutation.
-func (m *WuGeLuckyMutation) FirstStroke1() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) FirstStroke1() (r int, exists bool) {
 	v := m.first_stroke_1
 	if v == nil {
 		return
@@ -2485,7 +2457,7 @@ func (m *WuGeLuckyMutation) FirstStroke1() (r int32, exists bool) {
 // OldFirstStroke1 returns the old "first_stroke_1" field's value of the WuGeLucky entity.
 // If the WuGeLucky object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WuGeLuckyMutation) OldFirstStroke1(ctx context.Context) (v int32, err error) {
+func (m *WuGeLuckyMutation) OldFirstStroke1(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldFirstStroke1 is only allowed on UpdateOne operations")
 	}
@@ -2500,7 +2472,7 @@ func (m *WuGeLuckyMutation) OldFirstStroke1(ctx context.Context) (v int32, err e
 }
 
 // AddFirstStroke1 adds i to the "first_stroke_1" field.
-func (m *WuGeLuckyMutation) AddFirstStroke1(i int32) {
+func (m *WuGeLuckyMutation) AddFirstStroke1(i int) {
 	if m.addfirst_stroke_1 != nil {
 		*m.addfirst_stroke_1 += i
 	} else {
@@ -2509,7 +2481,7 @@ func (m *WuGeLuckyMutation) AddFirstStroke1(i int32) {
 }
 
 // AddedFirstStroke1 returns the value that was added to the "first_stroke_1" field in this mutation.
-func (m *WuGeLuckyMutation) AddedFirstStroke1() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) AddedFirstStroke1() (r int, exists bool) {
 	v := m.addfirst_stroke_1
 	if v == nil {
 		return
@@ -2517,34 +2489,20 @@ func (m *WuGeLuckyMutation) AddedFirstStroke1() (r int32, exists bool) {
 	return *v, true
 }
 
-// ClearFirstStroke1 clears the value of the "first_stroke_1" field.
-func (m *WuGeLuckyMutation) ClearFirstStroke1() {
-	m.first_stroke_1 = nil
-	m.addfirst_stroke_1 = nil
-	m.clearedFields[wugelucky.FieldFirstStroke1] = struct{}{}
-}
-
-// FirstStroke1Cleared returns if the "first_stroke_1" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) FirstStroke1Cleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldFirstStroke1]
-	return ok
-}
-
 // ResetFirstStroke1 resets all changes to the "first_stroke_1" field.
 func (m *WuGeLuckyMutation) ResetFirstStroke1() {
 	m.first_stroke_1 = nil
 	m.addfirst_stroke_1 = nil
-	delete(m.clearedFields, wugelucky.FieldFirstStroke1)
 }
 
 // SetFirstStroke2 sets the "first_stroke_2" field.
-func (m *WuGeLuckyMutation) SetFirstStroke2(i int32) {
+func (m *WuGeLuckyMutation) SetFirstStroke2(i int) {
 	m.first_stroke_2 = &i
 	m.addfirst_stroke_2 = nil
 }
 
 // FirstStroke2 returns the value of the "first_stroke_2" field in the mutation.
-func (m *WuGeLuckyMutation) FirstStroke2() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) FirstStroke2() (r int, exists bool) {
 	v := m.first_stroke_2
 	if v == nil {
 		return
@@ -2555,7 +2513,7 @@ func (m *WuGeLuckyMutation) FirstStroke2() (r int32, exists bool) {
 // OldFirstStroke2 returns the old "first_stroke_2" field's value of the WuGeLucky entity.
 // If the WuGeLucky object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WuGeLuckyMutation) OldFirstStroke2(ctx context.Context) (v int32, err error) {
+func (m *WuGeLuckyMutation) OldFirstStroke2(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldFirstStroke2 is only allowed on UpdateOne operations")
 	}
@@ -2570,7 +2528,7 @@ func (m *WuGeLuckyMutation) OldFirstStroke2(ctx context.Context) (v int32, err e
 }
 
 // AddFirstStroke2 adds i to the "first_stroke_2" field.
-func (m *WuGeLuckyMutation) AddFirstStroke2(i int32) {
+func (m *WuGeLuckyMutation) AddFirstStroke2(i int) {
 	if m.addfirst_stroke_2 != nil {
 		*m.addfirst_stroke_2 += i
 	} else {
@@ -2579,7 +2537,7 @@ func (m *WuGeLuckyMutation) AddFirstStroke2(i int32) {
 }
 
 // AddedFirstStroke2 returns the value that was added to the "first_stroke_2" field in this mutation.
-func (m *WuGeLuckyMutation) AddedFirstStroke2() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) AddedFirstStroke2() (r int, exists bool) {
 	v := m.addfirst_stroke_2
 	if v == nil {
 		return
@@ -2587,34 +2545,20 @@ func (m *WuGeLuckyMutation) AddedFirstStroke2() (r int32, exists bool) {
 	return *v, true
 }
 
-// ClearFirstStroke2 clears the value of the "first_stroke_2" field.
-func (m *WuGeLuckyMutation) ClearFirstStroke2() {
-	m.first_stroke_2 = nil
-	m.addfirst_stroke_2 = nil
-	m.clearedFields[wugelucky.FieldFirstStroke2] = struct{}{}
-}
-
-// FirstStroke2Cleared returns if the "first_stroke_2" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) FirstStroke2Cleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldFirstStroke2]
-	return ok
-}
-
 // ResetFirstStroke2 resets all changes to the "first_stroke_2" field.
 func (m *WuGeLuckyMutation) ResetFirstStroke2() {
 	m.first_stroke_2 = nil
 	m.addfirst_stroke_2 = nil
-	delete(m.clearedFields, wugelucky.FieldFirstStroke2)
 }
 
 // SetTianGe sets the "tian_ge" field.
-func (m *WuGeLuckyMutation) SetTianGe(i int32) {
+func (m *WuGeLuckyMutation) SetTianGe(i int) {
 	m.tian_ge = &i
 	m.addtian_ge = nil
 }
 
 // TianGe returns the value of the "tian_ge" field in the mutation.
-func (m *WuGeLuckyMutation) TianGe() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) TianGe() (r int, exists bool) {
 	v := m.tian_ge
 	if v == nil {
 		return
@@ -2625,7 +2569,7 @@ func (m *WuGeLuckyMutation) TianGe() (r int32, exists bool) {
 // OldTianGe returns the old "tian_ge" field's value of the WuGeLucky entity.
 // If the WuGeLucky object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WuGeLuckyMutation) OldTianGe(ctx context.Context) (v int32, err error) {
+func (m *WuGeLuckyMutation) OldTianGe(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTianGe is only allowed on UpdateOne operations")
 	}
@@ -2640,7 +2584,7 @@ func (m *WuGeLuckyMutation) OldTianGe(ctx context.Context) (v int32, err error) 
 }
 
 // AddTianGe adds i to the "tian_ge" field.
-func (m *WuGeLuckyMutation) AddTianGe(i int32) {
+func (m *WuGeLuckyMutation) AddTianGe(i int) {
 	if m.addtian_ge != nil {
 		*m.addtian_ge += i
 	} else {
@@ -2649,7 +2593,7 @@ func (m *WuGeLuckyMutation) AddTianGe(i int32) {
 }
 
 // AddedTianGe returns the value that was added to the "tian_ge" field in this mutation.
-func (m *WuGeLuckyMutation) AddedTianGe() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) AddedTianGe() (r int, exists bool) {
 	v := m.addtian_ge
 	if v == nil {
 		return
@@ -2657,24 +2601,10 @@ func (m *WuGeLuckyMutation) AddedTianGe() (r int32, exists bool) {
 	return *v, true
 }
 
-// ClearTianGe clears the value of the "tian_ge" field.
-func (m *WuGeLuckyMutation) ClearTianGe() {
-	m.tian_ge = nil
-	m.addtian_ge = nil
-	m.clearedFields[wugelucky.FieldTianGe] = struct{}{}
-}
-
-// TianGeCleared returns if the "tian_ge" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) TianGeCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldTianGe]
-	return ok
-}
-
 // ResetTianGe resets all changes to the "tian_ge" field.
 func (m *WuGeLuckyMutation) ResetTianGe() {
 	m.tian_ge = nil
 	m.addtian_ge = nil
-	delete(m.clearedFields, wugelucky.FieldTianGe)
 }
 
 // SetTianDaYan sets the "tian_da_yan" field.
@@ -2708,32 +2638,19 @@ func (m *WuGeLuckyMutation) OldTianDaYan(ctx context.Context) (v string, err err
 	return oldValue.TianDaYan, nil
 }
 
-// ClearTianDaYan clears the value of the "tian_da_yan" field.
-func (m *WuGeLuckyMutation) ClearTianDaYan() {
-	m.tian_da_yan = nil
-	m.clearedFields[wugelucky.FieldTianDaYan] = struct{}{}
-}
-
-// TianDaYanCleared returns if the "tian_da_yan" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) TianDaYanCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldTianDaYan]
-	return ok
-}
-
 // ResetTianDaYan resets all changes to the "tian_da_yan" field.
 func (m *WuGeLuckyMutation) ResetTianDaYan() {
 	m.tian_da_yan = nil
-	delete(m.clearedFields, wugelucky.FieldTianDaYan)
 }
 
 // SetRenGe sets the "ren_ge" field.
-func (m *WuGeLuckyMutation) SetRenGe(i int32) {
+func (m *WuGeLuckyMutation) SetRenGe(i int) {
 	m.ren_ge = &i
 	m.addren_ge = nil
 }
 
 // RenGe returns the value of the "ren_ge" field in the mutation.
-func (m *WuGeLuckyMutation) RenGe() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) RenGe() (r int, exists bool) {
 	v := m.ren_ge
 	if v == nil {
 		return
@@ -2744,7 +2661,7 @@ func (m *WuGeLuckyMutation) RenGe() (r int32, exists bool) {
 // OldRenGe returns the old "ren_ge" field's value of the WuGeLucky entity.
 // If the WuGeLucky object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WuGeLuckyMutation) OldRenGe(ctx context.Context) (v int32, err error) {
+func (m *WuGeLuckyMutation) OldRenGe(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRenGe is only allowed on UpdateOne operations")
 	}
@@ -2759,7 +2676,7 @@ func (m *WuGeLuckyMutation) OldRenGe(ctx context.Context) (v int32, err error) {
 }
 
 // AddRenGe adds i to the "ren_ge" field.
-func (m *WuGeLuckyMutation) AddRenGe(i int32) {
+func (m *WuGeLuckyMutation) AddRenGe(i int) {
 	if m.addren_ge != nil {
 		*m.addren_ge += i
 	} else {
@@ -2768,7 +2685,7 @@ func (m *WuGeLuckyMutation) AddRenGe(i int32) {
 }
 
 // AddedRenGe returns the value that was added to the "ren_ge" field in this mutation.
-func (m *WuGeLuckyMutation) AddedRenGe() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) AddedRenGe() (r int, exists bool) {
 	v := m.addren_ge
 	if v == nil {
 		return
@@ -2776,24 +2693,10 @@ func (m *WuGeLuckyMutation) AddedRenGe() (r int32, exists bool) {
 	return *v, true
 }
 
-// ClearRenGe clears the value of the "ren_ge" field.
-func (m *WuGeLuckyMutation) ClearRenGe() {
-	m.ren_ge = nil
-	m.addren_ge = nil
-	m.clearedFields[wugelucky.FieldRenGe] = struct{}{}
-}
-
-// RenGeCleared returns if the "ren_ge" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) RenGeCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldRenGe]
-	return ok
-}
-
 // ResetRenGe resets all changes to the "ren_ge" field.
 func (m *WuGeLuckyMutation) ResetRenGe() {
 	m.ren_ge = nil
 	m.addren_ge = nil
-	delete(m.clearedFields, wugelucky.FieldRenGe)
 }
 
 // SetRenDaYan sets the "ren_da_yan" field.
@@ -2827,32 +2730,19 @@ func (m *WuGeLuckyMutation) OldRenDaYan(ctx context.Context) (v string, err erro
 	return oldValue.RenDaYan, nil
 }
 
-// ClearRenDaYan clears the value of the "ren_da_yan" field.
-func (m *WuGeLuckyMutation) ClearRenDaYan() {
-	m.ren_da_yan = nil
-	m.clearedFields[wugelucky.FieldRenDaYan] = struct{}{}
-}
-
-// RenDaYanCleared returns if the "ren_da_yan" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) RenDaYanCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldRenDaYan]
-	return ok
-}
-
 // ResetRenDaYan resets all changes to the "ren_da_yan" field.
 func (m *WuGeLuckyMutation) ResetRenDaYan() {
 	m.ren_da_yan = nil
-	delete(m.clearedFields, wugelucky.FieldRenDaYan)
 }
 
 // SetDiGe sets the "di_ge" field.
-func (m *WuGeLuckyMutation) SetDiGe(i int32) {
+func (m *WuGeLuckyMutation) SetDiGe(i int) {
 	m.di_ge = &i
 	m.adddi_ge = nil
 }
 
 // DiGe returns the value of the "di_ge" field in the mutation.
-func (m *WuGeLuckyMutation) DiGe() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) DiGe() (r int, exists bool) {
 	v := m.di_ge
 	if v == nil {
 		return
@@ -2863,7 +2753,7 @@ func (m *WuGeLuckyMutation) DiGe() (r int32, exists bool) {
 // OldDiGe returns the old "di_ge" field's value of the WuGeLucky entity.
 // If the WuGeLucky object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WuGeLuckyMutation) OldDiGe(ctx context.Context) (v int32, err error) {
+func (m *WuGeLuckyMutation) OldDiGe(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDiGe is only allowed on UpdateOne operations")
 	}
@@ -2878,7 +2768,7 @@ func (m *WuGeLuckyMutation) OldDiGe(ctx context.Context) (v int32, err error) {
 }
 
 // AddDiGe adds i to the "di_ge" field.
-func (m *WuGeLuckyMutation) AddDiGe(i int32) {
+func (m *WuGeLuckyMutation) AddDiGe(i int) {
 	if m.adddi_ge != nil {
 		*m.adddi_ge += i
 	} else {
@@ -2887,7 +2777,7 @@ func (m *WuGeLuckyMutation) AddDiGe(i int32) {
 }
 
 // AddedDiGe returns the value that was added to the "di_ge" field in this mutation.
-func (m *WuGeLuckyMutation) AddedDiGe() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) AddedDiGe() (r int, exists bool) {
 	v := m.adddi_ge
 	if v == nil {
 		return
@@ -2895,24 +2785,10 @@ func (m *WuGeLuckyMutation) AddedDiGe() (r int32, exists bool) {
 	return *v, true
 }
 
-// ClearDiGe clears the value of the "di_ge" field.
-func (m *WuGeLuckyMutation) ClearDiGe() {
-	m.di_ge = nil
-	m.adddi_ge = nil
-	m.clearedFields[wugelucky.FieldDiGe] = struct{}{}
-}
-
-// DiGeCleared returns if the "di_ge" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) DiGeCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldDiGe]
-	return ok
-}
-
 // ResetDiGe resets all changes to the "di_ge" field.
 func (m *WuGeLuckyMutation) ResetDiGe() {
 	m.di_ge = nil
 	m.adddi_ge = nil
-	delete(m.clearedFields, wugelucky.FieldDiGe)
 }
 
 // SetDiDaYan sets the "di_da_yan" field.
@@ -2946,32 +2822,19 @@ func (m *WuGeLuckyMutation) OldDiDaYan(ctx context.Context) (v string, err error
 	return oldValue.DiDaYan, nil
 }
 
-// ClearDiDaYan clears the value of the "di_da_yan" field.
-func (m *WuGeLuckyMutation) ClearDiDaYan() {
-	m.di_da_yan = nil
-	m.clearedFields[wugelucky.FieldDiDaYan] = struct{}{}
-}
-
-// DiDaYanCleared returns if the "di_da_yan" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) DiDaYanCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldDiDaYan]
-	return ok
-}
-
 // ResetDiDaYan resets all changes to the "di_da_yan" field.
 func (m *WuGeLuckyMutation) ResetDiDaYan() {
 	m.di_da_yan = nil
-	delete(m.clearedFields, wugelucky.FieldDiDaYan)
 }
 
 // SetWaiGe sets the "wai_ge" field.
-func (m *WuGeLuckyMutation) SetWaiGe(i int32) {
+func (m *WuGeLuckyMutation) SetWaiGe(i int) {
 	m.wai_ge = &i
 	m.addwai_ge = nil
 }
 
 // WaiGe returns the value of the "wai_ge" field in the mutation.
-func (m *WuGeLuckyMutation) WaiGe() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) WaiGe() (r int, exists bool) {
 	v := m.wai_ge
 	if v == nil {
 		return
@@ -2982,7 +2845,7 @@ func (m *WuGeLuckyMutation) WaiGe() (r int32, exists bool) {
 // OldWaiGe returns the old "wai_ge" field's value of the WuGeLucky entity.
 // If the WuGeLucky object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WuGeLuckyMutation) OldWaiGe(ctx context.Context) (v int32, err error) {
+func (m *WuGeLuckyMutation) OldWaiGe(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldWaiGe is only allowed on UpdateOne operations")
 	}
@@ -2997,7 +2860,7 @@ func (m *WuGeLuckyMutation) OldWaiGe(ctx context.Context) (v int32, err error) {
 }
 
 // AddWaiGe adds i to the "wai_ge" field.
-func (m *WuGeLuckyMutation) AddWaiGe(i int32) {
+func (m *WuGeLuckyMutation) AddWaiGe(i int) {
 	if m.addwai_ge != nil {
 		*m.addwai_ge += i
 	} else {
@@ -3006,7 +2869,7 @@ func (m *WuGeLuckyMutation) AddWaiGe(i int32) {
 }
 
 // AddedWaiGe returns the value that was added to the "wai_ge" field in this mutation.
-func (m *WuGeLuckyMutation) AddedWaiGe() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) AddedWaiGe() (r int, exists bool) {
 	v := m.addwai_ge
 	if v == nil {
 		return
@@ -3014,24 +2877,10 @@ func (m *WuGeLuckyMutation) AddedWaiGe() (r int32, exists bool) {
 	return *v, true
 }
 
-// ClearWaiGe clears the value of the "wai_ge" field.
-func (m *WuGeLuckyMutation) ClearWaiGe() {
-	m.wai_ge = nil
-	m.addwai_ge = nil
-	m.clearedFields[wugelucky.FieldWaiGe] = struct{}{}
-}
-
-// WaiGeCleared returns if the "wai_ge" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) WaiGeCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldWaiGe]
-	return ok
-}
-
 // ResetWaiGe resets all changes to the "wai_ge" field.
 func (m *WuGeLuckyMutation) ResetWaiGe() {
 	m.wai_ge = nil
 	m.addwai_ge = nil
-	delete(m.clearedFields, wugelucky.FieldWaiGe)
 }
 
 // SetWaiDaYan sets the "wai_da_yan" field.
@@ -3065,32 +2914,19 @@ func (m *WuGeLuckyMutation) OldWaiDaYan(ctx context.Context) (v string, err erro
 	return oldValue.WaiDaYan, nil
 }
 
-// ClearWaiDaYan clears the value of the "wai_da_yan" field.
-func (m *WuGeLuckyMutation) ClearWaiDaYan() {
-	m.wai_da_yan = nil
-	m.clearedFields[wugelucky.FieldWaiDaYan] = struct{}{}
-}
-
-// WaiDaYanCleared returns if the "wai_da_yan" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) WaiDaYanCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldWaiDaYan]
-	return ok
-}
-
 // ResetWaiDaYan resets all changes to the "wai_da_yan" field.
 func (m *WuGeLuckyMutation) ResetWaiDaYan() {
 	m.wai_da_yan = nil
-	delete(m.clearedFields, wugelucky.FieldWaiDaYan)
 }
 
 // SetZongGe sets the "zong_ge" field.
-func (m *WuGeLuckyMutation) SetZongGe(i int32) {
+func (m *WuGeLuckyMutation) SetZongGe(i int) {
 	m.zong_ge = &i
 	m.addzong_ge = nil
 }
 
 // ZongGe returns the value of the "zong_ge" field in the mutation.
-func (m *WuGeLuckyMutation) ZongGe() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) ZongGe() (r int, exists bool) {
 	v := m.zong_ge
 	if v == nil {
 		return
@@ -3101,7 +2937,7 @@ func (m *WuGeLuckyMutation) ZongGe() (r int32, exists bool) {
 // OldZongGe returns the old "zong_ge" field's value of the WuGeLucky entity.
 // If the WuGeLucky object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WuGeLuckyMutation) OldZongGe(ctx context.Context) (v int32, err error) {
+func (m *WuGeLuckyMutation) OldZongGe(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldZongGe is only allowed on UpdateOne operations")
 	}
@@ -3116,7 +2952,7 @@ func (m *WuGeLuckyMutation) OldZongGe(ctx context.Context) (v int32, err error) 
 }
 
 // AddZongGe adds i to the "zong_ge" field.
-func (m *WuGeLuckyMutation) AddZongGe(i int32) {
+func (m *WuGeLuckyMutation) AddZongGe(i int) {
 	if m.addzong_ge != nil {
 		*m.addzong_ge += i
 	} else {
@@ -3125,7 +2961,7 @@ func (m *WuGeLuckyMutation) AddZongGe(i int32) {
 }
 
 // AddedZongGe returns the value that was added to the "zong_ge" field in this mutation.
-func (m *WuGeLuckyMutation) AddedZongGe() (r int32, exists bool) {
+func (m *WuGeLuckyMutation) AddedZongGe() (r int, exists bool) {
 	v := m.addzong_ge
 	if v == nil {
 		return
@@ -3133,24 +2969,10 @@ func (m *WuGeLuckyMutation) AddedZongGe() (r int32, exists bool) {
 	return *v, true
 }
 
-// ClearZongGe clears the value of the "zong_ge" field.
-func (m *WuGeLuckyMutation) ClearZongGe() {
-	m.zong_ge = nil
-	m.addzong_ge = nil
-	m.clearedFields[wugelucky.FieldZongGe] = struct{}{}
-}
-
-// ZongGeCleared returns if the "zong_ge" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) ZongGeCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldZongGe]
-	return ok
-}
-
 // ResetZongGe resets all changes to the "zong_ge" field.
 func (m *WuGeLuckyMutation) ResetZongGe() {
 	m.zong_ge = nil
 	m.addzong_ge = nil
-	delete(m.clearedFields, wugelucky.FieldZongGe)
 }
 
 // SetZongDaYan sets the "zong_da_yan" field.
@@ -3184,22 +3006,9 @@ func (m *WuGeLuckyMutation) OldZongDaYan(ctx context.Context) (v string, err err
 	return oldValue.ZongDaYan, nil
 }
 
-// ClearZongDaYan clears the value of the "zong_da_yan" field.
-func (m *WuGeLuckyMutation) ClearZongDaYan() {
-	m.zong_da_yan = nil
-	m.clearedFields[wugelucky.FieldZongDaYan] = struct{}{}
-}
-
-// ZongDaYanCleared returns if the "zong_da_yan" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) ZongDaYanCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldZongDaYan]
-	return ok
-}
-
 // ResetZongDaYan resets all changes to the "zong_da_yan" field.
 func (m *WuGeLuckyMutation) ResetZongDaYan() {
 	m.zong_da_yan = nil
-	delete(m.clearedFields, wugelucky.FieldZongDaYan)
 }
 
 // SetZongLucky sets the "zong_lucky" field.
@@ -3233,22 +3042,9 @@ func (m *WuGeLuckyMutation) OldZongLucky(ctx context.Context) (v bool, err error
 	return oldValue.ZongLucky, nil
 }
 
-// ClearZongLucky clears the value of the "zong_lucky" field.
-func (m *WuGeLuckyMutation) ClearZongLucky() {
-	m.zong_lucky = nil
-	m.clearedFields[wugelucky.FieldZongLucky] = struct{}{}
-}
-
-// ZongLuckyCleared returns if the "zong_lucky" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) ZongLuckyCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldZongLucky]
-	return ok
-}
-
 // ResetZongLucky resets all changes to the "zong_lucky" field.
 func (m *WuGeLuckyMutation) ResetZongLucky() {
 	m.zong_lucky = nil
-	delete(m.clearedFields, wugelucky.FieldZongLucky)
 }
 
 // SetZongSex sets the "zong_sex" field.
@@ -3282,22 +3078,9 @@ func (m *WuGeLuckyMutation) OldZongSex(ctx context.Context) (v bool, err error) 
 	return oldValue.ZongSex, nil
 }
 
-// ClearZongSex clears the value of the "zong_sex" field.
-func (m *WuGeLuckyMutation) ClearZongSex() {
-	m.zong_sex = nil
-	m.clearedFields[wugelucky.FieldZongSex] = struct{}{}
-}
-
-// ZongSexCleared returns if the "zong_sex" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) ZongSexCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldZongSex]
-	return ok
-}
-
 // ResetZongSex resets all changes to the "zong_sex" field.
 func (m *WuGeLuckyMutation) ResetZongSex() {
 	m.zong_sex = nil
-	delete(m.clearedFields, wugelucky.FieldZongSex)
 }
 
 // SetZongMax sets the "zong_max" field.
@@ -3331,22 +3114,9 @@ func (m *WuGeLuckyMutation) OldZongMax(ctx context.Context) (v bool, err error) 
 	return oldValue.ZongMax, nil
 }
 
-// ClearZongMax clears the value of the "zong_max" field.
-func (m *WuGeLuckyMutation) ClearZongMax() {
-	m.zong_max = nil
-	m.clearedFields[wugelucky.FieldZongMax] = struct{}{}
-}
-
-// ZongMaxCleared returns if the "zong_max" field was cleared in this mutation.
-func (m *WuGeLuckyMutation) ZongMaxCleared() bool {
-	_, ok := m.clearedFields[wugelucky.FieldZongMax]
-	return ok
-}
-
 // ResetZongMax resets all changes to the "zong_max" field.
 func (m *WuGeLuckyMutation) ResetZongMax() {
 	m.zong_max = nil
-	delete(m.clearedFields, wugelucky.FieldZongMax)
 }
 
 // Where appends a list predicates to the WuGeLuckyMutation builder.
@@ -3515,35 +3285,35 @@ func (m *WuGeLuckyMutation) OldField(ctx context.Context, name string) (ent.Valu
 func (m *WuGeLuckyMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case wugelucky.FieldLastStroke1:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLastStroke1(v)
 		return nil
 	case wugelucky.FieldLastStroke2:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLastStroke2(v)
 		return nil
 	case wugelucky.FieldFirstStroke1:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetFirstStroke1(v)
 		return nil
 	case wugelucky.FieldFirstStroke2:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetFirstStroke2(v)
 		return nil
 	case wugelucky.FieldTianGe:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3557,7 +3327,7 @@ func (m *WuGeLuckyMutation) SetField(name string, value ent.Value) error {
 		m.SetTianDaYan(v)
 		return nil
 	case wugelucky.FieldRenGe:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3571,7 +3341,7 @@ func (m *WuGeLuckyMutation) SetField(name string, value ent.Value) error {
 		m.SetRenDaYan(v)
 		return nil
 	case wugelucky.FieldDiGe:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3585,7 +3355,7 @@ func (m *WuGeLuckyMutation) SetField(name string, value ent.Value) error {
 		m.SetDiDaYan(v)
 		return nil
 	case wugelucky.FieldWaiGe:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3599,7 +3369,7 @@ func (m *WuGeLuckyMutation) SetField(name string, value ent.Value) error {
 		m.SetWaiDaYan(v)
 		return nil
 	case wugelucky.FieldZongGe:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3704,63 +3474,63 @@ func (m *WuGeLuckyMutation) AddedField(name string) (ent.Value, bool) {
 func (m *WuGeLuckyMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case wugelucky.FieldLastStroke1:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddLastStroke1(v)
 		return nil
 	case wugelucky.FieldLastStroke2:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddLastStroke2(v)
 		return nil
 	case wugelucky.FieldFirstStroke1:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddFirstStroke1(v)
 		return nil
 	case wugelucky.FieldFirstStroke2:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddFirstStroke2(v)
 		return nil
 	case wugelucky.FieldTianGe:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTianGe(v)
 		return nil
 	case wugelucky.FieldRenGe:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddRenGe(v)
 		return nil
 	case wugelucky.FieldDiGe:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddDiGe(v)
 		return nil
 	case wugelucky.FieldWaiGe:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddWaiGe(v)
 		return nil
 	case wugelucky.FieldZongGe:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3773,59 +3543,7 @@ func (m *WuGeLuckyMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *WuGeLuckyMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(wugelucky.FieldLastStroke1) {
-		fields = append(fields, wugelucky.FieldLastStroke1)
-	}
-	if m.FieldCleared(wugelucky.FieldLastStroke2) {
-		fields = append(fields, wugelucky.FieldLastStroke2)
-	}
-	if m.FieldCleared(wugelucky.FieldFirstStroke1) {
-		fields = append(fields, wugelucky.FieldFirstStroke1)
-	}
-	if m.FieldCleared(wugelucky.FieldFirstStroke2) {
-		fields = append(fields, wugelucky.FieldFirstStroke2)
-	}
-	if m.FieldCleared(wugelucky.FieldTianGe) {
-		fields = append(fields, wugelucky.FieldTianGe)
-	}
-	if m.FieldCleared(wugelucky.FieldTianDaYan) {
-		fields = append(fields, wugelucky.FieldTianDaYan)
-	}
-	if m.FieldCleared(wugelucky.FieldRenGe) {
-		fields = append(fields, wugelucky.FieldRenGe)
-	}
-	if m.FieldCleared(wugelucky.FieldRenDaYan) {
-		fields = append(fields, wugelucky.FieldRenDaYan)
-	}
-	if m.FieldCleared(wugelucky.FieldDiGe) {
-		fields = append(fields, wugelucky.FieldDiGe)
-	}
-	if m.FieldCleared(wugelucky.FieldDiDaYan) {
-		fields = append(fields, wugelucky.FieldDiDaYan)
-	}
-	if m.FieldCleared(wugelucky.FieldWaiGe) {
-		fields = append(fields, wugelucky.FieldWaiGe)
-	}
-	if m.FieldCleared(wugelucky.FieldWaiDaYan) {
-		fields = append(fields, wugelucky.FieldWaiDaYan)
-	}
-	if m.FieldCleared(wugelucky.FieldZongGe) {
-		fields = append(fields, wugelucky.FieldZongGe)
-	}
-	if m.FieldCleared(wugelucky.FieldZongDaYan) {
-		fields = append(fields, wugelucky.FieldZongDaYan)
-	}
-	if m.FieldCleared(wugelucky.FieldZongLucky) {
-		fields = append(fields, wugelucky.FieldZongLucky)
-	}
-	if m.FieldCleared(wugelucky.FieldZongSex) {
-		fields = append(fields, wugelucky.FieldZongSex)
-	}
-	if m.FieldCleared(wugelucky.FieldZongMax) {
-		fields = append(fields, wugelucky.FieldZongMax)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3838,59 +3556,6 @@ func (m *WuGeLuckyMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *WuGeLuckyMutation) ClearField(name string) error {
-	switch name {
-	case wugelucky.FieldLastStroke1:
-		m.ClearLastStroke1()
-		return nil
-	case wugelucky.FieldLastStroke2:
-		m.ClearLastStroke2()
-		return nil
-	case wugelucky.FieldFirstStroke1:
-		m.ClearFirstStroke1()
-		return nil
-	case wugelucky.FieldFirstStroke2:
-		m.ClearFirstStroke2()
-		return nil
-	case wugelucky.FieldTianGe:
-		m.ClearTianGe()
-		return nil
-	case wugelucky.FieldTianDaYan:
-		m.ClearTianDaYan()
-		return nil
-	case wugelucky.FieldRenGe:
-		m.ClearRenGe()
-		return nil
-	case wugelucky.FieldRenDaYan:
-		m.ClearRenDaYan()
-		return nil
-	case wugelucky.FieldDiGe:
-		m.ClearDiGe()
-		return nil
-	case wugelucky.FieldDiDaYan:
-		m.ClearDiDaYan()
-		return nil
-	case wugelucky.FieldWaiGe:
-		m.ClearWaiGe()
-		return nil
-	case wugelucky.FieldWaiDaYan:
-		m.ClearWaiDaYan()
-		return nil
-	case wugelucky.FieldZongGe:
-		m.ClearZongGe()
-		return nil
-	case wugelucky.FieldZongDaYan:
-		m.ClearZongDaYan()
-		return nil
-	case wugelucky.FieldZongLucky:
-		m.ClearZongLucky()
-		return nil
-	case wugelucky.FieldZongSex:
-		m.ClearZongSex()
-		return nil
-	case wugelucky.FieldZongMax:
-		m.ClearZongMax()
-		return nil
-	}
 	return fmt.Errorf("unknown WuGeLucky nullable field %s", name)
 }
 
@@ -4010,8 +3675,8 @@ type WuXingMutation struct {
 	created       *time.Time
 	updated       *time.Time
 	deleted       *time.Time
-	version       *int32
-	addversion    *int32
+	version       *int
+	addversion    *int
 	first         *string
 	second        *string
 	third         *string
@@ -4274,13 +3939,13 @@ func (m *WuXingMutation) ResetDeleted() {
 }
 
 // SetVersion sets the "version" field.
-func (m *WuXingMutation) SetVersion(i int32) {
+func (m *WuXingMutation) SetVersion(i int) {
 	m.version = &i
 	m.addversion = nil
 }
 
 // Version returns the value of the "version" field in the mutation.
-func (m *WuXingMutation) Version() (r int32, exists bool) {
+func (m *WuXingMutation) Version() (r int, exists bool) {
 	v := m.version
 	if v == nil {
 		return
@@ -4291,7 +3956,7 @@ func (m *WuXingMutation) Version() (r int32, exists bool) {
 // OldVersion returns the old "version" field's value of the WuXing entity.
 // If the WuXing object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WuXingMutation) OldVersion(ctx context.Context) (v int32, err error) {
+func (m *WuXingMutation) OldVersion(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldVersion is only allowed on UpdateOne operations")
 	}
@@ -4306,7 +3971,7 @@ func (m *WuXingMutation) OldVersion(ctx context.Context) (v int32, err error) {
 }
 
 // AddVersion adds i to the "version" field.
-func (m *WuXingMutation) AddVersion(i int32) {
+func (m *WuXingMutation) AddVersion(i int) {
 	if m.addversion != nil {
 		*m.addversion += i
 	} else {
@@ -4315,7 +3980,7 @@ func (m *WuXingMutation) AddVersion(i int32) {
 }
 
 // AddedVersion returns the value that was added to the "version" field in this mutation.
-func (m *WuXingMutation) AddedVersion() (r int32, exists bool) {
+func (m *WuXingMutation) AddedVersion() (r int, exists bool) {
 	v := m.addversion
 	if v == nil {
 		return
@@ -4663,7 +4328,7 @@ func (m *WuXingMutation) SetField(name string, value ent.Value) error {
 		m.SetDeleted(v)
 		return nil
 	case wuxing.FieldVersion:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4728,7 +4393,7 @@ func (m *WuXingMutation) AddedField(name string) (ent.Value, bool) {
 func (m *WuXingMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case wuxing.FieldVersion:
-		v, ok := value.(int32)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

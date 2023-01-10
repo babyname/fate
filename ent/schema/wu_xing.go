@@ -17,7 +17,7 @@ func (WuXing) Fields() []ent.Field {
 		field.Time("created").Optional(),
 		field.Time("updated").Optional(),
 		field.Time("deleted").Optional(),
-		field.Int32("version").Optional(),
+		field.Int("version").Optional(),
 		field.String("first").Optional(),
 		field.String("second").Optional(),
 		field.String("third").Optional(),

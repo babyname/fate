@@ -83,8 +83,8 @@ func (wglq *WuGeLuckyQuery) FirstX(ctx context.Context) *WuGeLucky {
 
 // FirstID returns the first WuGeLucky ID from the query.
 // Returns a *NotFoundError when no WuGeLucky ID was found.
-func (wglq *WuGeLuckyQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (wglq *WuGeLuckyQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = wglq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -96,7 +96,7 @@ func (wglq *WuGeLuckyQuery) FirstID(ctx context.Context) (id string, err error) 
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (wglq *WuGeLuckyQuery) FirstIDX(ctx context.Context) string {
+func (wglq *WuGeLuckyQuery) FirstIDX(ctx context.Context) int {
 	id, err := wglq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -134,8 +134,8 @@ func (wglq *WuGeLuckyQuery) OnlyX(ctx context.Context) *WuGeLucky {
 // OnlyID is like Only, but returns the only WuGeLucky ID in the query.
 // Returns a *NotSingularError when more than one WuGeLucky ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (wglq *WuGeLuckyQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (wglq *WuGeLuckyQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = wglq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -151,7 +151,7 @@ func (wglq *WuGeLuckyQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (wglq *WuGeLuckyQuery) OnlyIDX(ctx context.Context) string {
+func (wglq *WuGeLuckyQuery) OnlyIDX(ctx context.Context) int {
 	id, err := wglq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -177,8 +177,8 @@ func (wglq *WuGeLuckyQuery) AllX(ctx context.Context) []*WuGeLucky {
 }
 
 // IDs executes the query and returns a list of WuGeLucky IDs.
-func (wglq *WuGeLuckyQuery) IDs(ctx context.Context) ([]string, error) {
-	var ids []string
+func (wglq *WuGeLuckyQuery) IDs(ctx context.Context) ([]int, error) {
+	var ids []int
 	if err := wglq.Select(wugelucky.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (wglq *WuGeLuckyQuery) IDs(ctx context.Context) ([]string, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (wglq *WuGeLuckyQuery) IDsX(ctx context.Context) []string {
+func (wglq *WuGeLuckyQuery) IDsX(ctx context.Context) []int {
 	ids, err := wglq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -253,7 +253,7 @@ func (wglq *WuGeLuckyQuery) Clone() *WuGeLuckyQuery {
 // Example:
 //
 //	var v []struct {
-//		LastStroke1 int32 `json:"last_stroke_1,omitempty"`
+//		LastStroke1 int `json:"last_stroke_1,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -281,7 +281,7 @@ func (wglq *WuGeLuckyQuery) GroupBy(field string, fields ...string) *WuGeLuckyGr
 // Example:
 //
 //	var v []struct {
-//		LastStroke1 int32 `json:"last_stroke_1,omitempty"`
+//		LastStroke1 int `json:"last_stroke_1,omitempty"`
 //	}
 //
 //	client.WuGeLucky.Query().
@@ -367,7 +367,7 @@ func (wglq *WuGeLuckyQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   wugelucky.Table,
 			Columns: wugelucky.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeInt,
 				Column: wugelucky.FieldID,
 			},
 		},

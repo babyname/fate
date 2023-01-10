@@ -100,14 +100,14 @@ func Radical(v string) predicate.Character {
 }
 
 // RadicalStroke applies equality check predicate on the "radical_stroke" field. It's identical to RadicalStrokeEQ.
-func RadicalStroke(v int32) predicate.Character {
+func RadicalStroke(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldRadicalStroke), v))
 	})
 }
 
 // Stroke applies equality check predicate on the "stroke" field. It's identical to StrokeEQ.
-func Stroke(v int32) predicate.Character {
+func Stroke(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldStroke), v))
 	})
@@ -128,7 +128,7 @@ func KangXi(v string) predicate.Character {
 }
 
 // KangXiStroke applies equality check predicate on the "kang_xi_stroke" field. It's identical to KangXiStrokeEQ.
-func KangXiStroke(v int32) predicate.Character {
+func KangXiStroke(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldKangXiStroke), v))
 	})
@@ -142,14 +142,14 @@ func SimpleRadical(v string) predicate.Character {
 }
 
 // SimpleRadicalStroke applies equality check predicate on the "simple_radical_stroke" field. It's identical to SimpleRadicalStrokeEQ.
-func SimpleRadicalStroke(v int32) predicate.Character {
+func SimpleRadicalStroke(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldSimpleRadicalStroke), v))
 	})
 }
 
 // SimpleTotalStroke applies equality check predicate on the "simple_total_stroke" field. It's identical to SimpleTotalStrokeEQ.
-func SimpleTotalStroke(v int32) predicate.Character {
+func SimpleTotalStroke(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldSimpleTotalStroke), v))
 	})
@@ -163,14 +163,14 @@ func TraditionalRadical(v string) predicate.Character {
 }
 
 // TraditionalRadicalStroke applies equality check predicate on the "traditional_radical_stroke" field. It's identical to TraditionalRadicalStrokeEQ.
-func TraditionalRadicalStroke(v int32) predicate.Character {
+func TraditionalRadicalStroke(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldTraditionalRadicalStroke), v))
 	})
 }
 
 // TraditionalTotalStroke applies equality check predicate on the "traditional_total_stroke" field. It's identical to TraditionalTotalStrokeEQ.
-func TraditionalTotalStroke(v int32) predicate.Character {
+func TraditionalTotalStroke(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldTraditionalTotalStroke), v))
 	})
@@ -226,7 +226,7 @@ func Comment(v string) predicate.Character {
 }
 
 // ScienceStroke applies equality check predicate on the "science_stroke" field. It's identical to ScienceStrokeEQ.
-func ScienceStroke(v int32) predicate.Character {
+func ScienceStroke(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldScienceStroke), v))
 	})
@@ -530,21 +530,21 @@ func RadicalContainsFold(v string) predicate.Character {
 }
 
 // RadicalStrokeEQ applies the EQ predicate on the "radical_stroke" field.
-func RadicalStrokeEQ(v int32) predicate.Character {
+func RadicalStrokeEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldRadicalStroke), v))
 	})
 }
 
 // RadicalStrokeNEQ applies the NEQ predicate on the "radical_stroke" field.
-func RadicalStrokeNEQ(v int32) predicate.Character {
+func RadicalStrokeNEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldRadicalStroke), v))
 	})
 }
 
 // RadicalStrokeIn applies the In predicate on the "radical_stroke" field.
-func RadicalStrokeIn(vs ...int32) predicate.Character {
+func RadicalStrokeIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -555,7 +555,7 @@ func RadicalStrokeIn(vs ...int32) predicate.Character {
 }
 
 // RadicalStrokeNotIn applies the NotIn predicate on the "radical_stroke" field.
-func RadicalStrokeNotIn(vs ...int32) predicate.Character {
+func RadicalStrokeNotIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -566,49 +566,49 @@ func RadicalStrokeNotIn(vs ...int32) predicate.Character {
 }
 
 // RadicalStrokeGT applies the GT predicate on the "radical_stroke" field.
-func RadicalStrokeGT(v int32) predicate.Character {
+func RadicalStrokeGT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldRadicalStroke), v))
 	})
 }
 
 // RadicalStrokeGTE applies the GTE predicate on the "radical_stroke" field.
-func RadicalStrokeGTE(v int32) predicate.Character {
+func RadicalStrokeGTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldRadicalStroke), v))
 	})
 }
 
 // RadicalStrokeLT applies the LT predicate on the "radical_stroke" field.
-func RadicalStrokeLT(v int32) predicate.Character {
+func RadicalStrokeLT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldRadicalStroke), v))
 	})
 }
 
 // RadicalStrokeLTE applies the LTE predicate on the "radical_stroke" field.
-func RadicalStrokeLTE(v int32) predicate.Character {
+func RadicalStrokeLTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldRadicalStroke), v))
 	})
 }
 
 // StrokeEQ applies the EQ predicate on the "stroke" field.
-func StrokeEQ(v int32) predicate.Character {
+func StrokeEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldStroke), v))
 	})
 }
 
 // StrokeNEQ applies the NEQ predicate on the "stroke" field.
-func StrokeNEQ(v int32) predicate.Character {
+func StrokeNEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldStroke), v))
 	})
 }
 
 // StrokeIn applies the In predicate on the "stroke" field.
-func StrokeIn(vs ...int32) predicate.Character {
+func StrokeIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -619,7 +619,7 @@ func StrokeIn(vs ...int32) predicate.Character {
 }
 
 // StrokeNotIn applies the NotIn predicate on the "stroke" field.
-func StrokeNotIn(vs ...int32) predicate.Character {
+func StrokeNotIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -630,28 +630,28 @@ func StrokeNotIn(vs ...int32) predicate.Character {
 }
 
 // StrokeGT applies the GT predicate on the "stroke" field.
-func StrokeGT(v int32) predicate.Character {
+func StrokeGT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldStroke), v))
 	})
 }
 
 // StrokeGTE applies the GTE predicate on the "stroke" field.
-func StrokeGTE(v int32) predicate.Character {
+func StrokeGTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldStroke), v))
 	})
 }
 
 // StrokeLT applies the LT predicate on the "stroke" field.
-func StrokeLT(v int32) predicate.Character {
+func StrokeLT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldStroke), v))
 	})
 }
 
 // StrokeLTE applies the LTE predicate on the "stroke" field.
-func StrokeLTE(v int32) predicate.Character {
+func StrokeLTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldStroke), v))
 	})
@@ -771,21 +771,21 @@ func KangXiContainsFold(v string) predicate.Character {
 }
 
 // KangXiStrokeEQ applies the EQ predicate on the "kang_xi_stroke" field.
-func KangXiStrokeEQ(v int32) predicate.Character {
+func KangXiStrokeEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldKangXiStroke), v))
 	})
 }
 
 // KangXiStrokeNEQ applies the NEQ predicate on the "kang_xi_stroke" field.
-func KangXiStrokeNEQ(v int32) predicate.Character {
+func KangXiStrokeNEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldKangXiStroke), v))
 	})
 }
 
 // KangXiStrokeIn applies the In predicate on the "kang_xi_stroke" field.
-func KangXiStrokeIn(vs ...int32) predicate.Character {
+func KangXiStrokeIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -796,7 +796,7 @@ func KangXiStrokeIn(vs ...int32) predicate.Character {
 }
 
 // KangXiStrokeNotIn applies the NotIn predicate on the "kang_xi_stroke" field.
-func KangXiStrokeNotIn(vs ...int32) predicate.Character {
+func KangXiStrokeNotIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -807,28 +807,28 @@ func KangXiStrokeNotIn(vs ...int32) predicate.Character {
 }
 
 // KangXiStrokeGT applies the GT predicate on the "kang_xi_stroke" field.
-func KangXiStrokeGT(v int32) predicate.Character {
+func KangXiStrokeGT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldKangXiStroke), v))
 	})
 }
 
 // KangXiStrokeGTE applies the GTE predicate on the "kang_xi_stroke" field.
-func KangXiStrokeGTE(v int32) predicate.Character {
+func KangXiStrokeGTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldKangXiStroke), v))
 	})
 }
 
 // KangXiStrokeLT applies the LT predicate on the "kang_xi_stroke" field.
-func KangXiStrokeLT(v int32) predicate.Character {
+func KangXiStrokeLT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldKangXiStroke), v))
 	})
 }
 
 // KangXiStrokeLTE applies the LTE predicate on the "kang_xi_stroke" field.
-func KangXiStrokeLTE(v int32) predicate.Character {
+func KangXiStrokeLTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldKangXiStroke), v))
 	})
@@ -934,21 +934,21 @@ func SimpleRadicalContainsFold(v string) predicate.Character {
 }
 
 // SimpleRadicalStrokeEQ applies the EQ predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeEQ(v int32) predicate.Character {
+func SimpleRadicalStrokeEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldSimpleRadicalStroke), v))
 	})
 }
 
 // SimpleRadicalStrokeNEQ applies the NEQ predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeNEQ(v int32) predicate.Character {
+func SimpleRadicalStrokeNEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldSimpleRadicalStroke), v))
 	})
 }
 
 // SimpleRadicalStrokeIn applies the In predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeIn(vs ...int32) predicate.Character {
+func SimpleRadicalStrokeIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -959,7 +959,7 @@ func SimpleRadicalStrokeIn(vs ...int32) predicate.Character {
 }
 
 // SimpleRadicalStrokeNotIn applies the NotIn predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeNotIn(vs ...int32) predicate.Character {
+func SimpleRadicalStrokeNotIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -970,49 +970,49 @@ func SimpleRadicalStrokeNotIn(vs ...int32) predicate.Character {
 }
 
 // SimpleRadicalStrokeGT applies the GT predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeGT(v int32) predicate.Character {
+func SimpleRadicalStrokeGT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldSimpleRadicalStroke), v))
 	})
 }
 
 // SimpleRadicalStrokeGTE applies the GTE predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeGTE(v int32) predicate.Character {
+func SimpleRadicalStrokeGTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldSimpleRadicalStroke), v))
 	})
 }
 
 // SimpleRadicalStrokeLT applies the LT predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeLT(v int32) predicate.Character {
+func SimpleRadicalStrokeLT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldSimpleRadicalStroke), v))
 	})
 }
 
 // SimpleRadicalStrokeLTE applies the LTE predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeLTE(v int32) predicate.Character {
+func SimpleRadicalStrokeLTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldSimpleRadicalStroke), v))
 	})
 }
 
 // SimpleTotalStrokeEQ applies the EQ predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeEQ(v int32) predicate.Character {
+func SimpleTotalStrokeEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldSimpleTotalStroke), v))
 	})
 }
 
 // SimpleTotalStrokeNEQ applies the NEQ predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeNEQ(v int32) predicate.Character {
+func SimpleTotalStrokeNEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldSimpleTotalStroke), v))
 	})
 }
 
 // SimpleTotalStrokeIn applies the In predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeIn(vs ...int32) predicate.Character {
+func SimpleTotalStrokeIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1023,7 +1023,7 @@ func SimpleTotalStrokeIn(vs ...int32) predicate.Character {
 }
 
 // SimpleTotalStrokeNotIn applies the NotIn predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeNotIn(vs ...int32) predicate.Character {
+func SimpleTotalStrokeNotIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1034,28 +1034,28 @@ func SimpleTotalStrokeNotIn(vs ...int32) predicate.Character {
 }
 
 // SimpleTotalStrokeGT applies the GT predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeGT(v int32) predicate.Character {
+func SimpleTotalStrokeGT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldSimpleTotalStroke), v))
 	})
 }
 
 // SimpleTotalStrokeGTE applies the GTE predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeGTE(v int32) predicate.Character {
+func SimpleTotalStrokeGTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldSimpleTotalStroke), v))
 	})
 }
 
 // SimpleTotalStrokeLT applies the LT predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeLT(v int32) predicate.Character {
+func SimpleTotalStrokeLT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldSimpleTotalStroke), v))
 	})
 }
 
 // SimpleTotalStrokeLTE applies the LTE predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeLTE(v int32) predicate.Character {
+func SimpleTotalStrokeLTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldSimpleTotalStroke), v))
 	})
@@ -1161,21 +1161,21 @@ func TraditionalRadicalContainsFold(v string) predicate.Character {
 }
 
 // TraditionalRadicalStrokeEQ applies the EQ predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeEQ(v int32) predicate.Character {
+func TraditionalRadicalStrokeEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldTraditionalRadicalStroke), v))
 	})
 }
 
 // TraditionalRadicalStrokeNEQ applies the NEQ predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeNEQ(v int32) predicate.Character {
+func TraditionalRadicalStrokeNEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldTraditionalRadicalStroke), v))
 	})
 }
 
 // TraditionalRadicalStrokeIn applies the In predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeIn(vs ...int32) predicate.Character {
+func TraditionalRadicalStrokeIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1186,7 +1186,7 @@ func TraditionalRadicalStrokeIn(vs ...int32) predicate.Character {
 }
 
 // TraditionalRadicalStrokeNotIn applies the NotIn predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeNotIn(vs ...int32) predicate.Character {
+func TraditionalRadicalStrokeNotIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1197,49 +1197,49 @@ func TraditionalRadicalStrokeNotIn(vs ...int32) predicate.Character {
 }
 
 // TraditionalRadicalStrokeGT applies the GT predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeGT(v int32) predicate.Character {
+func TraditionalRadicalStrokeGT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldTraditionalRadicalStroke), v))
 	})
 }
 
 // TraditionalRadicalStrokeGTE applies the GTE predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeGTE(v int32) predicate.Character {
+func TraditionalRadicalStrokeGTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldTraditionalRadicalStroke), v))
 	})
 }
 
 // TraditionalRadicalStrokeLT applies the LT predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeLT(v int32) predicate.Character {
+func TraditionalRadicalStrokeLT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldTraditionalRadicalStroke), v))
 	})
 }
 
 // TraditionalRadicalStrokeLTE applies the LTE predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeLTE(v int32) predicate.Character {
+func TraditionalRadicalStrokeLTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldTraditionalRadicalStroke), v))
 	})
 }
 
 // TraditionalTotalStrokeEQ applies the EQ predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeEQ(v int32) predicate.Character {
+func TraditionalTotalStrokeEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldTraditionalTotalStroke), v))
 	})
 }
 
 // TraditionalTotalStrokeNEQ applies the NEQ predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeNEQ(v int32) predicate.Character {
+func TraditionalTotalStrokeNEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldTraditionalTotalStroke), v))
 	})
 }
 
 // TraditionalTotalStrokeIn applies the In predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeIn(vs ...int32) predicate.Character {
+func TraditionalTotalStrokeIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1250,7 +1250,7 @@ func TraditionalTotalStrokeIn(vs ...int32) predicate.Character {
 }
 
 // TraditionalTotalStrokeNotIn applies the NotIn predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeNotIn(vs ...int32) predicate.Character {
+func TraditionalTotalStrokeNotIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1261,28 +1261,28 @@ func TraditionalTotalStrokeNotIn(vs ...int32) predicate.Character {
 }
 
 // TraditionalTotalStrokeGT applies the GT predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeGT(v int32) predicate.Character {
+func TraditionalTotalStrokeGT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldTraditionalTotalStroke), v))
 	})
 }
 
 // TraditionalTotalStrokeGTE applies the GTE predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeGTE(v int32) predicate.Character {
+func TraditionalTotalStrokeGTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldTraditionalTotalStroke), v))
 	})
 }
 
 // TraditionalTotalStrokeLT applies the LT predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeLT(v int32) predicate.Character {
+func TraditionalTotalStrokeLT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldTraditionalTotalStroke), v))
 	})
 }
 
 // TraditionalTotalStrokeLTE applies the LTE predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeLTE(v int32) predicate.Character {
+func TraditionalTotalStrokeLTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldTraditionalTotalStroke), v))
 	})
@@ -1812,21 +1812,21 @@ func CommentContainsFold(v string) predicate.Character {
 }
 
 // ScienceStrokeEQ applies the EQ predicate on the "science_stroke" field.
-func ScienceStrokeEQ(v int32) predicate.Character {
+func ScienceStrokeEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldScienceStroke), v))
 	})
 }
 
 // ScienceStrokeNEQ applies the NEQ predicate on the "science_stroke" field.
-func ScienceStrokeNEQ(v int32) predicate.Character {
+func ScienceStrokeNEQ(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldScienceStroke), v))
 	})
 }
 
 // ScienceStrokeIn applies the In predicate on the "science_stroke" field.
-func ScienceStrokeIn(vs ...int32) predicate.Character {
+func ScienceStrokeIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1837,7 +1837,7 @@ func ScienceStrokeIn(vs ...int32) predicate.Character {
 }
 
 // ScienceStrokeNotIn applies the NotIn predicate on the "science_stroke" field.
-func ScienceStrokeNotIn(vs ...int32) predicate.Character {
+func ScienceStrokeNotIn(vs ...int) predicate.Character {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -1848,28 +1848,28 @@ func ScienceStrokeNotIn(vs ...int32) predicate.Character {
 }
 
 // ScienceStrokeGT applies the GT predicate on the "science_stroke" field.
-func ScienceStrokeGT(v int32) predicate.Character {
+func ScienceStrokeGT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldScienceStroke), v))
 	})
 }
 
 // ScienceStrokeGTE applies the GTE predicate on the "science_stroke" field.
-func ScienceStrokeGTE(v int32) predicate.Character {
+func ScienceStrokeGTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldScienceStroke), v))
 	})
 }
 
 // ScienceStrokeLT applies the LT predicate on the "science_stroke" field.
-func ScienceStrokeLT(v int32) predicate.Character {
+func ScienceStrokeLT(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldScienceStroke), v))
 	})
 }
 
 // ScienceStrokeLTE applies the LTE predicate on the "science_stroke" field.
-func ScienceStrokeLTE(v int32) predicate.Character {
+func ScienceStrokeLTE(v int) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldScienceStroke), v))
 	})
