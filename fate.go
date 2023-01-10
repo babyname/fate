@@ -3,6 +3,7 @@ package fate
 import (
 	"context"
 	"fmt"
+	"github.com/babyname/fate/ent"
 	"strings"
 
 	"github.com/babyname/fate/config"
@@ -39,8 +40,8 @@ func InitDayanLuckyTable(ctx context.Context, model *model.Model) error {
 	if err != nil {
 		return err
 	}
-	lucky := make(chan *WuGeLucky)
-	go initWuGe(lucky)
+	lucky := make(chan *ent.WuGeLucky)
+	//go initWuGe(lucky)
 	for la := range lucky {
 		//todo
 		fmt.Println("la", la)

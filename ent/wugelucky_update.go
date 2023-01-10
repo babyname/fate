@@ -28,137 +28,67 @@ func (wglu *WuGeLuckyUpdate) Where(ps ...predicate.WuGeLucky) *WuGeLuckyUpdate {
 }
 
 // SetLastStroke1 sets the "last_stroke_1" field.
-func (wglu *WuGeLuckyUpdate) SetLastStroke1(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) SetLastStroke1(i int) *WuGeLuckyUpdate {
 	wglu.mutation.ResetLastStroke1()
 	wglu.mutation.SetLastStroke1(i)
 	return wglu
 }
 
-// SetNillableLastStroke1 sets the "last_stroke_1" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableLastStroke1(i *int32) *WuGeLuckyUpdate {
-	if i != nil {
-		wglu.SetLastStroke1(*i)
-	}
-	return wglu
-}
-
 // AddLastStroke1 adds i to the "last_stroke_1" field.
-func (wglu *WuGeLuckyUpdate) AddLastStroke1(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) AddLastStroke1(i int) *WuGeLuckyUpdate {
 	wglu.mutation.AddLastStroke1(i)
 	return wglu
 }
 
-// ClearLastStroke1 clears the value of the "last_stroke_1" field.
-func (wglu *WuGeLuckyUpdate) ClearLastStroke1() *WuGeLuckyUpdate {
-	wglu.mutation.ClearLastStroke1()
-	return wglu
-}
-
 // SetLastStroke2 sets the "last_stroke_2" field.
-func (wglu *WuGeLuckyUpdate) SetLastStroke2(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) SetLastStroke2(i int) *WuGeLuckyUpdate {
 	wglu.mutation.ResetLastStroke2()
 	wglu.mutation.SetLastStroke2(i)
 	return wglu
 }
 
-// SetNillableLastStroke2 sets the "last_stroke_2" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableLastStroke2(i *int32) *WuGeLuckyUpdate {
-	if i != nil {
-		wglu.SetLastStroke2(*i)
-	}
-	return wglu
-}
-
 // AddLastStroke2 adds i to the "last_stroke_2" field.
-func (wglu *WuGeLuckyUpdate) AddLastStroke2(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) AddLastStroke2(i int) *WuGeLuckyUpdate {
 	wglu.mutation.AddLastStroke2(i)
 	return wglu
 }
 
-// ClearLastStroke2 clears the value of the "last_stroke_2" field.
-func (wglu *WuGeLuckyUpdate) ClearLastStroke2() *WuGeLuckyUpdate {
-	wglu.mutation.ClearLastStroke2()
-	return wglu
-}
-
 // SetFirstStroke1 sets the "first_stroke_1" field.
-func (wglu *WuGeLuckyUpdate) SetFirstStroke1(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) SetFirstStroke1(i int) *WuGeLuckyUpdate {
 	wglu.mutation.ResetFirstStroke1()
 	wglu.mutation.SetFirstStroke1(i)
 	return wglu
 }
 
-// SetNillableFirstStroke1 sets the "first_stroke_1" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableFirstStroke1(i *int32) *WuGeLuckyUpdate {
-	if i != nil {
-		wglu.SetFirstStroke1(*i)
-	}
-	return wglu
-}
-
 // AddFirstStroke1 adds i to the "first_stroke_1" field.
-func (wglu *WuGeLuckyUpdate) AddFirstStroke1(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) AddFirstStroke1(i int) *WuGeLuckyUpdate {
 	wglu.mutation.AddFirstStroke1(i)
 	return wglu
 }
 
-// ClearFirstStroke1 clears the value of the "first_stroke_1" field.
-func (wglu *WuGeLuckyUpdate) ClearFirstStroke1() *WuGeLuckyUpdate {
-	wglu.mutation.ClearFirstStroke1()
-	return wglu
-}
-
 // SetFirstStroke2 sets the "first_stroke_2" field.
-func (wglu *WuGeLuckyUpdate) SetFirstStroke2(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) SetFirstStroke2(i int) *WuGeLuckyUpdate {
 	wglu.mutation.ResetFirstStroke2()
 	wglu.mutation.SetFirstStroke2(i)
 	return wglu
 }
 
-// SetNillableFirstStroke2 sets the "first_stroke_2" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableFirstStroke2(i *int32) *WuGeLuckyUpdate {
-	if i != nil {
-		wglu.SetFirstStroke2(*i)
-	}
-	return wglu
-}
-
 // AddFirstStroke2 adds i to the "first_stroke_2" field.
-func (wglu *WuGeLuckyUpdate) AddFirstStroke2(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) AddFirstStroke2(i int) *WuGeLuckyUpdate {
 	wglu.mutation.AddFirstStroke2(i)
 	return wglu
 }
 
-// ClearFirstStroke2 clears the value of the "first_stroke_2" field.
-func (wglu *WuGeLuckyUpdate) ClearFirstStroke2() *WuGeLuckyUpdate {
-	wglu.mutation.ClearFirstStroke2()
-	return wglu
-}
-
 // SetTianGe sets the "tian_ge" field.
-func (wglu *WuGeLuckyUpdate) SetTianGe(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) SetTianGe(i int) *WuGeLuckyUpdate {
 	wglu.mutation.ResetTianGe()
 	wglu.mutation.SetTianGe(i)
 	return wglu
 }
 
-// SetNillableTianGe sets the "tian_ge" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableTianGe(i *int32) *WuGeLuckyUpdate {
-	if i != nil {
-		wglu.SetTianGe(*i)
-	}
-	return wglu
-}
-
 // AddTianGe adds i to the "tian_ge" field.
-func (wglu *WuGeLuckyUpdate) AddTianGe(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) AddTianGe(i int) *WuGeLuckyUpdate {
 	wglu.mutation.AddTianGe(i)
-	return wglu
-}
-
-// ClearTianGe clears the value of the "tian_ge" field.
-func (wglu *WuGeLuckyUpdate) ClearTianGe() *WuGeLuckyUpdate {
-	wglu.mutation.ClearTianGe()
 	return wglu
 }
 
@@ -168,44 +98,16 @@ func (wglu *WuGeLuckyUpdate) SetTianDaYan(s string) *WuGeLuckyUpdate {
 	return wglu
 }
 
-// SetNillableTianDaYan sets the "tian_da_yan" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableTianDaYan(s *string) *WuGeLuckyUpdate {
-	if s != nil {
-		wglu.SetTianDaYan(*s)
-	}
-	return wglu
-}
-
-// ClearTianDaYan clears the value of the "tian_da_yan" field.
-func (wglu *WuGeLuckyUpdate) ClearTianDaYan() *WuGeLuckyUpdate {
-	wglu.mutation.ClearTianDaYan()
-	return wglu
-}
-
 // SetRenGe sets the "ren_ge" field.
-func (wglu *WuGeLuckyUpdate) SetRenGe(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) SetRenGe(i int) *WuGeLuckyUpdate {
 	wglu.mutation.ResetRenGe()
 	wglu.mutation.SetRenGe(i)
 	return wglu
 }
 
-// SetNillableRenGe sets the "ren_ge" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableRenGe(i *int32) *WuGeLuckyUpdate {
-	if i != nil {
-		wglu.SetRenGe(*i)
-	}
-	return wglu
-}
-
 // AddRenGe adds i to the "ren_ge" field.
-func (wglu *WuGeLuckyUpdate) AddRenGe(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) AddRenGe(i int) *WuGeLuckyUpdate {
 	wglu.mutation.AddRenGe(i)
-	return wglu
-}
-
-// ClearRenGe clears the value of the "ren_ge" field.
-func (wglu *WuGeLuckyUpdate) ClearRenGe() *WuGeLuckyUpdate {
-	wglu.mutation.ClearRenGe()
 	return wglu
 }
 
@@ -215,44 +117,16 @@ func (wglu *WuGeLuckyUpdate) SetRenDaYan(s string) *WuGeLuckyUpdate {
 	return wglu
 }
 
-// SetNillableRenDaYan sets the "ren_da_yan" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableRenDaYan(s *string) *WuGeLuckyUpdate {
-	if s != nil {
-		wglu.SetRenDaYan(*s)
-	}
-	return wglu
-}
-
-// ClearRenDaYan clears the value of the "ren_da_yan" field.
-func (wglu *WuGeLuckyUpdate) ClearRenDaYan() *WuGeLuckyUpdate {
-	wglu.mutation.ClearRenDaYan()
-	return wglu
-}
-
 // SetDiGe sets the "di_ge" field.
-func (wglu *WuGeLuckyUpdate) SetDiGe(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) SetDiGe(i int) *WuGeLuckyUpdate {
 	wglu.mutation.ResetDiGe()
 	wglu.mutation.SetDiGe(i)
 	return wglu
 }
 
-// SetNillableDiGe sets the "di_ge" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableDiGe(i *int32) *WuGeLuckyUpdate {
-	if i != nil {
-		wglu.SetDiGe(*i)
-	}
-	return wglu
-}
-
 // AddDiGe adds i to the "di_ge" field.
-func (wglu *WuGeLuckyUpdate) AddDiGe(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) AddDiGe(i int) *WuGeLuckyUpdate {
 	wglu.mutation.AddDiGe(i)
-	return wglu
-}
-
-// ClearDiGe clears the value of the "di_ge" field.
-func (wglu *WuGeLuckyUpdate) ClearDiGe() *WuGeLuckyUpdate {
-	wglu.mutation.ClearDiGe()
 	return wglu
 }
 
@@ -262,44 +136,16 @@ func (wglu *WuGeLuckyUpdate) SetDiDaYan(s string) *WuGeLuckyUpdate {
 	return wglu
 }
 
-// SetNillableDiDaYan sets the "di_da_yan" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableDiDaYan(s *string) *WuGeLuckyUpdate {
-	if s != nil {
-		wglu.SetDiDaYan(*s)
-	}
-	return wglu
-}
-
-// ClearDiDaYan clears the value of the "di_da_yan" field.
-func (wglu *WuGeLuckyUpdate) ClearDiDaYan() *WuGeLuckyUpdate {
-	wglu.mutation.ClearDiDaYan()
-	return wglu
-}
-
 // SetWaiGe sets the "wai_ge" field.
-func (wglu *WuGeLuckyUpdate) SetWaiGe(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) SetWaiGe(i int) *WuGeLuckyUpdate {
 	wglu.mutation.ResetWaiGe()
 	wglu.mutation.SetWaiGe(i)
 	return wglu
 }
 
-// SetNillableWaiGe sets the "wai_ge" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableWaiGe(i *int32) *WuGeLuckyUpdate {
-	if i != nil {
-		wglu.SetWaiGe(*i)
-	}
-	return wglu
-}
-
 // AddWaiGe adds i to the "wai_ge" field.
-func (wglu *WuGeLuckyUpdate) AddWaiGe(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) AddWaiGe(i int) *WuGeLuckyUpdate {
 	wglu.mutation.AddWaiGe(i)
-	return wglu
-}
-
-// ClearWaiGe clears the value of the "wai_ge" field.
-func (wglu *WuGeLuckyUpdate) ClearWaiGe() *WuGeLuckyUpdate {
-	wglu.mutation.ClearWaiGe()
 	return wglu
 }
 
@@ -309,44 +155,16 @@ func (wglu *WuGeLuckyUpdate) SetWaiDaYan(s string) *WuGeLuckyUpdate {
 	return wglu
 }
 
-// SetNillableWaiDaYan sets the "wai_da_yan" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableWaiDaYan(s *string) *WuGeLuckyUpdate {
-	if s != nil {
-		wglu.SetWaiDaYan(*s)
-	}
-	return wglu
-}
-
-// ClearWaiDaYan clears the value of the "wai_da_yan" field.
-func (wglu *WuGeLuckyUpdate) ClearWaiDaYan() *WuGeLuckyUpdate {
-	wglu.mutation.ClearWaiDaYan()
-	return wglu
-}
-
 // SetZongGe sets the "zong_ge" field.
-func (wglu *WuGeLuckyUpdate) SetZongGe(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) SetZongGe(i int) *WuGeLuckyUpdate {
 	wglu.mutation.ResetZongGe()
 	wglu.mutation.SetZongGe(i)
 	return wglu
 }
 
-// SetNillableZongGe sets the "zong_ge" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableZongGe(i *int32) *WuGeLuckyUpdate {
-	if i != nil {
-		wglu.SetZongGe(*i)
-	}
-	return wglu
-}
-
 // AddZongGe adds i to the "zong_ge" field.
-func (wglu *WuGeLuckyUpdate) AddZongGe(i int32) *WuGeLuckyUpdate {
+func (wglu *WuGeLuckyUpdate) AddZongGe(i int) *WuGeLuckyUpdate {
 	wglu.mutation.AddZongGe(i)
-	return wglu
-}
-
-// ClearZongGe clears the value of the "zong_ge" field.
-func (wglu *WuGeLuckyUpdate) ClearZongGe() *WuGeLuckyUpdate {
-	wglu.mutation.ClearZongGe()
 	return wglu
 }
 
@@ -356,37 +174,9 @@ func (wglu *WuGeLuckyUpdate) SetZongDaYan(s string) *WuGeLuckyUpdate {
 	return wglu
 }
 
-// SetNillableZongDaYan sets the "zong_da_yan" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableZongDaYan(s *string) *WuGeLuckyUpdate {
-	if s != nil {
-		wglu.SetZongDaYan(*s)
-	}
-	return wglu
-}
-
-// ClearZongDaYan clears the value of the "zong_da_yan" field.
-func (wglu *WuGeLuckyUpdate) ClearZongDaYan() *WuGeLuckyUpdate {
-	wglu.mutation.ClearZongDaYan()
-	return wglu
-}
-
 // SetZongLucky sets the "zong_lucky" field.
 func (wglu *WuGeLuckyUpdate) SetZongLucky(b bool) *WuGeLuckyUpdate {
 	wglu.mutation.SetZongLucky(b)
-	return wglu
-}
-
-// SetNillableZongLucky sets the "zong_lucky" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableZongLucky(b *bool) *WuGeLuckyUpdate {
-	if b != nil {
-		wglu.SetZongLucky(*b)
-	}
-	return wglu
-}
-
-// ClearZongLucky clears the value of the "zong_lucky" field.
-func (wglu *WuGeLuckyUpdate) ClearZongLucky() *WuGeLuckyUpdate {
-	wglu.mutation.ClearZongLucky()
 	return wglu
 }
 
@@ -396,37 +186,9 @@ func (wglu *WuGeLuckyUpdate) SetZongSex(b bool) *WuGeLuckyUpdate {
 	return wglu
 }
 
-// SetNillableZongSex sets the "zong_sex" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableZongSex(b *bool) *WuGeLuckyUpdate {
-	if b != nil {
-		wglu.SetZongSex(*b)
-	}
-	return wglu
-}
-
-// ClearZongSex clears the value of the "zong_sex" field.
-func (wglu *WuGeLuckyUpdate) ClearZongSex() *WuGeLuckyUpdate {
-	wglu.mutation.ClearZongSex()
-	return wglu
-}
-
 // SetZongMax sets the "zong_max" field.
 func (wglu *WuGeLuckyUpdate) SetZongMax(b bool) *WuGeLuckyUpdate {
 	wglu.mutation.SetZongMax(b)
-	return wglu
-}
-
-// SetNillableZongMax sets the "zong_max" field if the given value is not nil.
-func (wglu *WuGeLuckyUpdate) SetNillableZongMax(b *bool) *WuGeLuckyUpdate {
-	if b != nil {
-		wglu.SetZongMax(*b)
-	}
-	return wglu
-}
-
-// ClearZongMax clears the value of the "zong_max" field.
-func (wglu *WuGeLuckyUpdate) ClearZongMax() *WuGeLuckyUpdate {
-	wglu.mutation.ClearZongMax()
 	return wglu
 }
 
@@ -495,7 +257,7 @@ func (wglu *WuGeLuckyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   wugelucky.Table,
 			Columns: wugelucky.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeInt,
 				Column: wugelucky.FieldID,
 			},
 		},
@@ -508,133 +270,82 @@ func (wglu *WuGeLuckyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := wglu.mutation.LastStroke1(); ok {
-		_spec.SetField(wugelucky.FieldLastStroke1, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldLastStroke1, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.AddedLastStroke1(); ok {
-		_spec.AddField(wugelucky.FieldLastStroke1, field.TypeInt32, value)
-	}
-	if wglu.mutation.LastStroke1Cleared() {
-		_spec.ClearField(wugelucky.FieldLastStroke1, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldLastStroke1, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.LastStroke2(); ok {
-		_spec.SetField(wugelucky.FieldLastStroke2, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldLastStroke2, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.AddedLastStroke2(); ok {
-		_spec.AddField(wugelucky.FieldLastStroke2, field.TypeInt32, value)
-	}
-	if wglu.mutation.LastStroke2Cleared() {
-		_spec.ClearField(wugelucky.FieldLastStroke2, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldLastStroke2, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.FirstStroke1(); ok {
-		_spec.SetField(wugelucky.FieldFirstStroke1, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldFirstStroke1, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.AddedFirstStroke1(); ok {
-		_spec.AddField(wugelucky.FieldFirstStroke1, field.TypeInt32, value)
-	}
-	if wglu.mutation.FirstStroke1Cleared() {
-		_spec.ClearField(wugelucky.FieldFirstStroke1, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldFirstStroke1, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.FirstStroke2(); ok {
-		_spec.SetField(wugelucky.FieldFirstStroke2, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldFirstStroke2, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.AddedFirstStroke2(); ok {
-		_spec.AddField(wugelucky.FieldFirstStroke2, field.TypeInt32, value)
-	}
-	if wglu.mutation.FirstStroke2Cleared() {
-		_spec.ClearField(wugelucky.FieldFirstStroke2, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldFirstStroke2, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.TianGe(); ok {
-		_spec.SetField(wugelucky.FieldTianGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldTianGe, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.AddedTianGe(); ok {
-		_spec.AddField(wugelucky.FieldTianGe, field.TypeInt32, value)
-	}
-	if wglu.mutation.TianGeCleared() {
-		_spec.ClearField(wugelucky.FieldTianGe, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldTianGe, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.TianDaYan(); ok {
 		_spec.SetField(wugelucky.FieldTianDaYan, field.TypeString, value)
 	}
-	if wglu.mutation.TianDaYanCleared() {
-		_spec.ClearField(wugelucky.FieldTianDaYan, field.TypeString)
-	}
 	if value, ok := wglu.mutation.RenGe(); ok {
-		_spec.SetField(wugelucky.FieldRenGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldRenGe, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.AddedRenGe(); ok {
-		_spec.AddField(wugelucky.FieldRenGe, field.TypeInt32, value)
-	}
-	if wglu.mutation.RenGeCleared() {
-		_spec.ClearField(wugelucky.FieldRenGe, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldRenGe, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.RenDaYan(); ok {
 		_spec.SetField(wugelucky.FieldRenDaYan, field.TypeString, value)
 	}
-	if wglu.mutation.RenDaYanCleared() {
-		_spec.ClearField(wugelucky.FieldRenDaYan, field.TypeString)
-	}
 	if value, ok := wglu.mutation.DiGe(); ok {
-		_spec.SetField(wugelucky.FieldDiGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldDiGe, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.AddedDiGe(); ok {
-		_spec.AddField(wugelucky.FieldDiGe, field.TypeInt32, value)
-	}
-	if wglu.mutation.DiGeCleared() {
-		_spec.ClearField(wugelucky.FieldDiGe, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldDiGe, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.DiDaYan(); ok {
 		_spec.SetField(wugelucky.FieldDiDaYan, field.TypeString, value)
 	}
-	if wglu.mutation.DiDaYanCleared() {
-		_spec.ClearField(wugelucky.FieldDiDaYan, field.TypeString)
-	}
 	if value, ok := wglu.mutation.WaiGe(); ok {
-		_spec.SetField(wugelucky.FieldWaiGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldWaiGe, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.AddedWaiGe(); ok {
-		_spec.AddField(wugelucky.FieldWaiGe, field.TypeInt32, value)
-	}
-	if wglu.mutation.WaiGeCleared() {
-		_spec.ClearField(wugelucky.FieldWaiGe, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldWaiGe, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.WaiDaYan(); ok {
 		_spec.SetField(wugelucky.FieldWaiDaYan, field.TypeString, value)
 	}
-	if wglu.mutation.WaiDaYanCleared() {
-		_spec.ClearField(wugelucky.FieldWaiDaYan, field.TypeString)
-	}
 	if value, ok := wglu.mutation.ZongGe(); ok {
-		_spec.SetField(wugelucky.FieldZongGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldZongGe, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.AddedZongGe(); ok {
-		_spec.AddField(wugelucky.FieldZongGe, field.TypeInt32, value)
-	}
-	if wglu.mutation.ZongGeCleared() {
-		_spec.ClearField(wugelucky.FieldZongGe, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldZongGe, field.TypeInt, value)
 	}
 	if value, ok := wglu.mutation.ZongDaYan(); ok {
 		_spec.SetField(wugelucky.FieldZongDaYan, field.TypeString, value)
 	}
-	if wglu.mutation.ZongDaYanCleared() {
-		_spec.ClearField(wugelucky.FieldZongDaYan, field.TypeString)
-	}
 	if value, ok := wglu.mutation.ZongLucky(); ok {
 		_spec.SetField(wugelucky.FieldZongLucky, field.TypeBool, value)
-	}
-	if wglu.mutation.ZongLuckyCleared() {
-		_spec.ClearField(wugelucky.FieldZongLucky, field.TypeBool)
 	}
 	if value, ok := wglu.mutation.ZongSex(); ok {
 		_spec.SetField(wugelucky.FieldZongSex, field.TypeBool, value)
 	}
-	if wglu.mutation.ZongSexCleared() {
-		_spec.ClearField(wugelucky.FieldZongSex, field.TypeBool)
-	}
 	if value, ok := wglu.mutation.ZongMax(); ok {
 		_spec.SetField(wugelucky.FieldZongMax, field.TypeBool, value)
-	}
-	if wglu.mutation.ZongMaxCleared() {
-		_spec.ClearField(wugelucky.FieldZongMax, field.TypeBool)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, wglu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -656,137 +367,67 @@ type WuGeLuckyUpdateOne struct {
 }
 
 // SetLastStroke1 sets the "last_stroke_1" field.
-func (wgluo *WuGeLuckyUpdateOne) SetLastStroke1(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) SetLastStroke1(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.ResetLastStroke1()
 	wgluo.mutation.SetLastStroke1(i)
 	return wgluo
 }
 
-// SetNillableLastStroke1 sets the "last_stroke_1" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableLastStroke1(i *int32) *WuGeLuckyUpdateOne {
-	if i != nil {
-		wgluo.SetLastStroke1(*i)
-	}
-	return wgluo
-}
-
 // AddLastStroke1 adds i to the "last_stroke_1" field.
-func (wgluo *WuGeLuckyUpdateOne) AddLastStroke1(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) AddLastStroke1(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.AddLastStroke1(i)
 	return wgluo
 }
 
-// ClearLastStroke1 clears the value of the "last_stroke_1" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearLastStroke1() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearLastStroke1()
-	return wgluo
-}
-
 // SetLastStroke2 sets the "last_stroke_2" field.
-func (wgluo *WuGeLuckyUpdateOne) SetLastStroke2(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) SetLastStroke2(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.ResetLastStroke2()
 	wgluo.mutation.SetLastStroke2(i)
 	return wgluo
 }
 
-// SetNillableLastStroke2 sets the "last_stroke_2" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableLastStroke2(i *int32) *WuGeLuckyUpdateOne {
-	if i != nil {
-		wgluo.SetLastStroke2(*i)
-	}
-	return wgluo
-}
-
 // AddLastStroke2 adds i to the "last_stroke_2" field.
-func (wgluo *WuGeLuckyUpdateOne) AddLastStroke2(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) AddLastStroke2(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.AddLastStroke2(i)
 	return wgluo
 }
 
-// ClearLastStroke2 clears the value of the "last_stroke_2" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearLastStroke2() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearLastStroke2()
-	return wgluo
-}
-
 // SetFirstStroke1 sets the "first_stroke_1" field.
-func (wgluo *WuGeLuckyUpdateOne) SetFirstStroke1(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) SetFirstStroke1(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.ResetFirstStroke1()
 	wgluo.mutation.SetFirstStroke1(i)
 	return wgluo
 }
 
-// SetNillableFirstStroke1 sets the "first_stroke_1" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableFirstStroke1(i *int32) *WuGeLuckyUpdateOne {
-	if i != nil {
-		wgluo.SetFirstStroke1(*i)
-	}
-	return wgluo
-}
-
 // AddFirstStroke1 adds i to the "first_stroke_1" field.
-func (wgluo *WuGeLuckyUpdateOne) AddFirstStroke1(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) AddFirstStroke1(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.AddFirstStroke1(i)
 	return wgluo
 }
 
-// ClearFirstStroke1 clears the value of the "first_stroke_1" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearFirstStroke1() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearFirstStroke1()
-	return wgluo
-}
-
 // SetFirstStroke2 sets the "first_stroke_2" field.
-func (wgluo *WuGeLuckyUpdateOne) SetFirstStroke2(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) SetFirstStroke2(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.ResetFirstStroke2()
 	wgluo.mutation.SetFirstStroke2(i)
 	return wgluo
 }
 
-// SetNillableFirstStroke2 sets the "first_stroke_2" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableFirstStroke2(i *int32) *WuGeLuckyUpdateOne {
-	if i != nil {
-		wgluo.SetFirstStroke2(*i)
-	}
-	return wgluo
-}
-
 // AddFirstStroke2 adds i to the "first_stroke_2" field.
-func (wgluo *WuGeLuckyUpdateOne) AddFirstStroke2(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) AddFirstStroke2(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.AddFirstStroke2(i)
 	return wgluo
 }
 
-// ClearFirstStroke2 clears the value of the "first_stroke_2" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearFirstStroke2() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearFirstStroke2()
-	return wgluo
-}
-
 // SetTianGe sets the "tian_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) SetTianGe(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) SetTianGe(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.ResetTianGe()
 	wgluo.mutation.SetTianGe(i)
 	return wgluo
 }
 
-// SetNillableTianGe sets the "tian_ge" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableTianGe(i *int32) *WuGeLuckyUpdateOne {
-	if i != nil {
-		wgluo.SetTianGe(*i)
-	}
-	return wgluo
-}
-
 // AddTianGe adds i to the "tian_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) AddTianGe(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) AddTianGe(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.AddTianGe(i)
-	return wgluo
-}
-
-// ClearTianGe clears the value of the "tian_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearTianGe() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearTianGe()
 	return wgluo
 }
 
@@ -796,44 +437,16 @@ func (wgluo *WuGeLuckyUpdateOne) SetTianDaYan(s string) *WuGeLuckyUpdateOne {
 	return wgluo
 }
 
-// SetNillableTianDaYan sets the "tian_da_yan" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableTianDaYan(s *string) *WuGeLuckyUpdateOne {
-	if s != nil {
-		wgluo.SetTianDaYan(*s)
-	}
-	return wgluo
-}
-
-// ClearTianDaYan clears the value of the "tian_da_yan" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearTianDaYan() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearTianDaYan()
-	return wgluo
-}
-
 // SetRenGe sets the "ren_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) SetRenGe(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) SetRenGe(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.ResetRenGe()
 	wgluo.mutation.SetRenGe(i)
 	return wgluo
 }
 
-// SetNillableRenGe sets the "ren_ge" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableRenGe(i *int32) *WuGeLuckyUpdateOne {
-	if i != nil {
-		wgluo.SetRenGe(*i)
-	}
-	return wgluo
-}
-
 // AddRenGe adds i to the "ren_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) AddRenGe(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) AddRenGe(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.AddRenGe(i)
-	return wgluo
-}
-
-// ClearRenGe clears the value of the "ren_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearRenGe() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearRenGe()
 	return wgluo
 }
 
@@ -843,44 +456,16 @@ func (wgluo *WuGeLuckyUpdateOne) SetRenDaYan(s string) *WuGeLuckyUpdateOne {
 	return wgluo
 }
 
-// SetNillableRenDaYan sets the "ren_da_yan" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableRenDaYan(s *string) *WuGeLuckyUpdateOne {
-	if s != nil {
-		wgluo.SetRenDaYan(*s)
-	}
-	return wgluo
-}
-
-// ClearRenDaYan clears the value of the "ren_da_yan" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearRenDaYan() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearRenDaYan()
-	return wgluo
-}
-
 // SetDiGe sets the "di_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) SetDiGe(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) SetDiGe(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.ResetDiGe()
 	wgluo.mutation.SetDiGe(i)
 	return wgluo
 }
 
-// SetNillableDiGe sets the "di_ge" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableDiGe(i *int32) *WuGeLuckyUpdateOne {
-	if i != nil {
-		wgluo.SetDiGe(*i)
-	}
-	return wgluo
-}
-
 // AddDiGe adds i to the "di_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) AddDiGe(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) AddDiGe(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.AddDiGe(i)
-	return wgluo
-}
-
-// ClearDiGe clears the value of the "di_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearDiGe() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearDiGe()
 	return wgluo
 }
 
@@ -890,44 +475,16 @@ func (wgluo *WuGeLuckyUpdateOne) SetDiDaYan(s string) *WuGeLuckyUpdateOne {
 	return wgluo
 }
 
-// SetNillableDiDaYan sets the "di_da_yan" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableDiDaYan(s *string) *WuGeLuckyUpdateOne {
-	if s != nil {
-		wgluo.SetDiDaYan(*s)
-	}
-	return wgluo
-}
-
-// ClearDiDaYan clears the value of the "di_da_yan" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearDiDaYan() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearDiDaYan()
-	return wgluo
-}
-
 // SetWaiGe sets the "wai_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) SetWaiGe(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) SetWaiGe(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.ResetWaiGe()
 	wgluo.mutation.SetWaiGe(i)
 	return wgluo
 }
 
-// SetNillableWaiGe sets the "wai_ge" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableWaiGe(i *int32) *WuGeLuckyUpdateOne {
-	if i != nil {
-		wgluo.SetWaiGe(*i)
-	}
-	return wgluo
-}
-
 // AddWaiGe adds i to the "wai_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) AddWaiGe(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) AddWaiGe(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.AddWaiGe(i)
-	return wgluo
-}
-
-// ClearWaiGe clears the value of the "wai_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearWaiGe() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearWaiGe()
 	return wgluo
 }
 
@@ -937,44 +494,16 @@ func (wgluo *WuGeLuckyUpdateOne) SetWaiDaYan(s string) *WuGeLuckyUpdateOne {
 	return wgluo
 }
 
-// SetNillableWaiDaYan sets the "wai_da_yan" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableWaiDaYan(s *string) *WuGeLuckyUpdateOne {
-	if s != nil {
-		wgluo.SetWaiDaYan(*s)
-	}
-	return wgluo
-}
-
-// ClearWaiDaYan clears the value of the "wai_da_yan" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearWaiDaYan() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearWaiDaYan()
-	return wgluo
-}
-
 // SetZongGe sets the "zong_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) SetZongGe(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) SetZongGe(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.ResetZongGe()
 	wgluo.mutation.SetZongGe(i)
 	return wgluo
 }
 
-// SetNillableZongGe sets the "zong_ge" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableZongGe(i *int32) *WuGeLuckyUpdateOne {
-	if i != nil {
-		wgluo.SetZongGe(*i)
-	}
-	return wgluo
-}
-
 // AddZongGe adds i to the "zong_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) AddZongGe(i int32) *WuGeLuckyUpdateOne {
+func (wgluo *WuGeLuckyUpdateOne) AddZongGe(i int) *WuGeLuckyUpdateOne {
 	wgluo.mutation.AddZongGe(i)
-	return wgluo
-}
-
-// ClearZongGe clears the value of the "zong_ge" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearZongGe() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearZongGe()
 	return wgluo
 }
 
@@ -984,37 +513,9 @@ func (wgluo *WuGeLuckyUpdateOne) SetZongDaYan(s string) *WuGeLuckyUpdateOne {
 	return wgluo
 }
 
-// SetNillableZongDaYan sets the "zong_da_yan" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableZongDaYan(s *string) *WuGeLuckyUpdateOne {
-	if s != nil {
-		wgluo.SetZongDaYan(*s)
-	}
-	return wgluo
-}
-
-// ClearZongDaYan clears the value of the "zong_da_yan" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearZongDaYan() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearZongDaYan()
-	return wgluo
-}
-
 // SetZongLucky sets the "zong_lucky" field.
 func (wgluo *WuGeLuckyUpdateOne) SetZongLucky(b bool) *WuGeLuckyUpdateOne {
 	wgluo.mutation.SetZongLucky(b)
-	return wgluo
-}
-
-// SetNillableZongLucky sets the "zong_lucky" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableZongLucky(b *bool) *WuGeLuckyUpdateOne {
-	if b != nil {
-		wgluo.SetZongLucky(*b)
-	}
-	return wgluo
-}
-
-// ClearZongLucky clears the value of the "zong_lucky" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearZongLucky() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearZongLucky()
 	return wgluo
 }
 
@@ -1024,37 +525,9 @@ func (wgluo *WuGeLuckyUpdateOne) SetZongSex(b bool) *WuGeLuckyUpdateOne {
 	return wgluo
 }
 
-// SetNillableZongSex sets the "zong_sex" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableZongSex(b *bool) *WuGeLuckyUpdateOne {
-	if b != nil {
-		wgluo.SetZongSex(*b)
-	}
-	return wgluo
-}
-
-// ClearZongSex clears the value of the "zong_sex" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearZongSex() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearZongSex()
-	return wgluo
-}
-
 // SetZongMax sets the "zong_max" field.
 func (wgluo *WuGeLuckyUpdateOne) SetZongMax(b bool) *WuGeLuckyUpdateOne {
 	wgluo.mutation.SetZongMax(b)
-	return wgluo
-}
-
-// SetNillableZongMax sets the "zong_max" field if the given value is not nil.
-func (wgluo *WuGeLuckyUpdateOne) SetNillableZongMax(b *bool) *WuGeLuckyUpdateOne {
-	if b != nil {
-		wgluo.SetZongMax(*b)
-	}
-	return wgluo
-}
-
-// ClearZongMax clears the value of the "zong_max" field.
-func (wgluo *WuGeLuckyUpdateOne) ClearZongMax() *WuGeLuckyUpdateOne {
-	wgluo.mutation.ClearZongMax()
 	return wgluo
 }
 
@@ -1136,7 +609,7 @@ func (wgluo *WuGeLuckyUpdateOne) sqlSave(ctx context.Context) (_node *WuGeLucky,
 			Table:   wugelucky.Table,
 			Columns: wugelucky.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeInt,
 				Column: wugelucky.FieldID,
 			},
 		},
@@ -1166,133 +639,82 @@ func (wgluo *WuGeLuckyUpdateOne) sqlSave(ctx context.Context) (_node *WuGeLucky,
 		}
 	}
 	if value, ok := wgluo.mutation.LastStroke1(); ok {
-		_spec.SetField(wugelucky.FieldLastStroke1, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldLastStroke1, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.AddedLastStroke1(); ok {
-		_spec.AddField(wugelucky.FieldLastStroke1, field.TypeInt32, value)
-	}
-	if wgluo.mutation.LastStroke1Cleared() {
-		_spec.ClearField(wugelucky.FieldLastStroke1, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldLastStroke1, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.LastStroke2(); ok {
-		_spec.SetField(wugelucky.FieldLastStroke2, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldLastStroke2, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.AddedLastStroke2(); ok {
-		_spec.AddField(wugelucky.FieldLastStroke2, field.TypeInt32, value)
-	}
-	if wgluo.mutation.LastStroke2Cleared() {
-		_spec.ClearField(wugelucky.FieldLastStroke2, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldLastStroke2, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.FirstStroke1(); ok {
-		_spec.SetField(wugelucky.FieldFirstStroke1, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldFirstStroke1, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.AddedFirstStroke1(); ok {
-		_spec.AddField(wugelucky.FieldFirstStroke1, field.TypeInt32, value)
-	}
-	if wgluo.mutation.FirstStroke1Cleared() {
-		_spec.ClearField(wugelucky.FieldFirstStroke1, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldFirstStroke1, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.FirstStroke2(); ok {
-		_spec.SetField(wugelucky.FieldFirstStroke2, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldFirstStroke2, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.AddedFirstStroke2(); ok {
-		_spec.AddField(wugelucky.FieldFirstStroke2, field.TypeInt32, value)
-	}
-	if wgluo.mutation.FirstStroke2Cleared() {
-		_spec.ClearField(wugelucky.FieldFirstStroke2, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldFirstStroke2, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.TianGe(); ok {
-		_spec.SetField(wugelucky.FieldTianGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldTianGe, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.AddedTianGe(); ok {
-		_spec.AddField(wugelucky.FieldTianGe, field.TypeInt32, value)
-	}
-	if wgluo.mutation.TianGeCleared() {
-		_spec.ClearField(wugelucky.FieldTianGe, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldTianGe, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.TianDaYan(); ok {
 		_spec.SetField(wugelucky.FieldTianDaYan, field.TypeString, value)
 	}
-	if wgluo.mutation.TianDaYanCleared() {
-		_spec.ClearField(wugelucky.FieldTianDaYan, field.TypeString)
-	}
 	if value, ok := wgluo.mutation.RenGe(); ok {
-		_spec.SetField(wugelucky.FieldRenGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldRenGe, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.AddedRenGe(); ok {
-		_spec.AddField(wugelucky.FieldRenGe, field.TypeInt32, value)
-	}
-	if wgluo.mutation.RenGeCleared() {
-		_spec.ClearField(wugelucky.FieldRenGe, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldRenGe, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.RenDaYan(); ok {
 		_spec.SetField(wugelucky.FieldRenDaYan, field.TypeString, value)
 	}
-	if wgluo.mutation.RenDaYanCleared() {
-		_spec.ClearField(wugelucky.FieldRenDaYan, field.TypeString)
-	}
 	if value, ok := wgluo.mutation.DiGe(); ok {
-		_spec.SetField(wugelucky.FieldDiGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldDiGe, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.AddedDiGe(); ok {
-		_spec.AddField(wugelucky.FieldDiGe, field.TypeInt32, value)
-	}
-	if wgluo.mutation.DiGeCleared() {
-		_spec.ClearField(wugelucky.FieldDiGe, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldDiGe, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.DiDaYan(); ok {
 		_spec.SetField(wugelucky.FieldDiDaYan, field.TypeString, value)
 	}
-	if wgluo.mutation.DiDaYanCleared() {
-		_spec.ClearField(wugelucky.FieldDiDaYan, field.TypeString)
-	}
 	if value, ok := wgluo.mutation.WaiGe(); ok {
-		_spec.SetField(wugelucky.FieldWaiGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldWaiGe, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.AddedWaiGe(); ok {
-		_spec.AddField(wugelucky.FieldWaiGe, field.TypeInt32, value)
-	}
-	if wgluo.mutation.WaiGeCleared() {
-		_spec.ClearField(wugelucky.FieldWaiGe, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldWaiGe, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.WaiDaYan(); ok {
 		_spec.SetField(wugelucky.FieldWaiDaYan, field.TypeString, value)
 	}
-	if wgluo.mutation.WaiDaYanCleared() {
-		_spec.ClearField(wugelucky.FieldWaiDaYan, field.TypeString)
-	}
 	if value, ok := wgluo.mutation.ZongGe(); ok {
-		_spec.SetField(wugelucky.FieldZongGe, field.TypeInt32, value)
+		_spec.SetField(wugelucky.FieldZongGe, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.AddedZongGe(); ok {
-		_spec.AddField(wugelucky.FieldZongGe, field.TypeInt32, value)
-	}
-	if wgluo.mutation.ZongGeCleared() {
-		_spec.ClearField(wugelucky.FieldZongGe, field.TypeInt32)
+		_spec.AddField(wugelucky.FieldZongGe, field.TypeInt, value)
 	}
 	if value, ok := wgluo.mutation.ZongDaYan(); ok {
 		_spec.SetField(wugelucky.FieldZongDaYan, field.TypeString, value)
 	}
-	if wgluo.mutation.ZongDaYanCleared() {
-		_spec.ClearField(wugelucky.FieldZongDaYan, field.TypeString)
-	}
 	if value, ok := wgluo.mutation.ZongLucky(); ok {
 		_spec.SetField(wugelucky.FieldZongLucky, field.TypeBool, value)
-	}
-	if wgluo.mutation.ZongLuckyCleared() {
-		_spec.ClearField(wugelucky.FieldZongLucky, field.TypeBool)
 	}
 	if value, ok := wgluo.mutation.ZongSex(); ok {
 		_spec.SetField(wugelucky.FieldZongSex, field.TypeBool, value)
 	}
-	if wgluo.mutation.ZongSexCleared() {
-		_spec.ClearField(wugelucky.FieldZongSex, field.TypeBool)
-	}
 	if value, ok := wgluo.mutation.ZongMax(); ok {
 		_spec.SetField(wugelucky.FieldZongMax, field.TypeBool, value)
-	}
-	if wgluo.mutation.ZongMaxCleared() {
-		_spec.ClearField(wugelucky.FieldZongMax, field.TypeBool)
 	}
 	_node = &WuGeLucky{config: wgluo.config}
 	_spec.Assign = _node.assignValues

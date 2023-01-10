@@ -2,8 +2,7 @@ package fate
 
 import (
 	"github.com/babyname/fate/ent"
-	"github.com/goextension/log"
-	"github.com/google/uuid"
+	"github.com/babyname/fate/model"
 	"github.com/xormsharp/xorm"
 
 	"github.com/babyname/fate/dayan"
@@ -155,29 +154,7 @@ func (ge *WuGe) Check(ss ...string) bool {
 
 // WuGeLucky ...
 type WuGeLucky struct {
-	ID           string `xorm:"id pk"`
-	LastStroke1  int    `xorm:"last_stroke_1"`
-	LastStroke2  int    `xorm:"last_stroke_2"`
-	FirstStroke1 int    `xorm:"first_stroke_1"`
-	FirstStroke2 int    `xorm:"first_stroke_2"`
-	TianGe       int    `xorm:"tian_ge"`
-	TianDaYan    string `xorm:"tian_da_yan"`
-	RenGe        int    `xorm:"ren_ge"`
-	RenDaYan     string `xorm:"ren_da_yan"`
-	DiGe         int    `xorm:"di_ge"`
-	DiDaYan      string `xorm:"di_da_yan"`
-	WaiGe        int    `xorm:"wai_ge"`
-	WaiDaYan     string `xorm:"wai_da_yan"`
-	ZongGe       int    `xorm:"zong_ge"`
-	ZongDaYan    string `xorm:"zong_da_yan"`
-	ZongLucky    bool   `xorm:"zong_lucky"`
-	ZongSex      bool   `xorm:"zong_sex"`
-	ZongMax      bool   `xorm:"zong_max"`
-}
-
-// BeforeInsert ...
-func (w *WuGeLucky) BeforeInsert() {
-	w.ID = uuid.Must(uuid.NewUUID()).String()
+	*ent.WuGeLucky
 }
 
 func countWuGeLucky(engine *xorm.Engine) (n int64, e error) {
@@ -196,7 +173,6 @@ func insertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e 
 	if e != nil {
 		return n, e
 	}
-	log.Infow("lucky", lucky)
 	if n == 0 {
 		n, e = engine.InsertOne(lucky)
 		return
@@ -204,21 +180,18 @@ func insertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e 
 	return session().Update(lucky)
 }
 
-// WuGeMax ...
-const WuGeMax = 32
-
-func initWuGe(lucky chan<- *WuGeLucky) {
+func InitWuGe(lucky chan<- *ent.WuGeLucky) {
 	defer func() {
 		close(lucky)
 	}()
 	var wuge *WuGe
-	for l1 := 1; l1 <= WuGeMax; l1++ {
-		for l2 := 0; l2 <= WuGeMax; l2++ {
-			for f1 := 1; f1 <= WuGeMax; f1++ {
-				for f2 := 1; f2 <= WuGeMax; f2++ {
+	for l1 := 1; l1 <= model.WuGeLuckyMax; l1++ {
+		for l2 := 0; l2 <= model.WuGeLuckyMax; l2++ {
+			for f1 := 1; f1 <= model.WuGeLuckyMax; f1++ {
+				for f2 := 0; f2 <= model.WuGeLuckyMax; f2++ {
 					wuge = CalcWuGe(l1, l2, f1, f2)
-					lucky <- &WuGeLucky{
-						ID:           "",
+					lucky <- &ent.WuGeLucky{
+						ID:           model.WuGeLuckyID(l1, l2, f1, f2),
 						LastStroke1:  l1,
 						LastStroke2:  l2,
 						FirstStroke1: f1,
@@ -243,7 +216,7 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 	}
 }
 
-func getStroke(character *ent.Character) int32 {
+func getStroke(character *ent.Character) int {
 	if character.ScienceStroke != 0 {
 		return character.ScienceStroke
 	} else if character.KangXiStroke != 0 {
@@ -272,7 +245,7 @@ func filterWuGe(eng *xorm.Engine, last []*ent.Character, wg chan<- *WuGeLucky) e
 		close(wg)
 	}()
 	l1 := getStroke(last[0])
-	l2 := int32(0)
+	l2 := 0
 	if len(last) == 2 {
 		l2 = getStroke(last[1])
 	}
