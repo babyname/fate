@@ -1,6 +1,7 @@
 package fate
 
 import (
+	"github.com/babyname/fate/ent"
 	"github.com/goextension/log"
 	"github.com/google/uuid"
 	"github.com/xormsharp/xorm"
@@ -184,12 +185,14 @@ func countWuGeLucky(engine *xorm.Engine) (n int64, e error) {
 }
 
 func insertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e error) {
-	session := engine.Where("last_stroke_1 = ?", lucky.LastStroke1).
-		Where("last_stroke_2 = ?", lucky.LastStroke2).
-		Where("first_stroke_1 = ?", lucky.FirstStroke1).
-		Where("first_stroke_2 = ?", lucky.FirstStroke2)
+	session := func() *xorm.Session {
+		return engine.Where("last_stroke_1 = ?", lucky.LastStroke1).
+			Where("last_stroke_2 = ?", lucky.LastStroke2).
+			Where("first_stroke_1 = ?", lucky.FirstStroke1).
+			Where("first_stroke_2 = ?", lucky.FirstStroke2)
+	}
 
-	n, e = session.Clone().Count(&WuGeLucky{})
+	n, e = session().Count(&WuGeLucky{})
 	if e != nil {
 		return n, e
 	}
@@ -198,7 +201,7 @@ func insertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e 
 		n, e = engine.InsertOne(lucky)
 		return
 	}
-	return session.Clone().Update(lucky)
+	return session().Update(lucky)
 }
 
 // WuGeMax ...
@@ -240,7 +243,7 @@ func initWuGe(lucky chan<- *WuGeLucky) {
 	}
 }
 
-func getStroke(character *Character) int {
+func getStroke(character *ent.Character) int32 {
 	if character.ScienceStroke != 0 {
 		return character.ScienceStroke
 	} else if character.KangXiStroke != 0 {
@@ -264,12 +267,12 @@ func isSex(dys ...int) bool {
 	return false
 }
 
-func filterWuGe(eng *xorm.Engine, last []*Character, wg chan<- *WuGeLucky) error {
+func filterWuGe(eng *xorm.Engine, last []*ent.Character, wg chan<- *WuGeLucky) error {
 	defer func() {
 		close(wg)
 	}()
 	l1 := getStroke(last[0])
-	l2 := 0
+	l2 := int32(0)
 	if len(last) == 2 {
 		l2 = getStroke(last[1])
 	}

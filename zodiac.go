@@ -2,6 +2,7 @@ package fate
 
 import (
 	"fmt"
+	"github.com/babyname/fate/ent"
 	"strings"
 
 	"github.com/godcong/chronos"
@@ -23,7 +24,7 @@ const (
 	ZodiacPig     = "猪"
 )
 
-//Zodiac 生肖
+// Zodiac 生肖
 type Zodiac struct {
 	Name      string
 	Xi        string //喜
@@ -114,19 +115,19 @@ func GetZodiac(c chronos.Calendar) *Zodiac {
 	return nil
 }
 
-func (z *Zodiac) zodiacJi(character *Character) int {
+func (z *Zodiac) zodiacJi(character *ent.Character) int {
 	if strings.IndexRune(z.Ji, []rune(character.Ch)[0]) != -1 {
 		return -3
 	}
 	return 0
 }
 
-func filterZodiac(c chronos.Calendar, chars ...*Character) bool {
+func filterZodiac(c chronos.Calendar, chars ...*ent.Character) bool {
 	return GetZodiac(c).PointCheck(3, chars...)
 }
 
-//PointCheck 检查point
-func (z *Zodiac) PointCheck(limit int, chars ...*Character) bool {
+// PointCheck 检查point
+func (z *Zodiac) PointCheck(limit int, chars ...*ent.Character) bool {
 	for _, c := range chars {
 		if z.Point(c) < limit {
 			return false
@@ -135,15 +136,15 @@ func (z *Zodiac) PointCheck(limit int, chars ...*Character) bool {
 	return true
 }
 
-//Point 喜忌对冲，理论上喜忌都有的话，最好不要选给1，忌给0，喜给5，都没有给3
-func (z *Zodiac) Point(character *Character) int {
+// Point 喜忌对冲，理论上喜忌都有的话，最好不要选给1，忌给0，喜给5，都没有给3
+func (z *Zodiac) Point(character *ent.Character) int {
 	dp := 3
 	dp += z.zodiacJi(character)
 	dp += z.zodiacXi(character)
 	return dp
 }
 
-func (z *Zodiac) zodiacXi(character *Character) int {
+func (z *Zodiac) zodiacXi(character *ent.Character) int {
 	if strings.IndexRune(z.Xi, []rune(character.Ch)[0]) != -1 {
 		return 2
 	}
