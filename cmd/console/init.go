@@ -21,7 +21,7 @@ func cmdInit() *cobra.Command {
 				fmt.Println("building database error:", err)
 			}
 			m := model.New(cli)
-			wuge := make(chan *ent.WuGeLucky)
+			wuge := make(chan *ent.WuGeLucky, 1)
 			go fate.InitWuGe(wuge)
 			fmt.Println("database initializing...")
 			err = m.Initialize(cmd.Context(), wuge)
