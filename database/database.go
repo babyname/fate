@@ -17,7 +17,7 @@ type database struct {
 }
 
 type Builder interface {
-	BuildClient() (*ent.Client, error)
+	Client() (*ent.Client, error)
 }
 
 var driverDSN = map[string]BuildFunc{
@@ -31,7 +31,6 @@ func buildSqlite3(cfg config.DBConfig) (*ent.Client, error) {
 		dsn = cfg.DSN
 	}
 	link := fmt.Sprintf(dsn, cfg.Name)
-	fmt.Println("open:", link)
 	return ent.Open(cfg.Driver, link)
 }
 
@@ -45,7 +44,7 @@ func buildMysql(cfg config.DBConfig) (*ent.Client, error) {
 	return ent.Open(cfg.Driver, link)
 }
 
-func (d *database) BuildClient() (*ent.Client, error) {
+func (d *database) Client() (*ent.Client, error) {
 	fn, ok := driverDSN[d.Driver]
 	if !ok {
 		return nil, fmt.Errorf("the driver of %v is not supported", d.Driver)

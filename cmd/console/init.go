@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/babyname/fate/config"
-	"github.com/goextension/log"
+	"github.com/babyname/fate/database"
+	"github.com/babyname/fate/model"
 	"github.com/spf13/cobra"
-	"path/filepath"
 )
 
 func cmdInit() *cobra.Command {
@@ -14,17 +13,13 @@ func cmdInit() *cobra.Command {
 		Use:   "init",
 		Short: "output the init config",
 		Run: func(cmd *cobra.Command, args []string) {
-			absPath, e := filepath.Abs(path)
-			if e != nil {
-				log.Fatalw("wrong path", "error", e, "path", path)
+			b := database.New(cfg.Database)
+			cli, err := b.Client()
+			if err != nil {
+				fmt.Println("building database error:", err)
 			}
-			fmt.Printf("config will output to %s\n", filepath.Join(absPath, config.JSONName))
-
-			e = config.OutputConfig(config.DefaultConfig())
-			if e != nil {
-				log.Fatalw("config wrong", "error", e)
-			}
-
+			m := model.New(cli)
+			m.Initialize()
 		},
 	}
 	cmd.Flags().StringVarP(&path, "path", "p", "", "set the output path")
