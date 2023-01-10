@@ -18,7 +18,7 @@ type Version struct {
 	// CurrentVersion holds the value of the "current_version" field.
 	CurrentVersion int `json:"current_version,omitempty"`
 	// UpdatedUnix holds the value of the "updated_unix" field.
-	UpdatedUnix int64 `json:"updated_unix,omitempty"`
+	UpdatedUnix int `json:"updated_unix,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -59,7 +59,7 @@ func (v *Version) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_unix", values[i])
 			} else if value.Valid {
-				v.UpdatedUnix = value.Int64
+				v.UpdatedUnix = int(value.Int64)
 			}
 		}
 	}

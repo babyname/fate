@@ -6,6 +6,9 @@ import (
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/logger"
 	"github.com/spf13/cobra"
+
+	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -39,6 +42,7 @@ var rootCmd = &cobra.Command{
 			fmt.Println("Loading config file from: ", flagConfigPath)
 		}
 		cfg = config.LoadConfig(flagConfigPath)
+		fmt.Printf("Config file: %+v\n", cfg)
 		logger.SetOutput(logger.New(cfg.Log))
 	},
 	DisableSuggestions: false,

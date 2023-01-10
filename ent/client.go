@@ -363,7 +363,7 @@ func (c *WuGeLuckyClient) UpdateOne(wgl *WuGeLucky) *WuGeLuckyUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *WuGeLuckyClient) UpdateOneID(id string) *WuGeLuckyUpdateOne {
+func (c *WuGeLuckyClient) UpdateOneID(id int) *WuGeLuckyUpdateOne {
 	mutation := newWuGeLuckyMutation(c.config, OpUpdateOne, withWuGeLuckyID(id))
 	return &WuGeLuckyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -380,7 +380,7 @@ func (c *WuGeLuckyClient) DeleteOne(wgl *WuGeLucky) *WuGeLuckyDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *WuGeLuckyClient) DeleteOneID(id string) *WuGeLuckyDeleteOne {
+func (c *WuGeLuckyClient) DeleteOneID(id int) *WuGeLuckyDeleteOne {
 	builder := c.Delete().Where(wugelucky.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -395,12 +395,12 @@ func (c *WuGeLuckyClient) Query() *WuGeLuckyQuery {
 }
 
 // Get returns a WuGeLucky entity by its id.
-func (c *WuGeLuckyClient) Get(ctx context.Context, id string) (*WuGeLucky, error) {
+func (c *WuGeLuckyClient) Get(ctx context.Context, id int) (*WuGeLucky, error) {
 	return c.Query().Where(wugelucky.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *WuGeLuckyClient) GetX(ctx context.Context, id string) *WuGeLucky {
+func (c *WuGeLuckyClient) GetX(ctx context.Context, id int) *WuGeLucky {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

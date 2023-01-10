@@ -14,7 +14,7 @@ type LogConfig struct {
 
 func defaultLogConfig() LogConfig {
 	return LogConfig{
-		Path:       "fate/log/fate.log",
+		Path:       "log/fate.log",
 		ShowSource: false,
 		Level:      "INFO",
 		LogType:    "json",

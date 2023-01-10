@@ -62,13 +62,13 @@ func (wxc *WuXingCreate) SetNillableDeleted(t *time.Time) *WuXingCreate {
 }
 
 // SetVersion sets the "version" field.
-func (wxc *WuXingCreate) SetVersion(i int32) *WuXingCreate {
+func (wxc *WuXingCreate) SetVersion(i int) *WuXingCreate {
 	wxc.mutation.SetVersion(i)
 	return wxc
 }
 
 // SetNillableVersion sets the "version" field if the given value is not nil.
-func (wxc *WuXingCreate) SetNillableVersion(i *int32) *WuXingCreate {
+func (wxc *WuXingCreate) SetNillableVersion(i *int) *WuXingCreate {
 	if i != nil {
 		wxc.SetVersion(*i)
 	}
@@ -262,7 +262,7 @@ func (wxc *WuXingCreate) createSpec() (*WuXing, *sqlgraph.CreateSpec) {
 		_node.Deleted = value
 	}
 	if value, ok := wxc.mutation.Version(); ok {
-		_spec.SetField(wuxing.FieldVersion, field.TypeInt32, value)
+		_spec.SetField(wuxing.FieldVersion, field.TypeInt, value)
 		_node.Version = value
 	}
 	if value, ok := wxc.mutation.First(); ok {

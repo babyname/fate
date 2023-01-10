@@ -86,7 +86,7 @@ func CurrentVersion(v int) predicate.Version {
 }
 
 // UpdatedUnix applies equality check predicate on the "updated_unix" field. It's identical to UpdatedUnixEQ.
-func UpdatedUnix(v int64) predicate.Version {
+func UpdatedUnix(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldUpdatedUnix), v))
 	})
@@ -157,21 +157,21 @@ func CurrentVersionLTE(v int) predicate.Version {
 }
 
 // UpdatedUnixEQ applies the EQ predicate on the "updated_unix" field.
-func UpdatedUnixEQ(v int64) predicate.Version {
+func UpdatedUnixEQ(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldUpdatedUnix), v))
 	})
 }
 
 // UpdatedUnixNEQ applies the NEQ predicate on the "updated_unix" field.
-func UpdatedUnixNEQ(v int64) predicate.Version {
+func UpdatedUnixNEQ(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldUpdatedUnix), v))
 	})
 }
 
 // UpdatedUnixIn applies the In predicate on the "updated_unix" field.
-func UpdatedUnixIn(vs ...int64) predicate.Version {
+func UpdatedUnixIn(vs ...int) predicate.Version {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -182,7 +182,7 @@ func UpdatedUnixIn(vs ...int64) predicate.Version {
 }
 
 // UpdatedUnixNotIn applies the NotIn predicate on the "updated_unix" field.
-func UpdatedUnixNotIn(vs ...int64) predicate.Version {
+func UpdatedUnixNotIn(vs ...int) predicate.Version {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -193,28 +193,28 @@ func UpdatedUnixNotIn(vs ...int64) predicate.Version {
 }
 
 // UpdatedUnixGT applies the GT predicate on the "updated_unix" field.
-func UpdatedUnixGT(v int64) predicate.Version {
+func UpdatedUnixGT(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldUpdatedUnix), v))
 	})
 }
 
 // UpdatedUnixGTE applies the GTE predicate on the "updated_unix" field.
-func UpdatedUnixGTE(v int64) predicate.Version {
+func UpdatedUnixGTE(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldUpdatedUnix), v))
 	})
 }
 
 // UpdatedUnixLT applies the LT predicate on the "updated_unix" field.
-func UpdatedUnixLT(v int64) predicate.Version {
+func UpdatedUnixLT(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldUpdatedUnix), v))
 	})
 }
 
 // UpdatedUnixLTE applies the LTE predicate on the "updated_unix" field.
-func UpdatedUnixLTE(v int64) predicate.Version {
+func UpdatedUnixLTE(v int) predicate.Version {
 	return predicate.Version(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldUpdatedUnix), v))
 	})
