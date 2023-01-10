@@ -2,7 +2,7 @@ package model
 
 const (
 	WuGeLuckyMax = 81
-	PerInitStep  = 50000
+	PerInitStep  = 10000
 )
 
 func WuGeLuckyID(l1, l2, f1, f2 int) int {
