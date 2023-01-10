@@ -10,14 +10,14 @@ type DBConfig struct {
 	Name   string `json:"name,omitempty"`
 }
 
-func defaultSqlite3() DBConfig {
+func defaultDBSqlite3() DBConfig {
 	return DBConfig{
 		Name:   "fate",
 		Driver: "sqlite3",
 	}
 }
 
-func defaultMysql() DBConfig {
+func defaultDBMysql() DBConfig {
 	return DBConfig{
 		Host:   "127.0.0.1",
 		Port:   "3306",

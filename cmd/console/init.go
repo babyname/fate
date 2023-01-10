@@ -19,7 +19,6 @@ func cmdInit() *cobra.Command {
 				log.Fatalw("wrong path", "error", e, "path", path)
 			}
 			fmt.Printf("config will output to %s\n", filepath.Join(absPath, config.JSONName))
-			config.DefaultJSONPath = path
 
 			e = config.OutputConfig(config.DefaultConfig())
 			if e != nil {
