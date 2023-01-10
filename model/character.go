@@ -12,7 +12,7 @@ import (
 )
 
 type CharQuery func(query *ent.CharacterQuery) *ent.CharacterQuery
-type StrokeQuery func(query *ent.CharacterQuery, s int) *ent.CharacterQuery
+type StrokeQuery func(query *ent.CharacterQuery, s int32) *ent.CharacterQuery
 
 func (m Model) GetCharacter(ctx context.Context, filters ...CharQuery) (
 	*ent.Character, error) {
@@ -76,7 +76,7 @@ func (m Model) InsertOrUpdateCharacter(ctx context.Context, nch *ent.Character) 
 func Char(name string) CharQuery {
 	return func(query *ent.CharacterQuery) *ent.CharacterQuery {
 		return query.Where(character.ChEQ(name),
-			character.Or(character.KangxiEQ(name)),
+			character.Or(character.KangXiEQ(name)),
 			character.Or(func(selector *sql.Selector) {
 				sqljson.ValueContains(character.FieldTraditionalCharacter, name)
 			}))
@@ -86,24 +86,24 @@ func Char(name string) CharQuery {
 // Regular ...
 func Regular() func(query *ent.CharacterQuery) *ent.CharacterQuery {
 	return func(query *ent.CharacterQuery) *ent.CharacterQuery {
-		return query.Where(character.IsRegular(true))
+		return query.Where(character.Regular(true))
 	}
 }
 
-func StrokeKangxi(query *ent.CharacterQuery, s int) *ent.CharacterQuery {
-	return query.Where(character.Or(character.KangxiStrokeEQ(s)))
+func StrokeKangxi(query *ent.CharacterQuery, s int32) *ent.CharacterQuery {
+	return query.Where(character.Or(character.KangXiStroke(s)))
 }
 
-func StrokeSimpleTotal(query *ent.CharacterQuery, s int) *ent.CharacterQuery {
+func StrokeSimpleTotal(query *ent.CharacterQuery, s int32) *ent.CharacterQuery {
 	return query.Where(character.Or(character.SimpleTotalStrokeEQ(s)))
 }
 
-func StrokeTraditionalTotal(query *ent.CharacterQuery, s int) *ent.CharacterQuery {
+func StrokeTraditionalTotal(query *ent.CharacterQuery, s int32) *ent.CharacterQuery {
 	return query.Where(character.Or(character.TraditionalTotalStrokeEQ(s)))
 }
 
 // Stroke ...
-func Stroke(s int, sqs ...StrokeQuery) CharQuery {
+func Stroke(s int32, sqs ...StrokeQuery) CharQuery {
 	return func(query *ent.CharacterQuery) *ent.CharacterQuery {
 		q := query.Where(character.And(character.ScienceStrokeEQ(s), func(selector *sql.Selector) {
 		}))
