@@ -1,8 +1,9 @@
 package fate
 
 import (
-	"github.com/godcong/chronos"
 	"strings"
+
+	"github.com/godcong/chronos"
 )
 
 var diIndex = map[string]int{
@@ -13,7 +14,7 @@ var tianIndex = map[string]int{
 	"甲": 0, "乙": 1, "丙": 2, "丁": 3, "戊": 4, "己": 5, "庚": 6, "辛": 7, "壬": 8, "癸": 9,
 }
 
-//天干强度表
+// 天干强度表
 var tiangan = [][]int{
 	{1200, 1200, 1000, 1000, 1000, 1000, 1000, 1000, 1200, 1200},
 	{1060, 1060, 1000, 1000, 1100, 1100, 1140, 1140, 1100, 1100},
@@ -29,7 +30,7 @@ var tiangan = [][]int{
 	{1200, 1200, 1000, 1000, 1000, 1000, 1000, 1000, 1140, 1140},
 }
 
-//地支强度表
+// 地支强度表
 var dizhi = []map[string][]int{
 	{
 		"癸": {1200, 1100, 1000, 1000, 1040, 1060, 1000, 1000, 1200, 1200, 1060, 1140},
@@ -98,12 +99,12 @@ var wuXingDiZhi = map[string]string{
 	"亥": "水",
 }
 
-//WuXingTianGan 五行天干
+// WuXingTianGan 五行天干
 func WuXingTianGan(s string) string {
 	return wuXingTianGan[s]
 }
 
-//WuXingDiZhi 五行地支
+// WuXingDiZhi 五行地支
 func WuXingDiZhi(s string) string {
 	return wuXingDiZhi[s]
 }
@@ -115,7 +116,7 @@ type BaZi struct {
 	xiyong *XiYong
 }
 
-//NewBazi 创建八字
+// NewBazi 创建八字
 func NewBazi(calendar chronos.Calendar) *BaZi {
 	ec := calendar.Lunar().EightCharacter()
 	return &BaZi{
@@ -129,7 +130,7 @@ func (z *BaZi) String() string {
 	return strings.Join(z.baZi, "")
 }
 
-//RiZhu 日主
+// RiZhu 日主
 func (z *BaZi) RiZhu() string {
 	return z.baZi[4]
 }
@@ -140,7 +141,7 @@ func (z *BaZi) calcXiYong() {
 	z.point().calcSimilar().calcHeterogeneous() //.yongShen().xiShen()
 }
 
-//XiYong 喜用神
+// XiYong 喜用神
 func (z *BaZi) XiYong() *XiYong {
 	if z.xiyong == nil {
 		z.calcXiYong()
@@ -148,7 +149,7 @@ func (z *BaZi) XiYong() *XiYong {
 	return z.xiyong
 }
 
-//XiYongShen 平衡用神
+// XiYongShen 平衡用神
 func (z *BaZi) XiYongShen() string {
 	return z.XiYong().Shen()
 }
@@ -180,7 +181,7 @@ func baziToWuXing(bazi []string) []string {
 	return wx
 }
 
-//计算同类
+// 计算同类
 func (z *BaZi) calcSimilar() *BaZi {
 	for i := range sheng {
 		if wuXingTianGan[z.RiZhu()] == sheng[i] {
@@ -200,7 +201,7 @@ func (z *BaZi) calcSimilar() *BaZi {
 	return z
 }
 
-//计算异类
+// 计算异类
 func (z *BaZi) calcHeterogeneous() *BaZi {
 	for i := range sheng {
 		for ti := range z.xiyong.Similar {
@@ -212,7 +213,6 @@ func (z *BaZi) calcHeterogeneous() *BaZi {
 		z.xiyong.HeterogeneousPoint += z.xiyong.GetFen(sheng[i])
 	EndSimilar:
 		continue
-
 	}
 	return z
 }

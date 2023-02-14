@@ -4,8 +4,8 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+
 	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/logger"
 )
 
 type Model struct {
@@ -58,6 +58,6 @@ func ID(name string) string {
 // @param *ent.Client
 // @return *Model
 func New(client *ent.Client) *Model {
-	log = logger.WithGroup("Model")
+	Logger("Model")
 	return &Model{Client: client}
 }
