@@ -1,16 +1,17 @@
 package fate
 
 import (
-	"context"
-	"fmt"
-	"github.com/babyname/fate/ent"
 	"strings"
 
 	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/database"
 	"github.com/babyname/fate/model"
+	"golang.org/x/net/context"
 )
 
-type Session interface{}
+type Session interface {
+	Start(ctx context.Context) error
+}
 
 // Fate ...
 type Fate interface {
@@ -23,30 +24,14 @@ type fateImpl struct {
 }
 
 func (f *fateImpl) NewSession(Properties Property) Session {
-	//TODO implement me
-	panic("implement me")
+	return &session{
+		props: Properties,
+		db:    f.db,
+	}
 }
 
 func (f *fateImpl) Query() *model.Model {
 	return f.db
-}
-
-func (f *fateImpl) Initialize(ctx context.Context) error {
-	panic("implement me")
-}
-
-func InitDayanLuckyTable(ctx context.Context, model *model.Model) error {
-	err := model.Schema.Create(ctx)
-	if err != nil {
-		return err
-	}
-	lucky := make(chan *ent.WuGeLucky)
-	//go initWuGe(lucky)
-	for la := range lucky {
-		//todo
-		fmt.Println("la", la)
-	}
-	return nil
 }
 
 func filterSex(lucky *WuGeLucky) bool {
@@ -60,10 +45,20 @@ func isLucky(s string) bool {
 	return false
 }
 
-func New(cfg *config.Config) Fate {
+// New creates a new instance of Fate
+// @param *config.Config
+// @return Fate
+// @return error
+func New(cfg *config.Config) (Fate, error) {
+	c := database.New(cfg.Database)
+	client, err := c.Client()
+	if err != nil {
+		return nil, err
+	}
 	return &fateImpl{
 		cfg: cfg,
-	}
+		db:  model.New(client),
+	}, nil
 }
 
 var _ Fate = (*fateImpl)(nil)
