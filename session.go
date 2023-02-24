@@ -7,10 +7,10 @@ import (
 
 type session struct {
 	db    *model.Model
-	props Property
+	props *Property
 	name  map[string]string
 }
 
-func (s *session) Start(ctx context.Context) error {
+func (s *session) Start(ctx context.Context, input *Input) error {
 	return nil
 }

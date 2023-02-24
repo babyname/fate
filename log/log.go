@@ -4,7 +4,9 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/babyname/fate/config"
 	"golang.org/x/exp/slog"
 )
 
@@ -13,10 +15,7 @@ const (
 )
 
 var (
-	output         = os.Stderr
-	opts           = slog.HandlerOptions{AddSource: true}
-	WipeData       = false
-	WipeDataLength = 1024
+	opts = slog.HandlerOptions{AddSource: true}
 )
 
 type Logger interface {
@@ -57,15 +56,51 @@ func openLogFile(path string) error {
 	if err != nil {
 		return err
 	}
-	output = file
+	output.File = file
+	//unsafeL := (*unsafe.Pointer)(unsafe.Pointer(output.File))
+	//atomic.SwapPointer(unsafeL, unsafe.Pointer(file))
 	return nil
 }
 
-func SetGlobalLogger(l Logger) {
-	defaultLogger = l
-	initialized.Store(true)
+func SetGlobalOutput(f *os.File) {
+	output.File = f
+	//unsafeL := (*unsafe.Pointer)(unsafe.Pointer(output.File))
+	//atomic.SwapPointer(unsafeL, unsafe.Pointer(f))
 }
 
-func Default() *slog.Logger {
-	return slog.New(opts.NewJSONHandler(output))
+func LoadGlobalConfig(cfg config.LogConfig) error {
+	err := openLogFile(cfg.Path)
+	if err != nil {
+		return err
+	}
+
+	opts.AddSource = cfg.ShowSource
+	var h slog.Handler = opts.NewJSONHandler(output.File)
+	if cfg.LogType != "json" {
+		h = opts.NewTextHandler(output.File)
+	}
+
+	l := slog.New(h)
+	l.Enabled(stringToLevel(cfg.Level))
+	output.Logger = l
+	//unsafeL := (*unsafe.Pointer)(unsafe.Pointer(output.Logger))
+	//atomic.SwapPointer(unsafeL, unsafe.Pointer(l))
+	return nil
+}
+
+func Default() Logger {
+	return output
+}
+
+func stringToLevel(level string) slog.Level {
+	switch strings.ToUpper(level) {
+	case "DEBUG":
+		return -4
+	case "INFO":
+		return 0
+	case "WARN":
+		return 4
+	default:
+		return 8
+	}
 }

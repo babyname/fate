@@ -10,12 +10,12 @@ import (
 )
 
 type Session interface {
-	Start(ctx context.Context) error
+	Start(ctx context.Context, input *Input) error
 }
 
 // Fate ...
 type Fate interface {
-	NewSession(Properties Property) Session
+	NewSession(Properties *Property) Session
 }
 
 type fateImpl struct {
@@ -23,9 +23,9 @@ type fateImpl struct {
 	db  *model.Model
 }
 
-func (f *fateImpl) NewSession(Properties Property) Session {
+func (f *fateImpl) NewSession(props *Property) Session {
 	return &session{
-		props: Properties,
+		props: props,
 		db:    f.db,
 	}
 }

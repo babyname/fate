@@ -1,7 +1,6 @@
 package fate
 
 import (
-	"github.com/goextension/log"
 	"github.com/google/uuid"
 	"github.com/xormsharp/xorm"
 )
@@ -121,34 +120,35 @@ func zongGe(l1, l2, f1, f2 int) int {
 	return zg%81 + 1
 }
 
-// Check 格检查
-func (ge *WuGe) Check(ss ...string) bool {
-	v := map[string]bool{}
-	if ss == nil {
-		ss = append(ss, "吉", "半吉")
-	}
-	//ignore:tianGe
-	v[GetDaYan(ge.diGe).Lucky] = false
-	v[GetDaYan(ge.renGe).Lucky] = false
-	v[GetDaYan(ge.waiGe).Lucky] = false
-	v[GetDaYan(ge.zongGe).Lucky] = false
-
-	for l := range v {
-		for i := range ss {
-			if ss[i] == l {
-				v[l] = true
-				break
-			}
-		}
-	}
-	for l := range v {
-		if v[l] == false {
-			return false
-		}
-	}
-	return true
-
-}
+//
+//// Check 格检查
+//func (ge *WuGe) Check(ss ...string) bool {
+//	v := map[string]bool{}
+//	if ss == nil {
+//		ss = append(ss, "吉", "半吉")
+//	}
+//	//ignore:tianGe
+//	v[GetDaYan(ge.diGe).Lucky] = false
+//	v[GetDaYan(ge.renGe).Lucky] = false
+//	v[GetDaYan(ge.waiGe).Lucky] = false
+//	v[GetDaYan(ge.zongGe).Lucky] = false
+//
+//	for l := range v {
+//		for i := range ss {
+//			if ss[i] == l {
+//				v[l] = true
+//				break
+//			}
+//		}
+//	}
+//	for l := range v {
+//		if v[l] == false {
+//			return false
+//		}
+//	}
+//	return true
+//
+//}
 
 // WuGeLucky ...
 type WuGeLucky struct {
@@ -193,7 +193,7 @@ func insertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e 
 	if e != nil {
 		return n, e
 	}
-	log.Infow("lucky", lucky)
+	log.Info("lucky", lucky)
 	if n == 0 {
 		n, e = engine.InsertOne(lucky)
 		return
@@ -204,90 +204,91 @@ func insertOrUpdateWuGeLucky(engine *xorm.Engine, lucky *WuGeLucky) (n int64, e 
 // WuGeMax ...
 const WuGeMax = 32
 
-func initWuGe(lucky chan<- *WuGeLucky) {
-	defer func() {
-		close(lucky)
-	}()
-	var wuge *WuGe
-	for l1 := 1; l1 <= WuGeMax; l1++ {
-		for l2 := 0; l2 <= WuGeMax; l2++ {
-			for f1 := 1; f1 <= WuGeMax; f1++ {
-				for f2 := 1; f2 <= WuGeMax; f2++ {
-					wuge = CalcWuGe(l1, l2, f1, f2)
-					lucky <- &WuGeLucky{
-						ID:           "",
-						LastStroke1:  l1,
-						LastStroke2:  l2,
-						FirstStroke1: f1,
-						FirstStroke2: f2,
-						TianGe:       wuge.tianGe,
-						TianDaYan:    GetDaYan(wuge.tianGe).Lucky,
-						RenGe:        wuge.renGe,
-						RenDaYan:     GetDaYan(wuge.renGe).Lucky,
-						DiGe:         wuge.diGe,
-						DiDaYan:      GetDaYan(wuge.diGe).Lucky,
-						WaiGe:        wuge.waiGe,
-						WaiDaYan:     GetDaYan(wuge.waiGe).Lucky,
-						ZongGe:       wuge.zongGe,
-						ZongDaYan:    GetDaYan(wuge.zongGe).Lucky,
-						ZongLucky:    wuge.Check(),
-						ZongSex:      isSex(wuge.zongGe, wuge.waiGe, wuge.renGe, wuge.diGe),
-						ZongMax:      GetDaYan(wuge.zongGe).IsMax(),
-					}
-				}
-			}
-		}
-	}
-}
-
-func getStroke(character *Character) int {
-	if character.ScienceStroke != 0 {
-		return character.ScienceStroke
-	} else if character.KangXiStroke != 0 {
-		return character.KangXiStroke
-	} else if character.Stroke != 0 {
-		return character.Stroke
-	} else if character.SimpleTotalStroke != 0 {
-		return character.SimpleTotalStroke
-	} else if character.TraditionalTotalStroke != 0 {
-		return character.TraditionalTotalStroke
-	}
-	return 0
-}
-
-func isSex(dys ...int) bool {
-	for _, dy := range dys {
-		if GetDaYan(dy).Sex {
-			return true
-		}
-	}
-	return false
-}
-
-func filterWuGe(eng *xorm.Engine, last []*Character, wg chan<- *WuGeLucky) error {
-	defer func() {
-		close(wg)
-	}()
-	l1 := getStroke(last[0])
-	l2 := 0
-	if len(last) == 2 {
-		l2 = getStroke(last[1])
-	}
-	s := eng.Where("last_stroke_1 =?", l1).
-		And("last_stroke_2 =?", l2).
-		And("zong_lucky = ?", 1)
-	rows, e := s.Rows(&WuGeLucky{})
-	if e != nil {
-		return e
-	}
-	for rows.Next() {
-		var tmp WuGeLucky
-		e := rows.Scan(&tmp)
-		if e != nil {
-			return e
-		}
-		wg <- &tmp
-	}
-
-	return nil
-}
+//
+//func initWuGe(lucky chan<- *WuGeLucky) {
+//	defer func() {
+//		close(lucky)
+//	}()
+//	var wuge *WuGe
+//	for l1 := 1; l1 <= WuGeMax; l1++ {
+//		for l2 := 0; l2 <= WuGeMax; l2++ {
+//			for f1 := 1; f1 <= WuGeMax; f1++ {
+//				for f2 := 1; f2 <= WuGeMax; f2++ {
+//					wuge = CalcWuGe(l1, l2, f1, f2)
+//					lucky <- &WuGeLucky{
+//						ID:           "",
+//						LastStroke1:  l1,
+//						LastStroke2:  l2,
+//						FirstStroke1: f1,
+//						FirstStroke2: f2,
+//						TianGe:       wuge.tianGe,
+//						TianDaYan:    GetDaYan(wuge.tianGe).Lucky,
+//						RenGe:        wuge.renGe,
+//						RenDaYan:     GetDaYan(wuge.renGe).Lucky,
+//						DiGe:         wuge.diGe,
+//						DiDaYan:      GetDaYan(wuge.diGe).Lucky,
+//						WaiGe:        wuge.waiGe,
+//						WaiDaYan:     GetDaYan(wuge.waiGe).Lucky,
+//						ZongGe:       wuge.zongGe,
+//						ZongDaYan:    GetDaYan(wuge.zongGe).Lucky,
+//						ZongLucky:    wuge.Check(),
+//						ZongSex:      isSex(wuge.zongGe, wuge.waiGe, wuge.renGe, wuge.diGe),
+//						ZongMax:      GetDaYan(wuge.zongGe).IsMax(),
+//					}
+//				}
+//			}
+//		}
+//	}
+//}
+//
+//func getStroke(character *Character) int {
+//	if character.ScienceStroke != 0 {
+//		return character.ScienceStroke
+//	} else if character.KangXiStroke != 0 {
+//		return character.KangXiStroke
+//	} else if character.Stroke != 0 {
+//		return character.Stroke
+//	} else if character.SimpleTotalStroke != 0 {
+//		return character.SimpleTotalStroke
+//	} else if character.TraditionalTotalStroke != 0 {
+//		return character.TraditionalTotalStroke
+//	}
+//	return 0
+//}
+//
+//func isSex(dys ...int) bool {
+//	for _, dy := range dys {
+//		if GetDaYan(dy).Sex {
+//			return true
+//		}
+//	}
+//	return false
+//}
+//
+//func filterWuGe(eng *xorm.Engine, last []*Character, wg chan<- *WuGeLucky) error {
+//	defer func() {
+//		close(wg)
+//	}()
+//	l1 := getStroke(last[0])
+//	l2 := 0
+//	if len(last) == 2 {
+//		l2 = getStroke(last[1])
+//	}
+//	s := eng.Where("last_stroke_1 =?", l1).
+//		And("last_stroke_2 =?", l2).
+//		And("zong_lucky = ?", 1)
+//	rows, e := s.Rows(&WuGeLucky{})
+//	if e != nil {
+//		return e
+//	}
+//	for rows.Next() {
+//		var tmp WuGeLucky
+//		e := rows.Scan(&tmp)
+//		if e != nil {
+//			return e
+//		}
+//		wg <- &tmp
+//	}
+//
+//	return nil
+//}
