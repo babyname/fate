@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/babyname/fate"
 	"github.com/babyname/fate/config"
-	"github.com/babyname/fate/logger"
+	"github.com/babyname/fate/log"
 	"github.com/spf13/cobra"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -43,7 +44,11 @@ var rootCmd = &cobra.Command{
 		}
 		cfg = config.LoadConfig(flagConfigPath)
 		fmt.Printf("Config file: %+v\n", cfg)
-		logger.SetOutput(logger.New(cfg.Log))
+		err := log.LoadGlobalConfig(cfg.Log)
+		if err != nil {
+			return
+		}
+		log.Info("logging config file", "path", cfg.Log.Path)
 	},
 	DisableSuggestions: false,
 	CompletionOptions: cobra.CompletionOptions{

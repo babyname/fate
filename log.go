@@ -1,5 +1,7 @@
 package fate
 
-import "github.com/babyname/fate/logger"
+import (
+	logger "github.com/babyname/fate/log"
+)
 
-var log logger.Logger
+var log = logger.WithGroup("Fate")

@@ -2,20 +2,23 @@ package log
 
 import (
 	"context"
-	"sync/atomic"
+	"os"
 
 	"golang.org/x/exp/slog"
 )
 
 var defaultLogger Logger = Default()
-var initialized = &atomic.Bool{}
+var output = initOutput()
 
-func ini() {
-	//defaultLogger =
+type logWarped struct {
+	*os.File
+	*slog.Logger
 }
 
-func IsInitialized() bool {
-	return initialized.Load()
+func initOutput() *logWarped {
+	l := logWarped{File: os.Stderr}
+	l.Logger = slog.New(opts.NewJSONHandler(l.File))
+	return &l
 }
 
 // Handler ...

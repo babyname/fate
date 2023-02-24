@@ -4,32 +4,28 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/babyname/fate/config"
 	"golang.org/x/exp/slog"
 )
 
-type FileLogger struct {
-	*slog.Logger
-	file *os.File
-}
-
-func NewFileLogger(path string) (*FileLogger, error) {
-	dir, _ := filepath.Split(path)
+func New(cfg config.LogConfig) (Logger, error) {
+	dir, _ := filepath.Split(cfg.Path)
 	if dir != "" {
 		_ = os.MkdirAll(dir, 0755)
 	}
-	var fl FileLogger
-	var err error
-	fl.file, err = os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+
+	file, err := os.OpenFile(cfg.Path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return nil, err
 	}
-	fl.Logger = slog.New(opts.NewJSONHandler(fl.file))
-	return &fl, nil
-}
 
-func (l *FileLogger) Close() error {
-	if l.file != nil {
-		return l.file.Close()
+	opts.AddSource = cfg.ShowSource
+	var h slog.Handler = opts.NewJSONHandler(file)
+	if cfg.LogType != "json" {
+		h = opts.NewTextHandler(file)
 	}
-	return nil
+
+	l := slog.New(h)
+	l.Enabled(stringToLevel(cfg.Level))
+	return l, nil
 }

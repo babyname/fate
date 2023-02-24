@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/babyname/fate"
+
 	"github.com/babyname/fate/database"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/model"
@@ -22,7 +22,7 @@ func cmdInit() *cobra.Command {
 			}
 			m := model.New(cli)
 			wuge := make(chan *ent.WuGeLucky, 1)
-			go fate.InitWuGe(wuge)
+			//go fate.InitWuGe(wuge)
 			fmt.Println("database initializing...")
 			err = m.Initialize(cmd.Context(), wuge)
 			if err != nil {
