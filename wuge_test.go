@@ -2,10 +2,11 @@ package fate_test
 
 import (
 	"fmt"
-	"github.com/babyname/fate"
-	"github.com/babyname/fate/model"
 	"log"
 	"testing"
+
+	"github.com/babyname/fate"
+	"github.com/babyname/fate/model"
 )
 
 // TestWuGe_WaiGe ...
@@ -29,7 +30,7 @@ func TestWuGe_WaiGe(t *testing.T) {
 		if wg.ZongGe() != sum {
 			log.Println(wg.ZongGe() == sum, l1, l2, f1, f2, wg.ZongGe())
 		}
-		fmt.Println("result:", wg.Check())
+		//fmt.Println("result:", wg.Check())
 		f2++
 	}
 }
@@ -62,7 +63,7 @@ func TestWuGeID(t *testing.T) {
 			got := model.WuGeLuckyID(tt.args.l1, tt.args.l2, tt.args.f1, tt.args.f2)
 			fmt.Printf("got %x\n", got)
 			if got != tt.want {
-				t.Errorf("WuGeID() = %v, want %v", got, tt.want)
+				t.Errorf("WuGeID() = %v, nowant %v", got, tt.want)
 			}
 		})
 	}
