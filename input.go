@@ -7,7 +7,7 @@ import (
 type Sex int //girl:0,boy:1
 
 type Input struct {
-	Name [2]rune
+	Last [2]string
 	Born time.Time
 	Sex  Sex
 }

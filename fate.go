@@ -1,21 +1,15 @@
 package fate
 
 import (
-	"strings"
-
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/database"
 	"github.com/babyname/fate/model"
-	"golang.org/x/net/context"
 )
-
-type Session interface {
-	Start(ctx context.Context, input *Input) error
-}
 
 // Fate ...
 type Fate interface {
-	NewSession(Properties *Property) Session
+	NewSession() Session
+	NewSessionWithProperty(p *Filter) Session
 }
 
 type fateImpl struct {
@@ -23,26 +17,15 @@ type fateImpl struct {
 	db  *model.Model
 }
 
-func (f *fateImpl) NewSession(props *Property) Session {
+func (f *fateImpl) NewSessionWithProperty(p *Filter) Session {
 	return &session{
-		props: props,
+		props: p,
 		db:    f.db,
 	}
 }
 
-func (f *fateImpl) Query() *model.Model {
-	return f.db
-}
-
-func filterSex(lucky *WuGeLucky) bool {
-	return lucky.ZongSex == true
-}
-
-func isLucky(s string) bool {
-	if strings.Compare(s, "吉") == 0 || strings.Compare(s, "半吉") == 0 {
-		return true
-	}
-	return false
+func (f *fateImpl) NewSession() Session {
+	return f.NewSessionWithProperty(DefaultProperty())
 }
 
 // New creates a new instance of Fate
