@@ -17,10 +17,10 @@ type fateImpl struct {
 	db  *model.Model
 }
 
-func (f *fateImpl) NewSessionWithProperty(p *Filter) Session {
+func (f *fateImpl) NewSessionWithProperty(filter *Filter) Session {
 	return &session{
-		props: p,
-		db:    f.db,
+		filter: filter,
+		db:     f.db,
 	}
 }
 
