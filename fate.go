@@ -9,7 +9,7 @@ import (
 // Fate ...
 type Fate interface {
 	NewSession() Session
-	NewSessionWithProperty(p *Filter) Session
+	NewSessionWithFilter(f Filter) Session
 }
 
 type fateImpl struct {
@@ -17,7 +17,7 @@ type fateImpl struct {
 	db  *model.Model
 }
 
-func (f *fateImpl) NewSessionWithProperty(filter *Filter) Session {
+func (f *fateImpl) NewSessionWithFilter(filter Filter) Session {
 	return &session{
 		filter: filter,
 		db:     f.db,
@@ -25,7 +25,7 @@ func (f *fateImpl) NewSessionWithProperty(filter *Filter) Session {
 }
 
 func (f *fateImpl) NewSession() Session {
-	return f.NewSessionWithProperty(DefaultProperty())
+	return f.NewSessionWithFilter(DefaultFilter())
 }
 
 // New creates a new instance of Fate
