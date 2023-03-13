@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"github.com/babyname/fate/config"
-	"golang.org/x/net/context"
-
 	_ "github.com/sqlite3ent/sqlite3"
 )
 
@@ -39,9 +37,15 @@ func TestNew(t *testing.T) {
 			if got == tt.nowant {
 				t.Errorf("New() got = %v, nowant %v", got, tt.nowant)
 			}
-			session := got.NewSession(DefaultProperty())
-			err = session.Start(context.TODO(), &Input{
-				Name: [2]string{"章"},
+			session := got.NewSessionWithFilter(NewFilter(FilterOption{
+				CharacterFilter:     true,
+				CharacterFilterType: 0,
+				MinCharacter:        3,
+				MaxCharacter:        18,
+				SexFilter:           true,
+			}))
+			err = session.Start(&Input{
+				Last: [2]string{"章"},
 				Born: time.Now(),
 				Sex:  1,
 			})
