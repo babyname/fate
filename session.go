@@ -14,7 +14,7 @@ type session struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 	db     *model.Model
-	filter *Filter
+	filter Filter
 	base   NameBase
 	detail []NameDetail
 	name   chan Name
