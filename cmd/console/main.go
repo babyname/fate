@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/sqlite3ent/sqlite3"
 )
 
 const (
