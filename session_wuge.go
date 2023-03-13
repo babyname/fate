@@ -163,10 +163,11 @@ func (s *session) getWuGeLucky() error {
 	if err != nil {
 		return err
 	}
-
+	log.Debug("wuge lucky list", "size", len(lucky))
 	var tmp *ent.WuGeLucky
 	for i := range lucky {
 		tmp = lucky[i]
+		log.Debug("current lukcy", "lucky", tmp)
 		if s.filter.SexFilter(tmp) {
 			continue
 		}
