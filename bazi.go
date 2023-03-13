@@ -1,9 +1,7 @@
 package fate
 
 import (
-	"strings"
-
-	"github.com/godcong/chronos"
+	"github.com/godcong/chronos/v2"
 )
 
 var diIndex = map[string]int{
@@ -111,28 +109,28 @@ func WuXingDiZhi(s string) string {
 
 // BaZi ...
 type BaZi struct {
-	baZi   []string
-	wuXing []string
+	baZi   chronos.EightChar
+	wuXing [4]string
 	xiyong *XiYong
 }
 
 // NewBazi 创建八字
 func NewBazi(calendar chronos.Calendar) *BaZi {
-	ec := calendar.Lunar().EightCharacter()
+	ec := calendar.Lunar().GetEightChar()
 	return &BaZi{
 		baZi:   ec,
-		wuXing: baziToWuXing(ec),
+		wuXing: ec.GetWuXing(),
 	}
 }
 
 // String ...
 func (z *BaZi) String() string {
-	return strings.Join(z.baZi, "")
+	return z.String()
 }
 
 // RiZhu 日主
 func (z *BaZi) RiZhu() string {
-	return z.baZi[4]
+	return z.baZi.GetSiZhu()[3]
 }
 
 func (z *BaZi) calcXiYong() {
@@ -155,8 +153,8 @@ func (z *BaZi) XiYongShen() string {
 }
 
 func (z *BaZi) point() *BaZi {
-	di := diIndex[z.baZi[3]]
-	for idx, v := range z.baZi {
+	di := diIndex[z.baZi.GetSiZhu()[2]]
+	for idx, v := range z.baZi.GetSiZhu() {
 		if idx%2 == 0 {
 			z.xiyong.AddFen(WuXingTianGan(v), tiangan[di][tianIndex[v]])
 		} else {

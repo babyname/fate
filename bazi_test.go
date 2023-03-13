@@ -1,15 +1,16 @@
 package fate_test
 
 import (
-	"github.com/godcong/chronos"
-	"github.com/babyname/fate"
 	"log"
 	"testing"
+
+	"github.com/babyname/fate"
+	"github.com/godcong/chronos/v2"
 )
 
 func TestPoint(t *testing.T) {
-	t1 := chronos.New("2020/01/24 15:30")
-	log.Println(t1.Lunar().EightCharacter())
+	t1 := chronos.ParseSolarString("2020/01/24 15:30")
+	log.Println(t1.Lunar().GetEightChar())
 
 	bz := fate.NewBazi(t1)
 	t.Log(bz.XiYong())

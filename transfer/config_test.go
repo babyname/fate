@@ -24,8 +24,8 @@ func Test_writeConfig(t *testing.T) {
 			args: args{
 				p: "transfer.cfg",
 				db: DatabaseConfig{
-					Source: config.DefaultConfig(),
-					Target: config.DefaultSqliteConfig(),
+					Source: *config.DefaultMysqlConfig(),
+					Target: *config.DefaultConfig(),
 					Tables: []string{"Character", "WuGeLucky", "WuXing"},
 				},
 			},
@@ -57,8 +57,6 @@ func TestReadTransferConfig(t *testing.T) {
 				p: "transfer.cfg",
 			},
 			want: &DatabaseConfig{
-				Source: nil,
-				Target: nil,
 				Tables: nil,
 			},
 			wantErr: false,

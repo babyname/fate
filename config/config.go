@@ -87,6 +87,14 @@ func DefaultConfig() *Config {
 	}
 }
 
+func DefaultMysqlConfig() *Config {
+	return &Config{
+		WorkingDir: defaultWorkingDir,
+		Database:   defaultDBMysql(),
+		Log:        defaultLogConfig(),
+	}
+}
+
 func GetPath(root string, paths ...string) string {
 	workpath := filepath.Join(paths...)
 	path := filepath.Join(defaultWorkingDir, workpath)
@@ -102,4 +110,8 @@ func GetPath(root string, paths ...string) string {
 		return s
 	}
 	return filepath.Join(root, workpath)
+}
+
+func (c *Config) DecodeBytes(bs []byte) error {
+	return json.Unmarshal(bs, c)
 }

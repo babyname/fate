@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/babyname/fate/database"
 	"github.com/babyname/fate/ent"
 )
 
@@ -145,11 +146,11 @@ func (t transferDatabase) transferWuXing(ctx context.Context) error {
 }
 
 func newTransfer(c *DatabaseConfig) (*transferDatabase, error) {
-	source, err := c.Source.Database().BuildClient()
+	source, err := database.New(c.Source.Database).Client()
 	if err != nil {
 		return nil, fmt.Errorf("could not open source database: %v", err)
 	}
-	target, err := c.Target.Database().BuildClient()
+	target, err := database.New(c.Target.Database).Client()
 	if err != nil {
 		return nil, fmt.Errorf("could not open target database: %v", err)
 	}
