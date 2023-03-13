@@ -28,11 +28,14 @@ func ReadTransferConfig(p string) (*DatabaseConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.Source, err = config.LoadFromBytes(db.SourceRaw)
+	err = db.Source.DecodeBytes(db.SourceRaw)
 	if err != nil {
 		return nil, err
 	}
-	db.Target, err = config.LoadFromBytes(db.TargetRaw)
+	err = db.Target.DecodeBytes(db.TargetRaw)
+	if err != nil {
+		return nil, err
+	}
 	return &db, nil
 }
 

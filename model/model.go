@@ -6,10 +6,12 @@ import (
 	"encoding/hex"
 
 	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/ent/character"
 )
 
 type Model struct {
 	*ent.Client
+	cache Cache
 }
 
 func (m Model) Initialize(ctx context.Context, luckies <-chan *ent.WuGeLucky) error {
@@ -46,6 +48,20 @@ func (m Model) Initialize(ctx context.Context, luckies <-chan *ent.WuGeLucky) er
 
 func (m Model) insertWuGeLucky(ctx context.Context, tmp []*ent.WuGeLuckyCreate) ([]*ent.WuGeLucky, error) {
 	return m.WuGeLucky.CreateBulk(tmp...).Save(ctx)
+}
+
+func (m Model) QueryLastName(ctx context.Context, last [2]string) (lastName [2]*ent.Character, err error) {
+	lastName[0], err = m.Character.Query().Where(character.ChEQ(last[0])).First(ctx)
+	if err != nil {
+		return lastName, err
+	}
+	if last[1] != "" {
+		lastName[1], err = m.Character.Query().Where(character.ChEQ(last[1])).First(ctx)
+		if err != nil {
+			return lastName, err
+		}
+	}
+	return lastName, nil
 }
 
 // ID ...
