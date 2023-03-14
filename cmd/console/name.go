@@ -60,15 +60,24 @@ func cmdName() *cobra.Command {
 				fmt.Println("发生了一些错误", err.Error())
 				return
 			}
+			var names []fate.Name
 			for fn := range s.Output() {
-				n := s.Name(fn)
-				fmt.Println("Name:", n.String())
+				names = append(names, s.Name(fn))
 			}
 			if s.Err() != nil {
 				fmt.Println("输出时发生了一些错误", s.Err().Error())
 				return
 			}
 			fmt.Println("end", time.Now().String())
+			time.Sleep(3 * time.Second)
+			for i := 0; i < len(names); i += 10 {
+				fmt.Print("Name:")
+				for j := i; j < len(names) && j < i+10; j++ {
+					fmt.Print(names[j], "  |  ")
+				}
+				fmt.Printf("\r\n")
+			}
+			fmt.Println("Total", len(names))
 		},
 	}
 	cmd.Flags().StringVarP(&last, "last", "l", "", "指定姓氏")
