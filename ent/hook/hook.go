@@ -15,11 +15,10 @@ type CharacterFunc func(context.Context, *ent.CharacterMutation) (ent.Value, err
 
 // Mutate calls f(ctx, m).
 func (f CharacterFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.CharacterMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CharacterMutation", m)
+	if mv, ok := m.(*ent.CharacterMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CharacterMutation", m)
 }
 
 // The VersionFunc type is an adapter to allow the use of ordinary
@@ -28,11 +27,10 @@ type VersionFunc func(context.Context, *ent.VersionMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f VersionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.VersionMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.VersionMutation", m)
+	if mv, ok := m.(*ent.VersionMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.VersionMutation", m)
 }
 
 // The WuGeLuckyFunc type is an adapter to allow the use of ordinary
@@ -41,11 +39,10 @@ type WuGeLuckyFunc func(context.Context, *ent.WuGeLuckyMutation) (ent.Value, err
 
 // Mutate calls f(ctx, m).
 func (f WuGeLuckyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.WuGeLuckyMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WuGeLuckyMutation", m)
+	if mv, ok := m.(*ent.WuGeLuckyMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WuGeLuckyMutation", m)
 }
 
 // The WuXingFunc type is an adapter to allow the use of ordinary
@@ -54,11 +51,10 @@ type WuXingFunc func(context.Context, *ent.WuXingMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f WuXingFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.WuXingMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WuXingMutation", m)
+	if mv, ok := m.(*ent.WuXingMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WuXingMutation", m)
 }
 
 // Condition is a hook condition function.

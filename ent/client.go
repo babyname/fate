@@ -9,14 +9,15 @@ import (
 	"log"
 
 	"github.com/babyname/fate/ent/migrate"
+	"github.com/google/uuid"
 
+	"entgo.io/ent"
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"github.com/babyname/fate/ent/character"
 	"github.com/babyname/fate/ent/version"
 	"github.com/babyname/fate/ent/wugelucky"
 	"github.com/babyname/fate/ent/wuxing"
-
-	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql"
 )
 
 // Client is the client that holds all ent builders.
@@ -36,7 +37,7 @@ type Client struct {
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}}
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
 	cfg.options(opts...)
 	client := &Client{config: cfg}
 	client.init()
@@ -49,6 +50,55 @@ func (c *Client) init() {
 	c.Version = NewVersionClient(c.config)
 	c.WuGeLucky = NewWuGeLuckyClient(c.config)
 	c.WuXing = NewWuXingClient(c.config)
+}
+
+type (
+	// config is the configuration for the client and its builder.
+	config struct {
+		// driver used for executing database requests.
+		driver dialect.Driver
+		// debug enable a debug logging.
+		debug bool
+		// log used for logging on debug mode.
+		log func(...any)
+		// hooks to execute on mutations.
+		hooks *hooks
+		// interceptors to execute on queries.
+		inters *inters
+	}
+	// Option function to configure the client.
+	Option func(*config)
+)
+
+// options applies the options on the config object.
+func (c *config) options(opts ...Option) {
+	for _, opt := range opts {
+		opt(c)
+	}
+	if c.debug {
+		c.driver = dialect.Debug(c.driver, c.log)
+	}
+}
+
+// Debug enables debug logging on the ent.Driver.
+func Debug() Option {
+	return func(c *config) {
+		c.debug = true
+	}
+}
+
+// Log sets the logging function for debug mode.
+func Log(fn func(...any)) Option {
+	return func(c *config) {
+		c.log = fn
+	}
+}
+
+// Driver configures the client driver.
+func Driver(driver dialect.Driver) Option {
+	return func(c *config) {
+		c.driver = driver
+	}
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -143,6 +193,31 @@ func (c *Client) Use(hooks ...Hook) {
 	c.WuXing.Use(hooks...)
 }
 
+// Intercept adds the query interceptors to all the entity clients.
+// In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
+func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.Character.Intercept(interceptors...)
+	c.Version.Intercept(interceptors...)
+	c.WuGeLucky.Intercept(interceptors...)
+	c.WuXing.Intercept(interceptors...)
+}
+
+// Mutate implements the ent.Mutator interface.
+func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
+	switch m := m.(type) {
+	case *CharacterMutation:
+		return c.Character.mutate(ctx, m)
+	case *VersionMutation:
+		return c.Version.mutate(ctx, m)
+	case *WuGeLuckyMutation:
+		return c.WuGeLucky.mutate(ctx, m)
+	case *WuXingMutation:
+		return c.WuXing.mutate(ctx, m)
+	default:
+		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
 // CharacterClient is a client for the Character schema.
 type CharacterClient struct {
 	config
@@ -157,6 +232,12 @@ func NewCharacterClient(c config) *CharacterClient {
 // A call to `Use(f, g, h)` equals to `character.Hooks(f(g(h())))`.
 func (c *CharacterClient) Use(hooks ...Hook) {
 	c.hooks.Character = append(c.hooks.Character, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `character.Intercept(f(g(h())))`.
+func (c *CharacterClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Character = append(c.inters.Character, interceptors...)
 }
 
 // Create returns a builder for creating a Character entity.
@@ -211,6 +292,8 @@ func (c *CharacterClient) DeleteOneID(id string) *CharacterDeleteOne {
 func (c *CharacterClient) Query() *CharacterQuery {
 	return &CharacterQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeCharacter},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -233,6 +316,26 @@ func (c *CharacterClient) Hooks() []Hook {
 	return c.hooks.Character
 }
 
+// Interceptors returns the client interceptors.
+func (c *CharacterClient) Interceptors() []Interceptor {
+	return c.inters.Character
+}
+
+func (c *CharacterClient) mutate(ctx context.Context, m *CharacterMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CharacterCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CharacterUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CharacterDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Character mutation op: %q", m.Op())
+	}
+}
+
 // VersionClient is a client for the Version schema.
 type VersionClient struct {
 	config
@@ -247,6 +350,12 @@ func NewVersionClient(c config) *VersionClient {
 // A call to `Use(f, g, h)` equals to `version.Hooks(f(g(h())))`.
 func (c *VersionClient) Use(hooks ...Hook) {
 	c.hooks.Version = append(c.hooks.Version, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `version.Intercept(f(g(h())))`.
+func (c *VersionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Version = append(c.inters.Version, interceptors...)
 }
 
 // Create returns a builder for creating a Version entity.
@@ -301,6 +410,8 @@ func (c *VersionClient) DeleteOneID(id int) *VersionDeleteOne {
 func (c *VersionClient) Query() *VersionQuery {
 	return &VersionQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeVersion},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -323,6 +434,26 @@ func (c *VersionClient) Hooks() []Hook {
 	return c.hooks.Version
 }
 
+// Interceptors returns the client interceptors.
+func (c *VersionClient) Interceptors() []Interceptor {
+	return c.inters.Version
+}
+
+func (c *VersionClient) mutate(ctx context.Context, m *VersionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&VersionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&VersionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&VersionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&VersionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Version mutation op: %q", m.Op())
+	}
+}
+
 // WuGeLuckyClient is a client for the WuGeLucky schema.
 type WuGeLuckyClient struct {
 	config
@@ -337,6 +468,12 @@ func NewWuGeLuckyClient(c config) *WuGeLuckyClient {
 // A call to `Use(f, g, h)` equals to `wugelucky.Hooks(f(g(h())))`.
 func (c *WuGeLuckyClient) Use(hooks ...Hook) {
 	c.hooks.WuGeLucky = append(c.hooks.WuGeLucky, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `wugelucky.Intercept(f(g(h())))`.
+func (c *WuGeLuckyClient) Intercept(interceptors ...Interceptor) {
+	c.inters.WuGeLucky = append(c.inters.WuGeLucky, interceptors...)
 }
 
 // Create returns a builder for creating a WuGeLucky entity.
@@ -363,7 +500,7 @@ func (c *WuGeLuckyClient) UpdateOne(wgl *WuGeLucky) *WuGeLuckyUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *WuGeLuckyClient) UpdateOneID(id int) *WuGeLuckyUpdateOne {
+func (c *WuGeLuckyClient) UpdateOneID(id uuid.UUID) *WuGeLuckyUpdateOne {
 	mutation := newWuGeLuckyMutation(c.config, OpUpdateOne, withWuGeLuckyID(id))
 	return &WuGeLuckyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -380,7 +517,7 @@ func (c *WuGeLuckyClient) DeleteOne(wgl *WuGeLucky) *WuGeLuckyDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *WuGeLuckyClient) DeleteOneID(id int) *WuGeLuckyDeleteOne {
+func (c *WuGeLuckyClient) DeleteOneID(id uuid.UUID) *WuGeLuckyDeleteOne {
 	builder := c.Delete().Where(wugelucky.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -391,16 +528,18 @@ func (c *WuGeLuckyClient) DeleteOneID(id int) *WuGeLuckyDeleteOne {
 func (c *WuGeLuckyClient) Query() *WuGeLuckyQuery {
 	return &WuGeLuckyQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeWuGeLucky},
+		inters: c.Interceptors(),
 	}
 }
 
 // Get returns a WuGeLucky entity by its id.
-func (c *WuGeLuckyClient) Get(ctx context.Context, id int) (*WuGeLucky, error) {
+func (c *WuGeLuckyClient) Get(ctx context.Context, id uuid.UUID) (*WuGeLucky, error) {
 	return c.Query().Where(wugelucky.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *WuGeLuckyClient) GetX(ctx context.Context, id int) *WuGeLucky {
+func (c *WuGeLuckyClient) GetX(ctx context.Context, id uuid.UUID) *WuGeLucky {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -411,6 +550,26 @@ func (c *WuGeLuckyClient) GetX(ctx context.Context, id int) *WuGeLucky {
 // Hooks returns the client hooks.
 func (c *WuGeLuckyClient) Hooks() []Hook {
 	return c.hooks.WuGeLucky
+}
+
+// Interceptors returns the client interceptors.
+func (c *WuGeLuckyClient) Interceptors() []Interceptor {
+	return c.inters.WuGeLucky
+}
+
+func (c *WuGeLuckyClient) mutate(ctx context.Context, m *WuGeLuckyMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&WuGeLuckyCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&WuGeLuckyUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&WuGeLuckyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&WuGeLuckyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown WuGeLucky mutation op: %q", m.Op())
+	}
 }
 
 // WuXingClient is a client for the WuXing schema.
@@ -427,6 +586,12 @@ func NewWuXingClient(c config) *WuXingClient {
 // A call to `Use(f, g, h)` equals to `wuxing.Hooks(f(g(h())))`.
 func (c *WuXingClient) Use(hooks ...Hook) {
 	c.hooks.WuXing = append(c.hooks.WuXing, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `wuxing.Intercept(f(g(h())))`.
+func (c *WuXingClient) Intercept(interceptors ...Interceptor) {
+	c.inters.WuXing = append(c.inters.WuXing, interceptors...)
 }
 
 // Create returns a builder for creating a WuXing entity.
@@ -481,6 +646,8 @@ func (c *WuXingClient) DeleteOneID(id string) *WuXingDeleteOne {
 func (c *WuXingClient) Query() *WuXingQuery {
 	return &WuXingQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeWuXing},
+		inters: c.Interceptors(),
 	}
 }
 
@@ -502,3 +669,33 @@ func (c *WuXingClient) GetX(ctx context.Context, id string) *WuXing {
 func (c *WuXingClient) Hooks() []Hook {
 	return c.hooks.WuXing
 }
+
+// Interceptors returns the client interceptors.
+func (c *WuXingClient) Interceptors() []Interceptor {
+	return c.inters.WuXing
+}
+
+func (c *WuXingClient) mutate(ctx context.Context, m *WuXingMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&WuXingCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&WuXingUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&WuXingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&WuXingDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown WuXing mutation op: %q", m.Op())
+	}
+}
+
+// hooks and interceptors per client, for fast access.
+type (
+	hooks struct {
+		Character, Version, WuGeLucky, WuXing []ent.Hook
+	}
+	inters struct {
+		Character, Version, WuGeLucky, WuXing []ent.Interceptor
+	}
+)

@@ -70,7 +70,7 @@ func (v *Version) assignValues(columns []string, values []any) error {
 // Note that you need to call Version.Unwrap() before calling this method if this Version
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (v *Version) Update() *VersionUpdateOne {
-	return (&VersionClient{config: v.config}).UpdateOne(v)
+	return NewVersionClient(v.config).UpdateOne(v)
 }
 
 // Unwrap unwraps the Version entity that was returned from a transaction after it was closed,
@@ -100,9 +100,3 @@ func (v *Version) String() string {
 
 // Versions is a parsable slice of Version.
 type Versions []*Version
-
-func (v Versions) config(cfg config) {
-	for _i := range v {
-		v[_i].config = cfg
-	}
-}

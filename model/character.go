@@ -23,8 +23,7 @@ func (m Model) GetCharacter(ctx context.Context, filters ...CharQuery) (
 	return q.First(ctx)
 }
 
-func (m Model) GetCharacters(ctx context.Context, filters ...CharQuery) (
-	[]*ent.Character, error) {
+func (m Model) GetCharacters(ctx context.Context, filters ...CharQuery) ([]*ent.Character, error) {
 	q := m.Character.Query()
 	for _, filter := range filters {
 		q = filter(q)

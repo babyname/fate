@@ -38,49 +38,7 @@ func (vc *VersionCreate) Mutation() *VersionMutation {
 
 // Save creates the Version in the database.
 func (vc *VersionCreate) Save(ctx context.Context) (*Version, error) {
-	var (
-		err  error
-		node *Version
-	)
-	if len(vc.hooks) == 0 {
-		if err = vc.check(); err != nil {
-			return nil, err
-		}
-		node, err = vc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*VersionMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = vc.check(); err != nil {
-				return nil, err
-			}
-			vc.mutation = mutation
-			if node, err = vc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(vc.hooks) - 1; i >= 0; i-- {
-			if vc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = vc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, vc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Version)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from VersionMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Version, VersionMutation](ctx, vc.sqlSave, vc.mutation, vc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -117,6 +75,9 @@ func (vc *VersionCreate) check() error {
 }
 
 func (vc *VersionCreate) sqlSave(ctx context.Context) (*Version, error) {
+	if err := vc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := vc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, vc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -126,19 +87,15 @@ func (vc *VersionCreate) sqlSave(ctx context.Context) (*Version, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
+	vc.mutation.id = &_node.ID
+	vc.mutation.done = true
 	return _node, nil
 }
 
 func (vc *VersionCreate) createSpec() (*Version, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Version{config: vc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: version.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
-				Column: version.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(version.Table, sqlgraph.NewFieldSpec(version.FieldID, field.TypeInt))
 	)
 	if value, ok := vc.mutation.CurrentVersion(); ok {
 		_spec.SetField(version.FieldCurrentVersion, field.TypeInt, value)
