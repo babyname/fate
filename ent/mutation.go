@@ -9,13 +9,14 @@ import (
 	"sync"
 	"time"
 
+	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 	"github.com/babyname/fate/ent/character"
 	"github.com/babyname/fate/ent/predicate"
 	"github.com/babyname/fate/ent/version"
 	"github.com/babyname/fate/ent/wugelucky"
 	"github.com/babyname/fate/ent/wuxing"
-
-	"entgo.io/ent"
+	"github.com/google/uuid"
 )
 
 const (
@@ -1136,9 +1137,24 @@ func (m *CharacterMutation) Where(ps ...predicate.Character) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the CharacterMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *CharacterMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Character, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *CharacterMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *CharacterMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Character).
@@ -1982,9 +1998,24 @@ func (m *VersionMutation) Where(ps ...predicate.Version) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the VersionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *VersionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Version, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *VersionMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *VersionMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Version).
@@ -2190,7 +2221,7 @@ type WuGeLuckyMutation struct {
 	config
 	op                Op
 	typ               string
-	id                *int
+	id                *uuid.UUID
 	last_stroke_1     *int
 	addlast_stroke_1  *int
 	last_stroke_2     *int
@@ -2243,7 +2274,7 @@ func newWuGeLuckyMutation(c config, op Op, opts ...wugeluckyOption) *WuGeLuckyMu
 }
 
 // withWuGeLuckyID sets the ID field of the mutation.
-func withWuGeLuckyID(id int) wugeluckyOption {
+func withWuGeLuckyID(id uuid.UUID) wugeluckyOption {
 	return func(m *WuGeLuckyMutation) {
 		var (
 			err   error
@@ -2295,13 +2326,13 @@ func (m WuGeLuckyMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of WuGeLucky entities.
-func (m *WuGeLuckyMutation) SetID(id int) {
+func (m *WuGeLuckyMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *WuGeLuckyMutation) ID() (id int, exists bool) {
+func (m *WuGeLuckyMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -2312,12 +2343,12 @@ func (m *WuGeLuckyMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *WuGeLuckyMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *WuGeLuckyMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -3124,9 +3155,24 @@ func (m *WuGeLuckyMutation) Where(ps ...predicate.WuGeLucky) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the WuGeLuckyMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *WuGeLuckyMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.WuGeLucky, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *WuGeLuckyMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *WuGeLuckyMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (WuGeLucky).
@@ -4209,9 +4255,24 @@ func (m *WuXingMutation) Where(ps ...predicate.WuXing) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the WuXingMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *WuXingMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.WuXing, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *WuXingMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *WuXingMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (WuXing).

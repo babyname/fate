@@ -123,7 +123,7 @@ func (wx *WuXing) assignValues(columns []string, values []any) error {
 // Note that you need to call WuXing.Unwrap() before calling this method if this WuXing
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (wx *WuXing) Update() *WuXingUpdateOne {
-	return (&WuXingClient{config: wx.config}).UpdateOne(wx)
+	return NewWuXingClient(wx.config).UpdateOne(wx)
 }
 
 // Unwrap unwraps the WuXing entity that was returned from a transaction after it was closed,
@@ -171,9 +171,3 @@ func (wx *WuXing) String() string {
 
 // WuXings is a parsable slice of WuXing.
 type WuXings []*WuXing
-
-func (wx WuXings) config(cfg config) {
-	for _i := range wx {
-		wx[_i].config = cfg
-	}
-}

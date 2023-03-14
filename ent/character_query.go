@@ -17,11 +17,9 @@ import (
 // CharacterQuery is the builder for querying Character entities.
 type CharacterQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
+	ctx        *QueryContext
 	order      []OrderFunc
-	fields     []string
+	inters     []Interceptor
 	predicates []predicate.Character
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -34,26 +32,26 @@ func (cq *CharacterQuery) Where(ps ...predicate.Character) *CharacterQuery {
 	return cq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (cq *CharacterQuery) Limit(limit int) *CharacterQuery {
-	cq.limit = &limit
+	cq.ctx.Limit = &limit
 	return cq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (cq *CharacterQuery) Offset(offset int) *CharacterQuery {
-	cq.offset = &offset
+	cq.ctx.Offset = &offset
 	return cq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (cq *CharacterQuery) Unique(unique bool) *CharacterQuery {
-	cq.unique = &unique
+	cq.ctx.Unique = &unique
 	return cq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (cq *CharacterQuery) Order(o ...OrderFunc) *CharacterQuery {
 	cq.order = append(cq.order, o...)
 	return cq
@@ -62,7 +60,7 @@ func (cq *CharacterQuery) Order(o ...OrderFunc) *CharacterQuery {
 // First returns the first Character entity from the query.
 // Returns a *NotFoundError when no Character was found.
 func (cq *CharacterQuery) First(ctx context.Context) (*Character, error) {
-	nodes, err := cq.Limit(1).All(ctx)
+	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +83,7 @@ func (cq *CharacterQuery) FirstX(ctx context.Context) *Character {
 // Returns a *NotFoundError when no Character ID was found.
 func (cq *CharacterQuery) FirstID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = cq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -108,7 +106,7 @@ func (cq *CharacterQuery) FirstIDX(ctx context.Context) string {
 // Returns a *NotSingularError when more than one Character entity is found.
 // Returns a *NotFoundError when no Character entities are found.
 func (cq *CharacterQuery) Only(ctx context.Context) (*Character, error) {
-	nodes, err := cq.Limit(2).All(ctx)
+	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +134,7 @@ func (cq *CharacterQuery) OnlyX(ctx context.Context) *Character {
 // Returns a *NotFoundError when no entities are found.
 func (cq *CharacterQuery) OnlyID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = cq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -161,10 +159,12 @@ func (cq *CharacterQuery) OnlyIDX(ctx context.Context) string {
 
 // All executes the query and returns a list of Characters.
 func (cq *CharacterQuery) All(ctx context.Context) ([]*Character, error) {
+	ctx = setContextOp(ctx, cq.ctx, "All")
 	if err := cq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return cq.sqlAll(ctx)
+	qr := querierAll[[]*Character, *CharacterQuery]()
+	return withInterceptors[[]*Character](ctx, cq, qr, cq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -177,9 +177,12 @@ func (cq *CharacterQuery) AllX(ctx context.Context) []*Character {
 }
 
 // IDs executes the query and returns a list of Character IDs.
-func (cq *CharacterQuery) IDs(ctx context.Context) ([]string, error) {
-	var ids []string
-	if err := cq.Select(character.FieldID).Scan(ctx, &ids); err != nil {
+func (cq *CharacterQuery) IDs(ctx context.Context) (ids []string, err error) {
+	if cq.ctx.Unique == nil && cq.path != nil {
+		cq.Unique(true)
+	}
+	ctx = setContextOp(ctx, cq.ctx, "IDs")
+	if err = cq.Select(character.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -196,10 +199,11 @@ func (cq *CharacterQuery) IDsX(ctx context.Context) []string {
 
 // Count returns the count of the given query.
 func (cq *CharacterQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, cq.ctx, "Count")
 	if err := cq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return cq.sqlCount(ctx)
+	return withInterceptors[int](ctx, cq, querierCount[*CharacterQuery](), cq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -213,10 +217,15 @@ func (cq *CharacterQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (cq *CharacterQuery) Exist(ctx context.Context) (bool, error) {
-	if err := cq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = setContextOp(ctx, cq.ctx, "Exist")
+	switch _, err := cq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return cq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -236,14 +245,13 @@ func (cq *CharacterQuery) Clone() *CharacterQuery {
 	}
 	return &CharacterQuery{
 		config:     cq.config,
-		limit:      cq.limit,
-		offset:     cq.offset,
+		ctx:        cq.ctx.Clone(),
 		order:      append([]OrderFunc{}, cq.order...),
+		inters:     append([]Interceptor{}, cq.inters...),
 		predicates: append([]predicate.Character{}, cq.predicates...),
 		// clone intermediate query.
-		sql:    cq.sql.Clone(),
-		path:   cq.path,
-		unique: cq.unique,
+		sql:  cq.sql.Clone(),
+		path: cq.path,
 	}
 }
 
@@ -262,16 +270,11 @@ func (cq *CharacterQuery) Clone() *CharacterQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (cq *CharacterQuery) GroupBy(field string, fields ...string) *CharacterGroupBy {
-	grbuild := &CharacterGroupBy{config: cq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return cq.sqlQuery(ctx), nil
-	}
+	cq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &CharacterGroupBy{build: cq}
+	grbuild.flds = &cq.ctx.Fields
 	grbuild.label = character.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -288,11 +291,11 @@ func (cq *CharacterQuery) GroupBy(field string, fields ...string) *CharacterGrou
 //		Select(character.FieldPinYin).
 //		Scan(ctx, &v)
 func (cq *CharacterQuery) Select(fields ...string) *CharacterSelect {
-	cq.fields = append(cq.fields, fields...)
-	selbuild := &CharacterSelect{CharacterQuery: cq}
-	selbuild.label = character.Label
-	selbuild.flds, selbuild.scan = &cq.fields, selbuild.Scan
-	return selbuild
+	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
+	sbuild := &CharacterSelect{CharacterQuery: cq}
+	sbuild.label = character.Label
+	sbuild.flds, sbuild.scan = &cq.ctx.Fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a CharacterSelect configured with the given aggregations.
@@ -301,7 +304,17 @@ func (cq *CharacterQuery) Aggregate(fns ...AggregateFunc) *CharacterSelect {
 }
 
 func (cq *CharacterQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range cq.fields {
+	for _, inter := range cq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, cq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range cq.ctx.Fields {
 		if !character.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -343,41 +356,22 @@ func (cq *CharacterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 
 func (cq *CharacterQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
-	_spec.Node.Columns = cq.fields
-	if len(cq.fields) > 0 {
-		_spec.Unique = cq.unique != nil && *cq.unique
+	_spec.Node.Columns = cq.ctx.Fields
+	if len(cq.ctx.Fields) > 0 {
+		_spec.Unique = cq.ctx.Unique != nil && *cq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, cq.driver, _spec)
 }
 
-func (cq *CharacterQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := cq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
-}
-
 func (cq *CharacterQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   character.Table,
-			Columns: character.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: character.FieldID,
-			},
-		},
-		From:   cq.sql,
-		Unique: true,
-	}
-	if unique := cq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(character.Table, character.Columns, sqlgraph.NewFieldSpec(character.FieldID, field.TypeString))
+	_spec.From = cq.sql
+	if unique := cq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if cq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := cq.fields; len(fields) > 0 {
+	if fields := cq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, character.FieldID)
 		for i := range fields {
@@ -393,10 +387,10 @@ func (cq *CharacterQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := cq.limit; limit != nil {
+	if limit := cq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := cq.offset; offset != nil {
+	if offset := cq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := cq.order; len(ps) > 0 {
@@ -412,7 +406,7 @@ func (cq *CharacterQuery) querySpec() *sqlgraph.QuerySpec {
 func (cq *CharacterQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(cq.driver.Dialect())
 	t1 := builder.Table(character.Table)
-	columns := cq.fields
+	columns := cq.ctx.Fields
 	if len(columns) == 0 {
 		columns = character.Columns
 	}
@@ -421,7 +415,7 @@ func (cq *CharacterQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = cq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if cq.unique != nil && *cq.unique {
+	if cq.ctx.Unique != nil && *cq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range cq.predicates {
@@ -430,12 +424,12 @@ func (cq *CharacterQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range cq.order {
 		p(selector)
 	}
-	if offset := cq.offset; offset != nil {
+	if offset := cq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := cq.limit; limit != nil {
+	if limit := cq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -443,13 +437,8 @@ func (cq *CharacterQuery) sqlQuery(ctx context.Context) *sql.Selector {
 
 // CharacterGroupBy is the group-by builder for Character entities.
 type CharacterGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *CharacterQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -458,58 +447,46 @@ func (cgb *CharacterGroupBy) Aggregate(fns ...AggregateFunc) *CharacterGroupBy {
 	return cgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (cgb *CharacterGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := cgb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, cgb.build.ctx, "GroupBy")
+	if err := cgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	cgb.sql = query
-	return cgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*CharacterQuery, *CharacterGroupBy](ctx, cgb.build, cgb, cgb.build.inters, v)
 }
 
-func (cgb *CharacterGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range cgb.fields {
-		if !character.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (cgb *CharacterGroupBy) sqlScan(ctx context.Context, root *CharacterQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(cgb.fns))
+	for _, fn := range cgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := cgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*cgb.flds)+len(cgb.fns))
+		for _, f := range *cgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*cgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := cgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := cgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (cgb *CharacterGroupBy) sqlQuery() *sql.Selector {
-	selector := cgb.sql.Select()
-	aggregation := make([]string, 0, len(cgb.fns))
-	for _, fn := range cgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(cgb.fields)+len(cgb.fns))
-		for _, f := range cgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(cgb.fields...)...)
-}
-
 // CharacterSelect is the builder for selecting fields of Character entities.
 type CharacterSelect struct {
 	*CharacterQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -520,26 +497,27 @@ func (cs *CharacterSelect) Aggregate(fns ...AggregateFunc) *CharacterSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (cs *CharacterSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, cs.ctx, "Select")
 	if err := cs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	cs.sql = cs.CharacterQuery.sqlQuery(ctx)
-	return cs.sqlScan(ctx, v)
+	return scanWithInterceptors[*CharacterQuery, *CharacterSelect](ctx, cs.CharacterQuery, cs, cs.inters, v)
 }
 
-func (cs *CharacterSelect) sqlScan(ctx context.Context, v any) error {
+func (cs *CharacterSelect) sqlScan(ctx context.Context, root *CharacterQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(cs.fns))
 	for _, fn := range cs.fns {
-		aggregation = append(aggregation, fn(cs.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*cs.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		cs.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		cs.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := cs.sql.Query()
+	query, args := selector.Query()
 	if err := cs.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

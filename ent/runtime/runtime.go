@@ -5,6 +5,6 @@ package runtime
 // The schema-stitching logic is generated in github.com/babyname/fate/ent/runtime.go
 
 const (
-	Version = "v0.11.4"                                         // Version of ent codegen.
-	Sum     = "h1:grwVY0fp31BZ6oEo3YrXenAuv8VJmEw7F/Bi6WqeH3Q=" // Sum of ent codegen.
+	Version = "v0.11.9"                                         // Version of ent codegen.
+	Sum     = "h1:dbbCkAiPVTRBIJwoZctiSYjB7zxQIBOzVSU5H9VYIQI=" // Sum of ent codegen.
 )

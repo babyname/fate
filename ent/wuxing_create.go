@@ -144,49 +144,7 @@ func (wxc *WuXingCreate) Mutation() *WuXingMutation {
 
 // Save creates the WuXing in the database.
 func (wxc *WuXingCreate) Save(ctx context.Context) (*WuXing, error) {
-	var (
-		err  error
-		node *WuXing
-	)
-	if len(wxc.hooks) == 0 {
-		if err = wxc.check(); err != nil {
-			return nil, err
-		}
-		node, err = wxc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*WuXingMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = wxc.check(); err != nil {
-				return nil, err
-			}
-			wxc.mutation = mutation
-			if node, err = wxc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(wxc.hooks) - 1; i >= 0; i-- {
-			if wxc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = wxc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, wxc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*WuXing)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from WuXingMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*WuXing, WuXingMutation](ctx, wxc.sqlSave, wxc.mutation, wxc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -217,6 +175,9 @@ func (wxc *WuXingCreate) check() error {
 }
 
 func (wxc *WuXingCreate) sqlSave(ctx context.Context) (*WuXing, error) {
+	if err := wxc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := wxc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, wxc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -231,19 +192,15 @@ func (wxc *WuXingCreate) sqlSave(ctx context.Context) (*WuXing, error) {
 			return nil, fmt.Errorf("unexpected WuXing.ID type: %T", _spec.ID.Value)
 		}
 	}
+	wxc.mutation.id = &_node.ID
+	wxc.mutation.done = true
 	return _node, nil
 }
 
 func (wxc *WuXingCreate) createSpec() (*WuXing, *sqlgraph.CreateSpec) {
 	var (
 		_node = &WuXing{config: wxc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: wuxing.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: wuxing.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(wuxing.Table, sqlgraph.NewFieldSpec(wuxing.FieldID, field.TypeString))
 	)
 	if id, ok := wxc.mutation.ID(); ok {
 		_node.ID = id

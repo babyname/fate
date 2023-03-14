@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/google/uuid"
 )
 
 type WuGeLucky struct {
@@ -14,7 +15,7 @@ type WuGeLucky struct {
 
 func (WuGeLucky) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id"),
+		field.UUID("id", uuid.UUID{}),
 		field.Int("last_stroke_1"),
 		field.Int("last_stroke_2"),
 		field.Int("first_stroke_1"),

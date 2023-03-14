@@ -60,34 +60,7 @@ func (vu *VersionUpdate) Mutation() *VersionMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (vu *VersionUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(vu.hooks) == 0 {
-		affected, err = vu.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*VersionMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			vu.mutation = mutation
-			affected, err = vu.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(vu.hooks) - 1; i >= 0; i-- {
-			if vu.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = vu.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, vu.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, VersionMutation](ctx, vu.sqlSave, vu.mutation, vu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -113,16 +86,7 @@ func (vu *VersionUpdate) ExecX(ctx context.Context) {
 }
 
 func (vu *VersionUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   version.Table,
-			Columns: version.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
-				Column: version.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(version.Table, version.Columns, sqlgraph.NewFieldSpec(version.FieldID, field.TypeInt))
 	if ps := vu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -150,6 +114,7 @@ func (vu *VersionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	vu.mutation.done = true
 	return n, nil
 }
 
@@ -192,6 +157,12 @@ func (vuo *VersionUpdateOne) Mutation() *VersionMutation {
 	return vuo.mutation
 }
 
+// Where appends a list predicates to the VersionUpdate builder.
+func (vuo *VersionUpdateOne) Where(ps ...predicate.Version) *VersionUpdateOne {
+	vuo.mutation.Where(ps...)
+	return vuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (vuo *VersionUpdateOne) Select(field string, fields ...string) *VersionUpdateOne {
@@ -201,40 +172,7 @@ func (vuo *VersionUpdateOne) Select(field string, fields ...string) *VersionUpda
 
 // Save executes the query and returns the updated Version entity.
 func (vuo *VersionUpdateOne) Save(ctx context.Context) (*Version, error) {
-	var (
-		err  error
-		node *Version
-	)
-	if len(vuo.hooks) == 0 {
-		node, err = vuo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*VersionMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			vuo.mutation = mutation
-			node, err = vuo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(vuo.hooks) - 1; i >= 0; i-- {
-			if vuo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = vuo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, vuo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Version)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from VersionMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Version, VersionMutation](ctx, vuo.sqlSave, vuo.mutation, vuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -260,16 +198,7 @@ func (vuo *VersionUpdateOne) ExecX(ctx context.Context) {
 }
 
 func (vuo *VersionUpdateOne) sqlSave(ctx context.Context) (_node *Version, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   version.Table,
-			Columns: version.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
-				Column: version.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(version.Table, version.Columns, sqlgraph.NewFieldSpec(version.FieldID, field.TypeInt))
 	id, ok := vuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Version.id" for update`)}
@@ -317,5 +246,6 @@ func (vuo *VersionUpdateOne) sqlSave(ctx context.Context) (_node *Version, err e
 		}
 		return nil, err
 	}
+	vuo.mutation.done = true
 	return _node, nil
 }
