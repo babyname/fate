@@ -4,9 +4,11 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/character"
+	"github.com/google/uuid"
 )
 
 type Model struct {
@@ -20,11 +22,12 @@ func (m Model) Initialize(ctx context.Context, luckies <-chan *ent.WuGeLucky) er
 		return err
 	}
 	var tmp []*ent.WuGeLuckyCreate
-	var id int
+	//var id int
 	var count int
 	for lucky := range luckies {
-		id = WuGeLuckyID(lucky.LastStroke1, lucky.LastStroke2, lucky.FirstStroke1, lucky.FirstStroke2)
-		tmp = append(tmp, m.WuGeLucky.Create().SetWuGeLuckyWithOptional(lucky).SetID(id))
+		_ = WuGeLuckyID(lucky.LastStroke1, lucky.LastStroke2, lucky.FirstStroke1, lucky.FirstStroke2)
+		uid := uuid.Must(uuid.NewUUID())
+		tmp = append(tmp, m.WuGeLucky.Create().SetWuGeLuckyWithOptional(lucky).SetID(uid))
 		count++
 		if len(tmp) >= PerInitStep {
 			log.Info("insert into wugelucky", "count", count)
@@ -53,12 +56,12 @@ func (m Model) insertWuGeLucky(ctx context.Context, tmp []*ent.WuGeLuckyCreate) 
 func (m Model) QueryLastName(ctx context.Context, last [2]string) (lastName [2]*ent.Character, err error) {
 	lastName[0], err = m.Character.Query().Where(character.ChEQ(last[0])).First(ctx)
 	if err != nil {
-		return lastName, err
+		return lastName, fmt.Errorf("query last name 0:%v", err)
 	}
 	if last[1] != "" {
 		lastName[1], err = m.Character.Query().Where(character.ChEQ(last[1])).First(ctx)
 		if err != nil {
-			return lastName, err
+			return lastName, fmt.Errorf("query last name 1:%v", err)
 		}
 	}
 	return lastName, nil

@@ -17,11 +17,9 @@ import (
 // VersionQuery is the builder for querying Version entities.
 type VersionQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
+	ctx        *QueryContext
 	order      []OrderFunc
-	fields     []string
+	inters     []Interceptor
 	predicates []predicate.Version
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -34,26 +32,26 @@ func (vq *VersionQuery) Where(ps ...predicate.Version) *VersionQuery {
 	return vq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (vq *VersionQuery) Limit(limit int) *VersionQuery {
-	vq.limit = &limit
+	vq.ctx.Limit = &limit
 	return vq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (vq *VersionQuery) Offset(offset int) *VersionQuery {
-	vq.offset = &offset
+	vq.ctx.Offset = &offset
 	return vq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (vq *VersionQuery) Unique(unique bool) *VersionQuery {
-	vq.unique = &unique
+	vq.ctx.Unique = &unique
 	return vq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (vq *VersionQuery) Order(o ...OrderFunc) *VersionQuery {
 	vq.order = append(vq.order, o...)
 	return vq
@@ -62,7 +60,7 @@ func (vq *VersionQuery) Order(o ...OrderFunc) *VersionQuery {
 // First returns the first Version entity from the query.
 // Returns a *NotFoundError when no Version was found.
 func (vq *VersionQuery) First(ctx context.Context) (*Version, error) {
-	nodes, err := vq.Limit(1).All(ctx)
+	nodes, err := vq.Limit(1).All(setContextOp(ctx, vq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +83,7 @@ func (vq *VersionQuery) FirstX(ctx context.Context) *Version {
 // Returns a *NotFoundError when no Version ID was found.
 func (vq *VersionQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = vq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = vq.Limit(1).IDs(setContextOp(ctx, vq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -108,7 +106,7 @@ func (vq *VersionQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one Version entity is found.
 // Returns a *NotFoundError when no Version entities are found.
 func (vq *VersionQuery) Only(ctx context.Context) (*Version, error) {
-	nodes, err := vq.Limit(2).All(ctx)
+	nodes, err := vq.Limit(2).All(setContextOp(ctx, vq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +134,7 @@ func (vq *VersionQuery) OnlyX(ctx context.Context) *Version {
 // Returns a *NotFoundError when no entities are found.
 func (vq *VersionQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = vq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = vq.Limit(2).IDs(setContextOp(ctx, vq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -161,10 +159,12 @@ func (vq *VersionQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Versions.
 func (vq *VersionQuery) All(ctx context.Context) ([]*Version, error) {
+	ctx = setContextOp(ctx, vq.ctx, "All")
 	if err := vq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return vq.sqlAll(ctx)
+	qr := querierAll[[]*Version, *VersionQuery]()
+	return withInterceptors[[]*Version](ctx, vq, qr, vq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -177,9 +177,12 @@ func (vq *VersionQuery) AllX(ctx context.Context) []*Version {
 }
 
 // IDs executes the query and returns a list of Version IDs.
-func (vq *VersionQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
-	if err := vq.Select(version.FieldID).Scan(ctx, &ids); err != nil {
+func (vq *VersionQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if vq.ctx.Unique == nil && vq.path != nil {
+		vq.Unique(true)
+	}
+	ctx = setContextOp(ctx, vq.ctx, "IDs")
+	if err = vq.Select(version.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -196,10 +199,11 @@ func (vq *VersionQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (vq *VersionQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, vq.ctx, "Count")
 	if err := vq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return vq.sqlCount(ctx)
+	return withInterceptors[int](ctx, vq, querierCount[*VersionQuery](), vq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -213,10 +217,15 @@ func (vq *VersionQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (vq *VersionQuery) Exist(ctx context.Context) (bool, error) {
-	if err := vq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = setContextOp(ctx, vq.ctx, "Exist")
+	switch _, err := vq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return vq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -236,14 +245,13 @@ func (vq *VersionQuery) Clone() *VersionQuery {
 	}
 	return &VersionQuery{
 		config:     vq.config,
-		limit:      vq.limit,
-		offset:     vq.offset,
+		ctx:        vq.ctx.Clone(),
 		order:      append([]OrderFunc{}, vq.order...),
+		inters:     append([]Interceptor{}, vq.inters...),
 		predicates: append([]predicate.Version{}, vq.predicates...),
 		// clone intermediate query.
-		sql:    vq.sql.Clone(),
-		path:   vq.path,
-		unique: vq.unique,
+		sql:  vq.sql.Clone(),
+		path: vq.path,
 	}
 }
 
@@ -262,16 +270,11 @@ func (vq *VersionQuery) Clone() *VersionQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (vq *VersionQuery) GroupBy(field string, fields ...string) *VersionGroupBy {
-	grbuild := &VersionGroupBy{config: vq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := vq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return vq.sqlQuery(ctx), nil
-	}
+	vq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &VersionGroupBy{build: vq}
+	grbuild.flds = &vq.ctx.Fields
 	grbuild.label = version.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -288,11 +291,11 @@ func (vq *VersionQuery) GroupBy(field string, fields ...string) *VersionGroupBy 
 //		Select(version.FieldCurrentVersion).
 //		Scan(ctx, &v)
 func (vq *VersionQuery) Select(fields ...string) *VersionSelect {
-	vq.fields = append(vq.fields, fields...)
-	selbuild := &VersionSelect{VersionQuery: vq}
-	selbuild.label = version.Label
-	selbuild.flds, selbuild.scan = &vq.fields, selbuild.Scan
-	return selbuild
+	vq.ctx.Fields = append(vq.ctx.Fields, fields...)
+	sbuild := &VersionSelect{VersionQuery: vq}
+	sbuild.label = version.Label
+	sbuild.flds, sbuild.scan = &vq.ctx.Fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a VersionSelect configured with the given aggregations.
@@ -301,7 +304,17 @@ func (vq *VersionQuery) Aggregate(fns ...AggregateFunc) *VersionSelect {
 }
 
 func (vq *VersionQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range vq.fields {
+	for _, inter := range vq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, vq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range vq.ctx.Fields {
 		if !version.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -343,41 +356,22 @@ func (vq *VersionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vers
 
 func (vq *VersionQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := vq.querySpec()
-	_spec.Node.Columns = vq.fields
-	if len(vq.fields) > 0 {
-		_spec.Unique = vq.unique != nil && *vq.unique
+	_spec.Node.Columns = vq.ctx.Fields
+	if len(vq.ctx.Fields) > 0 {
+		_spec.Unique = vq.ctx.Unique != nil && *vq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, vq.driver, _spec)
 }
 
-func (vq *VersionQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := vq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
-}
-
 func (vq *VersionQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   version.Table,
-			Columns: version.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
-				Column: version.FieldID,
-			},
-		},
-		From:   vq.sql,
-		Unique: true,
-	}
-	if unique := vq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(version.Table, version.Columns, sqlgraph.NewFieldSpec(version.FieldID, field.TypeInt))
+	_spec.From = vq.sql
+	if unique := vq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if vq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := vq.fields; len(fields) > 0 {
+	if fields := vq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, version.FieldID)
 		for i := range fields {
@@ -393,10 +387,10 @@ func (vq *VersionQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := vq.limit; limit != nil {
+	if limit := vq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := vq.offset; offset != nil {
+	if offset := vq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := vq.order; len(ps) > 0 {
@@ -412,7 +406,7 @@ func (vq *VersionQuery) querySpec() *sqlgraph.QuerySpec {
 func (vq *VersionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(vq.driver.Dialect())
 	t1 := builder.Table(version.Table)
-	columns := vq.fields
+	columns := vq.ctx.Fields
 	if len(columns) == 0 {
 		columns = version.Columns
 	}
@@ -421,7 +415,7 @@ func (vq *VersionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = vq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if vq.unique != nil && *vq.unique {
+	if vq.ctx.Unique != nil && *vq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range vq.predicates {
@@ -430,12 +424,12 @@ func (vq *VersionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range vq.order {
 		p(selector)
 	}
-	if offset := vq.offset; offset != nil {
+	if offset := vq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := vq.limit; limit != nil {
+	if limit := vq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -443,13 +437,8 @@ func (vq *VersionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 
 // VersionGroupBy is the group-by builder for Version entities.
 type VersionGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *VersionQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -458,58 +447,46 @@ func (vgb *VersionGroupBy) Aggregate(fns ...AggregateFunc) *VersionGroupBy {
 	return vgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (vgb *VersionGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := vgb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, vgb.build.ctx, "GroupBy")
+	if err := vgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	vgb.sql = query
-	return vgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*VersionQuery, *VersionGroupBy](ctx, vgb.build, vgb, vgb.build.inters, v)
 }
 
-func (vgb *VersionGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range vgb.fields {
-		if !version.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (vgb *VersionGroupBy) sqlScan(ctx context.Context, root *VersionQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(vgb.fns))
+	for _, fn := range vgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := vgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*vgb.flds)+len(vgb.fns))
+		for _, f := range *vgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*vgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := vgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := vgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (vgb *VersionGroupBy) sqlQuery() *sql.Selector {
-	selector := vgb.sql.Select()
-	aggregation := make([]string, 0, len(vgb.fns))
-	for _, fn := range vgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(vgb.fields)+len(vgb.fns))
-		for _, f := range vgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(vgb.fields...)...)
-}
-
 // VersionSelect is the builder for selecting fields of Version entities.
 type VersionSelect struct {
 	*VersionQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -520,26 +497,27 @@ func (vs *VersionSelect) Aggregate(fns ...AggregateFunc) *VersionSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (vs *VersionSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, vs.ctx, "Select")
 	if err := vs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	vs.sql = vs.VersionQuery.sqlQuery(ctx)
-	return vs.sqlScan(ctx, v)
+	return scanWithInterceptors[*VersionQuery, *VersionSelect](ctx, vs.VersionQuery, vs, vs.inters, v)
 }
 
-func (vs *VersionSelect) sqlScan(ctx context.Context, v any) error {
+func (vs *VersionSelect) sqlScan(ctx context.Context, root *VersionQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(vs.fns))
 	for _, fn := range vs.fns {
-		aggregation = append(aggregation, fn(vs.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*vs.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		vs.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		vs.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := vs.sql.Query()
+	query, args := selector.Query()
 	if err := vs.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

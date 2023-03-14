@@ -202,34 +202,7 @@ func (wxu *WuXingUpdate) Mutation() *WuXingMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (wxu *WuXingUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(wxu.hooks) == 0 {
-		affected, err = wxu.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*WuXingMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			wxu.mutation = mutation
-			affected, err = wxu.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(wxu.hooks) - 1; i >= 0; i-- {
-			if wxu.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = wxu.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, wxu.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, WuXingMutation](ctx, wxu.sqlSave, wxu.mutation, wxu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -255,16 +228,7 @@ func (wxu *WuXingUpdate) ExecX(ctx context.Context) {
 }
 
 func (wxu *WuXingUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   wuxing.Table,
-			Columns: wuxing.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: wuxing.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(wuxing.Table, wuxing.Columns, sqlgraph.NewFieldSpec(wuxing.FieldID, field.TypeString))
 	if ps := wxu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -331,6 +295,7 @@ func (wxu *WuXingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	wxu.mutation.done = true
 	return n, nil
 }
 
@@ -514,6 +479,12 @@ func (wxuo *WuXingUpdateOne) Mutation() *WuXingMutation {
 	return wxuo.mutation
 }
 
+// Where appends a list predicates to the WuXingUpdate builder.
+func (wxuo *WuXingUpdateOne) Where(ps ...predicate.WuXing) *WuXingUpdateOne {
+	wxuo.mutation.Where(ps...)
+	return wxuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (wxuo *WuXingUpdateOne) Select(field string, fields ...string) *WuXingUpdateOne {
@@ -523,40 +494,7 @@ func (wxuo *WuXingUpdateOne) Select(field string, fields ...string) *WuXingUpdat
 
 // Save executes the query and returns the updated WuXing entity.
 func (wxuo *WuXingUpdateOne) Save(ctx context.Context) (*WuXing, error) {
-	var (
-		err  error
-		node *WuXing
-	)
-	if len(wxuo.hooks) == 0 {
-		node, err = wxuo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*WuXingMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			wxuo.mutation = mutation
-			node, err = wxuo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(wxuo.hooks) - 1; i >= 0; i-- {
-			if wxuo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = wxuo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, wxuo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*WuXing)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from WuXingMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*WuXing, WuXingMutation](ctx, wxuo.sqlSave, wxuo.mutation, wxuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -582,16 +520,7 @@ func (wxuo *WuXingUpdateOne) ExecX(ctx context.Context) {
 }
 
 func (wxuo *WuXingUpdateOne) sqlSave(ctx context.Context) (_node *WuXing, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   wuxing.Table,
-			Columns: wuxing.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: wuxing.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(wuxing.Table, wuxing.Columns, sqlgraph.NewFieldSpec(wuxing.FieldID, field.TypeString))
 	id, ok := wxuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "WuXing.id" for update`)}
@@ -678,5 +607,6 @@ func (wxuo *WuXingUpdateOne) sqlSave(ctx context.Context) (_node *WuXing, err er
 		}
 		return nil, err
 	}
+	wxuo.mutation.done = true
 	return _node, nil
 }

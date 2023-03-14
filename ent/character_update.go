@@ -222,34 +222,7 @@ func (cu *CharacterUpdate) Mutation() *CharacterMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cu *CharacterUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(cu.hooks) == 0 {
-		affected, err = cu.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*CharacterMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			cu.mutation = mutation
-			affected, err = cu.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(cu.hooks) - 1; i >= 0; i-- {
-			if cu.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = cu.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, cu.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, CharacterMutation](ctx, cu.sqlSave, cu.mutation, cu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -275,16 +248,7 @@ func (cu *CharacterUpdate) ExecX(ctx context.Context) {
 }
 
 func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   character.Table,
-			Columns: character.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: character.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(character.Table, character.Columns, sqlgraph.NewFieldSpec(character.FieldID, field.TypeString))
 	if ps := cu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -390,6 +354,7 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	cu.mutation.done = true
 	return n, nil
 }
 
@@ -594,6 +559,12 @@ func (cuo *CharacterUpdateOne) Mutation() *CharacterMutation {
 	return cuo.mutation
 }
 
+// Where appends a list predicates to the CharacterUpdate builder.
+func (cuo *CharacterUpdateOne) Where(ps ...predicate.Character) *CharacterUpdateOne {
+	cuo.mutation.Where(ps...)
+	return cuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (cuo *CharacterUpdateOne) Select(field string, fields ...string) *CharacterUpdateOne {
@@ -603,40 +574,7 @@ func (cuo *CharacterUpdateOne) Select(field string, fields ...string) *Character
 
 // Save executes the query and returns the updated Character entity.
 func (cuo *CharacterUpdateOne) Save(ctx context.Context) (*Character, error) {
-	var (
-		err  error
-		node *Character
-	)
-	if len(cuo.hooks) == 0 {
-		node, err = cuo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*CharacterMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			cuo.mutation = mutation
-			node, err = cuo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(cuo.hooks) - 1; i >= 0; i-- {
-			if cuo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = cuo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, cuo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Character)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from CharacterMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Character, CharacterMutation](ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -662,16 +600,7 @@ func (cuo *CharacterUpdateOne) ExecX(ctx context.Context) {
 }
 
 func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   character.Table,
-			Columns: character.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: character.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(character.Table, character.Columns, sqlgraph.NewFieldSpec(character.FieldID, field.TypeString))
 	id, ok := cuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Character.id" for update`)}
@@ -797,5 +726,6 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 		}
 		return nil, err
 	}
+	cuo.mutation.done = true
 	return _node, nil
 }

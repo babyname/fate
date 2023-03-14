@@ -9,215 +9,137 @@ import (
 
 // ID filters vertices based on their ID field.
 func ID(id int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Version(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
 func IDEQ(id int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Version(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
 func IDNEQ(id int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldID), id))
-	})
+	return predicate.Version(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.In(s.C(FieldID), v...))
-	})
+	return predicate.Version(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.NotIn(s.C(FieldID), v...))
-	})
+	return predicate.Version(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
 func IDGT(id int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldID), id))
-	})
+	return predicate.Version(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
 func IDGTE(id int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldID), id))
-	})
+	return predicate.Version(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
 func IDLT(id int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldID), id))
-	})
+	return predicate.Version(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldID), id))
-	})
+	return predicate.Version(sql.FieldLTE(FieldID, id))
 }
 
 // CurrentVersion applies equality check predicate on the "current_version" field. It's identical to CurrentVersionEQ.
 func CurrentVersion(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCurrentVersion), v))
-	})
+	return predicate.Version(sql.FieldEQ(FieldCurrentVersion, v))
 }
 
 // UpdatedUnix applies equality check predicate on the "updated_unix" field. It's identical to UpdatedUnixEQ.
 func UpdatedUnix(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUpdatedUnix), v))
-	})
+	return predicate.Version(sql.FieldEQ(FieldUpdatedUnix, v))
 }
 
 // CurrentVersionEQ applies the EQ predicate on the "current_version" field.
 func CurrentVersionEQ(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCurrentVersion), v))
-	})
+	return predicate.Version(sql.FieldEQ(FieldCurrentVersion, v))
 }
 
 // CurrentVersionNEQ applies the NEQ predicate on the "current_version" field.
 func CurrentVersionNEQ(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCurrentVersion), v))
-	})
+	return predicate.Version(sql.FieldNEQ(FieldCurrentVersion, v))
 }
 
 // CurrentVersionIn applies the In predicate on the "current_version" field.
 func CurrentVersionIn(vs ...int) predicate.Version {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldCurrentVersion), v...))
-	})
+	return predicate.Version(sql.FieldIn(FieldCurrentVersion, vs...))
 }
 
 // CurrentVersionNotIn applies the NotIn predicate on the "current_version" field.
 func CurrentVersionNotIn(vs ...int) predicate.Version {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldCurrentVersion), v...))
-	})
+	return predicate.Version(sql.FieldNotIn(FieldCurrentVersion, vs...))
 }
 
 // CurrentVersionGT applies the GT predicate on the "current_version" field.
 func CurrentVersionGT(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCurrentVersion), v))
-	})
+	return predicate.Version(sql.FieldGT(FieldCurrentVersion, v))
 }
 
 // CurrentVersionGTE applies the GTE predicate on the "current_version" field.
 func CurrentVersionGTE(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCurrentVersion), v))
-	})
+	return predicate.Version(sql.FieldGTE(FieldCurrentVersion, v))
 }
 
 // CurrentVersionLT applies the LT predicate on the "current_version" field.
 func CurrentVersionLT(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCurrentVersion), v))
-	})
+	return predicate.Version(sql.FieldLT(FieldCurrentVersion, v))
 }
 
 // CurrentVersionLTE applies the LTE predicate on the "current_version" field.
 func CurrentVersionLTE(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCurrentVersion), v))
-	})
+	return predicate.Version(sql.FieldLTE(FieldCurrentVersion, v))
 }
 
 // UpdatedUnixEQ applies the EQ predicate on the "updated_unix" field.
 func UpdatedUnixEQ(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUpdatedUnix), v))
-	})
+	return predicate.Version(sql.FieldEQ(FieldUpdatedUnix, v))
 }
 
 // UpdatedUnixNEQ applies the NEQ predicate on the "updated_unix" field.
 func UpdatedUnixNEQ(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUpdatedUnix), v))
-	})
+	return predicate.Version(sql.FieldNEQ(FieldUpdatedUnix, v))
 }
 
 // UpdatedUnixIn applies the In predicate on the "updated_unix" field.
 func UpdatedUnixIn(vs ...int) predicate.Version {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldUpdatedUnix), v...))
-	})
+	return predicate.Version(sql.FieldIn(FieldUpdatedUnix, vs...))
 }
 
 // UpdatedUnixNotIn applies the NotIn predicate on the "updated_unix" field.
 func UpdatedUnixNotIn(vs ...int) predicate.Version {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldUpdatedUnix), v...))
-	})
+	return predicate.Version(sql.FieldNotIn(FieldUpdatedUnix, vs...))
 }
 
 // UpdatedUnixGT applies the GT predicate on the "updated_unix" field.
 func UpdatedUnixGT(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUpdatedUnix), v))
-	})
+	return predicate.Version(sql.FieldGT(FieldUpdatedUnix, v))
 }
 
 // UpdatedUnixGTE applies the GTE predicate on the "updated_unix" field.
 func UpdatedUnixGTE(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUpdatedUnix), v))
-	})
+	return predicate.Version(sql.FieldGTE(FieldUpdatedUnix, v))
 }
 
 // UpdatedUnixLT applies the LT predicate on the "updated_unix" field.
 func UpdatedUnixLT(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUpdatedUnix), v))
-	})
+	return predicate.Version(sql.FieldLT(FieldUpdatedUnix, v))
 }
 
 // UpdatedUnixLTE applies the LTE predicate on the "updated_unix" field.
 func UpdatedUnixLTE(v int) predicate.Version {
-	return predicate.Version(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUpdatedUnix), v))
-	})
+	return predicate.Version(sql.FieldLTE(FieldUpdatedUnix, v))
 }
 
 // And groups predicates with the AND operator between them.
