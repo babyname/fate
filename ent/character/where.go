@@ -9,1870 +9,1222 @@ import (
 
 // ID filters vertices based on their ID field.
 func ID(id string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Character(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
 func IDEQ(id string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Character(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
 func IDNEQ(id string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldID), id))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.In(s.C(FieldID), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.NotIn(s.C(FieldID), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
 func IDGT(id string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldID), id))
-	})
+	return predicate.Character(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
 func IDGTE(id string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldID), id))
-	})
+	return predicate.Character(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
 func IDLT(id string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldID), id))
-	})
+	return predicate.Character(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldID), id))
-	})
+	return predicate.Character(sql.FieldLTE(FieldID, id))
 }
 
 // PinYin applies equality check predicate on the "pin_yin" field. It's identical to PinYinEQ.
 func PinYin(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPinYin), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldPinYin, v))
 }
 
 // Ch applies equality check predicate on the "ch" field. It's identical to ChEQ.
 func Ch(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCh), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldCh, v))
 }
 
 // Radical applies equality check predicate on the "radical" field. It's identical to RadicalEQ.
 func Radical(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRadical), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldRadical, v))
 }
 
 // RadicalStroke applies equality check predicate on the "radical_stroke" field. It's identical to RadicalStrokeEQ.
 func RadicalStroke(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldRadicalStroke, v))
 }
 
 // Stroke applies equality check predicate on the "stroke" field. It's identical to StrokeEQ.
 func Stroke(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldStroke, v))
 }
 
 // IsKangXi applies equality check predicate on the "is_kang_xi" field. It's identical to IsKangXiEQ.
 func IsKangXi(v bool) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldIsKangXi), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldIsKangXi, v))
 }
 
 // KangXi applies equality check predicate on the "kang_xi" field. It's identical to KangXiEQ.
 func KangXi(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldKangXi), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldKangXi, v))
 }
 
 // KangXiStroke applies equality check predicate on the "kang_xi_stroke" field. It's identical to KangXiStrokeEQ.
 func KangXiStroke(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldKangXiStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldKangXiStroke, v))
 }
 
 // SimpleRadical applies equality check predicate on the "simple_radical" field. It's identical to SimpleRadicalEQ.
 func SimpleRadical(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSimpleRadical), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldSimpleRadical, v))
 }
 
 // SimpleRadicalStroke applies equality check predicate on the "simple_radical_stroke" field. It's identical to SimpleRadicalStrokeEQ.
 func SimpleRadicalStroke(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSimpleRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldSimpleRadicalStroke, v))
 }
 
 // SimpleTotalStroke applies equality check predicate on the "simple_total_stroke" field. It's identical to SimpleTotalStrokeEQ.
 func SimpleTotalStroke(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSimpleTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldSimpleTotalStroke, v))
 }
 
 // TraditionalRadical applies equality check predicate on the "traditional_radical" field. It's identical to TraditionalRadicalEQ.
 func TraditionalRadical(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldTraditionalRadical), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldTraditionalRadical, v))
 }
 
 // TraditionalRadicalStroke applies equality check predicate on the "traditional_radical_stroke" field. It's identical to TraditionalRadicalStrokeEQ.
 func TraditionalRadicalStroke(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldTraditionalRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldTraditionalRadicalStroke, v))
 }
 
 // TraditionalTotalStroke applies equality check predicate on the "traditional_total_stroke" field. It's identical to TraditionalTotalStrokeEQ.
 func TraditionalTotalStroke(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldTraditionalTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldTraditionalTotalStroke, v))
 }
 
 // NameScience applies equality check predicate on the "name_science" field. It's identical to NameScienceEQ.
 func NameScience(v bool) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldNameScience), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldNameScience, v))
 }
 
 // WuXing applies equality check predicate on the "wu_xing" field. It's identical to WuXingEQ.
 func WuXing(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldWuXing), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldWuXing, v))
 }
 
 // Lucky applies equality check predicate on the "lucky" field. It's identical to LuckyEQ.
 func Lucky(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLucky), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldLucky, v))
 }
 
 // Regular applies equality check predicate on the "regular" field. It's identical to RegularEQ.
 func Regular(v bool) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRegular), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldRegular, v))
 }
 
 // TraditionalCharacter applies equality check predicate on the "traditional_character" field. It's identical to TraditionalCharacterEQ.
 func TraditionalCharacter(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldTraditionalCharacter), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldTraditionalCharacter, v))
 }
 
 // VariantCharacter applies equality check predicate on the "variant_character" field. It's identical to VariantCharacterEQ.
 func VariantCharacter(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldVariantCharacter), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldVariantCharacter, v))
 }
 
 // Comment applies equality check predicate on the "comment" field. It's identical to CommentEQ.
 func Comment(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldComment), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldComment, v))
 }
 
 // ScienceStroke applies equality check predicate on the "science_stroke" field. It's identical to ScienceStrokeEQ.
 func ScienceStroke(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldScienceStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldScienceStroke, v))
 }
 
 // PinYinEQ applies the EQ predicate on the "pin_yin" field.
 func PinYinEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPinYin), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldPinYin, v))
 }
 
 // PinYinNEQ applies the NEQ predicate on the "pin_yin" field.
 func PinYinNEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldPinYin), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldPinYin, v))
 }
 
 // PinYinIn applies the In predicate on the "pin_yin" field.
 func PinYinIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldPinYin), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldPinYin, vs...))
 }
 
 // PinYinNotIn applies the NotIn predicate on the "pin_yin" field.
 func PinYinNotIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldPinYin), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldPinYin, vs...))
 }
 
 // PinYinGT applies the GT predicate on the "pin_yin" field.
 func PinYinGT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldPinYin), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldPinYin, v))
 }
 
 // PinYinGTE applies the GTE predicate on the "pin_yin" field.
 func PinYinGTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldPinYin), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldPinYin, v))
 }
 
 // PinYinLT applies the LT predicate on the "pin_yin" field.
 func PinYinLT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldPinYin), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldPinYin, v))
 }
 
 // PinYinLTE applies the LTE predicate on the "pin_yin" field.
 func PinYinLTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldPinYin), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldPinYin, v))
 }
 
 // PinYinContains applies the Contains predicate on the "pin_yin" field.
 func PinYinContains(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldPinYin), v))
-	})
+	return predicate.Character(sql.FieldContains(FieldPinYin, v))
 }
 
 // PinYinHasPrefix applies the HasPrefix predicate on the "pin_yin" field.
 func PinYinHasPrefix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldPinYin), v))
-	})
+	return predicate.Character(sql.FieldHasPrefix(FieldPinYin, v))
 }
 
 // PinYinHasSuffix applies the HasSuffix predicate on the "pin_yin" field.
 func PinYinHasSuffix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldPinYin), v))
-	})
+	return predicate.Character(sql.FieldHasSuffix(FieldPinYin, v))
 }
 
 // PinYinEqualFold applies the EqualFold predicate on the "pin_yin" field.
 func PinYinEqualFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldPinYin), v))
-	})
+	return predicate.Character(sql.FieldEqualFold(FieldPinYin, v))
 }
 
 // PinYinContainsFold applies the ContainsFold predicate on the "pin_yin" field.
 func PinYinContainsFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldPinYin), v))
-	})
+	return predicate.Character(sql.FieldContainsFold(FieldPinYin, v))
 }
 
 // ChEQ applies the EQ predicate on the "ch" field.
 func ChEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCh), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldCh, v))
 }
 
 // ChNEQ applies the NEQ predicate on the "ch" field.
 func ChNEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCh), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldCh, v))
 }
 
 // ChIn applies the In predicate on the "ch" field.
 func ChIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldCh), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldCh, vs...))
 }
 
 // ChNotIn applies the NotIn predicate on the "ch" field.
 func ChNotIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldCh), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldCh, vs...))
 }
 
 // ChGT applies the GT predicate on the "ch" field.
 func ChGT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCh), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldCh, v))
 }
 
 // ChGTE applies the GTE predicate on the "ch" field.
 func ChGTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCh), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldCh, v))
 }
 
 // ChLT applies the LT predicate on the "ch" field.
 func ChLT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCh), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldCh, v))
 }
 
 // ChLTE applies the LTE predicate on the "ch" field.
 func ChLTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCh), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldCh, v))
 }
 
 // ChContains applies the Contains predicate on the "ch" field.
 func ChContains(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldCh), v))
-	})
+	return predicate.Character(sql.FieldContains(FieldCh, v))
 }
 
 // ChHasPrefix applies the HasPrefix predicate on the "ch" field.
 func ChHasPrefix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldCh), v))
-	})
+	return predicate.Character(sql.FieldHasPrefix(FieldCh, v))
 }
 
 // ChHasSuffix applies the HasSuffix predicate on the "ch" field.
 func ChHasSuffix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldCh), v))
-	})
+	return predicate.Character(sql.FieldHasSuffix(FieldCh, v))
 }
 
 // ChEqualFold applies the EqualFold predicate on the "ch" field.
 func ChEqualFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldCh), v))
-	})
+	return predicate.Character(sql.FieldEqualFold(FieldCh, v))
 }
 
 // ChContainsFold applies the ContainsFold predicate on the "ch" field.
 func ChContainsFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldCh), v))
-	})
+	return predicate.Character(sql.FieldContainsFold(FieldCh, v))
 }
 
 // RadicalEQ applies the EQ predicate on the "radical" field.
 func RadicalEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRadical), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldRadical, v))
 }
 
 // RadicalNEQ applies the NEQ predicate on the "radical" field.
 func RadicalNEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldRadical), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldRadical, v))
 }
 
 // RadicalIn applies the In predicate on the "radical" field.
 func RadicalIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldRadical), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldRadical, vs...))
 }
 
 // RadicalNotIn applies the NotIn predicate on the "radical" field.
 func RadicalNotIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldRadical), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldRadical, vs...))
 }
 
 // RadicalGT applies the GT predicate on the "radical" field.
 func RadicalGT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldRadical), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldRadical, v))
 }
 
 // RadicalGTE applies the GTE predicate on the "radical" field.
 func RadicalGTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldRadical), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldRadical, v))
 }
 
 // RadicalLT applies the LT predicate on the "radical" field.
 func RadicalLT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldRadical), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldRadical, v))
 }
 
 // RadicalLTE applies the LTE predicate on the "radical" field.
 func RadicalLTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldRadical), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldRadical, v))
 }
 
 // RadicalContains applies the Contains predicate on the "radical" field.
 func RadicalContains(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldRadical), v))
-	})
+	return predicate.Character(sql.FieldContains(FieldRadical, v))
 }
 
 // RadicalHasPrefix applies the HasPrefix predicate on the "radical" field.
 func RadicalHasPrefix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldRadical), v))
-	})
+	return predicate.Character(sql.FieldHasPrefix(FieldRadical, v))
 }
 
 // RadicalHasSuffix applies the HasSuffix predicate on the "radical" field.
 func RadicalHasSuffix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldRadical), v))
-	})
+	return predicate.Character(sql.FieldHasSuffix(FieldRadical, v))
 }
 
 // RadicalEqualFold applies the EqualFold predicate on the "radical" field.
 func RadicalEqualFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldRadical), v))
-	})
+	return predicate.Character(sql.FieldEqualFold(FieldRadical, v))
 }
 
 // RadicalContainsFold applies the ContainsFold predicate on the "radical" field.
 func RadicalContainsFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldRadical), v))
-	})
+	return predicate.Character(sql.FieldContainsFold(FieldRadical, v))
 }
 
 // RadicalStrokeEQ applies the EQ predicate on the "radical_stroke" field.
 func RadicalStrokeEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldRadicalStroke, v))
 }
 
 // RadicalStrokeNEQ applies the NEQ predicate on the "radical_stroke" field.
 func RadicalStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldRadicalStroke, v))
 }
 
 // RadicalStrokeIn applies the In predicate on the "radical_stroke" field.
 func RadicalStrokeIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldRadicalStroke), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldRadicalStroke, vs...))
 }
 
 // RadicalStrokeNotIn applies the NotIn predicate on the "radical_stroke" field.
 func RadicalStrokeNotIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldRadicalStroke), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldRadicalStroke, vs...))
 }
 
 // RadicalStrokeGT applies the GT predicate on the "radical_stroke" field.
 func RadicalStrokeGT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldRadicalStroke, v))
 }
 
 // RadicalStrokeGTE applies the GTE predicate on the "radical_stroke" field.
 func RadicalStrokeGTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldRadicalStroke, v))
 }
 
 // RadicalStrokeLT applies the LT predicate on the "radical_stroke" field.
 func RadicalStrokeLT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldRadicalStroke, v))
 }
 
 // RadicalStrokeLTE applies the LTE predicate on the "radical_stroke" field.
 func RadicalStrokeLTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldRadicalStroke, v))
 }
 
 // StrokeEQ applies the EQ predicate on the "stroke" field.
 func StrokeEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldStroke, v))
 }
 
 // StrokeNEQ applies the NEQ predicate on the "stroke" field.
 func StrokeNEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldStroke), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldStroke, v))
 }
 
 // StrokeIn applies the In predicate on the "stroke" field.
 func StrokeIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldStroke), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldStroke, vs...))
 }
 
 // StrokeNotIn applies the NotIn predicate on the "stroke" field.
 func StrokeNotIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldStroke), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldStroke, vs...))
 }
 
 // StrokeGT applies the GT predicate on the "stroke" field.
 func StrokeGT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldStroke), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldStroke, v))
 }
 
 // StrokeGTE applies the GTE predicate on the "stroke" field.
 func StrokeGTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldStroke), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldStroke, v))
 }
 
 // StrokeLT applies the LT predicate on the "stroke" field.
 func StrokeLT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldStroke), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldStroke, v))
 }
 
 // StrokeLTE applies the LTE predicate on the "stroke" field.
 func StrokeLTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldStroke), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldStroke, v))
 }
 
 // IsKangXiEQ applies the EQ predicate on the "is_kang_xi" field.
 func IsKangXiEQ(v bool) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldIsKangXi), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldIsKangXi, v))
 }
 
 // IsKangXiNEQ applies the NEQ predicate on the "is_kang_xi" field.
 func IsKangXiNEQ(v bool) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldIsKangXi), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldIsKangXi, v))
 }
 
 // KangXiEQ applies the EQ predicate on the "kang_xi" field.
 func KangXiEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldKangXi), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldKangXi, v))
 }
 
 // KangXiNEQ applies the NEQ predicate on the "kang_xi" field.
 func KangXiNEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldKangXi), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldKangXi, v))
 }
 
 // KangXiIn applies the In predicate on the "kang_xi" field.
 func KangXiIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldKangXi), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldKangXi, vs...))
 }
 
 // KangXiNotIn applies the NotIn predicate on the "kang_xi" field.
 func KangXiNotIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldKangXi), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldKangXi, vs...))
 }
 
 // KangXiGT applies the GT predicate on the "kang_xi" field.
 func KangXiGT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldKangXi), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldKangXi, v))
 }
 
 // KangXiGTE applies the GTE predicate on the "kang_xi" field.
 func KangXiGTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldKangXi), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldKangXi, v))
 }
 
 // KangXiLT applies the LT predicate on the "kang_xi" field.
 func KangXiLT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldKangXi), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldKangXi, v))
 }
 
 // KangXiLTE applies the LTE predicate on the "kang_xi" field.
 func KangXiLTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldKangXi), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldKangXi, v))
 }
 
 // KangXiContains applies the Contains predicate on the "kang_xi" field.
 func KangXiContains(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldKangXi), v))
-	})
+	return predicate.Character(sql.FieldContains(FieldKangXi, v))
 }
 
 // KangXiHasPrefix applies the HasPrefix predicate on the "kang_xi" field.
 func KangXiHasPrefix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldKangXi), v))
-	})
+	return predicate.Character(sql.FieldHasPrefix(FieldKangXi, v))
 }
 
 // KangXiHasSuffix applies the HasSuffix predicate on the "kang_xi" field.
 func KangXiHasSuffix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldKangXi), v))
-	})
+	return predicate.Character(sql.FieldHasSuffix(FieldKangXi, v))
 }
 
 // KangXiEqualFold applies the EqualFold predicate on the "kang_xi" field.
 func KangXiEqualFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldKangXi), v))
-	})
+	return predicate.Character(sql.FieldEqualFold(FieldKangXi, v))
 }
 
 // KangXiContainsFold applies the ContainsFold predicate on the "kang_xi" field.
 func KangXiContainsFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldKangXi), v))
-	})
+	return predicate.Character(sql.FieldContainsFold(FieldKangXi, v))
 }
 
 // KangXiStrokeEQ applies the EQ predicate on the "kang_xi_stroke" field.
 func KangXiStrokeEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldKangXiStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldKangXiStroke, v))
 }
 
 // KangXiStrokeNEQ applies the NEQ predicate on the "kang_xi_stroke" field.
 func KangXiStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldKangXiStroke), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldKangXiStroke, v))
 }
 
 // KangXiStrokeIn applies the In predicate on the "kang_xi_stroke" field.
 func KangXiStrokeIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldKangXiStroke), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldKangXiStroke, vs...))
 }
 
 // KangXiStrokeNotIn applies the NotIn predicate on the "kang_xi_stroke" field.
 func KangXiStrokeNotIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldKangXiStroke), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldKangXiStroke, vs...))
 }
 
 // KangXiStrokeGT applies the GT predicate on the "kang_xi_stroke" field.
 func KangXiStrokeGT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldKangXiStroke), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldKangXiStroke, v))
 }
 
 // KangXiStrokeGTE applies the GTE predicate on the "kang_xi_stroke" field.
 func KangXiStrokeGTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldKangXiStroke), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldKangXiStroke, v))
 }
 
 // KangXiStrokeLT applies the LT predicate on the "kang_xi_stroke" field.
 func KangXiStrokeLT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldKangXiStroke), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldKangXiStroke, v))
 }
 
 // KangXiStrokeLTE applies the LTE predicate on the "kang_xi_stroke" field.
 func KangXiStrokeLTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldKangXiStroke), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldKangXiStroke, v))
 }
 
 // SimpleRadicalEQ applies the EQ predicate on the "simple_radical" field.
 func SimpleRadicalEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSimpleRadical), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldSimpleRadical, v))
 }
 
 // SimpleRadicalNEQ applies the NEQ predicate on the "simple_radical" field.
 func SimpleRadicalNEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldSimpleRadical), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldSimpleRadical, v))
 }
 
 // SimpleRadicalIn applies the In predicate on the "simple_radical" field.
 func SimpleRadicalIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldSimpleRadical), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldSimpleRadical, vs...))
 }
 
 // SimpleRadicalNotIn applies the NotIn predicate on the "simple_radical" field.
 func SimpleRadicalNotIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldSimpleRadical), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldSimpleRadical, vs...))
 }
 
 // SimpleRadicalGT applies the GT predicate on the "simple_radical" field.
 func SimpleRadicalGT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldSimpleRadical), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldSimpleRadical, v))
 }
 
 // SimpleRadicalGTE applies the GTE predicate on the "simple_radical" field.
 func SimpleRadicalGTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldSimpleRadical), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldSimpleRadical, v))
 }
 
 // SimpleRadicalLT applies the LT predicate on the "simple_radical" field.
 func SimpleRadicalLT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldSimpleRadical), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldSimpleRadical, v))
 }
 
 // SimpleRadicalLTE applies the LTE predicate on the "simple_radical" field.
 func SimpleRadicalLTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldSimpleRadical), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldSimpleRadical, v))
 }
 
 // SimpleRadicalContains applies the Contains predicate on the "simple_radical" field.
 func SimpleRadicalContains(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldSimpleRadical), v))
-	})
+	return predicate.Character(sql.FieldContains(FieldSimpleRadical, v))
 }
 
 // SimpleRadicalHasPrefix applies the HasPrefix predicate on the "simple_radical" field.
 func SimpleRadicalHasPrefix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldSimpleRadical), v))
-	})
+	return predicate.Character(sql.FieldHasPrefix(FieldSimpleRadical, v))
 }
 
 // SimpleRadicalHasSuffix applies the HasSuffix predicate on the "simple_radical" field.
 func SimpleRadicalHasSuffix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldSimpleRadical), v))
-	})
+	return predicate.Character(sql.FieldHasSuffix(FieldSimpleRadical, v))
 }
 
 // SimpleRadicalEqualFold applies the EqualFold predicate on the "simple_radical" field.
 func SimpleRadicalEqualFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldSimpleRadical), v))
-	})
+	return predicate.Character(sql.FieldEqualFold(FieldSimpleRadical, v))
 }
 
 // SimpleRadicalContainsFold applies the ContainsFold predicate on the "simple_radical" field.
 func SimpleRadicalContainsFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldSimpleRadical), v))
-	})
+	return predicate.Character(sql.FieldContainsFold(FieldSimpleRadical, v))
 }
 
 // SimpleRadicalStrokeEQ applies the EQ predicate on the "simple_radical_stroke" field.
 func SimpleRadicalStrokeEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSimpleRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldSimpleRadicalStroke, v))
 }
 
 // SimpleRadicalStrokeNEQ applies the NEQ predicate on the "simple_radical_stroke" field.
 func SimpleRadicalStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldSimpleRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldSimpleRadicalStroke, v))
 }
 
 // SimpleRadicalStrokeIn applies the In predicate on the "simple_radical_stroke" field.
 func SimpleRadicalStrokeIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldSimpleRadicalStroke), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldSimpleRadicalStroke, vs...))
 }
 
 // SimpleRadicalStrokeNotIn applies the NotIn predicate on the "simple_radical_stroke" field.
 func SimpleRadicalStrokeNotIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldSimpleRadicalStroke), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldSimpleRadicalStroke, vs...))
 }
 
 // SimpleRadicalStrokeGT applies the GT predicate on the "simple_radical_stroke" field.
 func SimpleRadicalStrokeGT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldSimpleRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldSimpleRadicalStroke, v))
 }
 
 // SimpleRadicalStrokeGTE applies the GTE predicate on the "simple_radical_stroke" field.
 func SimpleRadicalStrokeGTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldSimpleRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldSimpleRadicalStroke, v))
 }
 
 // SimpleRadicalStrokeLT applies the LT predicate on the "simple_radical_stroke" field.
 func SimpleRadicalStrokeLT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldSimpleRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldSimpleRadicalStroke, v))
 }
 
 // SimpleRadicalStrokeLTE applies the LTE predicate on the "simple_radical_stroke" field.
 func SimpleRadicalStrokeLTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldSimpleRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldSimpleRadicalStroke, v))
 }
 
 // SimpleTotalStrokeEQ applies the EQ predicate on the "simple_total_stroke" field.
 func SimpleTotalStrokeEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSimpleTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldSimpleTotalStroke, v))
 }
 
 // SimpleTotalStrokeNEQ applies the NEQ predicate on the "simple_total_stroke" field.
 func SimpleTotalStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldSimpleTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldSimpleTotalStroke, v))
 }
 
 // SimpleTotalStrokeIn applies the In predicate on the "simple_total_stroke" field.
 func SimpleTotalStrokeIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldSimpleTotalStroke), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldSimpleTotalStroke, vs...))
 }
 
 // SimpleTotalStrokeNotIn applies the NotIn predicate on the "simple_total_stroke" field.
 func SimpleTotalStrokeNotIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldSimpleTotalStroke), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldSimpleTotalStroke, vs...))
 }
 
 // SimpleTotalStrokeGT applies the GT predicate on the "simple_total_stroke" field.
 func SimpleTotalStrokeGT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldSimpleTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldSimpleTotalStroke, v))
 }
 
 // SimpleTotalStrokeGTE applies the GTE predicate on the "simple_total_stroke" field.
 func SimpleTotalStrokeGTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldSimpleTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldSimpleTotalStroke, v))
 }
 
 // SimpleTotalStrokeLT applies the LT predicate on the "simple_total_stroke" field.
 func SimpleTotalStrokeLT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldSimpleTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldSimpleTotalStroke, v))
 }
 
 // SimpleTotalStrokeLTE applies the LTE predicate on the "simple_total_stroke" field.
 func SimpleTotalStrokeLTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldSimpleTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldSimpleTotalStroke, v))
 }
 
 // TraditionalRadicalEQ applies the EQ predicate on the "traditional_radical" field.
 func TraditionalRadicalEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldTraditionalRadical), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldTraditionalRadical, v))
 }
 
 // TraditionalRadicalNEQ applies the NEQ predicate on the "traditional_radical" field.
 func TraditionalRadicalNEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldTraditionalRadical), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldTraditionalRadical, v))
 }
 
 // TraditionalRadicalIn applies the In predicate on the "traditional_radical" field.
 func TraditionalRadicalIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldTraditionalRadical), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldTraditionalRadical, vs...))
 }
 
 // TraditionalRadicalNotIn applies the NotIn predicate on the "traditional_radical" field.
 func TraditionalRadicalNotIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldTraditionalRadical), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldTraditionalRadical, vs...))
 }
 
 // TraditionalRadicalGT applies the GT predicate on the "traditional_radical" field.
 func TraditionalRadicalGT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldTraditionalRadical), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldTraditionalRadical, v))
 }
 
 // TraditionalRadicalGTE applies the GTE predicate on the "traditional_radical" field.
 func TraditionalRadicalGTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldTraditionalRadical), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldTraditionalRadical, v))
 }
 
 // TraditionalRadicalLT applies the LT predicate on the "traditional_radical" field.
 func TraditionalRadicalLT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldTraditionalRadical), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldTraditionalRadical, v))
 }
 
 // TraditionalRadicalLTE applies the LTE predicate on the "traditional_radical" field.
 func TraditionalRadicalLTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldTraditionalRadical), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldTraditionalRadical, v))
 }
 
 // TraditionalRadicalContains applies the Contains predicate on the "traditional_radical" field.
 func TraditionalRadicalContains(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldTraditionalRadical), v))
-	})
+	return predicate.Character(sql.FieldContains(FieldTraditionalRadical, v))
 }
 
 // TraditionalRadicalHasPrefix applies the HasPrefix predicate on the "traditional_radical" field.
 func TraditionalRadicalHasPrefix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldTraditionalRadical), v))
-	})
+	return predicate.Character(sql.FieldHasPrefix(FieldTraditionalRadical, v))
 }
 
 // TraditionalRadicalHasSuffix applies the HasSuffix predicate on the "traditional_radical" field.
 func TraditionalRadicalHasSuffix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldTraditionalRadical), v))
-	})
+	return predicate.Character(sql.FieldHasSuffix(FieldTraditionalRadical, v))
 }
 
 // TraditionalRadicalEqualFold applies the EqualFold predicate on the "traditional_radical" field.
 func TraditionalRadicalEqualFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldTraditionalRadical), v))
-	})
+	return predicate.Character(sql.FieldEqualFold(FieldTraditionalRadical, v))
 }
 
 // TraditionalRadicalContainsFold applies the ContainsFold predicate on the "traditional_radical" field.
 func TraditionalRadicalContainsFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldTraditionalRadical), v))
-	})
+	return predicate.Character(sql.FieldContainsFold(FieldTraditionalRadical, v))
 }
 
 // TraditionalRadicalStrokeEQ applies the EQ predicate on the "traditional_radical_stroke" field.
 func TraditionalRadicalStrokeEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldTraditionalRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldTraditionalRadicalStroke, v))
 }
 
 // TraditionalRadicalStrokeNEQ applies the NEQ predicate on the "traditional_radical_stroke" field.
 func TraditionalRadicalStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldTraditionalRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldTraditionalRadicalStroke, v))
 }
 
 // TraditionalRadicalStrokeIn applies the In predicate on the "traditional_radical_stroke" field.
 func TraditionalRadicalStrokeIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldTraditionalRadicalStroke), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldTraditionalRadicalStroke, vs...))
 }
 
 // TraditionalRadicalStrokeNotIn applies the NotIn predicate on the "traditional_radical_stroke" field.
 func TraditionalRadicalStrokeNotIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldTraditionalRadicalStroke), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldTraditionalRadicalStroke, vs...))
 }
 
 // TraditionalRadicalStrokeGT applies the GT predicate on the "traditional_radical_stroke" field.
 func TraditionalRadicalStrokeGT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldTraditionalRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldTraditionalRadicalStroke, v))
 }
 
 // TraditionalRadicalStrokeGTE applies the GTE predicate on the "traditional_radical_stroke" field.
 func TraditionalRadicalStrokeGTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldTraditionalRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldTraditionalRadicalStroke, v))
 }
 
 // TraditionalRadicalStrokeLT applies the LT predicate on the "traditional_radical_stroke" field.
 func TraditionalRadicalStrokeLT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldTraditionalRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldTraditionalRadicalStroke, v))
 }
 
 // TraditionalRadicalStrokeLTE applies the LTE predicate on the "traditional_radical_stroke" field.
 func TraditionalRadicalStrokeLTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldTraditionalRadicalStroke), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldTraditionalRadicalStroke, v))
 }
 
 // TraditionalTotalStrokeEQ applies the EQ predicate on the "traditional_total_stroke" field.
 func TraditionalTotalStrokeEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldTraditionalTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldTraditionalTotalStroke, v))
 }
 
 // TraditionalTotalStrokeNEQ applies the NEQ predicate on the "traditional_total_stroke" field.
 func TraditionalTotalStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldTraditionalTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldTraditionalTotalStroke, v))
 }
 
 // TraditionalTotalStrokeIn applies the In predicate on the "traditional_total_stroke" field.
 func TraditionalTotalStrokeIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldTraditionalTotalStroke), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldTraditionalTotalStroke, vs...))
 }
 
 // TraditionalTotalStrokeNotIn applies the NotIn predicate on the "traditional_total_stroke" field.
 func TraditionalTotalStrokeNotIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldTraditionalTotalStroke), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldTraditionalTotalStroke, vs...))
 }
 
 // TraditionalTotalStrokeGT applies the GT predicate on the "traditional_total_stroke" field.
 func TraditionalTotalStrokeGT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldTraditionalTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldTraditionalTotalStroke, v))
 }
 
 // TraditionalTotalStrokeGTE applies the GTE predicate on the "traditional_total_stroke" field.
 func TraditionalTotalStrokeGTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldTraditionalTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldTraditionalTotalStroke, v))
 }
 
 // TraditionalTotalStrokeLT applies the LT predicate on the "traditional_total_stroke" field.
 func TraditionalTotalStrokeLT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldTraditionalTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldTraditionalTotalStroke, v))
 }
 
 // TraditionalTotalStrokeLTE applies the LTE predicate on the "traditional_total_stroke" field.
 func TraditionalTotalStrokeLTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldTraditionalTotalStroke), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldTraditionalTotalStroke, v))
 }
 
 // NameScienceEQ applies the EQ predicate on the "name_science" field.
 func NameScienceEQ(v bool) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldNameScience), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldNameScience, v))
 }
 
 // NameScienceNEQ applies the NEQ predicate on the "name_science" field.
 func NameScienceNEQ(v bool) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldNameScience), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldNameScience, v))
 }
 
 // WuXingEQ applies the EQ predicate on the "wu_xing" field.
 func WuXingEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldWuXing), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldWuXing, v))
 }
 
 // WuXingNEQ applies the NEQ predicate on the "wu_xing" field.
 func WuXingNEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldWuXing), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldWuXing, v))
 }
 
 // WuXingIn applies the In predicate on the "wu_xing" field.
 func WuXingIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldWuXing), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldWuXing, vs...))
 }
 
 // WuXingNotIn applies the NotIn predicate on the "wu_xing" field.
 func WuXingNotIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldWuXing), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldWuXing, vs...))
 }
 
 // WuXingGT applies the GT predicate on the "wu_xing" field.
 func WuXingGT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldWuXing), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldWuXing, v))
 }
 
 // WuXingGTE applies the GTE predicate on the "wu_xing" field.
 func WuXingGTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldWuXing), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldWuXing, v))
 }
 
 // WuXingLT applies the LT predicate on the "wu_xing" field.
 func WuXingLT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldWuXing), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldWuXing, v))
 }
 
 // WuXingLTE applies the LTE predicate on the "wu_xing" field.
 func WuXingLTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldWuXing), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldWuXing, v))
 }
 
 // WuXingContains applies the Contains predicate on the "wu_xing" field.
 func WuXingContains(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldWuXing), v))
-	})
+	return predicate.Character(sql.FieldContains(FieldWuXing, v))
 }
 
 // WuXingHasPrefix applies the HasPrefix predicate on the "wu_xing" field.
 func WuXingHasPrefix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldWuXing), v))
-	})
+	return predicate.Character(sql.FieldHasPrefix(FieldWuXing, v))
 }
 
 // WuXingHasSuffix applies the HasSuffix predicate on the "wu_xing" field.
 func WuXingHasSuffix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldWuXing), v))
-	})
+	return predicate.Character(sql.FieldHasSuffix(FieldWuXing, v))
 }
 
 // WuXingEqualFold applies the EqualFold predicate on the "wu_xing" field.
 func WuXingEqualFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldWuXing), v))
-	})
+	return predicate.Character(sql.FieldEqualFold(FieldWuXing, v))
 }
 
 // WuXingContainsFold applies the ContainsFold predicate on the "wu_xing" field.
 func WuXingContainsFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldWuXing), v))
-	})
+	return predicate.Character(sql.FieldContainsFold(FieldWuXing, v))
 }
 
 // LuckyEQ applies the EQ predicate on the "lucky" field.
 func LuckyEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLucky), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldLucky, v))
 }
 
 // LuckyNEQ applies the NEQ predicate on the "lucky" field.
 func LuckyNEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldLucky), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldLucky, v))
 }
 
 // LuckyIn applies the In predicate on the "lucky" field.
 func LuckyIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldLucky), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldLucky, vs...))
 }
 
 // LuckyNotIn applies the NotIn predicate on the "lucky" field.
 func LuckyNotIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldLucky), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldLucky, vs...))
 }
 
 // LuckyGT applies the GT predicate on the "lucky" field.
 func LuckyGT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldLucky), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldLucky, v))
 }
 
 // LuckyGTE applies the GTE predicate on the "lucky" field.
 func LuckyGTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldLucky), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldLucky, v))
 }
 
 // LuckyLT applies the LT predicate on the "lucky" field.
 func LuckyLT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldLucky), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldLucky, v))
 }
 
 // LuckyLTE applies the LTE predicate on the "lucky" field.
 func LuckyLTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldLucky), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldLucky, v))
 }
 
 // LuckyContains applies the Contains predicate on the "lucky" field.
 func LuckyContains(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldLucky), v))
-	})
+	return predicate.Character(sql.FieldContains(FieldLucky, v))
 }
 
 // LuckyHasPrefix applies the HasPrefix predicate on the "lucky" field.
 func LuckyHasPrefix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldLucky), v))
-	})
+	return predicate.Character(sql.FieldHasPrefix(FieldLucky, v))
 }
 
 // LuckyHasSuffix applies the HasSuffix predicate on the "lucky" field.
 func LuckyHasSuffix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldLucky), v))
-	})
+	return predicate.Character(sql.FieldHasSuffix(FieldLucky, v))
 }
 
 // LuckyEqualFold applies the EqualFold predicate on the "lucky" field.
 func LuckyEqualFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldLucky), v))
-	})
+	return predicate.Character(sql.FieldEqualFold(FieldLucky, v))
 }
 
 // LuckyContainsFold applies the ContainsFold predicate on the "lucky" field.
 func LuckyContainsFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldLucky), v))
-	})
+	return predicate.Character(sql.FieldContainsFold(FieldLucky, v))
 }
 
 // RegularEQ applies the EQ predicate on the "regular" field.
 func RegularEQ(v bool) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRegular), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldRegular, v))
 }
 
 // RegularNEQ applies the NEQ predicate on the "regular" field.
 func RegularNEQ(v bool) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldRegular), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldRegular, v))
 }
 
 // TraditionalCharacterEQ applies the EQ predicate on the "traditional_character" field.
 func TraditionalCharacterEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldTraditionalCharacter), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldTraditionalCharacter, v))
 }
 
 // TraditionalCharacterNEQ applies the NEQ predicate on the "traditional_character" field.
 func TraditionalCharacterNEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldTraditionalCharacter), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldTraditionalCharacter, v))
 }
 
 // TraditionalCharacterIn applies the In predicate on the "traditional_character" field.
 func TraditionalCharacterIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldTraditionalCharacter), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldTraditionalCharacter, vs...))
 }
 
 // TraditionalCharacterNotIn applies the NotIn predicate on the "traditional_character" field.
 func TraditionalCharacterNotIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldTraditionalCharacter), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldTraditionalCharacter, vs...))
 }
 
 // TraditionalCharacterGT applies the GT predicate on the "traditional_character" field.
 func TraditionalCharacterGT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldTraditionalCharacter), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldTraditionalCharacter, v))
 }
 
 // TraditionalCharacterGTE applies the GTE predicate on the "traditional_character" field.
 func TraditionalCharacterGTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldTraditionalCharacter), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldTraditionalCharacter, v))
 }
 
 // TraditionalCharacterLT applies the LT predicate on the "traditional_character" field.
 func TraditionalCharacterLT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldTraditionalCharacter), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldTraditionalCharacter, v))
 }
 
 // TraditionalCharacterLTE applies the LTE predicate on the "traditional_character" field.
 func TraditionalCharacterLTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldTraditionalCharacter), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldTraditionalCharacter, v))
 }
 
 // TraditionalCharacterContains applies the Contains predicate on the "traditional_character" field.
 func TraditionalCharacterContains(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldTraditionalCharacter), v))
-	})
+	return predicate.Character(sql.FieldContains(FieldTraditionalCharacter, v))
 }
 
 // TraditionalCharacterHasPrefix applies the HasPrefix predicate on the "traditional_character" field.
 func TraditionalCharacterHasPrefix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldTraditionalCharacter), v))
-	})
+	return predicate.Character(sql.FieldHasPrefix(FieldTraditionalCharacter, v))
 }
 
 // TraditionalCharacterHasSuffix applies the HasSuffix predicate on the "traditional_character" field.
 func TraditionalCharacterHasSuffix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldTraditionalCharacter), v))
-	})
+	return predicate.Character(sql.FieldHasSuffix(FieldTraditionalCharacter, v))
 }
 
 // TraditionalCharacterEqualFold applies the EqualFold predicate on the "traditional_character" field.
 func TraditionalCharacterEqualFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldTraditionalCharacter), v))
-	})
+	return predicate.Character(sql.FieldEqualFold(FieldTraditionalCharacter, v))
 }
 
 // TraditionalCharacterContainsFold applies the ContainsFold predicate on the "traditional_character" field.
 func TraditionalCharacterContainsFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldTraditionalCharacter), v))
-	})
+	return predicate.Character(sql.FieldContainsFold(FieldTraditionalCharacter, v))
 }
 
 // VariantCharacterEQ applies the EQ predicate on the "variant_character" field.
 func VariantCharacterEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldVariantCharacter), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldVariantCharacter, v))
 }
 
 // VariantCharacterNEQ applies the NEQ predicate on the "variant_character" field.
 func VariantCharacterNEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldVariantCharacter), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldVariantCharacter, v))
 }
 
 // VariantCharacterIn applies the In predicate on the "variant_character" field.
 func VariantCharacterIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldVariantCharacter), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldVariantCharacter, vs...))
 }
 
 // VariantCharacterNotIn applies the NotIn predicate on the "variant_character" field.
 func VariantCharacterNotIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldVariantCharacter), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldVariantCharacter, vs...))
 }
 
 // VariantCharacterGT applies the GT predicate on the "variant_character" field.
 func VariantCharacterGT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldVariantCharacter), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldVariantCharacter, v))
 }
 
 // VariantCharacterGTE applies the GTE predicate on the "variant_character" field.
 func VariantCharacterGTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldVariantCharacter), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldVariantCharacter, v))
 }
 
 // VariantCharacterLT applies the LT predicate on the "variant_character" field.
 func VariantCharacterLT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldVariantCharacter), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldVariantCharacter, v))
 }
 
 // VariantCharacterLTE applies the LTE predicate on the "variant_character" field.
 func VariantCharacterLTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldVariantCharacter), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldVariantCharacter, v))
 }
 
 // VariantCharacterContains applies the Contains predicate on the "variant_character" field.
 func VariantCharacterContains(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldVariantCharacter), v))
-	})
+	return predicate.Character(sql.FieldContains(FieldVariantCharacter, v))
 }
 
 // VariantCharacterHasPrefix applies the HasPrefix predicate on the "variant_character" field.
 func VariantCharacterHasPrefix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldVariantCharacter), v))
-	})
+	return predicate.Character(sql.FieldHasPrefix(FieldVariantCharacter, v))
 }
 
 // VariantCharacterHasSuffix applies the HasSuffix predicate on the "variant_character" field.
 func VariantCharacterHasSuffix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldVariantCharacter), v))
-	})
+	return predicate.Character(sql.FieldHasSuffix(FieldVariantCharacter, v))
 }
 
 // VariantCharacterEqualFold applies the EqualFold predicate on the "variant_character" field.
 func VariantCharacterEqualFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldVariantCharacter), v))
-	})
+	return predicate.Character(sql.FieldEqualFold(FieldVariantCharacter, v))
 }
 
 // VariantCharacterContainsFold applies the ContainsFold predicate on the "variant_character" field.
 func VariantCharacterContainsFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldVariantCharacter), v))
-	})
+	return predicate.Character(sql.FieldContainsFold(FieldVariantCharacter, v))
 }
 
 // CommentEQ applies the EQ predicate on the "comment" field.
 func CommentEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldComment), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldComment, v))
 }
 
 // CommentNEQ applies the NEQ predicate on the "comment" field.
 func CommentNEQ(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldComment), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldComment, v))
 }
 
 // CommentIn applies the In predicate on the "comment" field.
 func CommentIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldComment), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldComment, vs...))
 }
 
 // CommentNotIn applies the NotIn predicate on the "comment" field.
 func CommentNotIn(vs ...string) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldComment), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldComment, vs...))
 }
 
 // CommentGT applies the GT predicate on the "comment" field.
 func CommentGT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldComment), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldComment, v))
 }
 
 // CommentGTE applies the GTE predicate on the "comment" field.
 func CommentGTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldComment), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldComment, v))
 }
 
 // CommentLT applies the LT predicate on the "comment" field.
 func CommentLT(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldComment), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldComment, v))
 }
 
 // CommentLTE applies the LTE predicate on the "comment" field.
 func CommentLTE(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldComment), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldComment, v))
 }
 
 // CommentContains applies the Contains predicate on the "comment" field.
 func CommentContains(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldComment), v))
-	})
+	return predicate.Character(sql.FieldContains(FieldComment, v))
 }
 
 // CommentHasPrefix applies the HasPrefix predicate on the "comment" field.
 func CommentHasPrefix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldComment), v))
-	})
+	return predicate.Character(sql.FieldHasPrefix(FieldComment, v))
 }
 
 // CommentHasSuffix applies the HasSuffix predicate on the "comment" field.
 func CommentHasSuffix(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldComment), v))
-	})
+	return predicate.Character(sql.FieldHasSuffix(FieldComment, v))
 }
 
 // CommentEqualFold applies the EqualFold predicate on the "comment" field.
 func CommentEqualFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldComment), v))
-	})
+	return predicate.Character(sql.FieldEqualFold(FieldComment, v))
 }
 
 // CommentContainsFold applies the ContainsFold predicate on the "comment" field.
 func CommentContainsFold(v string) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldComment), v))
-	})
+	return predicate.Character(sql.FieldContainsFold(FieldComment, v))
 }
 
 // ScienceStrokeEQ applies the EQ predicate on the "science_stroke" field.
 func ScienceStrokeEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldScienceStroke), v))
-	})
+	return predicate.Character(sql.FieldEQ(FieldScienceStroke, v))
 }
 
 // ScienceStrokeNEQ applies the NEQ predicate on the "science_stroke" field.
 func ScienceStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldScienceStroke), v))
-	})
+	return predicate.Character(sql.FieldNEQ(FieldScienceStroke, v))
 }
 
 // ScienceStrokeIn applies the In predicate on the "science_stroke" field.
 func ScienceStrokeIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldScienceStroke), v...))
-	})
+	return predicate.Character(sql.FieldIn(FieldScienceStroke, vs...))
 }
 
 // ScienceStrokeNotIn applies the NotIn predicate on the "science_stroke" field.
 func ScienceStrokeNotIn(vs ...int) predicate.Character {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldScienceStroke), v...))
-	})
+	return predicate.Character(sql.FieldNotIn(FieldScienceStroke, vs...))
 }
 
 // ScienceStrokeGT applies the GT predicate on the "science_stroke" field.
 func ScienceStrokeGT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldScienceStroke), v))
-	})
+	return predicate.Character(sql.FieldGT(FieldScienceStroke, v))
 }
 
 // ScienceStrokeGTE applies the GTE predicate on the "science_stroke" field.
 func ScienceStrokeGTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldScienceStroke), v))
-	})
+	return predicate.Character(sql.FieldGTE(FieldScienceStroke, v))
 }
 
 // ScienceStrokeLT applies the LT predicate on the "science_stroke" field.
 func ScienceStrokeLT(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldScienceStroke), v))
-	})
+	return predicate.Character(sql.FieldLT(FieldScienceStroke, v))
 }
 
 // ScienceStrokeLTE applies the LTE predicate on the "science_stroke" field.
 func ScienceStrokeLTE(v int) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldScienceStroke), v))
-	})
+	return predicate.Character(sql.FieldLTE(FieldScienceStroke, v))
 }
 
 // And groups predicates with the AND operator between them.

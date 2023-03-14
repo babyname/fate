@@ -64,8 +64,6 @@ func openLogFile(path string) error {
 
 func SetGlobalOutput(f *os.File) {
 	output.File = f
-	//unsafeL := (*unsafe.Pointer)(unsafe.Pointer(output.File))
-	//atomic.SwapPointer(unsafeL, unsafe.Pointer(f))
 }
 
 func LoadGlobalConfig(cfg config.LogConfig) error {
@@ -83,8 +81,6 @@ func LoadGlobalConfig(cfg config.LogConfig) error {
 	l := slog.New(h)
 	l.Enabled(stringToLevel(cfg.Level))
 	output.Logger = l
-	//unsafeL := (*unsafe.Pointer)(unsafe.Pointer(output.Logger))
-	//atomic.SwapPointer(unsafeL, unsafe.Pointer(l))
 	return nil
 }
 

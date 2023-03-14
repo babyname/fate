@@ -8,13 +8,14 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/babyname/fate/ent/wugelucky"
+	"github.com/google/uuid"
 )
 
 // WuGeLucky is the model entity for the WuGeLucky schema.
 type WuGeLucky struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// LastStroke1 holds the value of the "last_stroke_1" field.
 	LastStroke1 int `json:"last_stroke_1,omitempty"`
 	// LastStroke2 holds the value of the "last_stroke_2" field.
@@ -58,10 +59,12 @@ func (*WuGeLucky) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case wugelucky.FieldZongLucky, wugelucky.FieldZongSex, wugelucky.FieldZongMax:
 			values[i] = new(sql.NullBool)
-		case wugelucky.FieldID, wugelucky.FieldLastStroke1, wugelucky.FieldLastStroke2, wugelucky.FieldFirstStroke1, wugelucky.FieldFirstStroke2, wugelucky.FieldTianGe, wugelucky.FieldRenGe, wugelucky.FieldDiGe, wugelucky.FieldWaiGe, wugelucky.FieldZongGe:
+		case wugelucky.FieldLastStroke1, wugelucky.FieldLastStroke2, wugelucky.FieldFirstStroke1, wugelucky.FieldFirstStroke2, wugelucky.FieldTianGe, wugelucky.FieldRenGe, wugelucky.FieldDiGe, wugelucky.FieldWaiGe, wugelucky.FieldZongGe:
 			values[i] = new(sql.NullInt64)
 		case wugelucky.FieldTianDaYan, wugelucky.FieldRenDaYan, wugelucky.FieldDiDaYan, wugelucky.FieldWaiDaYan, wugelucky.FieldZongDaYan:
 			values[i] = new(sql.NullString)
+		case wugelucky.FieldID:
+			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type WuGeLucky", columns[i])
 		}
@@ -78,11 +81,11 @@ func (wgl *WuGeLucky) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case wugelucky.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				wgl.ID = *value
 			}
-			wgl.ID = int(value.Int64)
 		case wugelucky.FieldLastStroke1:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field last_stroke_1", values[i])
@@ -194,7 +197,7 @@ func (wgl *WuGeLucky) assignValues(columns []string, values []any) error {
 // Note that you need to call WuGeLucky.Unwrap() before calling this method if this WuGeLucky
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (wgl *WuGeLucky) Update() *WuGeLuckyUpdateOne {
-	return (&WuGeLuckyClient{config: wgl.config}).UpdateOne(wgl)
+	return NewWuGeLuckyClient(wgl.config).UpdateOne(wgl)
 }
 
 // Unwrap unwraps the WuGeLucky entity that was returned from a transaction after it was closed,
@@ -269,9 +272,3 @@ func (wgl *WuGeLucky) String() string {
 
 // WuGeLuckies is a parsable slice of WuGeLucky.
 type WuGeLuckies []*WuGeLucky
-
-func (wgl WuGeLuckies) config(cfg config) {
-	for _i := range wgl {
-		wgl[_i].config = cfg
-	}
-}

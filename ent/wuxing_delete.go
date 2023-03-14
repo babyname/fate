@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,34 +27,7 @@ func (wxd *WuXingDelete) Where(ps ...predicate.WuXing) *WuXingDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (wxd *WuXingDelete) Exec(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(wxd.hooks) == 0 {
-		affected, err = wxd.sqlExec(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*WuXingMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			wxd.mutation = mutation
-			affected, err = wxd.sqlExec(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(wxd.hooks) - 1; i >= 0; i-- {
-			if wxd.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = wxd.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, wxd.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, WuXingMutation](ctx, wxd.sqlExec, wxd.mutation, wxd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -68,15 +40,7 @@ func (wxd *WuXingDelete) ExecX(ctx context.Context) int {
 }
 
 func (wxd *WuXingDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: wuxing.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: wuxing.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(wuxing.Table, sqlgraph.NewFieldSpec(wuxing.FieldID, field.TypeString))
 	if ps := wxd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -88,12 +52,19 @@ func (wxd *WuXingDelete) sqlExec(ctx context.Context) (int, error) {
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
+	wxd.mutation.done = true
 	return affected, err
 }
 
 // WuXingDeleteOne is the builder for deleting a single WuXing entity.
 type WuXingDeleteOne struct {
 	wxd *WuXingDelete
+}
+
+// Where appends a list predicates to the WuXingDelete builder.
+func (wxdo *WuXingDeleteOne) Where(ps ...predicate.WuXing) *WuXingDeleteOne {
+	wxdo.wxd.mutation.Where(ps...)
+	return wxdo
 }
 
 // Exec executes the deletion query.
@@ -111,5 +82,7 @@ func (wxdo *WuXingDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (wxdo *WuXingDeleteOne) ExecX(ctx context.Context) {
-	wxdo.wxd.ExecX(ctx)
+	if err := wxdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

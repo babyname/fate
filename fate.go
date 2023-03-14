@@ -3,6 +3,8 @@ package fate
 import (
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/database"
+	"github.com/babyname/fate/ent"
+	logger "github.com/babyname/fate/log"
 	"github.com/babyname/fate/model"
 )
 
@@ -19,8 +21,13 @@ type fateImpl struct {
 
 func (f *fateImpl) NewSessionWithFilter(filter Filter) Session {
 	return &session{
-		filter: filter,
 		db:     f.db,
+		chars:  make(map[int][]*ent.Character, 128),
+		filter: filter,
+		base:   NameBase{},
+		//detail: nil,
+		//name:   make(chan FirstName, 1024),
+		//err:    nil,
 	}
 }
 
@@ -33,6 +40,7 @@ func (f *fateImpl) NewSession() Session {
 // @return Fate
 // @return error
 func New(cfg *config.Config) (Fate, error) {
+	log = logger.WithGroup("fate")
 	c := database.New(cfg.Database)
 	client, err := c.Client()
 	if err != nil {

@@ -199,34 +199,7 @@ func (wglu *WuGeLuckyUpdate) Mutation() *WuGeLuckyMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (wglu *WuGeLuckyUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(wglu.hooks) == 0 {
-		affected, err = wglu.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*WuGeLuckyMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			wglu.mutation = mutation
-			affected, err = wglu.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(wglu.hooks) - 1; i >= 0; i-- {
-			if wglu.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = wglu.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, wglu.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, WuGeLuckyMutation](ctx, wglu.sqlSave, wglu.mutation, wglu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -252,16 +225,7 @@ func (wglu *WuGeLuckyUpdate) ExecX(ctx context.Context) {
 }
 
 func (wglu *WuGeLuckyUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   wugelucky.Table,
-			Columns: wugelucky.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
-				Column: wugelucky.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(wugelucky.Table, wugelucky.Columns, sqlgraph.NewFieldSpec(wugelucky.FieldID, field.TypeUUID))
 	if ps := wglu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -355,6 +319,7 @@ func (wglu *WuGeLuckyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	wglu.mutation.done = true
 	return n, nil
 }
 
@@ -536,6 +501,12 @@ func (wgluo *WuGeLuckyUpdateOne) Mutation() *WuGeLuckyMutation {
 	return wgluo.mutation
 }
 
+// Where appends a list predicates to the WuGeLuckyUpdate builder.
+func (wgluo *WuGeLuckyUpdateOne) Where(ps ...predicate.WuGeLucky) *WuGeLuckyUpdateOne {
+	wgluo.mutation.Where(ps...)
+	return wgluo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (wgluo *WuGeLuckyUpdateOne) Select(field string, fields ...string) *WuGeLuckyUpdateOne {
@@ -545,40 +516,7 @@ func (wgluo *WuGeLuckyUpdateOne) Select(field string, fields ...string) *WuGeLuc
 
 // Save executes the query and returns the updated WuGeLucky entity.
 func (wgluo *WuGeLuckyUpdateOne) Save(ctx context.Context) (*WuGeLucky, error) {
-	var (
-		err  error
-		node *WuGeLucky
-	)
-	if len(wgluo.hooks) == 0 {
-		node, err = wgluo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*WuGeLuckyMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			wgluo.mutation = mutation
-			node, err = wgluo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(wgluo.hooks) - 1; i >= 0; i-- {
-			if wgluo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = wgluo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, wgluo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*WuGeLucky)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from WuGeLuckyMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*WuGeLucky, WuGeLuckyMutation](ctx, wgluo.sqlSave, wgluo.mutation, wgluo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -604,16 +542,7 @@ func (wgluo *WuGeLuckyUpdateOne) ExecX(ctx context.Context) {
 }
 
 func (wgluo *WuGeLuckyUpdateOne) sqlSave(ctx context.Context) (_node *WuGeLucky, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   wugelucky.Table,
-			Columns: wugelucky.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
-				Column: wugelucky.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(wugelucky.Table, wugelucky.Columns, sqlgraph.NewFieldSpec(wugelucky.FieldID, field.TypeUUID))
 	id, ok := wgluo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "WuGeLucky.id" for update`)}
@@ -727,5 +656,6 @@ func (wgluo *WuGeLuckyUpdateOne) sqlSave(ctx context.Context) (_node *WuGeLucky,
 		}
 		return nil, err
 	}
+	wgluo.mutation.done = true
 	return _node, nil
 }

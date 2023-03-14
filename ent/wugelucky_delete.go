@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,34 +27,7 @@ func (wgld *WuGeLuckyDelete) Where(ps ...predicate.WuGeLucky) *WuGeLuckyDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (wgld *WuGeLuckyDelete) Exec(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(wgld.hooks) == 0 {
-		affected, err = wgld.sqlExec(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*WuGeLuckyMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			wgld.mutation = mutation
-			affected, err = wgld.sqlExec(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(wgld.hooks) - 1; i >= 0; i-- {
-			if wgld.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = wgld.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, wgld.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, WuGeLuckyMutation](ctx, wgld.sqlExec, wgld.mutation, wgld.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -68,15 +40,7 @@ func (wgld *WuGeLuckyDelete) ExecX(ctx context.Context) int {
 }
 
 func (wgld *WuGeLuckyDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: wugelucky.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
-				Column: wugelucky.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(wugelucky.Table, sqlgraph.NewFieldSpec(wugelucky.FieldID, field.TypeUUID))
 	if ps := wgld.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -88,12 +52,19 @@ func (wgld *WuGeLuckyDelete) sqlExec(ctx context.Context) (int, error) {
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
+	wgld.mutation.done = true
 	return affected, err
 }
 
 // WuGeLuckyDeleteOne is the builder for deleting a single WuGeLucky entity.
 type WuGeLuckyDeleteOne struct {
 	wgld *WuGeLuckyDelete
+}
+
+// Where appends a list predicates to the WuGeLuckyDelete builder.
+func (wgldo *WuGeLuckyDeleteOne) Where(ps ...predicate.WuGeLucky) *WuGeLuckyDeleteOne {
+	wgldo.wgld.mutation.Where(ps...)
+	return wgldo
 }
 
 // Exec executes the deletion query.
@@ -111,5 +82,7 @@ func (wgldo *WuGeLuckyDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (wgldo *WuGeLuckyDeleteOne) ExecX(ctx context.Context) {
-	wgldo.wgld.ExecX(ctx)
+	if err := wgldo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

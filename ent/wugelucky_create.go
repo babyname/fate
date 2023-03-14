@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/babyname/fate/ent/wugelucky"
+	"github.com/google/uuid"
 )
 
 // WuGeLuckyCreate is the builder for creating a WuGeLucky entity.
@@ -122,8 +123,8 @@ func (wglc *WuGeLuckyCreate) SetZongMax(b bool) *WuGeLuckyCreate {
 }
 
 // SetID sets the "id" field.
-func (wglc *WuGeLuckyCreate) SetID(i int) *WuGeLuckyCreate {
-	wglc.mutation.SetID(i)
+func (wglc *WuGeLuckyCreate) SetID(u uuid.UUID) *WuGeLuckyCreate {
+	wglc.mutation.SetID(u)
 	return wglc
 }
 
@@ -134,49 +135,7 @@ func (wglc *WuGeLuckyCreate) Mutation() *WuGeLuckyMutation {
 
 // Save creates the WuGeLucky in the database.
 func (wglc *WuGeLuckyCreate) Save(ctx context.Context) (*WuGeLucky, error) {
-	var (
-		err  error
-		node *WuGeLucky
-	)
-	if len(wglc.hooks) == 0 {
-		if err = wglc.check(); err != nil {
-			return nil, err
-		}
-		node, err = wglc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*WuGeLuckyMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = wglc.check(); err != nil {
-				return nil, err
-			}
-			wglc.mutation = mutation
-			if node, err = wglc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(wglc.hooks) - 1; i >= 0; i-- {
-			if wglc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = wglc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, wglc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*WuGeLucky)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from WuGeLuckyMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*WuGeLucky, WuGeLuckyMutation](ctx, wglc.sqlSave, wglc.mutation, wglc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -258,6 +217,9 @@ func (wglc *WuGeLuckyCreate) check() error {
 }
 
 func (wglc *WuGeLuckyCreate) sqlSave(ctx context.Context) (*WuGeLucky, error) {
+	if err := wglc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := wglc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, wglc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -265,27 +227,26 @@ func (wglc *WuGeLuckyCreate) sqlSave(ctx context.Context) (*WuGeLucky, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != _node.ID {
-		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
 	}
+	wglc.mutation.id = &_node.ID
+	wglc.mutation.done = true
 	return _node, nil
 }
 
 func (wglc *WuGeLuckyCreate) createSpec() (*WuGeLucky, *sqlgraph.CreateSpec) {
 	var (
 		_node = &WuGeLucky{config: wglc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: wugelucky.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
-				Column: wugelucky.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(wugelucky.Table, sqlgraph.NewFieldSpec(wugelucky.FieldID, field.TypeUUID))
 	)
 	if id, ok := wglc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := wglc.mutation.LastStroke1(); ok {
 		_spec.SetField(wugelucky.FieldLastStroke1, field.TypeInt, value)
@@ -398,10 +359,6 @@ func (wglcb *WuGeLuckyCreateBulk) Save(ctx context.Context) ([]*WuGeLucky, error
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				mutation.done = true
 				return nodes[i], nil
 			})

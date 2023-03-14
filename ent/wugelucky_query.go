@@ -12,16 +12,15 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/babyname/fate/ent/predicate"
 	"github.com/babyname/fate/ent/wugelucky"
+	"github.com/google/uuid"
 )
 
 // WuGeLuckyQuery is the builder for querying WuGeLucky entities.
 type WuGeLuckyQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
+	ctx        *QueryContext
 	order      []OrderFunc
-	fields     []string
+	inters     []Interceptor
 	predicates []predicate.WuGeLucky
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -34,26 +33,26 @@ func (wglq *WuGeLuckyQuery) Where(ps ...predicate.WuGeLucky) *WuGeLuckyQuery {
 	return wglq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (wglq *WuGeLuckyQuery) Limit(limit int) *WuGeLuckyQuery {
-	wglq.limit = &limit
+	wglq.ctx.Limit = &limit
 	return wglq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (wglq *WuGeLuckyQuery) Offset(offset int) *WuGeLuckyQuery {
-	wglq.offset = &offset
+	wglq.ctx.Offset = &offset
 	return wglq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (wglq *WuGeLuckyQuery) Unique(unique bool) *WuGeLuckyQuery {
-	wglq.unique = &unique
+	wglq.ctx.Unique = &unique
 	return wglq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (wglq *WuGeLuckyQuery) Order(o ...OrderFunc) *WuGeLuckyQuery {
 	wglq.order = append(wglq.order, o...)
 	return wglq
@@ -62,7 +61,7 @@ func (wglq *WuGeLuckyQuery) Order(o ...OrderFunc) *WuGeLuckyQuery {
 // First returns the first WuGeLucky entity from the query.
 // Returns a *NotFoundError when no WuGeLucky was found.
 func (wglq *WuGeLuckyQuery) First(ctx context.Context) (*WuGeLucky, error) {
-	nodes, err := wglq.Limit(1).All(ctx)
+	nodes, err := wglq.Limit(1).All(setContextOp(ctx, wglq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -83,9 +82,9 @@ func (wglq *WuGeLuckyQuery) FirstX(ctx context.Context) *WuGeLucky {
 
 // FirstID returns the first WuGeLucky ID from the query.
 // Returns a *NotFoundError when no WuGeLucky ID was found.
-func (wglq *WuGeLuckyQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
-	if ids, err = wglq.Limit(1).IDs(ctx); err != nil {
+func (wglq *WuGeLuckyQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
+	if ids, err = wglq.Limit(1).IDs(setContextOp(ctx, wglq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -96,7 +95,7 @@ func (wglq *WuGeLuckyQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (wglq *WuGeLuckyQuery) FirstIDX(ctx context.Context) int {
+func (wglq *WuGeLuckyQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := wglq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -108,7 +107,7 @@ func (wglq *WuGeLuckyQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one WuGeLucky entity is found.
 // Returns a *NotFoundError when no WuGeLucky entities are found.
 func (wglq *WuGeLuckyQuery) Only(ctx context.Context) (*WuGeLucky, error) {
-	nodes, err := wglq.Limit(2).All(ctx)
+	nodes, err := wglq.Limit(2).All(setContextOp(ctx, wglq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -134,9 +133,9 @@ func (wglq *WuGeLuckyQuery) OnlyX(ctx context.Context) *WuGeLucky {
 // OnlyID is like Only, but returns the only WuGeLucky ID in the query.
 // Returns a *NotSingularError when more than one WuGeLucky ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (wglq *WuGeLuckyQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
-	if ids, err = wglq.Limit(2).IDs(ctx); err != nil {
+func (wglq *WuGeLuckyQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
+	if ids, err = wglq.Limit(2).IDs(setContextOp(ctx, wglq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -151,7 +150,7 @@ func (wglq *WuGeLuckyQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (wglq *WuGeLuckyQuery) OnlyIDX(ctx context.Context) int {
+func (wglq *WuGeLuckyQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := wglq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -161,10 +160,12 @@ func (wglq *WuGeLuckyQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of WuGeLuckies.
 func (wglq *WuGeLuckyQuery) All(ctx context.Context) ([]*WuGeLucky, error) {
+	ctx = setContextOp(ctx, wglq.ctx, "All")
 	if err := wglq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return wglq.sqlAll(ctx)
+	qr := querierAll[[]*WuGeLucky, *WuGeLuckyQuery]()
+	return withInterceptors[[]*WuGeLucky](ctx, wglq, qr, wglq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -177,16 +178,19 @@ func (wglq *WuGeLuckyQuery) AllX(ctx context.Context) []*WuGeLucky {
 }
 
 // IDs executes the query and returns a list of WuGeLucky IDs.
-func (wglq *WuGeLuckyQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
-	if err := wglq.Select(wugelucky.FieldID).Scan(ctx, &ids); err != nil {
+func (wglq *WuGeLuckyQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+	if wglq.ctx.Unique == nil && wglq.path != nil {
+		wglq.Unique(true)
+	}
+	ctx = setContextOp(ctx, wglq.ctx, "IDs")
+	if err = wglq.Select(wugelucky.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (wglq *WuGeLuckyQuery) IDsX(ctx context.Context) []int {
+func (wglq *WuGeLuckyQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := wglq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -196,10 +200,11 @@ func (wglq *WuGeLuckyQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (wglq *WuGeLuckyQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, wglq.ctx, "Count")
 	if err := wglq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return wglq.sqlCount(ctx)
+	return withInterceptors[int](ctx, wglq, querierCount[*WuGeLuckyQuery](), wglq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -213,10 +218,15 @@ func (wglq *WuGeLuckyQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (wglq *WuGeLuckyQuery) Exist(ctx context.Context) (bool, error) {
-	if err := wglq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = setContextOp(ctx, wglq.ctx, "Exist")
+	switch _, err := wglq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return wglq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -236,14 +246,13 @@ func (wglq *WuGeLuckyQuery) Clone() *WuGeLuckyQuery {
 	}
 	return &WuGeLuckyQuery{
 		config:     wglq.config,
-		limit:      wglq.limit,
-		offset:     wglq.offset,
+		ctx:        wglq.ctx.Clone(),
 		order:      append([]OrderFunc{}, wglq.order...),
+		inters:     append([]Interceptor{}, wglq.inters...),
 		predicates: append([]predicate.WuGeLucky{}, wglq.predicates...),
 		// clone intermediate query.
-		sql:    wglq.sql.Clone(),
-		path:   wglq.path,
-		unique: wglq.unique,
+		sql:  wglq.sql.Clone(),
+		path: wglq.path,
 	}
 }
 
@@ -262,16 +271,11 @@ func (wglq *WuGeLuckyQuery) Clone() *WuGeLuckyQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (wglq *WuGeLuckyQuery) GroupBy(field string, fields ...string) *WuGeLuckyGroupBy {
-	grbuild := &WuGeLuckyGroupBy{config: wglq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := wglq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return wglq.sqlQuery(ctx), nil
-	}
+	wglq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &WuGeLuckyGroupBy{build: wglq}
+	grbuild.flds = &wglq.ctx.Fields
 	grbuild.label = wugelucky.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -288,11 +292,11 @@ func (wglq *WuGeLuckyQuery) GroupBy(field string, fields ...string) *WuGeLuckyGr
 //		Select(wugelucky.FieldLastStroke1).
 //		Scan(ctx, &v)
 func (wglq *WuGeLuckyQuery) Select(fields ...string) *WuGeLuckySelect {
-	wglq.fields = append(wglq.fields, fields...)
-	selbuild := &WuGeLuckySelect{WuGeLuckyQuery: wglq}
-	selbuild.label = wugelucky.Label
-	selbuild.flds, selbuild.scan = &wglq.fields, selbuild.Scan
-	return selbuild
+	wglq.ctx.Fields = append(wglq.ctx.Fields, fields...)
+	sbuild := &WuGeLuckySelect{WuGeLuckyQuery: wglq}
+	sbuild.label = wugelucky.Label
+	sbuild.flds, sbuild.scan = &wglq.ctx.Fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a WuGeLuckySelect configured with the given aggregations.
@@ -301,7 +305,17 @@ func (wglq *WuGeLuckyQuery) Aggregate(fns ...AggregateFunc) *WuGeLuckySelect {
 }
 
 func (wglq *WuGeLuckyQuery) prepareQuery(ctx context.Context) error {
-	for _, f := range wglq.fields {
+	for _, inter := range wglq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, wglq); err != nil {
+				return err
+			}
+		}
+	}
+	for _, f := range wglq.ctx.Fields {
 		if !wugelucky.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -343,41 +357,22 @@ func (wglq *WuGeLuckyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 
 func (wglq *WuGeLuckyQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := wglq.querySpec()
-	_spec.Node.Columns = wglq.fields
-	if len(wglq.fields) > 0 {
-		_spec.Unique = wglq.unique != nil && *wglq.unique
+	_spec.Node.Columns = wglq.ctx.Fields
+	if len(wglq.ctx.Fields) > 0 {
+		_spec.Unique = wglq.ctx.Unique != nil && *wglq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, wglq.driver, _spec)
 }
 
-func (wglq *WuGeLuckyQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := wglq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
-}
-
 func (wglq *WuGeLuckyQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   wugelucky.Table,
-			Columns: wugelucky.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
-				Column: wugelucky.FieldID,
-			},
-		},
-		From:   wglq.sql,
-		Unique: true,
-	}
-	if unique := wglq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(wugelucky.Table, wugelucky.Columns, sqlgraph.NewFieldSpec(wugelucky.FieldID, field.TypeUUID))
+	_spec.From = wglq.sql
+	if unique := wglq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if wglq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := wglq.fields; len(fields) > 0 {
+	if fields := wglq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, wugelucky.FieldID)
 		for i := range fields {
@@ -393,10 +388,10 @@ func (wglq *WuGeLuckyQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := wglq.limit; limit != nil {
+	if limit := wglq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := wglq.offset; offset != nil {
+	if offset := wglq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := wglq.order; len(ps) > 0 {
@@ -412,7 +407,7 @@ func (wglq *WuGeLuckyQuery) querySpec() *sqlgraph.QuerySpec {
 func (wglq *WuGeLuckyQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(wglq.driver.Dialect())
 	t1 := builder.Table(wugelucky.Table)
-	columns := wglq.fields
+	columns := wglq.ctx.Fields
 	if len(columns) == 0 {
 		columns = wugelucky.Columns
 	}
@@ -421,7 +416,7 @@ func (wglq *WuGeLuckyQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = wglq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if wglq.unique != nil && *wglq.unique {
+	if wglq.ctx.Unique != nil && *wglq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range wglq.predicates {
@@ -430,12 +425,12 @@ func (wglq *WuGeLuckyQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range wglq.order {
 		p(selector)
 	}
-	if offset := wglq.offset; offset != nil {
+	if offset := wglq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := wglq.limit; limit != nil {
+	if limit := wglq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -443,13 +438,8 @@ func (wglq *WuGeLuckyQuery) sqlQuery(ctx context.Context) *sql.Selector {
 
 // WuGeLuckyGroupBy is the group-by builder for WuGeLucky entities.
 type WuGeLuckyGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *WuGeLuckyQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -458,58 +448,46 @@ func (wglgb *WuGeLuckyGroupBy) Aggregate(fns ...AggregateFunc) *WuGeLuckyGroupBy
 	return wglgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (wglgb *WuGeLuckyGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := wglgb.path(ctx)
-	if err != nil {
+	ctx = setContextOp(ctx, wglgb.build.ctx, "GroupBy")
+	if err := wglgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	wglgb.sql = query
-	return wglgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*WuGeLuckyQuery, *WuGeLuckyGroupBy](ctx, wglgb.build, wglgb, wglgb.build.inters, v)
 }
 
-func (wglgb *WuGeLuckyGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range wglgb.fields {
-		if !wugelucky.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (wglgb *WuGeLuckyGroupBy) sqlScan(ctx context.Context, root *WuGeLuckyQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(wglgb.fns))
+	for _, fn := range wglgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := wglgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*wglgb.flds)+len(wglgb.fns))
+		for _, f := range *wglgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*wglgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := wglgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := wglgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (wglgb *WuGeLuckyGroupBy) sqlQuery() *sql.Selector {
-	selector := wglgb.sql.Select()
-	aggregation := make([]string, 0, len(wglgb.fns))
-	for _, fn := range wglgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(wglgb.fields)+len(wglgb.fns))
-		for _, f := range wglgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(wglgb.fields...)...)
-}
-
 // WuGeLuckySelect is the builder for selecting fields of WuGeLucky entities.
 type WuGeLuckySelect struct {
 	*WuGeLuckyQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -520,26 +498,27 @@ func (wgls *WuGeLuckySelect) Aggregate(fns ...AggregateFunc) *WuGeLuckySelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (wgls *WuGeLuckySelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, wgls.ctx, "Select")
 	if err := wgls.prepareQuery(ctx); err != nil {
 		return err
 	}
-	wgls.sql = wgls.WuGeLuckyQuery.sqlQuery(ctx)
-	return wgls.sqlScan(ctx, v)
+	return scanWithInterceptors[*WuGeLuckyQuery, *WuGeLuckySelect](ctx, wgls.WuGeLuckyQuery, wgls, wgls.inters, v)
 }
 
-func (wgls *WuGeLuckySelect) sqlScan(ctx context.Context, v any) error {
+func (wgls *WuGeLuckySelect) sqlScan(ctx context.Context, root *WuGeLuckyQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(wgls.fns))
 	for _, fn := range wgls.fns {
-		aggregation = append(aggregation, fn(wgls.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*wgls.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		wgls.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		wgls.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := wgls.sql.Query()
+	query, args := selector.Query()
 	if err := wgls.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

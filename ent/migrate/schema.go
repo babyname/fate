@@ -55,7 +55,7 @@ var (
 	}
 	// WuGeLuckyColumns holds the columns for the "wu_ge_lucky" table.
 	WuGeLuckyColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUUID},
 		{Name: "last_stroke_1", Type: field.TypeInt},
 		{Name: "last_stroke_2", Type: field.TypeInt},
 		{Name: "first_stroke_1", Type: field.TypeInt},
