@@ -38,7 +38,7 @@ func (o *Output) Basic() *NameBasic {
 	return o.basic
 }
 
-func (o *Output) Put(name FirstName) {
+func (o *Output) put(name FirstName) {
 	o.names.Put(name)
 }
 

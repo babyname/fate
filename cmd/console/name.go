@@ -61,7 +61,6 @@ func cmdName() *cobra.Command {
 				fmt.Println("发生了一些错误", err.Error())
 				return
 			}
-			var names []fate.Name
 			//for input.Output().NextName() {
 			//	names = append(names, s.Name(fn))
 			//}
@@ -72,14 +71,15 @@ func cmdName() *cobra.Command {
 			<-s.Context().Done()
 			fmt.Println("end", time.Now().String())
 			time.Sleep(3 * time.Second)
-			for i := 0; i < len(names); i += 10 {
+
+			for name, ok := input.Output().NextName(); ok; name, ok = input.Output().NextName() {
 				fmt.Print("Name:")
-				for j := i; j < len(names) && j < i+10; j++ {
-					fmt.Print(names[j], "  |  ")
+				for j := 0; j < 10; j++ {
+					fmt.Print(name, "  |  ")
 				}
 				fmt.Printf("\r\n")
 			}
-			fmt.Println("Total", len(names), input.Output().Total())
+			fmt.Println("Total", input.Output().Total())
 		},
 	}
 	cmd.Flags().StringVarP(&last, "last", "l", "", "指定姓氏")
