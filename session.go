@@ -3,14 +3,11 @@ package fate
 import (
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/model"
-	"github.com/godcong/chronos/v2"
 	"golang.org/x/net/context"
 )
 
 type Session interface {
 	Start(input *Input) error
-	Name(name FirstName) Name
-	Output() <-chan FirstName
 	Stop() error
 	Err() error
 }
@@ -21,9 +18,10 @@ type session struct {
 	db     *model.Model
 	chars  map[int][]*ent.Character
 	filter Filter
-	base   NameBase
-	name   chan FirstName
+
 	err    error
+	name   chan FirstName
+	output *Output
 }
 
 func (s *session) Start(input *Input) error {
@@ -32,25 +30,29 @@ func (s *session) Start(input *Input) error {
 	s.name = make(chan FirstName, 1024)
 
 	var err error
-	s.base.Sex = input.Sex
-	s.base.Born = chronos.ParseTime(input.Born)
-	s.base.LastName, err = s.db.QueryLastName(s.Context(), input.Last)
+	s.output = input.Output()
+	ln, err := s.db.QueryLastName(s.Context(), input.Last)
 	if err != nil {
 		return err
 	}
-	log.Info("generate", "base", s.base)
+	s.output.SetLastName(ln)
+	log.Info("generate", "base", s.output.Basic())
 	go s.generate()
+	go s.startOutput()
 	return nil
 }
 
-func (s *session) Output() <-chan FirstName {
-	return s.name
-}
-
-func (s *session) Name(name FirstName) Name {
-	return Name{
-		NameBase:  &s.base,
-		FirstName: name,
+func (s *session) startOutput() {
+	for {
+		select {
+		case <-s.Context().Done():
+			return
+		case name, ok := <-s.name:
+			if !ok {
+				return
+			}
+			s.output.Put(name)
+		}
 	}
 }
 
