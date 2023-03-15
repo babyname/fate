@@ -7,7 +7,7 @@ import (
 	"github.com/godcong/chronos/v2"
 )
 
-type NameBase struct {
+type NameBasic struct {
 	LastName  [2]*ent.Character
 	Born      chronos.Calendar
 	EightChar chronos.EightChar
@@ -22,7 +22,7 @@ type NameDetail struct {
 }
 
 type Name struct {
-	*NameBase
+	*NameBasic
 	FirstName
 }
 
@@ -31,4 +31,14 @@ func (n Name) String() string {
 		return fmt.Sprintf("%v%v %v%v", n.LastName[0].Ch, n.LastName[1].Ch, n.FirstName[0].Ch, n.FirstName[1].Ch)
 	}
 	return fmt.Sprintf("%v %v%v", n.LastName[0].Ch, n.FirstName[0].Ch, n.FirstName[1].Ch)
+}
+
+func parseNameBasicFromInput(input *Input) *NameBasic {
+	b := chronos.ParseTime(input.Born)
+	return &NameBasic{
+		LastName:  [2]*ent.Character{},
+		Born:      b,
+		EightChar: b.Lunar().GetEightChar(),
+		Sex:       input.Sex,
+	}
 }

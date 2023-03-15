@@ -51,19 +51,20 @@ func cmdName() *cobra.Command {
 			if sex == "girl" {
 				sx = 0
 			}
-			err = s.Start(&fate.Input{
+			input := &fate.Input{
 				Last: l,
 				Born: b,
 				Sex:  fate.Sex(sx),
-			})
+			}
+			err = s.Start(input)
 			if err != nil {
 				fmt.Println("发生了一些错误", err.Error())
 				return
 			}
 			var names []fate.Name
-			for fn := range s.Output() {
-				names = append(names, s.Name(fn))
-			}
+			//for input.Output().NextName() {
+			//	names = append(names, s.Name(fn))
+			//}
 			if s.Err() != nil {
 				fmt.Println("输出时发生了一些错误", s.Err().Error())
 				return
