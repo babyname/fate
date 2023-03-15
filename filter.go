@@ -1,6 +1,7 @@
 package fate
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/babyname/fate/dayan"
@@ -9,33 +10,35 @@ import (
 	"github.com/babyname/fate/wuxing"
 )
 
+// Filter
+// prefix with Query are used db search
 type Filter interface {
-	CustomFilter(name string, v any)
-	SexFilter(lucky *ent.WuGeLucky) bool
-	CharacterFilter(query *ent.CharacterQuery) *ent.CharacterQuery
-	RegularFilter(query *ent.CharacterQuery) *ent.CharacterQuery
-	StrokeFilter(stroke int) func(query *ent.CharacterQuery) *ent.CharacterQuery
-	DaYanFilter(lucky *ent.WuGeLucky) bool
-	WuXingFilter(ge int, ge2 int, ge3 int) bool
-	GetCharacterStroke(e *ent.Character) int
+	CustomFilter(name string, v any) error
+	QueryCharacterFilter(query *ent.CharacterQuery) *ent.CharacterQuery
+	QueryRegularFilter(query *ent.CharacterQuery) *ent.CharacterQuery
+	QueryStrokeFilter(stroke int) func(query *ent.CharacterQuery) *ent.CharacterQuery
+	CheckSexFilter(lucky *ent.WuGeLucky) bool
+	CheckDaYanFilter(lucky *ent.WuGeLucky) bool
+	CheckWuXingFilter(ge int, ge2 int, ge3 int) bool
+	GetCharacterStroke(c *ent.Character) int
 }
 
 type filter struct {
-	characterFilterType CharacterFilterType
-	sexFilter           func(lucky *ent.WuGeLucky) bool
-	daYanFilter         func(lucky *ent.WuGeLucky) bool
-	wuXingFilter        func(ge int, ge2 int, ge3 int) bool
-	characterFilter     func(query *ent.CharacterQuery) *ent.CharacterQuery
-	regularFilter       func(query *ent.CharacterQuery) *ent.CharacterQuery
-	strokeFilter        func(stroke int) func(query *ent.CharacterQuery) *ent.CharacterQuery
+	characterFilterType  CharacterFilterType
+	checkSexFilter       func(lucky *ent.WuGeLucky) bool
+	checkDaYanFilter     func(lucky *ent.WuGeLucky) bool
+	checkWuXingFilter    func(ge int, ge2 int, ge3 int) bool
+	queryCharacterFilter func(query *ent.CharacterQuery) *ent.CharacterQuery
+	queryRegularFilter   func(query *ent.CharacterQuery) *ent.CharacterQuery
+	queryStrokeFilter    func(stroke int) func(query *ent.CharacterQuery) *ent.CharacterQuery
 }
 
-func (f *filter) StrokeFilter(stroke int) func(query *ent.CharacterQuery) *ent.CharacterQuery {
-	return f.strokeFilter(stroke)
+func (f *filter) QueryStrokeFilter(stroke int) func(query *ent.CharacterQuery) *ent.CharacterQuery {
+	return f.queryStrokeFilter(stroke)
 }
 
-func (f *filter) RegularFilter(query *ent.CharacterQuery) *ent.CharacterQuery {
-	return f.regularFilter(query)
+func (f *filter) QueryRegularFilter(query *ent.CharacterQuery) *ent.CharacterQuery {
+	return f.queryRegularFilter(query)
 }
 
 func (f *filter) GetCharacterStroke(c *ent.Character) int {
@@ -53,42 +56,42 @@ func (f *filter) GetCharacterStroke(c *ent.Character) int {
 	}
 }
 
-func (f *filter) CustomFilter(name string, v any) {
+func (f *filter) CustomFilter(name string, v any) error {
 	if v == nil {
-		return
+		return errors.New("not implements")
 	}
 	switch name {
-	case "SexFilter":
-		fn, ok := v.(func(lucky *ent.WuGeLucky) bool)
-		if ok {
-			f.sexFilter = fn
-		}
-	case "WuXingFilter":
-		fn, ok := v.(func(ge int, ge2 int, ge3 int) bool)
-		if ok {
-			f.wuXingFilter = fn
-		}
-	case "DaYanFilter":
-	case "CharacterFilter":
+	//case "CheckSexFilter":
+	//	fn, ok := v.(func(lucky *ent.WuGeLucky) bool)
+	//	if ok {
+	//		f.checkSexFilter = fn
+	//	}
+	//case "CheckWuXingFilter":
+	//	fn, ok := v.(func(ge int, ge2 int, ge3 int) bool)
+	//	if ok {
+	//		f.checkWuXingFilter = fn
+	//	}
+	//case "CheckDaYanFilter":
+	//case "QueryCharacterFilter":
 	default:
-		return
+		return errors.New("not implements")
 	}
 }
 
-func (f *filter) WuXingFilter(ge int, ge2 int, ge3 int) bool {
-	return f.wuXingFilter(ge, ge2, ge3)
+func (f *filter) CheckWuXingFilter(ge int, ge2 int, ge3 int) bool {
+	return f.checkWuXingFilter(ge, ge2, ge3)
 }
 
-func (f *filter) DaYanFilter(lucky *ent.WuGeLucky) bool {
-	return f.daYanFilter(lucky)
+func (f *filter) CheckDaYanFilter(lucky *ent.WuGeLucky) bool {
+	return f.checkDaYanFilter(lucky)
 }
 
-func (f *filter) SexFilter(lucky *ent.WuGeLucky) bool {
-	return f.sexFilter(lucky)
+func (f *filter) CheckSexFilter(lucky *ent.WuGeLucky) bool {
+	return f.checkSexFilter(lucky)
 }
 
-func (f *filter) CharacterFilter(query *ent.CharacterQuery) *ent.CharacterQuery {
-	return f.characterFilter(query)
+func (f *filter) QueryCharacterFilter(query *ent.CharacterQuery) *ent.CharacterQuery {
+	return f.queryCharacterFilter(query)
 }
 
 // DefaultFilter ...
@@ -100,22 +103,22 @@ func DefaultFilter() Filter {
 func newFilter() *filter {
 	return &filter{
 		characterFilterType: CharacterFilterTypeDefault,
-		sexFilter: func(lucky *ent.WuGeLucky) bool {
+		checkSexFilter: func(lucky *ent.WuGeLucky) bool {
 			return false
 		},
-		daYanFilter: func(lucky *ent.WuGeLucky) bool {
+		checkDaYanFilter: func(lucky *ent.WuGeLucky) bool {
 			return false
 		},
-		wuXingFilter: func(ge int, ge2 int, ge3 int) bool {
+		checkWuXingFilter: func(ge int, ge2 int, ge3 int) bool {
 			return false
 		},
-		characterFilter: func(query *ent.CharacterQuery) *ent.CharacterQuery {
+		queryCharacterFilter: func(query *ent.CharacterQuery) *ent.CharacterQuery {
 			return query
 		},
-		regularFilter: func(query *ent.CharacterQuery) *ent.CharacterQuery {
+		queryRegularFilter: func(query *ent.CharacterQuery) *ent.CharacterQuery {
 			return query
 		},
-		strokeFilter: func(stroke int) func(query *ent.CharacterQuery) *ent.CharacterQuery {
+		queryStrokeFilter: func(stroke int) func(query *ent.CharacterQuery) *ent.CharacterQuery {
 			return func(query *ent.CharacterQuery) *ent.CharacterQuery {
 				return query.Where(character.StrokeEQ(stroke))
 			}
@@ -126,7 +129,7 @@ func newFilter() *filter {
 func NewFilter(fo FilterOption) Filter {
 	f := newFilter()
 	if fo.SexFilter {
-		f.sexFilter = func(lucky *ent.WuGeLucky) bool {
+		f.checkSexFilter = func(lucky *ent.WuGeLucky) bool {
 			return lucky.ZongLucky == false
 		}
 	}
@@ -134,29 +137,29 @@ func NewFilter(fo FilterOption) Filter {
 		f.characterFilterType = fo.CharacterFilterType
 		switch fo.CharacterFilterType {
 		case CharacterFilterTypeChs:
-			f.characterFilter = characterTypeFilterCHS(fo.MinCharacter, fo.MaxCharacter)
-			f.strokeFilter = strokeFilterCHS
+			f.queryCharacterFilter = characterTypeFilterCHS(fo.MinCharacter, fo.MaxCharacter)
+			f.queryStrokeFilter = strokeFilterCHS
 		case CharacterFilterTypeCht:
-			f.characterFilter = characterTypeFilterCHT(fo.MinCharacter, fo.MaxCharacter)
-			f.strokeFilter = strokeFilterCHT
+			f.queryCharacterFilter = characterTypeFilterCHT(fo.MinCharacter, fo.MaxCharacter)
+			f.queryStrokeFilter = strokeFilterCHT
 		case CharacterFilterTypeKangxi:
-			f.characterFilter = characterTypeFilterKX(fo.MinCharacter, fo.MaxCharacter)
-			f.strokeFilter = strokeFilterKX
+			f.queryCharacterFilter = characterTypeFilterKX(fo.MinCharacter, fo.MaxCharacter)
+			f.queryStrokeFilter = strokeFilterKX
 		case CharacterFilterTypeDefault:
 			fallthrough
 		default:
-			f.characterFilter = characterTypeFilterDefault(fo.MinCharacter, fo.MaxCharacter)
-			f.strokeFilter = strokeFilterDefault
+			f.queryCharacterFilter = characterTypeFilterDefault(fo.MinCharacter, fo.MaxCharacter)
+			f.queryStrokeFilter = strokeFilterDefault
 		}
 	}
 	if fo.DaYanFilter {
-		f.daYanFilter = daYanFilter
+		f.checkDaYanFilter = daYanFilter
 	}
 	if fo.WuXingFilter {
-		f.wuXingFilter = wuXingFilter
+		f.checkWuXingFilter = wuXingFilter
 	}
 	if fo.RegularFilter {
-		f.regularFilter = regularFilter
+		f.queryRegularFilter = regularFilter
 	}
 
 	return f
