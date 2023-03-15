@@ -1,12 +1,20 @@
 package fate
 
 import (
+	"sync/atomic"
+
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/model"
 	"golang.org/x/net/context"
+	"golang.org/x/sync/errgroup"
 )
 
+// SessionState ...
+// ENUM(waiting,generating,finish,canceled,failed)
+type SessionState int32
+
 type Session interface {
+	Context() context.Context
 	Start(input *Input) error
 	Stop() error
 	Err() error
@@ -16,16 +24,29 @@ type session struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 	db     *model.Model
-	chars  map[int][]*ent.Character
+	group  errgroup.Group
+	state  int32
 	filter Filter
 
-	err    error
+	chars map[int][]*ent.Character
+
 	name   chan FirstName
 	output *Output
 }
 
+func (s *session) State() SessionState {
+	return SessionState(atomic.LoadInt32(&s.state))
+}
+
+func (s *session) SetState(state SessionState) {
+	atomic.StoreInt32(&s.state, int32(state))
+}
+
 func (s *session) Start(input *Input) error {
 	log.Info("start", "input", input)
+	if s.State() != SessionStateWaiting {
+		return nil
+	}
 	s.ctx, s.cancel = context.WithCancel(context.Background())
 	s.name = make(chan FirstName, 1024)
 
@@ -37,7 +58,9 @@ func (s *session) Start(input *Input) error {
 	}
 	s.output.SetLastName(ln)
 	log.Info("generate", "base", s.output.Basic())
-	go s.generate()
+	s.SetState(SessionStateGenerating)
+
+	s.group.Go(s.generate)
 	go s.startOutput()
 	return nil
 }
@@ -57,14 +80,15 @@ func (s *session) startOutput() {
 }
 
 func (s *session) Err() error {
-	return s.err
+	if s.State() == SessionStateFailed {
+		return s.group.Wait()
+	}
+	return nil
 }
 
 func (s *session) Stop() error {
-	if s.cancel != nil {
-		s.cancel()
-		s.cancel = nil
-	}
+	s.close()
+	s.SetState(SessionStateWaiting)
 	return nil
 }
 
@@ -72,39 +96,40 @@ func (s *session) Context() context.Context {
 	return s.ctx
 }
 
-func (s *session) generate() {
+func (s *session) generate() error {
 	defer close(s.name)
-	lucky, err := s.db.GetWuGeLucky(s.Context(), s.getLastStroke())
+	defer s.close()
+	lucky, err := s.db.GetWuGeLucky(s.Context(), s.output.getLastStroke(s.filter))
 	if err != nil {
 		log.Error("get wuge lucky", err)
-		s.err = err
-		return
+		s.SetState(SessionStateFailed)
+		return err
 	}
 	log.Info("wuge lucky list", "size", len(lucky))
 	var tmp *ent.WuGeLucky
 	for i := range lucky {
 		tmp = lucky[i]
 		log.Info("current lukcy", "lucky", tmp)
-		if s.filter.SexFilter(tmp) {
+		if s.filter.CheckSexFilter(tmp) {
 			continue
 		}
-		log.Info("current lukcy sex filtered", "lucky", tmp, "dayan", s.filter.DaYanFilter(tmp))
-		if s.filter.DaYanFilter(tmp) {
+		log.Info("current lukcy sex filtered", "lucky", tmp, "dayan", s.filter.CheckDaYanFilter(tmp))
+		if s.filter.CheckDaYanFilter(tmp) {
 			continue
 		}
 		log.Info("current lukcy dayan filterd", "lucky", tmp)
-		if s.filter.WuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
+		if s.filter.CheckWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
 			continue
 		}
 		log.Info("current lukcy get chars", "lucky", tmp)
 		var f1s []*ent.Character
 
 		if cs, ok := s.chars[tmp.FirstStroke1]; !ok {
-			f1s, err = s.db.GetCharacters(s.Context(), s.filter.StrokeFilter(tmp.FirstStroke1), s.filter.RegularFilter)
+			f1s, err = s.db.GetCharacters(s.Context(), s.filter.QueryStrokeFilter(tmp.FirstStroke1), s.filter.QueryRegularFilter)
 			if err != nil {
 				log.Error("get first1 name", err)
-				s.err = err
-				return
+				s.SetState(SessionStateFailed)
+				return err
 			}
 		} else {
 			f1s = cs
@@ -112,11 +137,11 @@ func (s *session) generate() {
 
 		var f2s []*ent.Character
 		if cs, ok := s.chars[tmp.FirstStroke2]; !ok {
-			f2s, err = s.db.GetCharacters(s.Context(), s.filter.StrokeFilter(tmp.FirstStroke2), s.filter.RegularFilter)
+			f2s, err = s.db.GetCharacters(s.Context(), s.filter.QueryStrokeFilter(tmp.FirstStroke2), s.filter.QueryRegularFilter)
 			if err != nil {
 				log.Error("get first2 name", err)
-				s.err = err
-				return
+				s.SetState(SessionStateFailed)
+				return err
 			}
 		} else {
 			f2s = cs
@@ -127,7 +152,8 @@ func (s *session) generate() {
 			for i2 := range f2s {
 				select {
 				case <-s.Context().Done():
-					return
+					s.SetState(SessionStateCanceled)
+					return nil
 				default:
 					s.name <- FirstName{
 						f1s[i1],
@@ -137,5 +163,13 @@ func (s *session) generate() {
 			}
 		}
 	}
-	return
+	s.SetState(SessionStateFinish)
+	return nil
+}
+
+func (s *session) close() {
+	if s.cancel != nil {
+		s.cancel()
+		s.cancel = nil
+	}
 }

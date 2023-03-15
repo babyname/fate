@@ -69,6 +69,7 @@ func cmdName() *cobra.Command {
 				fmt.Println("输出时发生了一些错误", s.Err().Error())
 				return
 			}
+			<-s.Context().Done()
 			fmt.Println("end", time.Now().String())
 			time.Sleep(3 * time.Second)
 			for i := 0; i < len(names); i += 10 {
@@ -78,7 +79,7 @@ func cmdName() *cobra.Command {
 				}
 				fmt.Printf("\r\n")
 			}
-			fmt.Println("Total", len(names))
+			fmt.Println("Total", len(names), input.Output().Total())
 		},
 	}
 	cmd.Flags().StringVarP(&last, "last", "l", "", "指定姓氏")

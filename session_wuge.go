@@ -114,12 +114,3 @@ func zongGe(l1, l2, f1, f2 int) int {
 	}
 	return zg%81 + 1
 }
-
-func (s *session) getLastStroke() [2]int {
-	var strokes [2]int
-	strokes[0] = s.filter.GetCharacterStroke(s.base.LastName[0])
-	if s.base.LastName[1] != nil {
-		strokes[1] = s.filter.GetCharacterStroke(s.base.LastName[1])
-	}
-	return strokes
-}
