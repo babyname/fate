@@ -63,3 +63,16 @@ func (o *Output) NextName() (Name, bool) {
 	}
 	return Name{}, false
 }
+
+func (o *Output) Total() int {
+	return o.names.Len()
+}
+
+func (o *Output) getLastStroke(filter Filter) [2]int {
+	var strokes [2]int
+	strokes[0] = filter.GetCharacterStroke(o.Basic().LastName[0])
+	if o.Basic().LastName[1] != nil {
+		strokes[1] = filter.GetCharacterStroke(o.Basic().LastName[1])
+	}
+	return strokes
+}
