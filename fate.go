@@ -24,10 +24,6 @@ func (f *fateImpl) NewSessionWithFilter(filter Filter) Session {
 		db:     f.db,
 		chars:  make(map[int][]*ent.Character, 128),
 		filter: filter,
-		base:   NameBase{},
-		//detail: nil,
-		//name:   make(chan FirstName, 1024),
-		//err:    nil,
 	}
 }
 
