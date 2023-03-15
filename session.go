@@ -1,6 +1,7 @@
 package fate
 
 import (
+	"sync"
 	"sync/atomic"
 
 	"github.com/babyname/fate/ent"
@@ -74,7 +75,8 @@ func (s *session) startOutput() {
 			if !ok {
 				return
 			}
-			s.output.Put(name)
+			//Use a separate thread to call `put` to ensure thread safety
+			s.output.put(name)
 		}
 	}
 }
@@ -106,6 +108,7 @@ func (s *session) generate() error {
 		return err
 	}
 	log.Info("wuge lucky list", "size", len(lucky))
+	wg := sync.WaitGroup{}
 	var tmp *ent.WuGeLucky
 	for i := range lucky {
 		tmp = lucky[i]
@@ -148,21 +151,26 @@ func (s *session) generate() error {
 		}
 
 		//make first name
-		for i1 := range f1s {
-			for i2 := range f2s {
-				select {
-				case <-s.Context().Done():
-					s.SetState(SessionStateCanceled)
-					return nil
-				default:
-					s.name <- FirstName{
-						f1s[i1],
-						f2s[i2],
+		wg.Add(1)
+		go func(wg *sync.WaitGroup, f1s, f2s []*ent.Character) {
+			defer wg.Done()
+			for i1 := range f1s {
+				for i2 := range f2s {
+					select {
+					case <-s.Context().Done():
+						s.SetState(SessionStateCanceled)
+						return
+					default:
+						s.name <- FirstName{
+							f1s[i1],
+							f2s[i2],
+						}
 					}
 				}
 			}
-		}
+		}(&wg, f1s, f2s)
 	}
+	wg.Wait()
 	s.SetState(SessionStateFinish)
 	return nil
 }
