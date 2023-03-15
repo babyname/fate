@@ -10,6 +10,8 @@ import (
 	"github.com/babyname/fate/wuxing"
 )
 
+var defaultFilter Filter
+
 // Filter
 // prefix with Query are used db search
 type Filter interface {
@@ -97,7 +99,10 @@ func (f *filter) QueryCharacterFilter(query *ent.CharacterQuery) *ent.CharacterQ
 // DefaultFilter ...
 // @return Filter
 func DefaultFilter() Filter {
-	return newFilter()
+	if defaultFilter == nil {
+		defaultFilter = newFilter()
+	}
+	return defaultFilter
 }
 
 func newFilter() *filter {
