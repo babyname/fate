@@ -4,6 +4,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/babyname/fate/cache"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/model"
 	"golang.org/x/net/context"
@@ -67,6 +68,8 @@ func (s *session) Start(input *Input) error {
 }
 
 func (s *session) startOutput() {
+	put := cache.NewPutFilter()
+	defer s.output.SetCacheFilter(put)
 	for {
 		select {
 		case <-s.Context().Done():
@@ -75,8 +78,7 @@ func (s *session) startOutput() {
 			if !ok {
 				return
 			}
-			//Use a separate thread to call `put` to ensure thread safety
-			s.output.put(name)
+			put.Put(name)
 		}
 	}
 }
@@ -101,7 +103,7 @@ func (s *session) Context() context.Context {
 func (s *session) generate() error {
 	defer close(s.name)
 	defer s.close()
-	lucky, err := s.db.GetWuGeLucky(s.Context(), s.output.getLastStroke(s.filter))
+	lucky, err := s.db.GetWuGeLucky(s.Context(), getLastStrokeFromBasic(s.filter, s.output.Basic()))
 	if err != nil {
 		log.Error("get wuge lucky", err)
 		s.SetState(SessionStateFailed)
@@ -180,4 +182,13 @@ func (s *session) close() {
 		s.cancel()
 		s.cancel = nil
 	}
+}
+
+func getLastStrokeFromBasic(filter Filter, basic *NameBasic) [2]int {
+	var strokes [2]int
+	strokes[0] = filter.GetCharacterStroke(basic.LastName[0])
+	if basic.LastName[1] != nil {
+		strokes[1] = filter.GetCharacterStroke(basic.LastName[1])
+	}
+	return strokes
 }
