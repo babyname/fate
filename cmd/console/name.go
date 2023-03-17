@@ -27,6 +27,7 @@ func cmdName() *cobra.Command {
 			f, err := fate.New(cfg)
 			if err != nil {
 				log.Error("new fate", err)
+				return
 			}
 			s := f.NewSessionWithFilter(fate.NewFilter(fate.FilterOption{
 				CharacterFilter:     true,
