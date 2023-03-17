@@ -166,15 +166,16 @@ func NewFilter(fo FilterOption) Filter {
 			f.queryStrokeFilter = strokeFilterDefault
 		}
 	}
-
-	f.checkStrokeNumber = func(stroke int) bool {
-		if fo.MinStroke != 0 && stroke < fo.MinStroke {
-			return true
+	if fo.MinStroke != 0 || fo.MaxStroke != 0 {
+		f.checkStrokeNumber = func(stroke int) bool {
+			if fo.MinStroke != 0 && stroke < fo.MinStroke {
+				return true
+			}
+			if fo.MaxStroke != 0 && stroke > fo.MaxStroke {
+				return true
+			}
+			return false
 		}
-		if fo.MaxStroke != 0 && stroke > fo.MaxStroke {
-			return true
-		}
-		return false
 	}
 
 	if fo.DaYanFilter {
