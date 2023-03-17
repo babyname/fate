@@ -22,6 +22,7 @@ type Filter interface {
 	CheckSexFilter(lucky *ent.WuGeLucky) bool
 	CheckDaYanFilter(lucky *ent.WuGeLucky) bool
 	CheckWuXingFilter(ge int, ge2 int, ge3 int) bool
+	CheckStrokeNumber(stroke int) bool
 	GetCharacterStroke(c *ent.Character) int
 }
 
@@ -30,9 +31,14 @@ type filter struct {
 	checkSexFilter       func(lucky *ent.WuGeLucky) bool
 	checkDaYanFilter     func(lucky *ent.WuGeLucky) bool
 	checkWuXingFilter    func(ge int, ge2 int, ge3 int) bool
+	checkStrokeNumber    func(stroke int) bool
 	queryCharacterFilter func(query *ent.CharacterQuery) *ent.CharacterQuery
 	queryRegularFilter   func(query *ent.CharacterQuery) *ent.CharacterQuery
 	queryStrokeFilter    func(stroke int) func(query *ent.CharacterQuery) *ent.CharacterQuery
+}
+
+func (f *filter) CheckStrokeNumber(stroke int) bool {
+	return f.checkStrokeNumber(stroke)
 }
 
 func (f *filter) QueryStrokeFilter(stroke int) func(query *ent.CharacterQuery) *ent.CharacterQuery {
@@ -117,6 +123,9 @@ func newFilter() *filter {
 		checkWuXingFilter: func(ge int, ge2 int, ge3 int) bool {
 			return false
 		},
+		checkStrokeNumber: func(stroke int) bool {
+			return false
+		},
 		queryCharacterFilter: func(query *ent.CharacterQuery) *ent.CharacterQuery {
 			return query
 		},
@@ -142,21 +151,32 @@ func NewFilter(fo FilterOption) Filter {
 		f.characterFilterType = fo.CharacterFilterType
 		switch fo.CharacterFilterType {
 		case CharacterFilterTypeChs:
-			f.queryCharacterFilter = characterTypeFilterCHS(fo.MinCharacter, fo.MaxCharacter)
+			f.queryCharacterFilter = characterTypeFilterCHS(fo.MinStroke, fo.MaxStroke)
 			f.queryStrokeFilter = strokeFilterCHS
 		case CharacterFilterTypeCht:
-			f.queryCharacterFilter = characterTypeFilterCHT(fo.MinCharacter, fo.MaxCharacter)
+			f.queryCharacterFilter = characterTypeFilterCHT(fo.MinStroke, fo.MaxStroke)
 			f.queryStrokeFilter = strokeFilterCHT
 		case CharacterFilterTypeKangxi:
-			f.queryCharacterFilter = characterTypeFilterKX(fo.MinCharacter, fo.MaxCharacter)
+			f.queryCharacterFilter = characterTypeFilterKX(fo.MinStroke, fo.MaxStroke)
 			f.queryStrokeFilter = strokeFilterKX
 		case CharacterFilterTypeDefault:
 			fallthrough
 		default:
-			f.queryCharacterFilter = characterTypeFilterDefault(fo.MinCharacter, fo.MaxCharacter)
+			f.queryCharacterFilter = characterTypeFilterDefault(fo.MinStroke, fo.MaxStroke)
 			f.queryStrokeFilter = strokeFilterDefault
 		}
 	}
+
+	f.checkStrokeNumber = func(stroke int) bool {
+		if fo.MinStroke != 0 && stroke < fo.MinStroke {
+			return true
+		}
+		if fo.MaxStroke != 0 && stroke > fo.MaxStroke {
+			return true
+		}
+		return false
+	}
+
 	if fo.DaYanFilter {
 		f.checkDaYanFilter = daYanFilter
 	}
@@ -228,7 +248,6 @@ func wuXingFilter(ge int, ge2 int, ge3 int) bool {
 }
 
 func daYanFilter(lucky *ent.WuGeLucky) bool {
-
 	if isLucky(dayan.Find(lucky.DiGe).Lucky) &&
 		isLucky(dayan.Find(lucky.RenGe).Lucky) &&
 		isLucky(dayan.Find(lucky.WaiGe).Lucky) &&

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/babyname/fate"
@@ -29,8 +31,8 @@ func cmdName() *cobra.Command {
 			s := f.NewSessionWithFilter(fate.NewFilter(fate.FilterOption{
 				CharacterFilter:     true,
 				CharacterFilterType: 0,
-				MinCharacter:        3,
-				MaxCharacter:        18,
+				MinStroke:           3,
+				MaxStroke:           18,
 				RegularFilter:       true,
 				DaYanFilter:         true,
 				WuXingFilter:        true,
@@ -80,20 +82,15 @@ func cmdName() *cobra.Command {
 				}
 			}
 			fmt.Println("end", time.Now().String())
-			//OutputName:
-			//for name, ok := input.Output().NextName(); ; {
-			//	fmt.Print("Name:")
-			//	for j := 0; j < 10; j++ {
-			//		if !ok {
-			//			break OutputName
-			//		}
-			//		fmt.Print(name, "  |  ")
-			//		name, ok = input.Output().NextName()
-			//	}
-			//	fmt.Printf("\r\n")
-			//}
-			//fmt.Printf("\r\n")
-			fmt.Println("Total", input.Output().Total())
+			if output != "" {
+				fmt.Println("结果将输出到", output)
+				err := WriteToFile(input.Output(), output)
+				if err == nil {
+					return
+				}
+			}
+			PrintScreen(input.Output())
+			fmt.Println("Finished")
 		},
 	}
 	cmd.Flags().StringVarP(&last, "last", "l", "", "指定姓氏")
@@ -117,4 +114,74 @@ func getLastChar(s string) ([2]string, bool) {
 		return l, false
 	}
 	return l, true
+}
+
+func PrintScreen(output *fate.Output) {
+OutputName:
+	for name, ok := output.NextName(); ; {
+		fmt.Print("Name:")
+		for j := 0; j < 10; j++ {
+			if !ok {
+				break OutputName
+			}
+			fmt.Print(name, "  |  ")
+			name, ok = output.NextName()
+		}
+		fmt.Printf("\r\n")
+	}
+	fmt.Printf("\r\n")
+	fmt.Println("Total", output.Total())
+}
+
+func WriteToFile(output *fate.Output, path string) error {
+	log.Info("open file", "path", path)
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	w := bufio.NewWriter(f)
+	defer func(w *bufio.Writer) {
+		err := w.Flush()
+		if err != nil {
+			log.Error("flush", err)
+		}
+	}(w)
+
+OutputName:
+	for name, ok := output.NextName(); ; {
+		for j := 0; j < 10; j++ {
+			if !ok {
+				break OutputName
+			}
+			_, err = w.WriteString(name.String())
+			if err != nil {
+				return err
+			}
+			_, err = w.WriteString("(" + name.Strokes() + ")")
+			if err != nil {
+				return err
+			}
+			_, err = w.WriteString("  |  ")
+			if err != nil {
+				return err
+			}
+			name, ok = output.NextName()
+		}
+		_, err = w.WriteString("\n")
+		if err != nil {
+			return err
+		}
+
+	}
+
+	_, err = w.WriteString("\n")
+	if err != nil {
+		return err
+	}
+	_, err = w.WriteString(fmt.Sprintf("Total %d", output.Total()))
+	if err != nil {
+		return err
+	}
+	return nil
 }

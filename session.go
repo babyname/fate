@@ -114,19 +114,23 @@ func (s *session) generate() error {
 	var tmp *ent.WuGeLucky
 	for i := range lucky {
 		tmp = lucky[i]
-		log.Info("current lukcy", "lucky", tmp)
+		if s.filter.CheckStrokeNumber(tmp.FirstStroke1) || s.filter.CheckStrokeNumber(tmp.FirstStroke2) {
+			log.Info("current lukcy", "lucky", tmp, "blocked", "stroke")
+			continue
+		}
 		if s.filter.CheckSexFilter(tmp) {
+			log.Info("current lukcy", "lucky", tmp, "blocked", "sex")
 			continue
 		}
-		log.Info("current lukcy sex filtered", "lucky", tmp, "dayan", s.filter.CheckDaYanFilter(tmp))
 		if s.filter.CheckDaYanFilter(tmp) {
+			log.Info("current lukcy", "lucky", tmp, "blocked", "dayan")
 			continue
 		}
-		log.Info("current lukcy dayan filterd", "lucky", tmp)
 		if s.filter.CheckWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
+			log.Info("current lukcy", "lucky", tmp, "blocked", "wuxing")
 			continue
 		}
-		log.Info("current lukcy get chars", "lucky", tmp)
+		log.Info("lucky get chars", "lucky", tmp)
 		var f1s []*ent.Character
 
 		if cs, ok := s.chars[tmp.FirstStroke1]; !ok {
