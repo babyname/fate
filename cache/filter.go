@@ -46,7 +46,7 @@ func (f *PutFilter) getElement(idx int) *Element[[2]*ent.Character] {
 }
 
 func (f *PutFilter) gc() {
-	if f.Len() != 0 {
+	if f.list.Len() != 0 {
 		for s, i := range f.filterList {
 			if v := removeDeletedElement(i); len(v) != 0 {
 				f.filterList[s] = v
