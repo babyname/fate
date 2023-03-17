@@ -3,8 +3,11 @@ package database
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/ent/schema"
+	"golang.org/x/net/context"
 
 	"github.com/babyname/fate/ent"
 )
@@ -60,7 +63,31 @@ func (d *database) Client() (*ent.Client, error) {
 	if !ok {
 		fn, _ = driverDSN["other"]
 	}
-	return fn(d.DBConfig)
+	c, err := fn(d.DBConfig)
+	if err != nil {
+		return nil, err
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(d.DBConfig.Timeout))
+	defer cancel()
+	first, err := c.Version.Query().First(ctx)
+	if err != nil {
+		return nil, err
+	}
+	//fix empty version
+	if first == nil {
+		_, err := c.Version.Create().
+			SetCurrentVersion(schema.CurrentDataVersion).
+			SetUpdatedUnix(int(time.Now().Unix())).
+			Save(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return c, nil
+	}
+	if first.CurrentVersion != schema.CurrentDataVersion {
+		return nil, fmt.Errorf("database version %d is not current,please get the correct version database", first.CurrentVersion)
+	}
+	return c, nil
 }
 
 // New creates a new database builder

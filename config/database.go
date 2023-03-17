@@ -1,13 +1,14 @@
 package config
 
 type DBConfig struct {
-	Driver string `json:"driver,omitempty"`
-	DSN    string `json:"dsn,omitempty"`
-	Host   string `json:"host,omitempty"`
-	Port   string `json:"port,omitempty"`
-	User   string `json:"user,omitempty"`
-	Pwd    string `json:"pwd,omitempty"`
-	Name   string `json:"name,omitempty"`
+	Driver  string `json:"driver,omitempty"`
+	DSN     string `json:"dsn,omitempty"`
+	Host    string `json:"host,omitempty"`
+	Port    string `json:"port,omitempty"`
+	User    string `json:"user,omitempty"`
+	Pwd     string `json:"pwd,omitempty"`
+	Name    string `json:"name,omitempty"`
+	Timeout int    `json:"timeout,omitempty"`
 }
 
 func defaultDBSqlite3() DBConfig {
