@@ -67,10 +67,14 @@ func (d *database) Client() (*ent.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(d.DBConfig.Timeout))
-	defer cancel()
+	ctx := context.Background()
+	var cancel func()
+	if d.DBConfig.Timeout != 0 {
+		ctx, cancel = context.WithTimeout(context.Background(), time.Second*time.Duration(d.DBConfig.Timeout))
+		defer cancel()
+	}
 	first, err := c.Version.Query().First(ctx)
-	if err != nil {
+	if err != nil && !ent.IsNotFound(err) {
 		return nil, err
 	}
 	//fix empty version
