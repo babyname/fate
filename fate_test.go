@@ -40,8 +40,8 @@ func TestNew(t *testing.T) {
 			session := got.NewSessionWithFilter(NewFilter(FilterOption{
 				CharacterFilter:     true,
 				CharacterFilterType: 0,
-				MinCharacter:        3,
-				MaxCharacter:        18,
+				MinStroke:           3,
+				MaxStroke:           18,
 				SexFilter:           true,
 			}))
 			err = session.Start(&Input{

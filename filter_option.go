@@ -7,8 +7,8 @@ type CharacterFilterType int
 type FilterOption struct {
 	CharacterFilter     bool
 	CharacterFilterType CharacterFilterType //default,chs,cht,kx
-	MinCharacter        int
-	MaxCharacter        int
+	MinStroke           int
+	MaxStroke           int
 	RegularFilter       bool
 	DaYanFilter         bool
 	WuXingFilter        bool
