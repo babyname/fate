@@ -114,19 +114,19 @@ func (s *session) generate() error {
 	var tmp *ent.WuGeLucky
 	for i := range lucky {
 		tmp = lucky[i]
-		if s.filter.CheckStrokeNumber(tmp.FirstStroke1) || s.filter.CheckStrokeNumber(tmp.FirstStroke2) {
+		if s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) {
 			log.Info("current lukcy", "lucky", tmp, "blocked", "stroke")
 			continue
 		}
-		if s.filter.CheckSexFilter(tmp) {
+		if s.filter.CheckSkipSexFilter(tmp) {
 			log.Info("current lukcy", "lucky", tmp, "blocked", "sex")
 			continue
 		}
-		if s.filter.CheckDaYanFilter(tmp) {
+		if s.filter.CheckSkipDaYanFilter(tmp) {
 			log.Info("current lukcy", "lucky", tmp, "blocked", "dayan")
 			continue
 		}
-		if s.filter.CheckWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
+		if s.filter.CheckSkipWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
 			log.Info("current lukcy", "lucky", tmp, "blocked", "wuxing")
 			continue
 		}
@@ -190,9 +190,35 @@ func (s *session) close() {
 
 func getLastStrokeFromBasic(filter Filter, basic *NameBasic) [2]int {
 	var strokes [2]int
-	strokes[0] = filter.GetCharacterStroke(basic.LastName[0])
+	sg := strokeGetFromFilterType(filter.FilterType())
+	strokes[0] = sg(basic.LastName[0])
 	if basic.LastName[1] != nil {
-		strokes[1] = filter.GetCharacterStroke(basic.LastName[1])
+		strokes[1] = sg(basic.LastName[1])
 	}
 	return strokes
+}
+
+func strokeGetFromFilterType(ct CharacterFilterType) func(c *ent.Character) int {
+	switch ct {
+	case CharacterFilterTypeChs:
+		return func(c *ent.Character) int {
+			return c.SimpleTotalStroke
+		}
+	case CharacterFilterTypeCht:
+		return func(c *ent.Character) int {
+			return c.TraditionalTotalStroke
+		}
+
+	case CharacterFilterTypeKangxi:
+		return func(c *ent.Character) int {
+			return c.KangXiStroke
+		}
+
+	case CharacterFilterTypeDefault:
+		fallthrough
+	default:
+		return func(c *ent.Character) int {
+			return c.ScienceStroke
+		}
+	}
 }
