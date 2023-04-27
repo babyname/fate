@@ -1,7 +1,7 @@
 module github.com/babyname/fate
 
 require (
-	github.com/go-sql-driver/mysql v1.7.0
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/godcong/chronos v0.0.3
 	github.com/godcong/yi v1.0.2
 	github.com/goextension/log v0.0.2
