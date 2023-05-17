@@ -251,23 +251,13 @@ func wuXingFilter(ge int, ge2 int, ge3 int) bool {
 }
 
 func daYanFilter(lucky *ent.WuGeLucky) bool {
-	if isLucky(dayan.Find(lucky.DiGe).Lucky) &&
+	// simplified logic
+	return isLucky(dayan.Find(lucky.DiGe).Lucky) &&
 		isLucky(dayan.Find(lucky.RenGe).Lucky) &&
 		isLucky(dayan.Find(lucky.WaiGe).Lucky) &&
-		isLucky(dayan.Find(lucky.ZongGe).Lucky) {
-		return false
-	}
-	log.Info("dayan filter", "lucky", lucky,
-		"dige", isLucky(dayan.Find(lucky.DiGe).Lucky),
-		"renge", isLucky(dayan.Find(lucky.RenGe).Lucky),
-		"waige", isLucky(dayan.Find(lucky.WaiGe).Lucky),
-		"zongge", isLucky(dayan.Find(lucky.ZongGe).Lucky))
-	return true
+		isLucky(dayan.Find(lucky.ZongGe).Lucky)
 }
 
 func isLucky(s string) bool {
-	if strings.Index(s, "吉") != -1 {
-		return true
-	}
-	return false
+	return strings.Index(s, "吉") != -1
 }
