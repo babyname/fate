@@ -6,7 +6,7 @@ require (
 	github.com/godcong/yi v1.0.2
 	github.com/goextension/log v0.0.2
 	github.com/google/uuid v1.3.0
-	github.com/mattn/go-sqlite3 v1.14.16
+	github.com/mattn/go-sqlite3 v1.14.17
 	github.com/rakyll/statik v0.1.6
 	github.com/spf13/cobra v1.7.0
 	github.com/xormsharp/builder v0.3.8
