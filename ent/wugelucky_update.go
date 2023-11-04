@@ -199,7 +199,7 @@ func (wglu *WuGeLuckyUpdate) Mutation() *WuGeLuckyMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (wglu *WuGeLuckyUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, WuGeLuckyMutation](ctx, wglu.sqlSave, wglu.mutation, wglu.hooks)
+	return withHooks(ctx, wglu.sqlSave, wglu.mutation, wglu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -516,7 +516,7 @@ func (wgluo *WuGeLuckyUpdateOne) Select(field string, fields ...string) *WuGeLuc
 
 // Save executes the query and returns the updated WuGeLucky entity.
 func (wgluo *WuGeLuckyUpdateOne) Save(ctx context.Context) (*WuGeLucky, error) {
-	return withHooks[*WuGeLucky, WuGeLuckyMutation](ctx, wgluo.sqlSave, wgluo.mutation, wgluo.hooks)
+	return withHooks(ctx, wgluo.sqlSave, wgluo.mutation, wgluo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

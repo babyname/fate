@@ -2,6 +2,10 @@
 
 package version
 
+import (
+	"entgo.io/ent/dialect/sql"
+)
+
 const (
 	// Label holds the string label denoting the version type in the database.
 	Label = "version"
@@ -30,4 +34,22 @@ func ValidColumn(column string) bool {
 		}
 	}
 	return false
+}
+
+// OrderOption defines the ordering options for the Version queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCurrentVersion orders the results by the current_version field.
+func ByCurrentVersion(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCurrentVersion, opts...).ToFunc()
+}
+
+// ByUpdatedUnix orders the results by the updated_unix field.
+func ByUpdatedUnix(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedUnix, opts...).ToFunc()
 }

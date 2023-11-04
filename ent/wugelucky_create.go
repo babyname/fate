@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/babyname/fate/ent/wugelucky"
@@ -18,6 +20,7 @@ type WuGeLuckyCreate struct {
 	config
 	mutation *WuGeLuckyMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetLastStroke1 sets the "last_stroke_1" field.
@@ -135,7 +138,7 @@ func (wglc *WuGeLuckyCreate) Mutation() *WuGeLuckyMutation {
 
 // Save creates the WuGeLucky in the database.
 func (wglc *WuGeLuckyCreate) Save(ctx context.Context) (*WuGeLucky, error) {
-	return withHooks[*WuGeLucky, WuGeLuckyMutation](ctx, wglc.sqlSave, wglc.mutation, wglc.hooks)
+	return withHooks(ctx, wglc.sqlSave, wglc.mutation, wglc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -244,6 +247,7 @@ func (wglc *WuGeLuckyCreate) createSpec() (*WuGeLucky, *sqlgraph.CreateSpec) {
 		_node = &WuGeLucky{config: wglc.config}
 		_spec = sqlgraph.NewCreateSpec(wugelucky.Table, sqlgraph.NewFieldSpec(wugelucky.FieldID, field.TypeUUID))
 	)
+	_spec.OnConflict = wglc.conflict
 	if id, ok := wglc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
@@ -319,14 +323,713 @@ func (wglc *WuGeLuckyCreate) createSpec() (*WuGeLucky, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.WuGeLucky.Create().
+//		SetLastStroke1(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.WuGeLuckyUpsert) {
+//			SetLastStroke1(v+v).
+//		}).
+//		Exec(ctx)
+func (wglc *WuGeLuckyCreate) OnConflict(opts ...sql.ConflictOption) *WuGeLuckyUpsertOne {
+	wglc.conflict = opts
+	return &WuGeLuckyUpsertOne{
+		create: wglc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.WuGeLucky.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (wglc *WuGeLuckyCreate) OnConflictColumns(columns ...string) *WuGeLuckyUpsertOne {
+	wglc.conflict = append(wglc.conflict, sql.ConflictColumns(columns...))
+	return &WuGeLuckyUpsertOne{
+		create: wglc,
+	}
+}
+
+type (
+	// WuGeLuckyUpsertOne is the builder for "upsert"-ing
+	//  one WuGeLucky node.
+	WuGeLuckyUpsertOne struct {
+		create *WuGeLuckyCreate
+	}
+
+	// WuGeLuckyUpsert is the "OnConflict" setter.
+	WuGeLuckyUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetLastStroke1 sets the "last_stroke_1" field.
+func (u *WuGeLuckyUpsert) SetLastStroke1(v int) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldLastStroke1, v)
+	return u
+}
+
+// UpdateLastStroke1 sets the "last_stroke_1" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateLastStroke1() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldLastStroke1)
+	return u
+}
+
+// AddLastStroke1 adds v to the "last_stroke_1" field.
+func (u *WuGeLuckyUpsert) AddLastStroke1(v int) *WuGeLuckyUpsert {
+	u.Add(wugelucky.FieldLastStroke1, v)
+	return u
+}
+
+// SetLastStroke2 sets the "last_stroke_2" field.
+func (u *WuGeLuckyUpsert) SetLastStroke2(v int) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldLastStroke2, v)
+	return u
+}
+
+// UpdateLastStroke2 sets the "last_stroke_2" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateLastStroke2() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldLastStroke2)
+	return u
+}
+
+// AddLastStroke2 adds v to the "last_stroke_2" field.
+func (u *WuGeLuckyUpsert) AddLastStroke2(v int) *WuGeLuckyUpsert {
+	u.Add(wugelucky.FieldLastStroke2, v)
+	return u
+}
+
+// SetFirstStroke1 sets the "first_stroke_1" field.
+func (u *WuGeLuckyUpsert) SetFirstStroke1(v int) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldFirstStroke1, v)
+	return u
+}
+
+// UpdateFirstStroke1 sets the "first_stroke_1" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateFirstStroke1() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldFirstStroke1)
+	return u
+}
+
+// AddFirstStroke1 adds v to the "first_stroke_1" field.
+func (u *WuGeLuckyUpsert) AddFirstStroke1(v int) *WuGeLuckyUpsert {
+	u.Add(wugelucky.FieldFirstStroke1, v)
+	return u
+}
+
+// SetFirstStroke2 sets the "first_stroke_2" field.
+func (u *WuGeLuckyUpsert) SetFirstStroke2(v int) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldFirstStroke2, v)
+	return u
+}
+
+// UpdateFirstStroke2 sets the "first_stroke_2" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateFirstStroke2() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldFirstStroke2)
+	return u
+}
+
+// AddFirstStroke2 adds v to the "first_stroke_2" field.
+func (u *WuGeLuckyUpsert) AddFirstStroke2(v int) *WuGeLuckyUpsert {
+	u.Add(wugelucky.FieldFirstStroke2, v)
+	return u
+}
+
+// SetTianGe sets the "tian_ge" field.
+func (u *WuGeLuckyUpsert) SetTianGe(v int) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldTianGe, v)
+	return u
+}
+
+// UpdateTianGe sets the "tian_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateTianGe() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldTianGe)
+	return u
+}
+
+// AddTianGe adds v to the "tian_ge" field.
+func (u *WuGeLuckyUpsert) AddTianGe(v int) *WuGeLuckyUpsert {
+	u.Add(wugelucky.FieldTianGe, v)
+	return u
+}
+
+// SetTianDaYan sets the "tian_da_yan" field.
+func (u *WuGeLuckyUpsert) SetTianDaYan(v string) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldTianDaYan, v)
+	return u
+}
+
+// UpdateTianDaYan sets the "tian_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateTianDaYan() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldTianDaYan)
+	return u
+}
+
+// SetRenGe sets the "ren_ge" field.
+func (u *WuGeLuckyUpsert) SetRenGe(v int) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldRenGe, v)
+	return u
+}
+
+// UpdateRenGe sets the "ren_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateRenGe() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldRenGe)
+	return u
+}
+
+// AddRenGe adds v to the "ren_ge" field.
+func (u *WuGeLuckyUpsert) AddRenGe(v int) *WuGeLuckyUpsert {
+	u.Add(wugelucky.FieldRenGe, v)
+	return u
+}
+
+// SetRenDaYan sets the "ren_da_yan" field.
+func (u *WuGeLuckyUpsert) SetRenDaYan(v string) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldRenDaYan, v)
+	return u
+}
+
+// UpdateRenDaYan sets the "ren_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateRenDaYan() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldRenDaYan)
+	return u
+}
+
+// SetDiGe sets the "di_ge" field.
+func (u *WuGeLuckyUpsert) SetDiGe(v int) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldDiGe, v)
+	return u
+}
+
+// UpdateDiGe sets the "di_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateDiGe() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldDiGe)
+	return u
+}
+
+// AddDiGe adds v to the "di_ge" field.
+func (u *WuGeLuckyUpsert) AddDiGe(v int) *WuGeLuckyUpsert {
+	u.Add(wugelucky.FieldDiGe, v)
+	return u
+}
+
+// SetDiDaYan sets the "di_da_yan" field.
+func (u *WuGeLuckyUpsert) SetDiDaYan(v string) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldDiDaYan, v)
+	return u
+}
+
+// UpdateDiDaYan sets the "di_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateDiDaYan() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldDiDaYan)
+	return u
+}
+
+// SetWaiGe sets the "wai_ge" field.
+func (u *WuGeLuckyUpsert) SetWaiGe(v int) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldWaiGe, v)
+	return u
+}
+
+// UpdateWaiGe sets the "wai_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateWaiGe() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldWaiGe)
+	return u
+}
+
+// AddWaiGe adds v to the "wai_ge" field.
+func (u *WuGeLuckyUpsert) AddWaiGe(v int) *WuGeLuckyUpsert {
+	u.Add(wugelucky.FieldWaiGe, v)
+	return u
+}
+
+// SetWaiDaYan sets the "wai_da_yan" field.
+func (u *WuGeLuckyUpsert) SetWaiDaYan(v string) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldWaiDaYan, v)
+	return u
+}
+
+// UpdateWaiDaYan sets the "wai_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateWaiDaYan() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldWaiDaYan)
+	return u
+}
+
+// SetZongGe sets the "zong_ge" field.
+func (u *WuGeLuckyUpsert) SetZongGe(v int) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldZongGe, v)
+	return u
+}
+
+// UpdateZongGe sets the "zong_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateZongGe() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldZongGe)
+	return u
+}
+
+// AddZongGe adds v to the "zong_ge" field.
+func (u *WuGeLuckyUpsert) AddZongGe(v int) *WuGeLuckyUpsert {
+	u.Add(wugelucky.FieldZongGe, v)
+	return u
+}
+
+// SetZongDaYan sets the "zong_da_yan" field.
+func (u *WuGeLuckyUpsert) SetZongDaYan(v string) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldZongDaYan, v)
+	return u
+}
+
+// UpdateZongDaYan sets the "zong_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateZongDaYan() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldZongDaYan)
+	return u
+}
+
+// SetZongLucky sets the "zong_lucky" field.
+func (u *WuGeLuckyUpsert) SetZongLucky(v bool) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldZongLucky, v)
+	return u
+}
+
+// UpdateZongLucky sets the "zong_lucky" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateZongLucky() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldZongLucky)
+	return u
+}
+
+// SetZongSex sets the "zong_sex" field.
+func (u *WuGeLuckyUpsert) SetZongSex(v bool) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldZongSex, v)
+	return u
+}
+
+// UpdateZongSex sets the "zong_sex" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateZongSex() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldZongSex)
+	return u
+}
+
+// SetZongMax sets the "zong_max" field.
+func (u *WuGeLuckyUpsert) SetZongMax(v bool) *WuGeLuckyUpsert {
+	u.Set(wugelucky.FieldZongMax, v)
+	return u
+}
+
+// UpdateZongMax sets the "zong_max" field to the value that was provided on create.
+func (u *WuGeLuckyUpsert) UpdateZongMax() *WuGeLuckyUpsert {
+	u.SetExcluded(wugelucky.FieldZongMax)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.WuGeLucky.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(wugelucky.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *WuGeLuckyUpsertOne) UpdateNewValues() *WuGeLuckyUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(wugelucky.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.WuGeLucky.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *WuGeLuckyUpsertOne) Ignore() *WuGeLuckyUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *WuGeLuckyUpsertOne) DoNothing() *WuGeLuckyUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the WuGeLuckyCreate.OnConflict
+// documentation for more info.
+func (u *WuGeLuckyUpsertOne) Update(set func(*WuGeLuckyUpsert)) *WuGeLuckyUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&WuGeLuckyUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetLastStroke1 sets the "last_stroke_1" field.
+func (u *WuGeLuckyUpsertOne) SetLastStroke1(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetLastStroke1(v)
+	})
+}
+
+// AddLastStroke1 adds v to the "last_stroke_1" field.
+func (u *WuGeLuckyUpsertOne) AddLastStroke1(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddLastStroke1(v)
+	})
+}
+
+// UpdateLastStroke1 sets the "last_stroke_1" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateLastStroke1() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateLastStroke1()
+	})
+}
+
+// SetLastStroke2 sets the "last_stroke_2" field.
+func (u *WuGeLuckyUpsertOne) SetLastStroke2(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetLastStroke2(v)
+	})
+}
+
+// AddLastStroke2 adds v to the "last_stroke_2" field.
+func (u *WuGeLuckyUpsertOne) AddLastStroke2(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddLastStroke2(v)
+	})
+}
+
+// UpdateLastStroke2 sets the "last_stroke_2" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateLastStroke2() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateLastStroke2()
+	})
+}
+
+// SetFirstStroke1 sets the "first_stroke_1" field.
+func (u *WuGeLuckyUpsertOne) SetFirstStroke1(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetFirstStroke1(v)
+	})
+}
+
+// AddFirstStroke1 adds v to the "first_stroke_1" field.
+func (u *WuGeLuckyUpsertOne) AddFirstStroke1(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddFirstStroke1(v)
+	})
+}
+
+// UpdateFirstStroke1 sets the "first_stroke_1" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateFirstStroke1() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateFirstStroke1()
+	})
+}
+
+// SetFirstStroke2 sets the "first_stroke_2" field.
+func (u *WuGeLuckyUpsertOne) SetFirstStroke2(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetFirstStroke2(v)
+	})
+}
+
+// AddFirstStroke2 adds v to the "first_stroke_2" field.
+func (u *WuGeLuckyUpsertOne) AddFirstStroke2(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddFirstStroke2(v)
+	})
+}
+
+// UpdateFirstStroke2 sets the "first_stroke_2" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateFirstStroke2() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateFirstStroke2()
+	})
+}
+
+// SetTianGe sets the "tian_ge" field.
+func (u *WuGeLuckyUpsertOne) SetTianGe(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetTianGe(v)
+	})
+}
+
+// AddTianGe adds v to the "tian_ge" field.
+func (u *WuGeLuckyUpsertOne) AddTianGe(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddTianGe(v)
+	})
+}
+
+// UpdateTianGe sets the "tian_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateTianGe() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateTianGe()
+	})
+}
+
+// SetTianDaYan sets the "tian_da_yan" field.
+func (u *WuGeLuckyUpsertOne) SetTianDaYan(v string) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetTianDaYan(v)
+	})
+}
+
+// UpdateTianDaYan sets the "tian_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateTianDaYan() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateTianDaYan()
+	})
+}
+
+// SetRenGe sets the "ren_ge" field.
+func (u *WuGeLuckyUpsertOne) SetRenGe(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetRenGe(v)
+	})
+}
+
+// AddRenGe adds v to the "ren_ge" field.
+func (u *WuGeLuckyUpsertOne) AddRenGe(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddRenGe(v)
+	})
+}
+
+// UpdateRenGe sets the "ren_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateRenGe() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateRenGe()
+	})
+}
+
+// SetRenDaYan sets the "ren_da_yan" field.
+func (u *WuGeLuckyUpsertOne) SetRenDaYan(v string) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetRenDaYan(v)
+	})
+}
+
+// UpdateRenDaYan sets the "ren_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateRenDaYan() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateRenDaYan()
+	})
+}
+
+// SetDiGe sets the "di_ge" field.
+func (u *WuGeLuckyUpsertOne) SetDiGe(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetDiGe(v)
+	})
+}
+
+// AddDiGe adds v to the "di_ge" field.
+func (u *WuGeLuckyUpsertOne) AddDiGe(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddDiGe(v)
+	})
+}
+
+// UpdateDiGe sets the "di_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateDiGe() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateDiGe()
+	})
+}
+
+// SetDiDaYan sets the "di_da_yan" field.
+func (u *WuGeLuckyUpsertOne) SetDiDaYan(v string) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetDiDaYan(v)
+	})
+}
+
+// UpdateDiDaYan sets the "di_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateDiDaYan() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateDiDaYan()
+	})
+}
+
+// SetWaiGe sets the "wai_ge" field.
+func (u *WuGeLuckyUpsertOne) SetWaiGe(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetWaiGe(v)
+	})
+}
+
+// AddWaiGe adds v to the "wai_ge" field.
+func (u *WuGeLuckyUpsertOne) AddWaiGe(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddWaiGe(v)
+	})
+}
+
+// UpdateWaiGe sets the "wai_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateWaiGe() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateWaiGe()
+	})
+}
+
+// SetWaiDaYan sets the "wai_da_yan" field.
+func (u *WuGeLuckyUpsertOne) SetWaiDaYan(v string) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetWaiDaYan(v)
+	})
+}
+
+// UpdateWaiDaYan sets the "wai_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateWaiDaYan() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateWaiDaYan()
+	})
+}
+
+// SetZongGe sets the "zong_ge" field.
+func (u *WuGeLuckyUpsertOne) SetZongGe(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetZongGe(v)
+	})
+}
+
+// AddZongGe adds v to the "zong_ge" field.
+func (u *WuGeLuckyUpsertOne) AddZongGe(v int) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddZongGe(v)
+	})
+}
+
+// UpdateZongGe sets the "zong_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateZongGe() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateZongGe()
+	})
+}
+
+// SetZongDaYan sets the "zong_da_yan" field.
+func (u *WuGeLuckyUpsertOne) SetZongDaYan(v string) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetZongDaYan(v)
+	})
+}
+
+// UpdateZongDaYan sets the "zong_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateZongDaYan() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateZongDaYan()
+	})
+}
+
+// SetZongLucky sets the "zong_lucky" field.
+func (u *WuGeLuckyUpsertOne) SetZongLucky(v bool) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetZongLucky(v)
+	})
+}
+
+// UpdateZongLucky sets the "zong_lucky" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateZongLucky() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateZongLucky()
+	})
+}
+
+// SetZongSex sets the "zong_sex" field.
+func (u *WuGeLuckyUpsertOne) SetZongSex(v bool) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetZongSex(v)
+	})
+}
+
+// UpdateZongSex sets the "zong_sex" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateZongSex() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateZongSex()
+	})
+}
+
+// SetZongMax sets the "zong_max" field.
+func (u *WuGeLuckyUpsertOne) SetZongMax(v bool) *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetZongMax(v)
+	})
+}
+
+// UpdateZongMax sets the "zong_max" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertOne) UpdateZongMax() *WuGeLuckyUpsertOne {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateZongMax()
+	})
+}
+
+// Exec executes the query.
+func (u *WuGeLuckyUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for WuGeLuckyCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *WuGeLuckyUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *WuGeLuckyUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: WuGeLuckyUpsertOne.ID is not supported by MySQL driver. Use WuGeLuckyUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *WuGeLuckyUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // WuGeLuckyCreateBulk is the builder for creating many WuGeLucky entities in bulk.
 type WuGeLuckyCreateBulk struct {
 	config
+	err      error
 	builders []*WuGeLuckyCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the WuGeLucky entities in the database.
 func (wglcb *WuGeLuckyCreateBulk) Save(ctx context.Context) ([]*WuGeLucky, error) {
+	if wglcb.err != nil {
+		return nil, wglcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(wglcb.builders))
 	nodes := make([]*WuGeLucky, len(wglcb.builders))
 	mutators := make([]Mutator, len(wglcb.builders))
@@ -342,12 +1045,13 @@ func (wglcb *WuGeLuckyCreateBulk) Save(ctx context.Context) ([]*WuGeLucky, error
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, wglcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = wglcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, wglcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -394,6 +1098,421 @@ func (wglcb *WuGeLuckyCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (wglcb *WuGeLuckyCreateBulk) ExecX(ctx context.Context) {
 	if err := wglcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.WuGeLucky.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.WuGeLuckyUpsert) {
+//			SetLastStroke1(v+v).
+//		}).
+//		Exec(ctx)
+func (wglcb *WuGeLuckyCreateBulk) OnConflict(opts ...sql.ConflictOption) *WuGeLuckyUpsertBulk {
+	wglcb.conflict = opts
+	return &WuGeLuckyUpsertBulk{
+		create: wglcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.WuGeLucky.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (wglcb *WuGeLuckyCreateBulk) OnConflictColumns(columns ...string) *WuGeLuckyUpsertBulk {
+	wglcb.conflict = append(wglcb.conflict, sql.ConflictColumns(columns...))
+	return &WuGeLuckyUpsertBulk{
+		create: wglcb,
+	}
+}
+
+// WuGeLuckyUpsertBulk is the builder for "upsert"-ing
+// a bulk of WuGeLucky nodes.
+type WuGeLuckyUpsertBulk struct {
+	create *WuGeLuckyCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.WuGeLucky.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(wugelucky.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *WuGeLuckyUpsertBulk) UpdateNewValues() *WuGeLuckyUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(wugelucky.FieldID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.WuGeLucky.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *WuGeLuckyUpsertBulk) Ignore() *WuGeLuckyUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *WuGeLuckyUpsertBulk) DoNothing() *WuGeLuckyUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the WuGeLuckyCreateBulk.OnConflict
+// documentation for more info.
+func (u *WuGeLuckyUpsertBulk) Update(set func(*WuGeLuckyUpsert)) *WuGeLuckyUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&WuGeLuckyUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetLastStroke1 sets the "last_stroke_1" field.
+func (u *WuGeLuckyUpsertBulk) SetLastStroke1(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetLastStroke1(v)
+	})
+}
+
+// AddLastStroke1 adds v to the "last_stroke_1" field.
+func (u *WuGeLuckyUpsertBulk) AddLastStroke1(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddLastStroke1(v)
+	})
+}
+
+// UpdateLastStroke1 sets the "last_stroke_1" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateLastStroke1() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateLastStroke1()
+	})
+}
+
+// SetLastStroke2 sets the "last_stroke_2" field.
+func (u *WuGeLuckyUpsertBulk) SetLastStroke2(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetLastStroke2(v)
+	})
+}
+
+// AddLastStroke2 adds v to the "last_stroke_2" field.
+func (u *WuGeLuckyUpsertBulk) AddLastStroke2(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddLastStroke2(v)
+	})
+}
+
+// UpdateLastStroke2 sets the "last_stroke_2" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateLastStroke2() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateLastStroke2()
+	})
+}
+
+// SetFirstStroke1 sets the "first_stroke_1" field.
+func (u *WuGeLuckyUpsertBulk) SetFirstStroke1(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetFirstStroke1(v)
+	})
+}
+
+// AddFirstStroke1 adds v to the "first_stroke_1" field.
+func (u *WuGeLuckyUpsertBulk) AddFirstStroke1(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddFirstStroke1(v)
+	})
+}
+
+// UpdateFirstStroke1 sets the "first_stroke_1" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateFirstStroke1() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateFirstStroke1()
+	})
+}
+
+// SetFirstStroke2 sets the "first_stroke_2" field.
+func (u *WuGeLuckyUpsertBulk) SetFirstStroke2(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetFirstStroke2(v)
+	})
+}
+
+// AddFirstStroke2 adds v to the "first_stroke_2" field.
+func (u *WuGeLuckyUpsertBulk) AddFirstStroke2(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddFirstStroke2(v)
+	})
+}
+
+// UpdateFirstStroke2 sets the "first_stroke_2" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateFirstStroke2() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateFirstStroke2()
+	})
+}
+
+// SetTianGe sets the "tian_ge" field.
+func (u *WuGeLuckyUpsertBulk) SetTianGe(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetTianGe(v)
+	})
+}
+
+// AddTianGe adds v to the "tian_ge" field.
+func (u *WuGeLuckyUpsertBulk) AddTianGe(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddTianGe(v)
+	})
+}
+
+// UpdateTianGe sets the "tian_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateTianGe() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateTianGe()
+	})
+}
+
+// SetTianDaYan sets the "tian_da_yan" field.
+func (u *WuGeLuckyUpsertBulk) SetTianDaYan(v string) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetTianDaYan(v)
+	})
+}
+
+// UpdateTianDaYan sets the "tian_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateTianDaYan() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateTianDaYan()
+	})
+}
+
+// SetRenGe sets the "ren_ge" field.
+func (u *WuGeLuckyUpsertBulk) SetRenGe(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetRenGe(v)
+	})
+}
+
+// AddRenGe adds v to the "ren_ge" field.
+func (u *WuGeLuckyUpsertBulk) AddRenGe(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddRenGe(v)
+	})
+}
+
+// UpdateRenGe sets the "ren_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateRenGe() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateRenGe()
+	})
+}
+
+// SetRenDaYan sets the "ren_da_yan" field.
+func (u *WuGeLuckyUpsertBulk) SetRenDaYan(v string) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetRenDaYan(v)
+	})
+}
+
+// UpdateRenDaYan sets the "ren_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateRenDaYan() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateRenDaYan()
+	})
+}
+
+// SetDiGe sets the "di_ge" field.
+func (u *WuGeLuckyUpsertBulk) SetDiGe(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetDiGe(v)
+	})
+}
+
+// AddDiGe adds v to the "di_ge" field.
+func (u *WuGeLuckyUpsertBulk) AddDiGe(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddDiGe(v)
+	})
+}
+
+// UpdateDiGe sets the "di_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateDiGe() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateDiGe()
+	})
+}
+
+// SetDiDaYan sets the "di_da_yan" field.
+func (u *WuGeLuckyUpsertBulk) SetDiDaYan(v string) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetDiDaYan(v)
+	})
+}
+
+// UpdateDiDaYan sets the "di_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateDiDaYan() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateDiDaYan()
+	})
+}
+
+// SetWaiGe sets the "wai_ge" field.
+func (u *WuGeLuckyUpsertBulk) SetWaiGe(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetWaiGe(v)
+	})
+}
+
+// AddWaiGe adds v to the "wai_ge" field.
+func (u *WuGeLuckyUpsertBulk) AddWaiGe(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddWaiGe(v)
+	})
+}
+
+// UpdateWaiGe sets the "wai_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateWaiGe() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateWaiGe()
+	})
+}
+
+// SetWaiDaYan sets the "wai_da_yan" field.
+func (u *WuGeLuckyUpsertBulk) SetWaiDaYan(v string) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetWaiDaYan(v)
+	})
+}
+
+// UpdateWaiDaYan sets the "wai_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateWaiDaYan() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateWaiDaYan()
+	})
+}
+
+// SetZongGe sets the "zong_ge" field.
+func (u *WuGeLuckyUpsertBulk) SetZongGe(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetZongGe(v)
+	})
+}
+
+// AddZongGe adds v to the "zong_ge" field.
+func (u *WuGeLuckyUpsertBulk) AddZongGe(v int) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.AddZongGe(v)
+	})
+}
+
+// UpdateZongGe sets the "zong_ge" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateZongGe() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateZongGe()
+	})
+}
+
+// SetZongDaYan sets the "zong_da_yan" field.
+func (u *WuGeLuckyUpsertBulk) SetZongDaYan(v string) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetZongDaYan(v)
+	})
+}
+
+// UpdateZongDaYan sets the "zong_da_yan" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateZongDaYan() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateZongDaYan()
+	})
+}
+
+// SetZongLucky sets the "zong_lucky" field.
+func (u *WuGeLuckyUpsertBulk) SetZongLucky(v bool) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetZongLucky(v)
+	})
+}
+
+// UpdateZongLucky sets the "zong_lucky" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateZongLucky() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateZongLucky()
+	})
+}
+
+// SetZongSex sets the "zong_sex" field.
+func (u *WuGeLuckyUpsertBulk) SetZongSex(v bool) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetZongSex(v)
+	})
+}
+
+// UpdateZongSex sets the "zong_sex" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateZongSex() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateZongSex()
+	})
+}
+
+// SetZongMax sets the "zong_max" field.
+func (u *WuGeLuckyUpsertBulk) SetZongMax(v bool) *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.SetZongMax(v)
+	})
+}
+
+// UpdateZongMax sets the "zong_max" field to the value that was provided on create.
+func (u *WuGeLuckyUpsertBulk) UpdateZongMax() *WuGeLuckyUpsertBulk {
+	return u.Update(func(s *WuGeLuckyUpsert) {
+		s.UpdateZongMax()
+	})
+}
+
+// Exec executes the query.
+func (u *WuGeLuckyUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the WuGeLuckyCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for WuGeLuckyCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *WuGeLuckyUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

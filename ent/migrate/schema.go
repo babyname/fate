@@ -41,6 +41,33 @@ var (
 		Columns:    CharacterColumns,
 		PrimaryKey: []*schema.Column{CharacterColumns[0]},
 	}
+	// NCharacterColumns holds the columns for the "n_character" table.
+	NCharacterColumns = []*schema.Column{
+		{Name: "hash", Type: field.TypeString},
+		{Name: "pin_yin", Type: field.TypeString},
+		{Name: "ch_id", Type: field.TypeInt64},
+		{Name: "ch", Type: field.TypeString},
+		{Name: "radical", Type: field.TypeString},
+		{Name: "radical_stroke", Type: field.TypeInt},
+		{Name: "total_stroke", Type: field.TypeInt},
+		{Name: "is_kang_xi", Type: field.TypeBool},
+		{Name: "relate_kang_xi", Type: field.TypeString},
+		{Name: "relate_simple", Type: field.TypeString},
+		{Name: "relate_traditional", Type: field.TypeString},
+		{Name: "relate_variant", Type: field.TypeString},
+		{Name: "name_science", Type: field.TypeBool},
+		{Name: "science_stroke", Type: field.TypeInt},
+		{Name: "wu_xing", Type: field.TypeString},
+		{Name: "lucky", Type: field.TypeString},
+		{Name: "regular", Type: field.TypeBool},
+		{Name: "comment", Type: field.TypeString},
+	}
+	// NCharacterTable holds the schema information for the "n_character" table.
+	NCharacterTable = &schema.Table{
+		Name:       "n_character",
+		Columns:    NCharacterColumns,
+		PrimaryKey: []*schema.Column{NCharacterColumns[0]},
+	}
 	// VersionsColumns holds the columns for the "versions" table.
 	VersionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -113,6 +140,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CharacterTable,
+		NCharacterTable,
 		VersionsTable,
 		WuGeLuckyTable,
 		WuXingTable,
@@ -122,6 +150,9 @@ var (
 func init() {
 	CharacterTable.Annotation = &entsql.Annotation{
 		Table: "character",
+	}
+	NCharacterTable.Annotation = &entsql.Annotation{
+		Table: "n_character",
 	}
 	WuGeLuckyTable.Annotation = &entsql.Annotation{
 		Table: "wu_ge_lucky",

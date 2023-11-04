@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -18,9 +19,10 @@ import (
 type WuXingQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []wuxing.OrderOption
 	inters     []Interceptor
 	predicates []predicate.WuXing
+	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -52,7 +54,7 @@ func (wxq *WuXingQuery) Unique(unique bool) *WuXingQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (wxq *WuXingQuery) Order(o ...OrderFunc) *WuXingQuery {
+func (wxq *WuXingQuery) Order(o ...wuxing.OrderOption) *WuXingQuery {
 	wxq.order = append(wxq.order, o...)
 	return wxq
 }
@@ -246,7 +248,7 @@ func (wxq *WuXingQuery) Clone() *WuXingQuery {
 	return &WuXingQuery{
 		config:     wxq.config,
 		ctx:        wxq.ctx.Clone(),
-		order:      append([]OrderFunc{}, wxq.order...),
+		order:      append([]wuxing.OrderOption{}, wxq.order...),
 		inters:     append([]Interceptor{}, wxq.inters...),
 		predicates: append([]predicate.WuXing{}, wxq.predicates...),
 		// clone intermediate query.
@@ -342,6 +344,9 @@ func (wxq *WuXingQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*WuXi
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
+	if len(wxq.modifiers) > 0 {
+		_spec.Modifiers = wxq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -356,6 +361,9 @@ func (wxq *WuXingQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*WuXi
 
 func (wxq *WuXingQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := wxq.querySpec()
+	if len(wxq.modifiers) > 0 {
+		_spec.Modifiers = wxq.modifiers
+	}
 	_spec.Node.Columns = wxq.ctx.Fields
 	if len(wxq.ctx.Fields) > 0 {
 		_spec.Unique = wxq.ctx.Unique != nil && *wxq.ctx.Unique
@@ -418,6 +426,9 @@ func (wxq *WuXingQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if wxq.ctx.Unique != nil && *wxq.ctx.Unique {
 		selector.Distinct()
 	}
+	for _, m := range wxq.modifiers {
+		m(selector)
+	}
 	for _, p := range wxq.predicates {
 		p(selector)
 	}
@@ -433,6 +444,32 @@ func (wxq *WuXingQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// ForUpdate locks the selected rows against concurrent updates, and prevent them from being
+// updated, deleted or "selected ... for update" by other sessions, until the transaction is
+// either committed or rolled-back.
+func (wxq *WuXingQuery) ForUpdate(opts ...sql.LockOption) *WuXingQuery {
+	if wxq.driver.Dialect() == dialect.Postgres {
+		wxq.Unique(false)
+	}
+	wxq.modifiers = append(wxq.modifiers, func(s *sql.Selector) {
+		s.ForUpdate(opts...)
+	})
+	return wxq
+}
+
+// ForShare behaves similarly to ForUpdate, except that it acquires a shared mode lock
+// on any rows that are read. Other sessions can read the rows, but cannot modify them
+// until your transaction commits.
+func (wxq *WuXingQuery) ForShare(opts ...sql.LockOption) *WuXingQuery {
+	if wxq.driver.Dialect() == dialect.Postgres {
+		wxq.Unique(false)
+	}
+	wxq.modifiers = append(wxq.modifiers, func(s *sql.Selector) {
+		s.ForShare(opts...)
+	})
+	return wxq
 }
 
 // WuXingGroupBy is the group-by builder for WuXing entities.

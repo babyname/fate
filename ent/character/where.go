@@ -52,6 +52,16 @@ func IDLTE(id string) predicate.Character {
 	return predicate.Character(sql.FieldLTE(FieldID, id))
 }
 
+// IDEqualFold applies the EqualFold predicate on the ID field.
+func IDEqualFold(id string) predicate.Character {
+	return predicate.Character(sql.FieldEqualFold(FieldID, id))
+}
+
+// IDContainsFold applies the ContainsFold predicate on the ID field.
+func IDContainsFold(id string) predicate.Character {
+	return predicate.Character(sql.FieldContainsFold(FieldID, id))
+}
+
 // PinYin applies equality check predicate on the "pin_yin" field. It's identical to PinYinEQ.
 func PinYin(v string) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldPinYin, v))
@@ -1229,32 +1239,15 @@ func ScienceStrokeLTE(v int) predicate.Character {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Character) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Character(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Character) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Character(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Character) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Character(sql.NotPredicates(p))
 }

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"reflect"
 
 	"github.com/babyname/fate/ent/migrate"
 	"github.com/google/uuid"
@@ -15,6 +16,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/ent/ncharacter"
 	"github.com/babyname/fate/ent/version"
 	"github.com/babyname/fate/ent/wugelucky"
 	"github.com/babyname/fate/ent/wuxing"
@@ -27,6 +29,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Character is the client for interacting with the Character builders.
 	Character *CharacterClient
+	// NCharacter is the client for interacting with the NCharacter builders.
+	NCharacter *NCharacterClient
 	// Version is the client for interacting with the Version builders.
 	Version *VersionClient
 	// WuGeLucky is the client for interacting with the WuGeLucky builders.
@@ -47,6 +51,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Character = NewCharacterClient(c.config)
+	c.NCharacter = NewNCharacterClient(c.config)
 	c.Version = NewVersionClient(c.config)
 	c.WuGeLucky = NewWuGeLuckyClient(c.config)
 	c.WuXing = NewWuXingClient(c.config)
@@ -117,11 +122,14 @@ func Open(driverName, dataSourceName string, options ...Option) (*Client, error)
 	}
 }
 
+// ErrTxStarted is returned when trying to start a new transaction from a transactional client.
+var ErrTxStarted = errors.New("ent: cannot start a transaction within a transaction")
+
 // Tx returns a new transactional client. The provided context
 // is used until the transaction is committed or rolled back.
 func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	if _, ok := c.driver.(*txDriver); ok {
-		return nil, errors.New("ent: cannot start a transaction within a transaction")
+		return nil, ErrTxStarted
 	}
 	tx, err := newTx(ctx, c.driver)
 	if err != nil {
@@ -130,12 +138,13 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:       ctx,
-		config:    cfg,
-		Character: NewCharacterClient(cfg),
-		Version:   NewVersionClient(cfg),
-		WuGeLucky: NewWuGeLuckyClient(cfg),
-		WuXing:    NewWuXingClient(cfg),
+		ctx:        ctx,
+		config:     cfg,
+		Character:  NewCharacterClient(cfg),
+		NCharacter: NewNCharacterClient(cfg),
+		Version:    NewVersionClient(cfg),
+		WuGeLucky:  NewWuGeLuckyClient(cfg),
+		WuXing:     NewWuXingClient(cfg),
 	}, nil
 }
 
@@ -153,12 +162,13 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:       ctx,
-		config:    cfg,
-		Character: NewCharacterClient(cfg),
-		Version:   NewVersionClient(cfg),
-		WuGeLucky: NewWuGeLuckyClient(cfg),
-		WuXing:    NewWuXingClient(cfg),
+		ctx:        ctx,
+		config:     cfg,
+		Character:  NewCharacterClient(cfg),
+		NCharacter: NewNCharacterClient(cfg),
+		Version:    NewVersionClient(cfg),
+		WuGeLucky:  NewWuGeLuckyClient(cfg),
+		WuXing:     NewWuXingClient(cfg),
 	}, nil
 }
 
@@ -188,6 +198,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Character.Use(hooks...)
+	c.NCharacter.Use(hooks...)
 	c.Version.Use(hooks...)
 	c.WuGeLucky.Use(hooks...)
 	c.WuXing.Use(hooks...)
@@ -197,6 +208,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Character.Intercept(interceptors...)
+	c.NCharacter.Intercept(interceptors...)
 	c.Version.Intercept(interceptors...)
 	c.WuGeLucky.Intercept(interceptors...)
 	c.WuXing.Intercept(interceptors...)
@@ -207,6 +219,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *CharacterMutation:
 		return c.Character.mutate(ctx, m)
+	case *NCharacterMutation:
+		return c.NCharacter.mutate(ctx, m)
 	case *VersionMutation:
 		return c.Version.mutate(ctx, m)
 	case *WuGeLuckyMutation:
@@ -248,6 +262,21 @@ func (c *CharacterClient) Create() *CharacterCreate {
 
 // CreateBulk returns a builder for creating a bulk of Character entities.
 func (c *CharacterClient) CreateBulk(builders ...*CharacterCreate) *CharacterCreateBulk {
+	return &CharacterCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CharacterClient) MapCreateBulk(slice any, setFunc func(*CharacterCreate, int)) *CharacterCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CharacterCreateBulk{err: fmt.Errorf("calling to CharacterClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CharacterCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &CharacterCreateBulk{config: c.config, builders: builders}
 }
 
@@ -336,6 +365,139 @@ func (c *CharacterClient) mutate(ctx context.Context, m *CharacterMutation) (Val
 	}
 }
 
+// NCharacterClient is a client for the NCharacter schema.
+type NCharacterClient struct {
+	config
+}
+
+// NewNCharacterClient returns a client for the NCharacter from the given config.
+func NewNCharacterClient(c config) *NCharacterClient {
+	return &NCharacterClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `ncharacter.Hooks(f(g(h())))`.
+func (c *NCharacterClient) Use(hooks ...Hook) {
+	c.hooks.NCharacter = append(c.hooks.NCharacter, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `ncharacter.Intercept(f(g(h())))`.
+func (c *NCharacterClient) Intercept(interceptors ...Interceptor) {
+	c.inters.NCharacter = append(c.inters.NCharacter, interceptors...)
+}
+
+// Create returns a builder for creating a NCharacter entity.
+func (c *NCharacterClient) Create() *NCharacterCreate {
+	mutation := newNCharacterMutation(c.config, OpCreate)
+	return &NCharacterCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of NCharacter entities.
+func (c *NCharacterClient) CreateBulk(builders ...*NCharacterCreate) *NCharacterCreateBulk {
+	return &NCharacterCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *NCharacterClient) MapCreateBulk(slice any, setFunc func(*NCharacterCreate, int)) *NCharacterCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &NCharacterCreateBulk{err: fmt.Errorf("calling to NCharacterClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*NCharacterCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &NCharacterCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for NCharacter.
+func (c *NCharacterClient) Update() *NCharacterUpdate {
+	mutation := newNCharacterMutation(c.config, OpUpdate)
+	return &NCharacterUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *NCharacterClient) UpdateOne(n *NCharacter) *NCharacterUpdateOne {
+	mutation := newNCharacterMutation(c.config, OpUpdateOne, withNCharacter(n))
+	return &NCharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *NCharacterClient) UpdateOneID(id string) *NCharacterUpdateOne {
+	mutation := newNCharacterMutation(c.config, OpUpdateOne, withNCharacterID(id))
+	return &NCharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for NCharacter.
+func (c *NCharacterClient) Delete() *NCharacterDelete {
+	mutation := newNCharacterMutation(c.config, OpDelete)
+	return &NCharacterDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *NCharacterClient) DeleteOne(n *NCharacter) *NCharacterDeleteOne {
+	return c.DeleteOneID(n.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *NCharacterClient) DeleteOneID(id string) *NCharacterDeleteOne {
+	builder := c.Delete().Where(ncharacter.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &NCharacterDeleteOne{builder}
+}
+
+// Query returns a query builder for NCharacter.
+func (c *NCharacterClient) Query() *NCharacterQuery {
+	return &NCharacterQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeNCharacter},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a NCharacter entity by its id.
+func (c *NCharacterClient) Get(ctx context.Context, id string) (*NCharacter, error) {
+	return c.Query().Where(ncharacter.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *NCharacterClient) GetX(ctx context.Context, id string) *NCharacter {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *NCharacterClient) Hooks() []Hook {
+	return c.hooks.NCharacter
+}
+
+// Interceptors returns the client interceptors.
+func (c *NCharacterClient) Interceptors() []Interceptor {
+	return c.inters.NCharacter
+}
+
+func (c *NCharacterClient) mutate(ctx context.Context, m *NCharacterMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&NCharacterCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&NCharacterUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&NCharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&NCharacterDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown NCharacter mutation op: %q", m.Op())
+	}
+}
+
 // VersionClient is a client for the Version schema.
 type VersionClient struct {
 	config
@@ -366,6 +528,21 @@ func (c *VersionClient) Create() *VersionCreate {
 
 // CreateBulk returns a builder for creating a bulk of Version entities.
 func (c *VersionClient) CreateBulk(builders ...*VersionCreate) *VersionCreateBulk {
+	return &VersionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *VersionClient) MapCreateBulk(slice any, setFunc func(*VersionCreate, int)) *VersionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &VersionCreateBulk{err: fmt.Errorf("calling to VersionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*VersionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &VersionCreateBulk{config: c.config, builders: builders}
 }
 
@@ -487,6 +664,21 @@ func (c *WuGeLuckyClient) CreateBulk(builders ...*WuGeLuckyCreate) *WuGeLuckyCre
 	return &WuGeLuckyCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *WuGeLuckyClient) MapCreateBulk(slice any, setFunc func(*WuGeLuckyCreate, int)) *WuGeLuckyCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &WuGeLuckyCreateBulk{err: fmt.Errorf("calling to WuGeLuckyClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*WuGeLuckyCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &WuGeLuckyCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for WuGeLucky.
 func (c *WuGeLuckyClient) Update() *WuGeLuckyUpdate {
 	mutation := newWuGeLuckyMutation(c.config, OpUpdate)
@@ -605,6 +797,21 @@ func (c *WuXingClient) CreateBulk(builders ...*WuXingCreate) *WuXingCreateBulk {
 	return &WuXingCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *WuXingClient) MapCreateBulk(slice any, setFunc func(*WuXingCreate, int)) *WuXingCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &WuXingCreateBulk{err: fmt.Errorf("calling to WuXingClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*WuXingCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &WuXingCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for WuXing.
 func (c *WuXingClient) Update() *WuXingUpdate {
 	mutation := newWuXingMutation(c.config, OpUpdate)
@@ -693,9 +900,9 @@ func (c *WuXingClient) mutate(ctx context.Context, m *WuXingMutation) (Value, er
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Character, Version, WuGeLucky, WuXing []ent.Hook
+		Character, NCharacter, Version, WuGeLucky, WuXing []ent.Hook
 	}
 	inters struct {
-		Character, Version, WuGeLucky, WuXing []ent.Interceptor
+		Character, NCharacter, Version, WuGeLucky, WuXing []ent.Interceptor
 	}
 )

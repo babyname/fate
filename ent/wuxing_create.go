@@ -4,9 +4,12 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/babyname/fate/ent/wuxing"
@@ -17,6 +20,7 @@ type WuXingCreate struct {
 	config
 	mutation *WuXingMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreated sets the "created" field.
@@ -144,7 +148,7 @@ func (wxc *WuXingCreate) Mutation() *WuXingMutation {
 
 // Save creates the WuXing in the database.
 func (wxc *WuXingCreate) Save(ctx context.Context) (*WuXing, error) {
-	return withHooks[*WuXing, WuXingMutation](ctx, wxc.sqlSave, wxc.mutation, wxc.hooks)
+	return withHooks(ctx, wxc.sqlSave, wxc.mutation, wxc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -202,6 +206,7 @@ func (wxc *WuXingCreate) createSpec() (*WuXing, *sqlgraph.CreateSpec) {
 		_node = &WuXing{config: wxc.config}
 		_spec = sqlgraph.NewCreateSpec(wuxing.Table, sqlgraph.NewFieldSpec(wuxing.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = wxc.conflict
 	if id, ok := wxc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -241,14 +246,479 @@ func (wxc *WuXingCreate) createSpec() (*WuXing, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.WuXing.Create().
+//		SetCreated(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.WuXingUpsert) {
+//			SetCreated(v+v).
+//		}).
+//		Exec(ctx)
+func (wxc *WuXingCreate) OnConflict(opts ...sql.ConflictOption) *WuXingUpsertOne {
+	wxc.conflict = opts
+	return &WuXingUpsertOne{
+		create: wxc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.WuXing.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (wxc *WuXingCreate) OnConflictColumns(columns ...string) *WuXingUpsertOne {
+	wxc.conflict = append(wxc.conflict, sql.ConflictColumns(columns...))
+	return &WuXingUpsertOne{
+		create: wxc,
+	}
+}
+
+type (
+	// WuXingUpsertOne is the builder for "upsert"-ing
+	//  one WuXing node.
+	WuXingUpsertOne struct {
+		create *WuXingCreate
+	}
+
+	// WuXingUpsert is the "OnConflict" setter.
+	WuXingUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetCreated sets the "created" field.
+func (u *WuXingUpsert) SetCreated(v time.Time) *WuXingUpsert {
+	u.Set(wuxing.FieldCreated, v)
+	return u
+}
+
+// UpdateCreated sets the "created" field to the value that was provided on create.
+func (u *WuXingUpsert) UpdateCreated() *WuXingUpsert {
+	u.SetExcluded(wuxing.FieldCreated)
+	return u
+}
+
+// ClearCreated clears the value of the "created" field.
+func (u *WuXingUpsert) ClearCreated() *WuXingUpsert {
+	u.SetNull(wuxing.FieldCreated)
+	return u
+}
+
+// SetUpdated sets the "updated" field.
+func (u *WuXingUpsert) SetUpdated(v time.Time) *WuXingUpsert {
+	u.Set(wuxing.FieldUpdated, v)
+	return u
+}
+
+// UpdateUpdated sets the "updated" field to the value that was provided on create.
+func (u *WuXingUpsert) UpdateUpdated() *WuXingUpsert {
+	u.SetExcluded(wuxing.FieldUpdated)
+	return u
+}
+
+// ClearUpdated clears the value of the "updated" field.
+func (u *WuXingUpsert) ClearUpdated() *WuXingUpsert {
+	u.SetNull(wuxing.FieldUpdated)
+	return u
+}
+
+// SetDeleted sets the "deleted" field.
+func (u *WuXingUpsert) SetDeleted(v time.Time) *WuXingUpsert {
+	u.Set(wuxing.FieldDeleted, v)
+	return u
+}
+
+// UpdateDeleted sets the "deleted" field to the value that was provided on create.
+func (u *WuXingUpsert) UpdateDeleted() *WuXingUpsert {
+	u.SetExcluded(wuxing.FieldDeleted)
+	return u
+}
+
+// ClearDeleted clears the value of the "deleted" field.
+func (u *WuXingUpsert) ClearDeleted() *WuXingUpsert {
+	u.SetNull(wuxing.FieldDeleted)
+	return u
+}
+
+// SetVersion sets the "version" field.
+func (u *WuXingUpsert) SetVersion(v int) *WuXingUpsert {
+	u.Set(wuxing.FieldVersion, v)
+	return u
+}
+
+// UpdateVersion sets the "version" field to the value that was provided on create.
+func (u *WuXingUpsert) UpdateVersion() *WuXingUpsert {
+	u.SetExcluded(wuxing.FieldVersion)
+	return u
+}
+
+// AddVersion adds v to the "version" field.
+func (u *WuXingUpsert) AddVersion(v int) *WuXingUpsert {
+	u.Add(wuxing.FieldVersion, v)
+	return u
+}
+
+// ClearVersion clears the value of the "version" field.
+func (u *WuXingUpsert) ClearVersion() *WuXingUpsert {
+	u.SetNull(wuxing.FieldVersion)
+	return u
+}
+
+// SetFirst sets the "first" field.
+func (u *WuXingUpsert) SetFirst(v string) *WuXingUpsert {
+	u.Set(wuxing.FieldFirst, v)
+	return u
+}
+
+// UpdateFirst sets the "first" field to the value that was provided on create.
+func (u *WuXingUpsert) UpdateFirst() *WuXingUpsert {
+	u.SetExcluded(wuxing.FieldFirst)
+	return u
+}
+
+// ClearFirst clears the value of the "first" field.
+func (u *WuXingUpsert) ClearFirst() *WuXingUpsert {
+	u.SetNull(wuxing.FieldFirst)
+	return u
+}
+
+// SetSecond sets the "second" field.
+func (u *WuXingUpsert) SetSecond(v string) *WuXingUpsert {
+	u.Set(wuxing.FieldSecond, v)
+	return u
+}
+
+// UpdateSecond sets the "second" field to the value that was provided on create.
+func (u *WuXingUpsert) UpdateSecond() *WuXingUpsert {
+	u.SetExcluded(wuxing.FieldSecond)
+	return u
+}
+
+// ClearSecond clears the value of the "second" field.
+func (u *WuXingUpsert) ClearSecond() *WuXingUpsert {
+	u.SetNull(wuxing.FieldSecond)
+	return u
+}
+
+// SetThird sets the "third" field.
+func (u *WuXingUpsert) SetThird(v string) *WuXingUpsert {
+	u.Set(wuxing.FieldThird, v)
+	return u
+}
+
+// UpdateThird sets the "third" field to the value that was provided on create.
+func (u *WuXingUpsert) UpdateThird() *WuXingUpsert {
+	u.SetExcluded(wuxing.FieldThird)
+	return u
+}
+
+// ClearThird clears the value of the "third" field.
+func (u *WuXingUpsert) ClearThird() *WuXingUpsert {
+	u.SetNull(wuxing.FieldThird)
+	return u
+}
+
+// SetFortune sets the "fortune" field.
+func (u *WuXingUpsert) SetFortune(v string) *WuXingUpsert {
+	u.Set(wuxing.FieldFortune, v)
+	return u
+}
+
+// UpdateFortune sets the "fortune" field to the value that was provided on create.
+func (u *WuXingUpsert) UpdateFortune() *WuXingUpsert {
+	u.SetExcluded(wuxing.FieldFortune)
+	return u
+}
+
+// ClearFortune clears the value of the "fortune" field.
+func (u *WuXingUpsert) ClearFortune() *WuXingUpsert {
+	u.SetNull(wuxing.FieldFortune)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.WuXing.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(wuxing.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *WuXingUpsertOne) UpdateNewValues() *WuXingUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(wuxing.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.WuXing.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *WuXingUpsertOne) Ignore() *WuXingUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *WuXingUpsertOne) DoNothing() *WuXingUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the WuXingCreate.OnConflict
+// documentation for more info.
+func (u *WuXingUpsertOne) Update(set func(*WuXingUpsert)) *WuXingUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&WuXingUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreated sets the "created" field.
+func (u *WuXingUpsertOne) SetCreated(v time.Time) *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetCreated(v)
+	})
+}
+
+// UpdateCreated sets the "created" field to the value that was provided on create.
+func (u *WuXingUpsertOne) UpdateCreated() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateCreated()
+	})
+}
+
+// ClearCreated clears the value of the "created" field.
+func (u *WuXingUpsertOne) ClearCreated() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearCreated()
+	})
+}
+
+// SetUpdated sets the "updated" field.
+func (u *WuXingUpsertOne) SetUpdated(v time.Time) *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetUpdated(v)
+	})
+}
+
+// UpdateUpdated sets the "updated" field to the value that was provided on create.
+func (u *WuXingUpsertOne) UpdateUpdated() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateUpdated()
+	})
+}
+
+// ClearUpdated clears the value of the "updated" field.
+func (u *WuXingUpsertOne) ClearUpdated() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearUpdated()
+	})
+}
+
+// SetDeleted sets the "deleted" field.
+func (u *WuXingUpsertOne) SetDeleted(v time.Time) *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetDeleted(v)
+	})
+}
+
+// UpdateDeleted sets the "deleted" field to the value that was provided on create.
+func (u *WuXingUpsertOne) UpdateDeleted() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateDeleted()
+	})
+}
+
+// ClearDeleted clears the value of the "deleted" field.
+func (u *WuXingUpsertOne) ClearDeleted() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearDeleted()
+	})
+}
+
+// SetVersion sets the "version" field.
+func (u *WuXingUpsertOne) SetVersion(v int) *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetVersion(v)
+	})
+}
+
+// AddVersion adds v to the "version" field.
+func (u *WuXingUpsertOne) AddVersion(v int) *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.AddVersion(v)
+	})
+}
+
+// UpdateVersion sets the "version" field to the value that was provided on create.
+func (u *WuXingUpsertOne) UpdateVersion() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateVersion()
+	})
+}
+
+// ClearVersion clears the value of the "version" field.
+func (u *WuXingUpsertOne) ClearVersion() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearVersion()
+	})
+}
+
+// SetFirst sets the "first" field.
+func (u *WuXingUpsertOne) SetFirst(v string) *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetFirst(v)
+	})
+}
+
+// UpdateFirst sets the "first" field to the value that was provided on create.
+func (u *WuXingUpsertOne) UpdateFirst() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateFirst()
+	})
+}
+
+// ClearFirst clears the value of the "first" field.
+func (u *WuXingUpsertOne) ClearFirst() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearFirst()
+	})
+}
+
+// SetSecond sets the "second" field.
+func (u *WuXingUpsertOne) SetSecond(v string) *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetSecond(v)
+	})
+}
+
+// UpdateSecond sets the "second" field to the value that was provided on create.
+func (u *WuXingUpsertOne) UpdateSecond() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateSecond()
+	})
+}
+
+// ClearSecond clears the value of the "second" field.
+func (u *WuXingUpsertOne) ClearSecond() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearSecond()
+	})
+}
+
+// SetThird sets the "third" field.
+func (u *WuXingUpsertOne) SetThird(v string) *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetThird(v)
+	})
+}
+
+// UpdateThird sets the "third" field to the value that was provided on create.
+func (u *WuXingUpsertOne) UpdateThird() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateThird()
+	})
+}
+
+// ClearThird clears the value of the "third" field.
+func (u *WuXingUpsertOne) ClearThird() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearThird()
+	})
+}
+
+// SetFortune sets the "fortune" field.
+func (u *WuXingUpsertOne) SetFortune(v string) *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetFortune(v)
+	})
+}
+
+// UpdateFortune sets the "fortune" field to the value that was provided on create.
+func (u *WuXingUpsertOne) UpdateFortune() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateFortune()
+	})
+}
+
+// ClearFortune clears the value of the "fortune" field.
+func (u *WuXingUpsertOne) ClearFortune() *WuXingUpsertOne {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearFortune()
+	})
+}
+
+// Exec executes the query.
+func (u *WuXingUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for WuXingCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *WuXingUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *WuXingUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: WuXingUpsertOne.ID is not supported by MySQL driver. Use WuXingUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *WuXingUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // WuXingCreateBulk is the builder for creating many WuXing entities in bulk.
 type WuXingCreateBulk struct {
 	config
+	err      error
 	builders []*WuXingCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the WuXing entities in the database.
 func (wxcb *WuXingCreateBulk) Save(ctx context.Context) ([]*WuXing, error) {
+	if wxcb.err != nil {
+		return nil, wxcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(wxcb.builders))
 	nodes := make([]*WuXing, len(wxcb.builders))
 	mutators := make([]Mutator, len(wxcb.builders))
@@ -264,12 +734,13 @@ func (wxcb *WuXingCreateBulk) Save(ctx context.Context) ([]*WuXing, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, wxcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = wxcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, wxcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -316,6 +787,295 @@ func (wxcb *WuXingCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (wxcb *WuXingCreateBulk) ExecX(ctx context.Context) {
 	if err := wxcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.WuXing.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.WuXingUpsert) {
+//			SetCreated(v+v).
+//		}).
+//		Exec(ctx)
+func (wxcb *WuXingCreateBulk) OnConflict(opts ...sql.ConflictOption) *WuXingUpsertBulk {
+	wxcb.conflict = opts
+	return &WuXingUpsertBulk{
+		create: wxcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.WuXing.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (wxcb *WuXingCreateBulk) OnConflictColumns(columns ...string) *WuXingUpsertBulk {
+	wxcb.conflict = append(wxcb.conflict, sql.ConflictColumns(columns...))
+	return &WuXingUpsertBulk{
+		create: wxcb,
+	}
+}
+
+// WuXingUpsertBulk is the builder for "upsert"-ing
+// a bulk of WuXing nodes.
+type WuXingUpsertBulk struct {
+	create *WuXingCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.WuXing.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(wuxing.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *WuXingUpsertBulk) UpdateNewValues() *WuXingUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(wuxing.FieldID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.WuXing.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *WuXingUpsertBulk) Ignore() *WuXingUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *WuXingUpsertBulk) DoNothing() *WuXingUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the WuXingCreateBulk.OnConflict
+// documentation for more info.
+func (u *WuXingUpsertBulk) Update(set func(*WuXingUpsert)) *WuXingUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&WuXingUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreated sets the "created" field.
+func (u *WuXingUpsertBulk) SetCreated(v time.Time) *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetCreated(v)
+	})
+}
+
+// UpdateCreated sets the "created" field to the value that was provided on create.
+func (u *WuXingUpsertBulk) UpdateCreated() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateCreated()
+	})
+}
+
+// ClearCreated clears the value of the "created" field.
+func (u *WuXingUpsertBulk) ClearCreated() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearCreated()
+	})
+}
+
+// SetUpdated sets the "updated" field.
+func (u *WuXingUpsertBulk) SetUpdated(v time.Time) *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetUpdated(v)
+	})
+}
+
+// UpdateUpdated sets the "updated" field to the value that was provided on create.
+func (u *WuXingUpsertBulk) UpdateUpdated() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateUpdated()
+	})
+}
+
+// ClearUpdated clears the value of the "updated" field.
+func (u *WuXingUpsertBulk) ClearUpdated() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearUpdated()
+	})
+}
+
+// SetDeleted sets the "deleted" field.
+func (u *WuXingUpsertBulk) SetDeleted(v time.Time) *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetDeleted(v)
+	})
+}
+
+// UpdateDeleted sets the "deleted" field to the value that was provided on create.
+func (u *WuXingUpsertBulk) UpdateDeleted() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateDeleted()
+	})
+}
+
+// ClearDeleted clears the value of the "deleted" field.
+func (u *WuXingUpsertBulk) ClearDeleted() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearDeleted()
+	})
+}
+
+// SetVersion sets the "version" field.
+func (u *WuXingUpsertBulk) SetVersion(v int) *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetVersion(v)
+	})
+}
+
+// AddVersion adds v to the "version" field.
+func (u *WuXingUpsertBulk) AddVersion(v int) *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.AddVersion(v)
+	})
+}
+
+// UpdateVersion sets the "version" field to the value that was provided on create.
+func (u *WuXingUpsertBulk) UpdateVersion() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateVersion()
+	})
+}
+
+// ClearVersion clears the value of the "version" field.
+func (u *WuXingUpsertBulk) ClearVersion() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearVersion()
+	})
+}
+
+// SetFirst sets the "first" field.
+func (u *WuXingUpsertBulk) SetFirst(v string) *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetFirst(v)
+	})
+}
+
+// UpdateFirst sets the "first" field to the value that was provided on create.
+func (u *WuXingUpsertBulk) UpdateFirst() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateFirst()
+	})
+}
+
+// ClearFirst clears the value of the "first" field.
+func (u *WuXingUpsertBulk) ClearFirst() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearFirst()
+	})
+}
+
+// SetSecond sets the "second" field.
+func (u *WuXingUpsertBulk) SetSecond(v string) *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetSecond(v)
+	})
+}
+
+// UpdateSecond sets the "second" field to the value that was provided on create.
+func (u *WuXingUpsertBulk) UpdateSecond() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateSecond()
+	})
+}
+
+// ClearSecond clears the value of the "second" field.
+func (u *WuXingUpsertBulk) ClearSecond() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearSecond()
+	})
+}
+
+// SetThird sets the "third" field.
+func (u *WuXingUpsertBulk) SetThird(v string) *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetThird(v)
+	})
+}
+
+// UpdateThird sets the "third" field to the value that was provided on create.
+func (u *WuXingUpsertBulk) UpdateThird() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateThird()
+	})
+}
+
+// ClearThird clears the value of the "third" field.
+func (u *WuXingUpsertBulk) ClearThird() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearThird()
+	})
+}
+
+// SetFortune sets the "fortune" field.
+func (u *WuXingUpsertBulk) SetFortune(v string) *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.SetFortune(v)
+	})
+}
+
+// UpdateFortune sets the "fortune" field to the value that was provided on create.
+func (u *WuXingUpsertBulk) UpdateFortune() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.UpdateFortune()
+	})
+}
+
+// ClearFortune clears the value of the "fortune" field.
+func (u *WuXingUpsertBulk) ClearFortune() *WuXingUpsertBulk {
+	return u.Update(func(s *WuXingUpsert) {
+		s.ClearFortune()
+	})
+}
+
+// Exec executes the query.
+func (u *WuXingUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the WuXingCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for WuXingCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *WuXingUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -18,9 +19,10 @@ import (
 type VersionQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []version.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Version
+	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -52,7 +54,7 @@ func (vq *VersionQuery) Unique(unique bool) *VersionQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (vq *VersionQuery) Order(o ...OrderFunc) *VersionQuery {
+func (vq *VersionQuery) Order(o ...version.OrderOption) *VersionQuery {
 	vq.order = append(vq.order, o...)
 	return vq
 }
@@ -246,7 +248,7 @@ func (vq *VersionQuery) Clone() *VersionQuery {
 	return &VersionQuery{
 		config:     vq.config,
 		ctx:        vq.ctx.Clone(),
-		order:      append([]OrderFunc{}, vq.order...),
+		order:      append([]version.OrderOption{}, vq.order...),
 		inters:     append([]Interceptor{}, vq.inters...),
 		predicates: append([]predicate.Version{}, vq.predicates...),
 		// clone intermediate query.
@@ -342,6 +344,9 @@ func (vq *VersionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vers
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
+	if len(vq.modifiers) > 0 {
+		_spec.Modifiers = vq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -356,6 +361,9 @@ func (vq *VersionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vers
 
 func (vq *VersionQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := vq.querySpec()
+	if len(vq.modifiers) > 0 {
+		_spec.Modifiers = vq.modifiers
+	}
 	_spec.Node.Columns = vq.ctx.Fields
 	if len(vq.ctx.Fields) > 0 {
 		_spec.Unique = vq.ctx.Unique != nil && *vq.ctx.Unique
@@ -418,6 +426,9 @@ func (vq *VersionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if vq.ctx.Unique != nil && *vq.ctx.Unique {
 		selector.Distinct()
 	}
+	for _, m := range vq.modifiers {
+		m(selector)
+	}
 	for _, p := range vq.predicates {
 		p(selector)
 	}
@@ -433,6 +444,32 @@ func (vq *VersionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// ForUpdate locks the selected rows against concurrent updates, and prevent them from being
+// updated, deleted or "selected ... for update" by other sessions, until the transaction is
+// either committed or rolled-back.
+func (vq *VersionQuery) ForUpdate(opts ...sql.LockOption) *VersionQuery {
+	if vq.driver.Dialect() == dialect.Postgres {
+		vq.Unique(false)
+	}
+	vq.modifiers = append(vq.modifiers, func(s *sql.Selector) {
+		s.ForUpdate(opts...)
+	})
+	return vq
+}
+
+// ForShare behaves similarly to ForUpdate, except that it acquires a shared mode lock
+// on any rows that are read. Other sessions can read the rows, but cannot modify them
+// until your transaction commits.
+func (vq *VersionQuery) ForShare(opts ...sql.LockOption) *VersionQuery {
+	if vq.driver.Dialect() == dialect.Postgres {
+		vq.Unique(false)
+	}
+	vq.modifiers = append(vq.modifiers, func(s *sql.Selector) {
+		s.ForShare(opts...)
+	})
+	return vq
 }
 
 // VersionGroupBy is the group-by builder for Version entities.
