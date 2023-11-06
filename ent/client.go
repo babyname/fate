@@ -426,7 +426,7 @@ func (c *NCharacterClient) UpdateOne(n *NCharacter) *NCharacterUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *NCharacterClient) UpdateOneID(id string) *NCharacterUpdateOne {
+func (c *NCharacterClient) UpdateOneID(id int32) *NCharacterUpdateOne {
 	mutation := newNCharacterMutation(c.config, OpUpdateOne, withNCharacterID(id))
 	return &NCharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -443,7 +443,7 @@ func (c *NCharacterClient) DeleteOne(n *NCharacter) *NCharacterDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *NCharacterClient) DeleteOneID(id string) *NCharacterDeleteOne {
+func (c *NCharacterClient) DeleteOneID(id int32) *NCharacterDeleteOne {
 	builder := c.Delete().Where(ncharacter.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -460,12 +460,12 @@ func (c *NCharacterClient) Query() *NCharacterQuery {
 }
 
 // Get returns a NCharacter entity by its id.
-func (c *NCharacterClient) Get(ctx context.Context, id string) (*NCharacter, error) {
+func (c *NCharacterClient) Get(ctx context.Context, id int32) (*NCharacter, error) {
 	return c.Query().Where(ncharacter.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *NCharacterClient) GetX(ctx context.Context, id string) *NCharacter {
+func (c *NCharacterClient) GetX(ctx context.Context, id int32) *NCharacter {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

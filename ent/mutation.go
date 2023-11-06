@@ -1772,34 +1772,34 @@ func (m *CharacterMutation) ResetEdge(name string) error {
 // NCharacterMutation represents an operation that mutates the NCharacter nodes in the graph.
 type NCharacterMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *string
-	pin_yin            *string
-	ch_id              *int64
-	addch_id           *int64
-	ch                 *string
-	radical            *string
-	radical_stroke     *int
-	addradical_stroke  *int
-	total_stroke       *int
-	addtotal_stroke    *int
-	is_kang_xi         *bool
-	relate_kang_xi     *string
-	relate_simple      *string
-	relate_traditional *string
-	relate_variant     *string
-	name_science       *bool
-	science_stroke     *int
-	addscience_stroke  *int
-	wu_xing            *string
-	lucky              *string
-	regular            *bool
-	comment            *string
-	clearedFields      map[string]struct{}
-	done               bool
-	oldValue           func(context.Context) (*NCharacter, error)
-	predicates         []predicate.NCharacter
+	op                        Op
+	typ                       string
+	id                        *int32
+	pin_yin                   *string
+	ch                        *string
+	ch_stroke                 *int
+	addch_stroke              *int
+	ch_type                   *int
+	addch_type                *int
+	radical                   *string
+	radical_stroke            *int
+	addradical_stroke         *int
+	relate                    *string
+	relate_kang_xi            *string
+	relate_traditional        *string
+	relate_variant            *[]string
+	appendrelate_variant      []string
+	is_name_science           *bool
+	name_science_ch_stroke    *int
+	addname_science_ch_stroke *int
+	is_regular                *bool
+	wu_xing                   *string
+	lucky                     *string
+	comment                   *string
+	clearedFields             map[string]struct{}
+	done                      bool
+	oldValue                  func(context.Context) (*NCharacter, error)
+	predicates                []predicate.NCharacter
 }
 
 var _ ent.Mutation = (*NCharacterMutation)(nil)
@@ -1822,7 +1822,7 @@ func newNCharacterMutation(c config, op Op, opts ...ncharacterOption) *NCharacte
 }
 
 // withNCharacterID sets the ID field of the mutation.
-func withNCharacterID(id string) ncharacterOption {
+func withNCharacterID(id int32) ncharacterOption {
 	return func(m *NCharacterMutation) {
 		var (
 			err   error
@@ -1874,13 +1874,13 @@ func (m NCharacterMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of NCharacter entities.
-func (m *NCharacterMutation) SetID(id string) {
+func (m *NCharacterMutation) SetID(id int32) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *NCharacterMutation) ID() (id string, exists bool) {
+func (m *NCharacterMutation) ID() (id int32, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1891,12 +1891,12 @@ func (m *NCharacterMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *NCharacterMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *NCharacterMutation) IDs(ctx context.Context) ([]int32, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []string{id}, nil
+			return []int32{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -1942,62 +1942,6 @@ func (m *NCharacterMutation) ResetPinYin() {
 	m.pin_yin = nil
 }
 
-// SetChID sets the "ch_id" field.
-func (m *NCharacterMutation) SetChID(i int64) {
-	m.ch_id = &i
-	m.addch_id = nil
-}
-
-// ChID returns the value of the "ch_id" field in the mutation.
-func (m *NCharacterMutation) ChID() (r int64, exists bool) {
-	v := m.ch_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldChID returns the old "ch_id" field's value of the NCharacter entity.
-// If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NCharacterMutation) OldChID(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldChID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldChID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldChID: %w", err)
-	}
-	return oldValue.ChID, nil
-}
-
-// AddChID adds i to the "ch_id" field.
-func (m *NCharacterMutation) AddChID(i int64) {
-	if m.addch_id != nil {
-		*m.addch_id += i
-	} else {
-		m.addch_id = &i
-	}
-}
-
-// AddedChID returns the value that was added to the "ch_id" field in this mutation.
-func (m *NCharacterMutation) AddedChID() (r int64, exists bool) {
-	v := m.addch_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetChID resets all changes to the "ch_id" field.
-func (m *NCharacterMutation) ResetChID() {
-	m.ch_id = nil
-	m.addch_id = nil
-}
-
 // SetCh sets the "ch" field.
 func (m *NCharacterMutation) SetCh(s string) {
 	m.ch = &s
@@ -2032,6 +1976,118 @@ func (m *NCharacterMutation) OldCh(ctx context.Context) (v string, err error) {
 // ResetCh resets all changes to the "ch" field.
 func (m *NCharacterMutation) ResetCh() {
 	m.ch = nil
+}
+
+// SetChStroke sets the "ch_stroke" field.
+func (m *NCharacterMutation) SetChStroke(i int) {
+	m.ch_stroke = &i
+	m.addch_stroke = nil
+}
+
+// ChStroke returns the value of the "ch_stroke" field in the mutation.
+func (m *NCharacterMutation) ChStroke() (r int, exists bool) {
+	v := m.ch_stroke
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChStroke returns the old "ch_stroke" field's value of the NCharacter entity.
+// If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NCharacterMutation) OldChStroke(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChStroke is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChStroke requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChStroke: %w", err)
+	}
+	return oldValue.ChStroke, nil
+}
+
+// AddChStroke adds i to the "ch_stroke" field.
+func (m *NCharacterMutation) AddChStroke(i int) {
+	if m.addch_stroke != nil {
+		*m.addch_stroke += i
+	} else {
+		m.addch_stroke = &i
+	}
+}
+
+// AddedChStroke returns the value that was added to the "ch_stroke" field in this mutation.
+func (m *NCharacterMutation) AddedChStroke() (r int, exists bool) {
+	v := m.addch_stroke
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetChStroke resets all changes to the "ch_stroke" field.
+func (m *NCharacterMutation) ResetChStroke() {
+	m.ch_stroke = nil
+	m.addch_stroke = nil
+}
+
+// SetChType sets the "ch_type" field.
+func (m *NCharacterMutation) SetChType(i int) {
+	m.ch_type = &i
+	m.addch_type = nil
+}
+
+// ChType returns the value of the "ch_type" field in the mutation.
+func (m *NCharacterMutation) ChType() (r int, exists bool) {
+	v := m.ch_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChType returns the old "ch_type" field's value of the NCharacter entity.
+// If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NCharacterMutation) OldChType(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChType: %w", err)
+	}
+	return oldValue.ChType, nil
+}
+
+// AddChType adds i to the "ch_type" field.
+func (m *NCharacterMutation) AddChType(i int) {
+	if m.addch_type != nil {
+		*m.addch_type += i
+	} else {
+		m.addch_type = &i
+	}
+}
+
+// AddedChType returns the value that was added to the "ch_type" field in this mutation.
+func (m *NCharacterMutation) AddedChType() (r int, exists bool) {
+	v := m.addch_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetChType resets all changes to the "ch_type" field.
+func (m *NCharacterMutation) ResetChType() {
+	m.ch_type = nil
+	m.addch_type = nil
 }
 
 // SetRadical sets the "radical" field.
@@ -2126,96 +2182,40 @@ func (m *NCharacterMutation) ResetRadicalStroke() {
 	m.addradical_stroke = nil
 }
 
-// SetTotalStroke sets the "total_stroke" field.
-func (m *NCharacterMutation) SetTotalStroke(i int) {
-	m.total_stroke = &i
-	m.addtotal_stroke = nil
+// SetRelate sets the "relate" field.
+func (m *NCharacterMutation) SetRelate(s string) {
+	m.relate = &s
 }
 
-// TotalStroke returns the value of the "total_stroke" field in the mutation.
-func (m *NCharacterMutation) TotalStroke() (r int, exists bool) {
-	v := m.total_stroke
+// Relate returns the value of the "relate" field in the mutation.
+func (m *NCharacterMutation) Relate() (r string, exists bool) {
+	v := m.relate
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTotalStroke returns the old "total_stroke" field's value of the NCharacter entity.
+// OldRelate returns the old "relate" field's value of the NCharacter entity.
 // If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NCharacterMutation) OldTotalStroke(ctx context.Context) (v int, err error) {
+func (m *NCharacterMutation) OldRelate(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTotalStroke is only allowed on UpdateOne operations")
+		return v, errors.New("OldRelate is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTotalStroke requires an ID field in the mutation")
+		return v, errors.New("OldRelate requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTotalStroke: %w", err)
+		return v, fmt.Errorf("querying old value for OldRelate: %w", err)
 	}
-	return oldValue.TotalStroke, nil
+	return oldValue.Relate, nil
 }
 
-// AddTotalStroke adds i to the "total_stroke" field.
-func (m *NCharacterMutation) AddTotalStroke(i int) {
-	if m.addtotal_stroke != nil {
-		*m.addtotal_stroke += i
-	} else {
-		m.addtotal_stroke = &i
-	}
-}
-
-// AddedTotalStroke returns the value that was added to the "total_stroke" field in this mutation.
-func (m *NCharacterMutation) AddedTotalStroke() (r int, exists bool) {
-	v := m.addtotal_stroke
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetTotalStroke resets all changes to the "total_stroke" field.
-func (m *NCharacterMutation) ResetTotalStroke() {
-	m.total_stroke = nil
-	m.addtotal_stroke = nil
-}
-
-// SetIsKangXi sets the "is_kang_xi" field.
-func (m *NCharacterMutation) SetIsKangXi(b bool) {
-	m.is_kang_xi = &b
-}
-
-// IsKangXi returns the value of the "is_kang_xi" field in the mutation.
-func (m *NCharacterMutation) IsKangXi() (r bool, exists bool) {
-	v := m.is_kang_xi
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldIsKangXi returns the old "is_kang_xi" field's value of the NCharacter entity.
-// If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NCharacterMutation) OldIsKangXi(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIsKangXi is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIsKangXi requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsKangXi: %w", err)
-	}
-	return oldValue.IsKangXi, nil
-}
-
-// ResetIsKangXi resets all changes to the "is_kang_xi" field.
-func (m *NCharacterMutation) ResetIsKangXi() {
-	m.is_kang_xi = nil
+// ResetRelate resets all changes to the "relate" field.
+func (m *NCharacterMutation) ResetRelate() {
+	m.relate = nil
 }
 
 // SetRelateKangXi sets the "relate_kang_xi" field.
@@ -2252,42 +2252,6 @@ func (m *NCharacterMutation) OldRelateKangXi(ctx context.Context) (v string, err
 // ResetRelateKangXi resets all changes to the "relate_kang_xi" field.
 func (m *NCharacterMutation) ResetRelateKangXi() {
 	m.relate_kang_xi = nil
-}
-
-// SetRelateSimple sets the "relate_simple" field.
-func (m *NCharacterMutation) SetRelateSimple(s string) {
-	m.relate_simple = &s
-}
-
-// RelateSimple returns the value of the "relate_simple" field in the mutation.
-func (m *NCharacterMutation) RelateSimple() (r string, exists bool) {
-	v := m.relate_simple
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRelateSimple returns the old "relate_simple" field's value of the NCharacter entity.
-// If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NCharacterMutation) OldRelateSimple(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRelateSimple is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRelateSimple requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRelateSimple: %w", err)
-	}
-	return oldValue.RelateSimple, nil
-}
-
-// ResetRelateSimple resets all changes to the "relate_simple" field.
-func (m *NCharacterMutation) ResetRelateSimple() {
-	m.relate_simple = nil
 }
 
 // SetRelateTraditional sets the "relate_traditional" field.
@@ -2327,12 +2291,13 @@ func (m *NCharacterMutation) ResetRelateTraditional() {
 }
 
 // SetRelateVariant sets the "relate_variant" field.
-func (m *NCharacterMutation) SetRelateVariant(s string) {
+func (m *NCharacterMutation) SetRelateVariant(s []string) {
 	m.relate_variant = &s
+	m.appendrelate_variant = nil
 }
 
 // RelateVariant returns the value of the "relate_variant" field in the mutation.
-func (m *NCharacterMutation) RelateVariant() (r string, exists bool) {
+func (m *NCharacterMutation) RelateVariant() (r []string, exists bool) {
 	v := m.relate_variant
 	if v == nil {
 		return
@@ -2343,7 +2308,7 @@ func (m *NCharacterMutation) RelateVariant() (r string, exists bool) {
 // OldRelateVariant returns the old "relate_variant" field's value of the NCharacter entity.
 // If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NCharacterMutation) OldRelateVariant(ctx context.Context) (v string, err error) {
+func (m *NCharacterMutation) OldRelateVariant(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRelateVariant is only allowed on UpdateOne operations")
 	}
@@ -2357,101 +2322,151 @@ func (m *NCharacterMutation) OldRelateVariant(ctx context.Context) (v string, er
 	return oldValue.RelateVariant, nil
 }
 
+// AppendRelateVariant adds s to the "relate_variant" field.
+func (m *NCharacterMutation) AppendRelateVariant(s []string) {
+	m.appendrelate_variant = append(m.appendrelate_variant, s...)
+}
+
+// AppendedRelateVariant returns the list of values that were appended to the "relate_variant" field in this mutation.
+func (m *NCharacterMutation) AppendedRelateVariant() ([]string, bool) {
+	if len(m.appendrelate_variant) == 0 {
+		return nil, false
+	}
+	return m.appendrelate_variant, true
+}
+
 // ResetRelateVariant resets all changes to the "relate_variant" field.
 func (m *NCharacterMutation) ResetRelateVariant() {
 	m.relate_variant = nil
+	m.appendrelate_variant = nil
 }
 
-// SetNameScience sets the "name_science" field.
-func (m *NCharacterMutation) SetNameScience(b bool) {
-	m.name_science = &b
+// SetIsNameScience sets the "is_name_science" field.
+func (m *NCharacterMutation) SetIsNameScience(b bool) {
+	m.is_name_science = &b
 }
 
-// NameScience returns the value of the "name_science" field in the mutation.
-func (m *NCharacterMutation) NameScience() (r bool, exists bool) {
-	v := m.name_science
+// IsNameScience returns the value of the "is_name_science" field in the mutation.
+func (m *NCharacterMutation) IsNameScience() (r bool, exists bool) {
+	v := m.is_name_science
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldNameScience returns the old "name_science" field's value of the NCharacter entity.
+// OldIsNameScience returns the old "is_name_science" field's value of the NCharacter entity.
 // If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NCharacterMutation) OldNameScience(ctx context.Context) (v bool, err error) {
+func (m *NCharacterMutation) OldIsNameScience(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldNameScience is only allowed on UpdateOne operations")
+		return v, errors.New("OldIsNameScience is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldNameScience requires an ID field in the mutation")
+		return v, errors.New("OldIsNameScience requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldNameScience: %w", err)
+		return v, fmt.Errorf("querying old value for OldIsNameScience: %w", err)
 	}
-	return oldValue.NameScience, nil
+	return oldValue.IsNameScience, nil
 }
 
-// ResetNameScience resets all changes to the "name_science" field.
-func (m *NCharacterMutation) ResetNameScience() {
-	m.name_science = nil
+// ResetIsNameScience resets all changes to the "is_name_science" field.
+func (m *NCharacterMutation) ResetIsNameScience() {
+	m.is_name_science = nil
 }
 
-// SetScienceStroke sets the "science_stroke" field.
-func (m *NCharacterMutation) SetScienceStroke(i int) {
-	m.science_stroke = &i
-	m.addscience_stroke = nil
+// SetNameScienceChStroke sets the "name_science_ch_stroke" field.
+func (m *NCharacterMutation) SetNameScienceChStroke(i int) {
+	m.name_science_ch_stroke = &i
+	m.addname_science_ch_stroke = nil
 }
 
-// ScienceStroke returns the value of the "science_stroke" field in the mutation.
-func (m *NCharacterMutation) ScienceStroke() (r int, exists bool) {
-	v := m.science_stroke
+// NameScienceChStroke returns the value of the "name_science_ch_stroke" field in the mutation.
+func (m *NCharacterMutation) NameScienceChStroke() (r int, exists bool) {
+	v := m.name_science_ch_stroke
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldScienceStroke returns the old "science_stroke" field's value of the NCharacter entity.
+// OldNameScienceChStroke returns the old "name_science_ch_stroke" field's value of the NCharacter entity.
 // If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NCharacterMutation) OldScienceStroke(ctx context.Context) (v int, err error) {
+func (m *NCharacterMutation) OldNameScienceChStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldScienceStroke is only allowed on UpdateOne operations")
+		return v, errors.New("OldNameScienceChStroke is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldScienceStroke requires an ID field in the mutation")
+		return v, errors.New("OldNameScienceChStroke requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldScienceStroke: %w", err)
+		return v, fmt.Errorf("querying old value for OldNameScienceChStroke: %w", err)
 	}
-	return oldValue.ScienceStroke, nil
+	return oldValue.NameScienceChStroke, nil
 }
 
-// AddScienceStroke adds i to the "science_stroke" field.
-func (m *NCharacterMutation) AddScienceStroke(i int) {
-	if m.addscience_stroke != nil {
-		*m.addscience_stroke += i
+// AddNameScienceChStroke adds i to the "name_science_ch_stroke" field.
+func (m *NCharacterMutation) AddNameScienceChStroke(i int) {
+	if m.addname_science_ch_stroke != nil {
+		*m.addname_science_ch_stroke += i
 	} else {
-		m.addscience_stroke = &i
+		m.addname_science_ch_stroke = &i
 	}
 }
 
-// AddedScienceStroke returns the value that was added to the "science_stroke" field in this mutation.
-func (m *NCharacterMutation) AddedScienceStroke() (r int, exists bool) {
-	v := m.addscience_stroke
+// AddedNameScienceChStroke returns the value that was added to the "name_science_ch_stroke" field in this mutation.
+func (m *NCharacterMutation) AddedNameScienceChStroke() (r int, exists bool) {
+	v := m.addname_science_ch_stroke
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetScienceStroke resets all changes to the "science_stroke" field.
-func (m *NCharacterMutation) ResetScienceStroke() {
-	m.science_stroke = nil
-	m.addscience_stroke = nil
+// ResetNameScienceChStroke resets all changes to the "name_science_ch_stroke" field.
+func (m *NCharacterMutation) ResetNameScienceChStroke() {
+	m.name_science_ch_stroke = nil
+	m.addname_science_ch_stroke = nil
+}
+
+// SetIsRegular sets the "is_regular" field.
+func (m *NCharacterMutation) SetIsRegular(b bool) {
+	m.is_regular = &b
+}
+
+// IsRegular returns the value of the "is_regular" field in the mutation.
+func (m *NCharacterMutation) IsRegular() (r bool, exists bool) {
+	v := m.is_regular
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsRegular returns the old "is_regular" field's value of the NCharacter entity.
+// If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NCharacterMutation) OldIsRegular(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsRegular is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsRegular requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsRegular: %w", err)
+	}
+	return oldValue.IsRegular, nil
+}
+
+// ResetIsRegular resets all changes to the "is_regular" field.
+func (m *NCharacterMutation) ResetIsRegular() {
+	m.is_regular = nil
 }
 
 // SetWuXing sets the "wu_xing" field.
@@ -2526,42 +2541,6 @@ func (m *NCharacterMutation) ResetLucky() {
 	m.lucky = nil
 }
 
-// SetRegular sets the "regular" field.
-func (m *NCharacterMutation) SetRegular(b bool) {
-	m.regular = &b
-}
-
-// Regular returns the value of the "regular" field in the mutation.
-func (m *NCharacterMutation) Regular() (r bool, exists bool) {
-	v := m.regular
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRegular returns the old "regular" field's value of the NCharacter entity.
-// If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NCharacterMutation) OldRegular(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRegular is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRegular requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRegular: %w", err)
-	}
-	return oldValue.Regular, nil
-}
-
-// ResetRegular resets all changes to the "regular" field.
-func (m *NCharacterMutation) ResetRegular() {
-	m.regular = nil
-}
-
 // SetComment sets the "comment" field.
 func (m *NCharacterMutation) SetComment(s string) {
 	m.comment = &s
@@ -2632,15 +2611,18 @@ func (m *NCharacterMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NCharacterMutation) Fields() []string {
-	fields := make([]string, 0, 17)
+	fields := make([]string, 0, 16)
 	if m.pin_yin != nil {
 		fields = append(fields, ncharacter.FieldPinYin)
 	}
-	if m.ch_id != nil {
-		fields = append(fields, ncharacter.FieldChID)
-	}
 	if m.ch != nil {
 		fields = append(fields, ncharacter.FieldCh)
+	}
+	if m.ch_stroke != nil {
+		fields = append(fields, ncharacter.FieldChStroke)
+	}
+	if m.ch_type != nil {
+		fields = append(fields, ncharacter.FieldChType)
 	}
 	if m.radical != nil {
 		fields = append(fields, ncharacter.FieldRadical)
@@ -2648,17 +2630,11 @@ func (m *NCharacterMutation) Fields() []string {
 	if m.radical_stroke != nil {
 		fields = append(fields, ncharacter.FieldRadicalStroke)
 	}
-	if m.total_stroke != nil {
-		fields = append(fields, ncharacter.FieldTotalStroke)
-	}
-	if m.is_kang_xi != nil {
-		fields = append(fields, ncharacter.FieldIsKangXi)
+	if m.relate != nil {
+		fields = append(fields, ncharacter.FieldRelate)
 	}
 	if m.relate_kang_xi != nil {
 		fields = append(fields, ncharacter.FieldRelateKangXi)
-	}
-	if m.relate_simple != nil {
-		fields = append(fields, ncharacter.FieldRelateSimple)
 	}
 	if m.relate_traditional != nil {
 		fields = append(fields, ncharacter.FieldRelateTraditional)
@@ -2666,20 +2642,20 @@ func (m *NCharacterMutation) Fields() []string {
 	if m.relate_variant != nil {
 		fields = append(fields, ncharacter.FieldRelateVariant)
 	}
-	if m.name_science != nil {
-		fields = append(fields, ncharacter.FieldNameScience)
+	if m.is_name_science != nil {
+		fields = append(fields, ncharacter.FieldIsNameScience)
 	}
-	if m.science_stroke != nil {
-		fields = append(fields, ncharacter.FieldScienceStroke)
+	if m.name_science_ch_stroke != nil {
+		fields = append(fields, ncharacter.FieldNameScienceChStroke)
+	}
+	if m.is_regular != nil {
+		fields = append(fields, ncharacter.FieldIsRegular)
 	}
 	if m.wu_xing != nil {
 		fields = append(fields, ncharacter.FieldWuXing)
 	}
 	if m.lucky != nil {
 		fields = append(fields, ncharacter.FieldLucky)
-	}
-	if m.regular != nil {
-		fields = append(fields, ncharacter.FieldRegular)
 	}
 	if m.comment != nil {
 		fields = append(fields, ncharacter.FieldComment)
@@ -2694,36 +2670,34 @@ func (m *NCharacterMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case ncharacter.FieldPinYin:
 		return m.PinYin()
-	case ncharacter.FieldChID:
-		return m.ChID()
 	case ncharacter.FieldCh:
 		return m.Ch()
+	case ncharacter.FieldChStroke:
+		return m.ChStroke()
+	case ncharacter.FieldChType:
+		return m.ChType()
 	case ncharacter.FieldRadical:
 		return m.Radical()
 	case ncharacter.FieldRadicalStroke:
 		return m.RadicalStroke()
-	case ncharacter.FieldTotalStroke:
-		return m.TotalStroke()
-	case ncharacter.FieldIsKangXi:
-		return m.IsKangXi()
+	case ncharacter.FieldRelate:
+		return m.Relate()
 	case ncharacter.FieldRelateKangXi:
 		return m.RelateKangXi()
-	case ncharacter.FieldRelateSimple:
-		return m.RelateSimple()
 	case ncharacter.FieldRelateTraditional:
 		return m.RelateTraditional()
 	case ncharacter.FieldRelateVariant:
 		return m.RelateVariant()
-	case ncharacter.FieldNameScience:
-		return m.NameScience()
-	case ncharacter.FieldScienceStroke:
-		return m.ScienceStroke()
+	case ncharacter.FieldIsNameScience:
+		return m.IsNameScience()
+	case ncharacter.FieldNameScienceChStroke:
+		return m.NameScienceChStroke()
+	case ncharacter.FieldIsRegular:
+		return m.IsRegular()
 	case ncharacter.FieldWuXing:
 		return m.WuXing()
 	case ncharacter.FieldLucky:
 		return m.Lucky()
-	case ncharacter.FieldRegular:
-		return m.Regular()
 	case ncharacter.FieldComment:
 		return m.Comment()
 	}
@@ -2737,36 +2711,34 @@ func (m *NCharacterMutation) OldField(ctx context.Context, name string) (ent.Val
 	switch name {
 	case ncharacter.FieldPinYin:
 		return m.OldPinYin(ctx)
-	case ncharacter.FieldChID:
-		return m.OldChID(ctx)
 	case ncharacter.FieldCh:
 		return m.OldCh(ctx)
+	case ncharacter.FieldChStroke:
+		return m.OldChStroke(ctx)
+	case ncharacter.FieldChType:
+		return m.OldChType(ctx)
 	case ncharacter.FieldRadical:
 		return m.OldRadical(ctx)
 	case ncharacter.FieldRadicalStroke:
 		return m.OldRadicalStroke(ctx)
-	case ncharacter.FieldTotalStroke:
-		return m.OldTotalStroke(ctx)
-	case ncharacter.FieldIsKangXi:
-		return m.OldIsKangXi(ctx)
+	case ncharacter.FieldRelate:
+		return m.OldRelate(ctx)
 	case ncharacter.FieldRelateKangXi:
 		return m.OldRelateKangXi(ctx)
-	case ncharacter.FieldRelateSimple:
-		return m.OldRelateSimple(ctx)
 	case ncharacter.FieldRelateTraditional:
 		return m.OldRelateTraditional(ctx)
 	case ncharacter.FieldRelateVariant:
 		return m.OldRelateVariant(ctx)
-	case ncharacter.FieldNameScience:
-		return m.OldNameScience(ctx)
-	case ncharacter.FieldScienceStroke:
-		return m.OldScienceStroke(ctx)
+	case ncharacter.FieldIsNameScience:
+		return m.OldIsNameScience(ctx)
+	case ncharacter.FieldNameScienceChStroke:
+		return m.OldNameScienceChStroke(ctx)
+	case ncharacter.FieldIsRegular:
+		return m.OldIsRegular(ctx)
 	case ncharacter.FieldWuXing:
 		return m.OldWuXing(ctx)
 	case ncharacter.FieldLucky:
 		return m.OldLucky(ctx)
-	case ncharacter.FieldRegular:
-		return m.OldRegular(ctx)
 	case ncharacter.FieldComment:
 		return m.OldComment(ctx)
 	}
@@ -2785,19 +2757,26 @@ func (m *NCharacterMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPinYin(v)
 		return nil
-	case ncharacter.FieldChID:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetChID(v)
-		return nil
 	case ncharacter.FieldCh:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCh(v)
+		return nil
+	case ncharacter.FieldChStroke:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChStroke(v)
+		return nil
+	case ncharacter.FieldChType:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChType(v)
 		return nil
 	case ncharacter.FieldRadical:
 		v, ok := value.(string)
@@ -2813,19 +2792,12 @@ func (m *NCharacterMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRadicalStroke(v)
 		return nil
-	case ncharacter.FieldTotalStroke:
-		v, ok := value.(int)
+	case ncharacter.FieldRelate:
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTotalStroke(v)
-		return nil
-	case ncharacter.FieldIsKangXi:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIsKangXi(v)
+		m.SetRelate(v)
 		return nil
 	case ncharacter.FieldRelateKangXi:
 		v, ok := value.(string)
@@ -2833,13 +2805,6 @@ func (m *NCharacterMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRelateKangXi(v)
-		return nil
-	case ncharacter.FieldRelateSimple:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRelateSimple(v)
 		return nil
 	case ncharacter.FieldRelateTraditional:
 		v, ok := value.(string)
@@ -2849,25 +2814,32 @@ func (m *NCharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetRelateTraditional(v)
 		return nil
 	case ncharacter.FieldRelateVariant:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRelateVariant(v)
 		return nil
-	case ncharacter.FieldNameScience:
+	case ncharacter.FieldIsNameScience:
 		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetNameScience(v)
+		m.SetIsNameScience(v)
 		return nil
-	case ncharacter.FieldScienceStroke:
+	case ncharacter.FieldNameScienceChStroke:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetScienceStroke(v)
+		m.SetNameScienceChStroke(v)
+		return nil
+	case ncharacter.FieldIsRegular:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsRegular(v)
 		return nil
 	case ncharacter.FieldWuXing:
 		v, ok := value.(string)
@@ -2882,13 +2854,6 @@ func (m *NCharacterMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLucky(v)
-		return nil
-	case ncharacter.FieldRegular:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRegular(v)
 		return nil
 	case ncharacter.FieldComment:
 		v, ok := value.(string)
@@ -2905,17 +2870,17 @@ func (m *NCharacterMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *NCharacterMutation) AddedFields() []string {
 	var fields []string
-	if m.addch_id != nil {
-		fields = append(fields, ncharacter.FieldChID)
+	if m.addch_stroke != nil {
+		fields = append(fields, ncharacter.FieldChStroke)
+	}
+	if m.addch_type != nil {
+		fields = append(fields, ncharacter.FieldChType)
 	}
 	if m.addradical_stroke != nil {
 		fields = append(fields, ncharacter.FieldRadicalStroke)
 	}
-	if m.addtotal_stroke != nil {
-		fields = append(fields, ncharacter.FieldTotalStroke)
-	}
-	if m.addscience_stroke != nil {
-		fields = append(fields, ncharacter.FieldScienceStroke)
+	if m.addname_science_ch_stroke != nil {
+		fields = append(fields, ncharacter.FieldNameScienceChStroke)
 	}
 	return fields
 }
@@ -2925,14 +2890,14 @@ func (m *NCharacterMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *NCharacterMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case ncharacter.FieldChID:
-		return m.AddedChID()
+	case ncharacter.FieldChStroke:
+		return m.AddedChStroke()
+	case ncharacter.FieldChType:
+		return m.AddedChType()
 	case ncharacter.FieldRadicalStroke:
 		return m.AddedRadicalStroke()
-	case ncharacter.FieldTotalStroke:
-		return m.AddedTotalStroke()
-	case ncharacter.FieldScienceStroke:
-		return m.AddedScienceStroke()
+	case ncharacter.FieldNameScienceChStroke:
+		return m.AddedNameScienceChStroke()
 	}
 	return nil, false
 }
@@ -2942,12 +2907,19 @@ func (m *NCharacterMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *NCharacterMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case ncharacter.FieldChID:
-		v, ok := value.(int64)
+	case ncharacter.FieldChStroke:
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddChID(v)
+		m.AddChStroke(v)
+		return nil
+	case ncharacter.FieldChType:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddChType(v)
 		return nil
 	case ncharacter.FieldRadicalStroke:
 		v, ok := value.(int)
@@ -2956,19 +2928,12 @@ func (m *NCharacterMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddRadicalStroke(v)
 		return nil
-	case ncharacter.FieldTotalStroke:
+	case ncharacter.FieldNameScienceChStroke:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddTotalStroke(v)
-		return nil
-	case ncharacter.FieldScienceStroke:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddScienceStroke(v)
+		m.AddNameScienceChStroke(v)
 		return nil
 	}
 	return fmt.Errorf("unknown NCharacter numeric field %s", name)
@@ -3000,11 +2965,14 @@ func (m *NCharacterMutation) ResetField(name string) error {
 	case ncharacter.FieldPinYin:
 		m.ResetPinYin()
 		return nil
-	case ncharacter.FieldChID:
-		m.ResetChID()
-		return nil
 	case ncharacter.FieldCh:
 		m.ResetCh()
+		return nil
+	case ncharacter.FieldChStroke:
+		m.ResetChStroke()
+		return nil
+	case ncharacter.FieldChType:
+		m.ResetChType()
 		return nil
 	case ncharacter.FieldRadical:
 		m.ResetRadical()
@@ -3012,17 +2980,11 @@ func (m *NCharacterMutation) ResetField(name string) error {
 	case ncharacter.FieldRadicalStroke:
 		m.ResetRadicalStroke()
 		return nil
-	case ncharacter.FieldTotalStroke:
-		m.ResetTotalStroke()
-		return nil
-	case ncharacter.FieldIsKangXi:
-		m.ResetIsKangXi()
+	case ncharacter.FieldRelate:
+		m.ResetRelate()
 		return nil
 	case ncharacter.FieldRelateKangXi:
 		m.ResetRelateKangXi()
-		return nil
-	case ncharacter.FieldRelateSimple:
-		m.ResetRelateSimple()
 		return nil
 	case ncharacter.FieldRelateTraditional:
 		m.ResetRelateTraditional()
@@ -3030,20 +2992,20 @@ func (m *NCharacterMutation) ResetField(name string) error {
 	case ncharacter.FieldRelateVariant:
 		m.ResetRelateVariant()
 		return nil
-	case ncharacter.FieldNameScience:
-		m.ResetNameScience()
+	case ncharacter.FieldIsNameScience:
+		m.ResetIsNameScience()
 		return nil
-	case ncharacter.FieldScienceStroke:
-		m.ResetScienceStroke()
+	case ncharacter.FieldNameScienceChStroke:
+		m.ResetNameScienceChStroke()
+		return nil
+	case ncharacter.FieldIsRegular:
+		m.ResetIsRegular()
 		return nil
 	case ncharacter.FieldWuXing:
 		m.ResetWuXing()
 		return nil
 	case ncharacter.FieldLucky:
 		m.ResetLucky()
-		return nil
-	case ncharacter.FieldRegular:
-		m.ResetRegular()
 		return nil
 	case ncharacter.FieldComment:
 		m.ResetComment()

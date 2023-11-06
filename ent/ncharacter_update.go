@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/babyname/fate/ent/ncharacter"
 	"github.com/babyname/fate/ent/predicate"
@@ -33,22 +34,43 @@ func (nu *NCharacterUpdate) SetPinYin(s string) *NCharacterUpdate {
 	return nu
 }
 
-// SetChID sets the "ch_id" field.
-func (nu *NCharacterUpdate) SetChID(i int64) *NCharacterUpdate {
-	nu.mutation.ResetChID()
-	nu.mutation.SetChID(i)
-	return nu
-}
-
-// AddChID adds i to the "ch_id" field.
-func (nu *NCharacterUpdate) AddChID(i int64) *NCharacterUpdate {
-	nu.mutation.AddChID(i)
-	return nu
-}
-
 // SetCh sets the "ch" field.
 func (nu *NCharacterUpdate) SetCh(s string) *NCharacterUpdate {
 	nu.mutation.SetCh(s)
+	return nu
+}
+
+// SetChStroke sets the "ch_stroke" field.
+func (nu *NCharacterUpdate) SetChStroke(i int) *NCharacterUpdate {
+	nu.mutation.ResetChStroke()
+	nu.mutation.SetChStroke(i)
+	return nu
+}
+
+// AddChStroke adds i to the "ch_stroke" field.
+func (nu *NCharacterUpdate) AddChStroke(i int) *NCharacterUpdate {
+	nu.mutation.AddChStroke(i)
+	return nu
+}
+
+// SetChType sets the "ch_type" field.
+func (nu *NCharacterUpdate) SetChType(i int) *NCharacterUpdate {
+	nu.mutation.ResetChType()
+	nu.mutation.SetChType(i)
+	return nu
+}
+
+// SetNillableChType sets the "ch_type" field if the given value is not nil.
+func (nu *NCharacterUpdate) SetNillableChType(i *int) *NCharacterUpdate {
+	if i != nil {
+		nu.SetChType(*i)
+	}
+	return nu
+}
+
+// AddChType adds i to the "ch_type" field.
+func (nu *NCharacterUpdate) AddChType(i int) *NCharacterUpdate {
+	nu.mutation.AddChType(i)
 	return nu
 }
 
@@ -71,34 +93,15 @@ func (nu *NCharacterUpdate) AddRadicalStroke(i int) *NCharacterUpdate {
 	return nu
 }
 
-// SetTotalStroke sets the "total_stroke" field.
-func (nu *NCharacterUpdate) SetTotalStroke(i int) *NCharacterUpdate {
-	nu.mutation.ResetTotalStroke()
-	nu.mutation.SetTotalStroke(i)
-	return nu
-}
-
-// AddTotalStroke adds i to the "total_stroke" field.
-func (nu *NCharacterUpdate) AddTotalStroke(i int) *NCharacterUpdate {
-	nu.mutation.AddTotalStroke(i)
-	return nu
-}
-
-// SetIsKangXi sets the "is_kang_xi" field.
-func (nu *NCharacterUpdate) SetIsKangXi(b bool) *NCharacterUpdate {
-	nu.mutation.SetIsKangXi(b)
+// SetRelate sets the "relate" field.
+func (nu *NCharacterUpdate) SetRelate(s string) *NCharacterUpdate {
+	nu.mutation.SetRelate(s)
 	return nu
 }
 
 // SetRelateKangXi sets the "relate_kang_xi" field.
 func (nu *NCharacterUpdate) SetRelateKangXi(s string) *NCharacterUpdate {
 	nu.mutation.SetRelateKangXi(s)
-	return nu
-}
-
-// SetRelateSimple sets the "relate_simple" field.
-func (nu *NCharacterUpdate) SetRelateSimple(s string) *NCharacterUpdate {
-	nu.mutation.SetRelateSimple(s)
 	return nu
 }
 
@@ -109,27 +112,39 @@ func (nu *NCharacterUpdate) SetRelateTraditional(s string) *NCharacterUpdate {
 }
 
 // SetRelateVariant sets the "relate_variant" field.
-func (nu *NCharacterUpdate) SetRelateVariant(s string) *NCharacterUpdate {
+func (nu *NCharacterUpdate) SetRelateVariant(s []string) *NCharacterUpdate {
 	nu.mutation.SetRelateVariant(s)
 	return nu
 }
 
-// SetNameScience sets the "name_science" field.
-func (nu *NCharacterUpdate) SetNameScience(b bool) *NCharacterUpdate {
-	nu.mutation.SetNameScience(b)
+// AppendRelateVariant appends s to the "relate_variant" field.
+func (nu *NCharacterUpdate) AppendRelateVariant(s []string) *NCharacterUpdate {
+	nu.mutation.AppendRelateVariant(s)
 	return nu
 }
 
-// SetScienceStroke sets the "science_stroke" field.
-func (nu *NCharacterUpdate) SetScienceStroke(i int) *NCharacterUpdate {
-	nu.mutation.ResetScienceStroke()
-	nu.mutation.SetScienceStroke(i)
+// SetIsNameScience sets the "is_name_science" field.
+func (nu *NCharacterUpdate) SetIsNameScience(b bool) *NCharacterUpdate {
+	nu.mutation.SetIsNameScience(b)
 	return nu
 }
 
-// AddScienceStroke adds i to the "science_stroke" field.
-func (nu *NCharacterUpdate) AddScienceStroke(i int) *NCharacterUpdate {
-	nu.mutation.AddScienceStroke(i)
+// SetNameScienceChStroke sets the "name_science_ch_stroke" field.
+func (nu *NCharacterUpdate) SetNameScienceChStroke(i int) *NCharacterUpdate {
+	nu.mutation.ResetNameScienceChStroke()
+	nu.mutation.SetNameScienceChStroke(i)
+	return nu
+}
+
+// AddNameScienceChStroke adds i to the "name_science_ch_stroke" field.
+func (nu *NCharacterUpdate) AddNameScienceChStroke(i int) *NCharacterUpdate {
+	nu.mutation.AddNameScienceChStroke(i)
+	return nu
+}
+
+// SetIsRegular sets the "is_regular" field.
+func (nu *NCharacterUpdate) SetIsRegular(b bool) *NCharacterUpdate {
+	nu.mutation.SetIsRegular(b)
 	return nu
 }
 
@@ -142,12 +157,6 @@ func (nu *NCharacterUpdate) SetWuXing(s string) *NCharacterUpdate {
 // SetLucky sets the "lucky" field.
 func (nu *NCharacterUpdate) SetLucky(s string) *NCharacterUpdate {
 	nu.mutation.SetLucky(s)
-	return nu
-}
-
-// SetRegular sets the "regular" field.
-func (nu *NCharacterUpdate) SetRegular(b bool) *NCharacterUpdate {
-	nu.mutation.SetRegular(b)
 	return nu
 }
 
@@ -190,7 +199,7 @@ func (nu *NCharacterUpdate) ExecX(ctx context.Context) {
 }
 
 func (nu *NCharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(ncharacter.Table, ncharacter.Columns, sqlgraph.NewFieldSpec(ncharacter.FieldID, field.TypeString))
+	_spec := sqlgraph.NewUpdateSpec(ncharacter.Table, ncharacter.Columns, sqlgraph.NewFieldSpec(ncharacter.FieldID, field.TypeInt32))
 	if ps := nu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -201,14 +210,20 @@ func (nu *NCharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := nu.mutation.PinYin(); ok {
 		_spec.SetField(ncharacter.FieldPinYin, field.TypeString, value)
 	}
-	if value, ok := nu.mutation.ChID(); ok {
-		_spec.SetField(ncharacter.FieldChID, field.TypeInt64, value)
-	}
-	if value, ok := nu.mutation.AddedChID(); ok {
-		_spec.AddField(ncharacter.FieldChID, field.TypeInt64, value)
-	}
 	if value, ok := nu.mutation.Ch(); ok {
 		_spec.SetField(ncharacter.FieldCh, field.TypeString, value)
+	}
+	if value, ok := nu.mutation.ChStroke(); ok {
+		_spec.SetField(ncharacter.FieldChStroke, field.TypeInt, value)
+	}
+	if value, ok := nu.mutation.AddedChStroke(); ok {
+		_spec.AddField(ncharacter.FieldChStroke, field.TypeInt, value)
+	}
+	if value, ok := nu.mutation.ChType(); ok {
+		_spec.SetField(ncharacter.FieldChType, field.TypeInt, value)
+	}
+	if value, ok := nu.mutation.AddedChType(); ok {
+		_spec.AddField(ncharacter.FieldChType, field.TypeInt, value)
 	}
 	if value, ok := nu.mutation.Radical(); ok {
 		_spec.SetField(ncharacter.FieldRadical, field.TypeString, value)
@@ -219,44 +234,40 @@ func (nu *NCharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := nu.mutation.AddedRadicalStroke(); ok {
 		_spec.AddField(ncharacter.FieldRadicalStroke, field.TypeInt, value)
 	}
-	if value, ok := nu.mutation.TotalStroke(); ok {
-		_spec.SetField(ncharacter.FieldTotalStroke, field.TypeInt, value)
-	}
-	if value, ok := nu.mutation.AddedTotalStroke(); ok {
-		_spec.AddField(ncharacter.FieldTotalStroke, field.TypeInt, value)
-	}
-	if value, ok := nu.mutation.IsKangXi(); ok {
-		_spec.SetField(ncharacter.FieldIsKangXi, field.TypeBool, value)
+	if value, ok := nu.mutation.Relate(); ok {
+		_spec.SetField(ncharacter.FieldRelate, field.TypeString, value)
 	}
 	if value, ok := nu.mutation.RelateKangXi(); ok {
 		_spec.SetField(ncharacter.FieldRelateKangXi, field.TypeString, value)
-	}
-	if value, ok := nu.mutation.RelateSimple(); ok {
-		_spec.SetField(ncharacter.FieldRelateSimple, field.TypeString, value)
 	}
 	if value, ok := nu.mutation.RelateTraditional(); ok {
 		_spec.SetField(ncharacter.FieldRelateTraditional, field.TypeString, value)
 	}
 	if value, ok := nu.mutation.RelateVariant(); ok {
-		_spec.SetField(ncharacter.FieldRelateVariant, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldRelateVariant, field.TypeJSON, value)
 	}
-	if value, ok := nu.mutation.NameScience(); ok {
-		_spec.SetField(ncharacter.FieldNameScience, field.TypeBool, value)
+	if value, ok := nu.mutation.AppendedRelateVariant(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, ncharacter.FieldRelateVariant, value)
+		})
 	}
-	if value, ok := nu.mutation.ScienceStroke(); ok {
-		_spec.SetField(ncharacter.FieldScienceStroke, field.TypeInt, value)
+	if value, ok := nu.mutation.IsNameScience(); ok {
+		_spec.SetField(ncharacter.FieldIsNameScience, field.TypeBool, value)
 	}
-	if value, ok := nu.mutation.AddedScienceStroke(); ok {
-		_spec.AddField(ncharacter.FieldScienceStroke, field.TypeInt, value)
+	if value, ok := nu.mutation.NameScienceChStroke(); ok {
+		_spec.SetField(ncharacter.FieldNameScienceChStroke, field.TypeInt, value)
+	}
+	if value, ok := nu.mutation.AddedNameScienceChStroke(); ok {
+		_spec.AddField(ncharacter.FieldNameScienceChStroke, field.TypeInt, value)
+	}
+	if value, ok := nu.mutation.IsRegular(); ok {
+		_spec.SetField(ncharacter.FieldIsRegular, field.TypeBool, value)
 	}
 	if value, ok := nu.mutation.WuXing(); ok {
 		_spec.SetField(ncharacter.FieldWuXing, field.TypeString, value)
 	}
 	if value, ok := nu.mutation.Lucky(); ok {
 		_spec.SetField(ncharacter.FieldLucky, field.TypeString, value)
-	}
-	if value, ok := nu.mutation.Regular(); ok {
-		_spec.SetField(ncharacter.FieldRegular, field.TypeBool, value)
 	}
 	if value, ok := nu.mutation.Comment(); ok {
 		_spec.SetField(ncharacter.FieldComment, field.TypeString, value)
@@ -287,22 +298,43 @@ func (nuo *NCharacterUpdateOne) SetPinYin(s string) *NCharacterUpdateOne {
 	return nuo
 }
 
-// SetChID sets the "ch_id" field.
-func (nuo *NCharacterUpdateOne) SetChID(i int64) *NCharacterUpdateOne {
-	nuo.mutation.ResetChID()
-	nuo.mutation.SetChID(i)
-	return nuo
-}
-
-// AddChID adds i to the "ch_id" field.
-func (nuo *NCharacterUpdateOne) AddChID(i int64) *NCharacterUpdateOne {
-	nuo.mutation.AddChID(i)
-	return nuo
-}
-
 // SetCh sets the "ch" field.
 func (nuo *NCharacterUpdateOne) SetCh(s string) *NCharacterUpdateOne {
 	nuo.mutation.SetCh(s)
+	return nuo
+}
+
+// SetChStroke sets the "ch_stroke" field.
+func (nuo *NCharacterUpdateOne) SetChStroke(i int) *NCharacterUpdateOne {
+	nuo.mutation.ResetChStroke()
+	nuo.mutation.SetChStroke(i)
+	return nuo
+}
+
+// AddChStroke adds i to the "ch_stroke" field.
+func (nuo *NCharacterUpdateOne) AddChStroke(i int) *NCharacterUpdateOne {
+	nuo.mutation.AddChStroke(i)
+	return nuo
+}
+
+// SetChType sets the "ch_type" field.
+func (nuo *NCharacterUpdateOne) SetChType(i int) *NCharacterUpdateOne {
+	nuo.mutation.ResetChType()
+	nuo.mutation.SetChType(i)
+	return nuo
+}
+
+// SetNillableChType sets the "ch_type" field if the given value is not nil.
+func (nuo *NCharacterUpdateOne) SetNillableChType(i *int) *NCharacterUpdateOne {
+	if i != nil {
+		nuo.SetChType(*i)
+	}
+	return nuo
+}
+
+// AddChType adds i to the "ch_type" field.
+func (nuo *NCharacterUpdateOne) AddChType(i int) *NCharacterUpdateOne {
+	nuo.mutation.AddChType(i)
 	return nuo
 }
 
@@ -325,34 +357,15 @@ func (nuo *NCharacterUpdateOne) AddRadicalStroke(i int) *NCharacterUpdateOne {
 	return nuo
 }
 
-// SetTotalStroke sets the "total_stroke" field.
-func (nuo *NCharacterUpdateOne) SetTotalStroke(i int) *NCharacterUpdateOne {
-	nuo.mutation.ResetTotalStroke()
-	nuo.mutation.SetTotalStroke(i)
-	return nuo
-}
-
-// AddTotalStroke adds i to the "total_stroke" field.
-func (nuo *NCharacterUpdateOne) AddTotalStroke(i int) *NCharacterUpdateOne {
-	nuo.mutation.AddTotalStroke(i)
-	return nuo
-}
-
-// SetIsKangXi sets the "is_kang_xi" field.
-func (nuo *NCharacterUpdateOne) SetIsKangXi(b bool) *NCharacterUpdateOne {
-	nuo.mutation.SetIsKangXi(b)
+// SetRelate sets the "relate" field.
+func (nuo *NCharacterUpdateOne) SetRelate(s string) *NCharacterUpdateOne {
+	nuo.mutation.SetRelate(s)
 	return nuo
 }
 
 // SetRelateKangXi sets the "relate_kang_xi" field.
 func (nuo *NCharacterUpdateOne) SetRelateKangXi(s string) *NCharacterUpdateOne {
 	nuo.mutation.SetRelateKangXi(s)
-	return nuo
-}
-
-// SetRelateSimple sets the "relate_simple" field.
-func (nuo *NCharacterUpdateOne) SetRelateSimple(s string) *NCharacterUpdateOne {
-	nuo.mutation.SetRelateSimple(s)
 	return nuo
 }
 
@@ -363,27 +376,39 @@ func (nuo *NCharacterUpdateOne) SetRelateTraditional(s string) *NCharacterUpdate
 }
 
 // SetRelateVariant sets the "relate_variant" field.
-func (nuo *NCharacterUpdateOne) SetRelateVariant(s string) *NCharacterUpdateOne {
+func (nuo *NCharacterUpdateOne) SetRelateVariant(s []string) *NCharacterUpdateOne {
 	nuo.mutation.SetRelateVariant(s)
 	return nuo
 }
 
-// SetNameScience sets the "name_science" field.
-func (nuo *NCharacterUpdateOne) SetNameScience(b bool) *NCharacterUpdateOne {
-	nuo.mutation.SetNameScience(b)
+// AppendRelateVariant appends s to the "relate_variant" field.
+func (nuo *NCharacterUpdateOne) AppendRelateVariant(s []string) *NCharacterUpdateOne {
+	nuo.mutation.AppendRelateVariant(s)
 	return nuo
 }
 
-// SetScienceStroke sets the "science_stroke" field.
-func (nuo *NCharacterUpdateOne) SetScienceStroke(i int) *NCharacterUpdateOne {
-	nuo.mutation.ResetScienceStroke()
-	nuo.mutation.SetScienceStroke(i)
+// SetIsNameScience sets the "is_name_science" field.
+func (nuo *NCharacterUpdateOne) SetIsNameScience(b bool) *NCharacterUpdateOne {
+	nuo.mutation.SetIsNameScience(b)
 	return nuo
 }
 
-// AddScienceStroke adds i to the "science_stroke" field.
-func (nuo *NCharacterUpdateOne) AddScienceStroke(i int) *NCharacterUpdateOne {
-	nuo.mutation.AddScienceStroke(i)
+// SetNameScienceChStroke sets the "name_science_ch_stroke" field.
+func (nuo *NCharacterUpdateOne) SetNameScienceChStroke(i int) *NCharacterUpdateOne {
+	nuo.mutation.ResetNameScienceChStroke()
+	nuo.mutation.SetNameScienceChStroke(i)
+	return nuo
+}
+
+// AddNameScienceChStroke adds i to the "name_science_ch_stroke" field.
+func (nuo *NCharacterUpdateOne) AddNameScienceChStroke(i int) *NCharacterUpdateOne {
+	nuo.mutation.AddNameScienceChStroke(i)
+	return nuo
+}
+
+// SetIsRegular sets the "is_regular" field.
+func (nuo *NCharacterUpdateOne) SetIsRegular(b bool) *NCharacterUpdateOne {
+	nuo.mutation.SetIsRegular(b)
 	return nuo
 }
 
@@ -396,12 +421,6 @@ func (nuo *NCharacterUpdateOne) SetWuXing(s string) *NCharacterUpdateOne {
 // SetLucky sets the "lucky" field.
 func (nuo *NCharacterUpdateOne) SetLucky(s string) *NCharacterUpdateOne {
 	nuo.mutation.SetLucky(s)
-	return nuo
-}
-
-// SetRegular sets the "regular" field.
-func (nuo *NCharacterUpdateOne) SetRegular(b bool) *NCharacterUpdateOne {
-	nuo.mutation.SetRegular(b)
 	return nuo
 }
 
@@ -457,7 +476,7 @@ func (nuo *NCharacterUpdateOne) ExecX(ctx context.Context) {
 }
 
 func (nuo *NCharacterUpdateOne) sqlSave(ctx context.Context) (_node *NCharacter, err error) {
-	_spec := sqlgraph.NewUpdateSpec(ncharacter.Table, ncharacter.Columns, sqlgraph.NewFieldSpec(ncharacter.FieldID, field.TypeString))
+	_spec := sqlgraph.NewUpdateSpec(ncharacter.Table, ncharacter.Columns, sqlgraph.NewFieldSpec(ncharacter.FieldID, field.TypeInt32))
 	id, ok := nuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "NCharacter.id" for update`)}
@@ -485,14 +504,20 @@ func (nuo *NCharacterUpdateOne) sqlSave(ctx context.Context) (_node *NCharacter,
 	if value, ok := nuo.mutation.PinYin(); ok {
 		_spec.SetField(ncharacter.FieldPinYin, field.TypeString, value)
 	}
-	if value, ok := nuo.mutation.ChID(); ok {
-		_spec.SetField(ncharacter.FieldChID, field.TypeInt64, value)
-	}
-	if value, ok := nuo.mutation.AddedChID(); ok {
-		_spec.AddField(ncharacter.FieldChID, field.TypeInt64, value)
-	}
 	if value, ok := nuo.mutation.Ch(); ok {
 		_spec.SetField(ncharacter.FieldCh, field.TypeString, value)
+	}
+	if value, ok := nuo.mutation.ChStroke(); ok {
+		_spec.SetField(ncharacter.FieldChStroke, field.TypeInt, value)
+	}
+	if value, ok := nuo.mutation.AddedChStroke(); ok {
+		_spec.AddField(ncharacter.FieldChStroke, field.TypeInt, value)
+	}
+	if value, ok := nuo.mutation.ChType(); ok {
+		_spec.SetField(ncharacter.FieldChType, field.TypeInt, value)
+	}
+	if value, ok := nuo.mutation.AddedChType(); ok {
+		_spec.AddField(ncharacter.FieldChType, field.TypeInt, value)
 	}
 	if value, ok := nuo.mutation.Radical(); ok {
 		_spec.SetField(ncharacter.FieldRadical, field.TypeString, value)
@@ -503,44 +528,40 @@ func (nuo *NCharacterUpdateOne) sqlSave(ctx context.Context) (_node *NCharacter,
 	if value, ok := nuo.mutation.AddedRadicalStroke(); ok {
 		_spec.AddField(ncharacter.FieldRadicalStroke, field.TypeInt, value)
 	}
-	if value, ok := nuo.mutation.TotalStroke(); ok {
-		_spec.SetField(ncharacter.FieldTotalStroke, field.TypeInt, value)
-	}
-	if value, ok := nuo.mutation.AddedTotalStroke(); ok {
-		_spec.AddField(ncharacter.FieldTotalStroke, field.TypeInt, value)
-	}
-	if value, ok := nuo.mutation.IsKangXi(); ok {
-		_spec.SetField(ncharacter.FieldIsKangXi, field.TypeBool, value)
+	if value, ok := nuo.mutation.Relate(); ok {
+		_spec.SetField(ncharacter.FieldRelate, field.TypeString, value)
 	}
 	if value, ok := nuo.mutation.RelateKangXi(); ok {
 		_spec.SetField(ncharacter.FieldRelateKangXi, field.TypeString, value)
-	}
-	if value, ok := nuo.mutation.RelateSimple(); ok {
-		_spec.SetField(ncharacter.FieldRelateSimple, field.TypeString, value)
 	}
 	if value, ok := nuo.mutation.RelateTraditional(); ok {
 		_spec.SetField(ncharacter.FieldRelateTraditional, field.TypeString, value)
 	}
 	if value, ok := nuo.mutation.RelateVariant(); ok {
-		_spec.SetField(ncharacter.FieldRelateVariant, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldRelateVariant, field.TypeJSON, value)
 	}
-	if value, ok := nuo.mutation.NameScience(); ok {
-		_spec.SetField(ncharacter.FieldNameScience, field.TypeBool, value)
+	if value, ok := nuo.mutation.AppendedRelateVariant(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, ncharacter.FieldRelateVariant, value)
+		})
 	}
-	if value, ok := nuo.mutation.ScienceStroke(); ok {
-		_spec.SetField(ncharacter.FieldScienceStroke, field.TypeInt, value)
+	if value, ok := nuo.mutation.IsNameScience(); ok {
+		_spec.SetField(ncharacter.FieldIsNameScience, field.TypeBool, value)
 	}
-	if value, ok := nuo.mutation.AddedScienceStroke(); ok {
-		_spec.AddField(ncharacter.FieldScienceStroke, field.TypeInt, value)
+	if value, ok := nuo.mutation.NameScienceChStroke(); ok {
+		_spec.SetField(ncharacter.FieldNameScienceChStroke, field.TypeInt, value)
+	}
+	if value, ok := nuo.mutation.AddedNameScienceChStroke(); ok {
+		_spec.AddField(ncharacter.FieldNameScienceChStroke, field.TypeInt, value)
+	}
+	if value, ok := nuo.mutation.IsRegular(); ok {
+		_spec.SetField(ncharacter.FieldIsRegular, field.TypeBool, value)
 	}
 	if value, ok := nuo.mutation.WuXing(); ok {
 		_spec.SetField(ncharacter.FieldWuXing, field.TypeString, value)
 	}
 	if value, ok := nuo.mutation.Lucky(); ok {
 		_spec.SetField(ncharacter.FieldLucky, field.TypeString, value)
-	}
-	if value, ok := nuo.mutation.Regular(); ok {
-		_spec.SetField(ncharacter.FieldRegular, field.TypeBool, value)
 	}
 	if value, ok := nuo.mutation.Comment(); ok {
 		_spec.SetField(ncharacter.FieldComment, field.TypeString, value)

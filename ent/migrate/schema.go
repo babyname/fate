@@ -43,23 +43,22 @@ var (
 	}
 	// NCharacterColumns holds the columns for the "n_character" table.
 	NCharacterColumns = []*schema.Column{
-		{Name: "hash", Type: field.TypeString},
+		{Name: "id", Type: field.TypeInt32, Increment: true},
 		{Name: "pin_yin", Type: field.TypeString},
-		{Name: "ch_id", Type: field.TypeInt64},
 		{Name: "ch", Type: field.TypeString},
+		{Name: "ch_stroke", Type: field.TypeInt},
+		{Name: "ch_type", Type: field.TypeInt, Default: 0},
 		{Name: "radical", Type: field.TypeString},
 		{Name: "radical_stroke", Type: field.TypeInt},
-		{Name: "total_stroke", Type: field.TypeInt},
-		{Name: "is_kang_xi", Type: field.TypeBool},
+		{Name: "relate", Type: field.TypeString},
 		{Name: "relate_kang_xi", Type: field.TypeString},
-		{Name: "relate_simple", Type: field.TypeString},
 		{Name: "relate_traditional", Type: field.TypeString},
-		{Name: "relate_variant", Type: field.TypeString},
-		{Name: "name_science", Type: field.TypeBool},
-		{Name: "science_stroke", Type: field.TypeInt},
+		{Name: "relate_variant", Type: field.TypeJSON},
+		{Name: "is_name_science", Type: field.TypeBool},
+		{Name: "name_science_ch_stroke", Type: field.TypeInt},
+		{Name: "is_regular", Type: field.TypeBool},
 		{Name: "wu_xing", Type: field.TypeString},
 		{Name: "lucky", Type: field.TypeString},
-		{Name: "regular", Type: field.TypeBool},
 		{Name: "comment", Type: field.TypeString},
 	}
 	// NCharacterTable holds the schema information for the "n_character" table.

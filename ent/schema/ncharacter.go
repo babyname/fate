@@ -11,35 +11,32 @@ type NCharacter struct {
 	ent.Schema
 }
 
+const (
+	CharTypeUnknown     = 0x00
+	CharTypeSimple      = 0x01
+	CharTypeTraditional = 0x02
+	CharTypeKangXi      = 0x04
+	CharTypeVariant     = 0x08
+)
+
 func (NCharacter) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").StorageKey("hash"),
+		field.Int32("id"), //rune code
 		field.String("pin_yin"),
-		field.Int64("ch_id"),
 		field.String("ch"),
+		field.Int("ch_stroke"),
+		field.Int("ch_type").Default(CharTypeUnknown),
 		field.String("radical"),
 		field.Int("radical_stroke"),
-		field.Int("total_stroke"),
-		field.Bool("is_kang_xi"),
+		field.String("relate"), // relate simple chinese
 		field.String("relate_kang_xi"),
-		field.String("relate_simple"),
 		field.String("relate_traditional"),
-		field.String("relate_variant"),
-		//field.String("kang_xi"),
-		//field.Int("kang_xi_stroke"),
-		//field.String("simple_radical"),
-		//field.Int("simple_radical_stroke"),
-		//field.Int("simple_total_stroke"),
-		//field.String("traditional_radical"),
-		//field.Int("traditional_radical_stroke"),
-		//field.Int("traditional_total_stroke"),
-		field.Bool("name_science"),
-		field.Int("science_stroke"),
+		field.Strings("relate_variant"), //relate other variant characters
+		field.Bool("is_name_science"),
+		field.Int("name_science_ch_stroke"),
+		field.Bool("is_regular"),
 		field.String("wu_xing"),
 		field.String("lucky"),
-		field.Bool("regular"),
-		//field.String("traditional_character"),
-		//field.String("variant_character"),
 		field.String("comment"),
 	}
 }

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -28,15 +27,29 @@ func (nc *NCharacterCreate) SetPinYin(s string) *NCharacterCreate {
 	return nc
 }
 
-// SetChID sets the "ch_id" field.
-func (nc *NCharacterCreate) SetChID(i int64) *NCharacterCreate {
-	nc.mutation.SetChID(i)
-	return nc
-}
-
 // SetCh sets the "ch" field.
 func (nc *NCharacterCreate) SetCh(s string) *NCharacterCreate {
 	nc.mutation.SetCh(s)
+	return nc
+}
+
+// SetChStroke sets the "ch_stroke" field.
+func (nc *NCharacterCreate) SetChStroke(i int) *NCharacterCreate {
+	nc.mutation.SetChStroke(i)
+	return nc
+}
+
+// SetChType sets the "ch_type" field.
+func (nc *NCharacterCreate) SetChType(i int) *NCharacterCreate {
+	nc.mutation.SetChType(i)
+	return nc
+}
+
+// SetNillableChType sets the "ch_type" field if the given value is not nil.
+func (nc *NCharacterCreate) SetNillableChType(i *int) *NCharacterCreate {
+	if i != nil {
+		nc.SetChType(*i)
+	}
 	return nc
 }
 
@@ -52,27 +65,15 @@ func (nc *NCharacterCreate) SetRadicalStroke(i int) *NCharacterCreate {
 	return nc
 }
 
-// SetTotalStroke sets the "total_stroke" field.
-func (nc *NCharacterCreate) SetTotalStroke(i int) *NCharacterCreate {
-	nc.mutation.SetTotalStroke(i)
-	return nc
-}
-
-// SetIsKangXi sets the "is_kang_xi" field.
-func (nc *NCharacterCreate) SetIsKangXi(b bool) *NCharacterCreate {
-	nc.mutation.SetIsKangXi(b)
+// SetRelate sets the "relate" field.
+func (nc *NCharacterCreate) SetRelate(s string) *NCharacterCreate {
+	nc.mutation.SetRelate(s)
 	return nc
 }
 
 // SetRelateKangXi sets the "relate_kang_xi" field.
 func (nc *NCharacterCreate) SetRelateKangXi(s string) *NCharacterCreate {
 	nc.mutation.SetRelateKangXi(s)
-	return nc
-}
-
-// SetRelateSimple sets the "relate_simple" field.
-func (nc *NCharacterCreate) SetRelateSimple(s string) *NCharacterCreate {
-	nc.mutation.SetRelateSimple(s)
 	return nc
 }
 
@@ -83,20 +84,26 @@ func (nc *NCharacterCreate) SetRelateTraditional(s string) *NCharacterCreate {
 }
 
 // SetRelateVariant sets the "relate_variant" field.
-func (nc *NCharacterCreate) SetRelateVariant(s string) *NCharacterCreate {
+func (nc *NCharacterCreate) SetRelateVariant(s []string) *NCharacterCreate {
 	nc.mutation.SetRelateVariant(s)
 	return nc
 }
 
-// SetNameScience sets the "name_science" field.
-func (nc *NCharacterCreate) SetNameScience(b bool) *NCharacterCreate {
-	nc.mutation.SetNameScience(b)
+// SetIsNameScience sets the "is_name_science" field.
+func (nc *NCharacterCreate) SetIsNameScience(b bool) *NCharacterCreate {
+	nc.mutation.SetIsNameScience(b)
 	return nc
 }
 
-// SetScienceStroke sets the "science_stroke" field.
-func (nc *NCharacterCreate) SetScienceStroke(i int) *NCharacterCreate {
-	nc.mutation.SetScienceStroke(i)
+// SetNameScienceChStroke sets the "name_science_ch_stroke" field.
+func (nc *NCharacterCreate) SetNameScienceChStroke(i int) *NCharacterCreate {
+	nc.mutation.SetNameScienceChStroke(i)
+	return nc
+}
+
+// SetIsRegular sets the "is_regular" field.
+func (nc *NCharacterCreate) SetIsRegular(b bool) *NCharacterCreate {
+	nc.mutation.SetIsRegular(b)
 	return nc
 }
 
@@ -112,12 +119,6 @@ func (nc *NCharacterCreate) SetLucky(s string) *NCharacterCreate {
 	return nc
 }
 
-// SetRegular sets the "regular" field.
-func (nc *NCharacterCreate) SetRegular(b bool) *NCharacterCreate {
-	nc.mutation.SetRegular(b)
-	return nc
-}
-
 // SetComment sets the "comment" field.
 func (nc *NCharacterCreate) SetComment(s string) *NCharacterCreate {
 	nc.mutation.SetComment(s)
@@ -125,8 +126,8 @@ func (nc *NCharacterCreate) SetComment(s string) *NCharacterCreate {
 }
 
 // SetID sets the "id" field.
-func (nc *NCharacterCreate) SetID(s string) *NCharacterCreate {
-	nc.mutation.SetID(s)
+func (nc *NCharacterCreate) SetID(i int32) *NCharacterCreate {
+	nc.mutation.SetID(i)
 	return nc
 }
 
@@ -137,6 +138,7 @@ func (nc *NCharacterCreate) Mutation() *NCharacterMutation {
 
 // Save creates the NCharacter in the database.
 func (nc *NCharacterCreate) Save(ctx context.Context) (*NCharacter, error) {
+	nc.defaults()
 	return withHooks(ctx, nc.sqlSave, nc.mutation, nc.hooks)
 }
 
@@ -162,16 +164,27 @@ func (nc *NCharacterCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (nc *NCharacterCreate) defaults() {
+	if _, ok := nc.mutation.ChType(); !ok {
+		v := ncharacter.DefaultChType
+		nc.mutation.SetChType(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (nc *NCharacterCreate) check() error {
 	if _, ok := nc.mutation.PinYin(); !ok {
 		return &ValidationError{Name: "pin_yin", err: errors.New(`ent: missing required field "NCharacter.pin_yin"`)}
 	}
-	if _, ok := nc.mutation.ChID(); !ok {
-		return &ValidationError{Name: "ch_id", err: errors.New(`ent: missing required field "NCharacter.ch_id"`)}
-	}
 	if _, ok := nc.mutation.Ch(); !ok {
 		return &ValidationError{Name: "ch", err: errors.New(`ent: missing required field "NCharacter.ch"`)}
+	}
+	if _, ok := nc.mutation.ChStroke(); !ok {
+		return &ValidationError{Name: "ch_stroke", err: errors.New(`ent: missing required field "NCharacter.ch_stroke"`)}
+	}
+	if _, ok := nc.mutation.ChType(); !ok {
+		return &ValidationError{Name: "ch_type", err: errors.New(`ent: missing required field "NCharacter.ch_type"`)}
 	}
 	if _, ok := nc.mutation.Radical(); !ok {
 		return &ValidationError{Name: "radical", err: errors.New(`ent: missing required field "NCharacter.radical"`)}
@@ -179,17 +192,11 @@ func (nc *NCharacterCreate) check() error {
 	if _, ok := nc.mutation.RadicalStroke(); !ok {
 		return &ValidationError{Name: "radical_stroke", err: errors.New(`ent: missing required field "NCharacter.radical_stroke"`)}
 	}
-	if _, ok := nc.mutation.TotalStroke(); !ok {
-		return &ValidationError{Name: "total_stroke", err: errors.New(`ent: missing required field "NCharacter.total_stroke"`)}
-	}
-	if _, ok := nc.mutation.IsKangXi(); !ok {
-		return &ValidationError{Name: "is_kang_xi", err: errors.New(`ent: missing required field "NCharacter.is_kang_xi"`)}
+	if _, ok := nc.mutation.Relate(); !ok {
+		return &ValidationError{Name: "relate", err: errors.New(`ent: missing required field "NCharacter.relate"`)}
 	}
 	if _, ok := nc.mutation.RelateKangXi(); !ok {
 		return &ValidationError{Name: "relate_kang_xi", err: errors.New(`ent: missing required field "NCharacter.relate_kang_xi"`)}
-	}
-	if _, ok := nc.mutation.RelateSimple(); !ok {
-		return &ValidationError{Name: "relate_simple", err: errors.New(`ent: missing required field "NCharacter.relate_simple"`)}
 	}
 	if _, ok := nc.mutation.RelateTraditional(); !ok {
 		return &ValidationError{Name: "relate_traditional", err: errors.New(`ent: missing required field "NCharacter.relate_traditional"`)}
@@ -197,20 +204,20 @@ func (nc *NCharacterCreate) check() error {
 	if _, ok := nc.mutation.RelateVariant(); !ok {
 		return &ValidationError{Name: "relate_variant", err: errors.New(`ent: missing required field "NCharacter.relate_variant"`)}
 	}
-	if _, ok := nc.mutation.NameScience(); !ok {
-		return &ValidationError{Name: "name_science", err: errors.New(`ent: missing required field "NCharacter.name_science"`)}
+	if _, ok := nc.mutation.IsNameScience(); !ok {
+		return &ValidationError{Name: "is_name_science", err: errors.New(`ent: missing required field "NCharacter.is_name_science"`)}
 	}
-	if _, ok := nc.mutation.ScienceStroke(); !ok {
-		return &ValidationError{Name: "science_stroke", err: errors.New(`ent: missing required field "NCharacter.science_stroke"`)}
+	if _, ok := nc.mutation.NameScienceChStroke(); !ok {
+		return &ValidationError{Name: "name_science_ch_stroke", err: errors.New(`ent: missing required field "NCharacter.name_science_ch_stroke"`)}
+	}
+	if _, ok := nc.mutation.IsRegular(); !ok {
+		return &ValidationError{Name: "is_regular", err: errors.New(`ent: missing required field "NCharacter.is_regular"`)}
 	}
 	if _, ok := nc.mutation.WuXing(); !ok {
 		return &ValidationError{Name: "wu_xing", err: errors.New(`ent: missing required field "NCharacter.wu_xing"`)}
 	}
 	if _, ok := nc.mutation.Lucky(); !ok {
 		return &ValidationError{Name: "lucky", err: errors.New(`ent: missing required field "NCharacter.lucky"`)}
-	}
-	if _, ok := nc.mutation.Regular(); !ok {
-		return &ValidationError{Name: "regular", err: errors.New(`ent: missing required field "NCharacter.regular"`)}
 	}
 	if _, ok := nc.mutation.Comment(); !ok {
 		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required field "NCharacter.comment"`)}
@@ -229,12 +236,9 @@ func (nc *NCharacterCreate) sqlSave(ctx context.Context) (*NCharacter, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected NCharacter.ID type: %T", _spec.ID.Value)
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int32(id)
 	}
 	nc.mutation.id = &_node.ID
 	nc.mutation.done = true
@@ -244,7 +248,7 @@ func (nc *NCharacterCreate) sqlSave(ctx context.Context) (*NCharacter, error) {
 func (nc *NCharacterCreate) createSpec() (*NCharacter, *sqlgraph.CreateSpec) {
 	var (
 		_node = &NCharacter{config: nc.config}
-		_spec = sqlgraph.NewCreateSpec(ncharacter.Table, sqlgraph.NewFieldSpec(ncharacter.FieldID, field.TypeString))
+		_spec = sqlgraph.NewCreateSpec(ncharacter.Table, sqlgraph.NewFieldSpec(ncharacter.FieldID, field.TypeInt32))
 	)
 	_spec.OnConflict = nc.conflict
 	if id, ok := nc.mutation.ID(); ok {
@@ -255,13 +259,17 @@ func (nc *NCharacterCreate) createSpec() (*NCharacter, *sqlgraph.CreateSpec) {
 		_spec.SetField(ncharacter.FieldPinYin, field.TypeString, value)
 		_node.PinYin = value
 	}
-	if value, ok := nc.mutation.ChID(); ok {
-		_spec.SetField(ncharacter.FieldChID, field.TypeInt64, value)
-		_node.ChID = value
-	}
 	if value, ok := nc.mutation.Ch(); ok {
 		_spec.SetField(ncharacter.FieldCh, field.TypeString, value)
 		_node.Ch = value
+	}
+	if value, ok := nc.mutation.ChStroke(); ok {
+		_spec.SetField(ncharacter.FieldChStroke, field.TypeInt, value)
+		_node.ChStroke = value
+	}
+	if value, ok := nc.mutation.ChType(); ok {
+		_spec.SetField(ncharacter.FieldChType, field.TypeInt, value)
+		_node.ChType = value
 	}
 	if value, ok := nc.mutation.Radical(); ok {
 		_spec.SetField(ncharacter.FieldRadical, field.TypeString, value)
@@ -271,37 +279,33 @@ func (nc *NCharacterCreate) createSpec() (*NCharacter, *sqlgraph.CreateSpec) {
 		_spec.SetField(ncharacter.FieldRadicalStroke, field.TypeInt, value)
 		_node.RadicalStroke = value
 	}
-	if value, ok := nc.mutation.TotalStroke(); ok {
-		_spec.SetField(ncharacter.FieldTotalStroke, field.TypeInt, value)
-		_node.TotalStroke = value
-	}
-	if value, ok := nc.mutation.IsKangXi(); ok {
-		_spec.SetField(ncharacter.FieldIsKangXi, field.TypeBool, value)
-		_node.IsKangXi = value
+	if value, ok := nc.mutation.Relate(); ok {
+		_spec.SetField(ncharacter.FieldRelate, field.TypeString, value)
+		_node.Relate = value
 	}
 	if value, ok := nc.mutation.RelateKangXi(); ok {
 		_spec.SetField(ncharacter.FieldRelateKangXi, field.TypeString, value)
 		_node.RelateKangXi = value
-	}
-	if value, ok := nc.mutation.RelateSimple(); ok {
-		_spec.SetField(ncharacter.FieldRelateSimple, field.TypeString, value)
-		_node.RelateSimple = value
 	}
 	if value, ok := nc.mutation.RelateTraditional(); ok {
 		_spec.SetField(ncharacter.FieldRelateTraditional, field.TypeString, value)
 		_node.RelateTraditional = value
 	}
 	if value, ok := nc.mutation.RelateVariant(); ok {
-		_spec.SetField(ncharacter.FieldRelateVariant, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldRelateVariant, field.TypeJSON, value)
 		_node.RelateVariant = value
 	}
-	if value, ok := nc.mutation.NameScience(); ok {
-		_spec.SetField(ncharacter.FieldNameScience, field.TypeBool, value)
-		_node.NameScience = value
+	if value, ok := nc.mutation.IsNameScience(); ok {
+		_spec.SetField(ncharacter.FieldIsNameScience, field.TypeBool, value)
+		_node.IsNameScience = value
 	}
-	if value, ok := nc.mutation.ScienceStroke(); ok {
-		_spec.SetField(ncharacter.FieldScienceStroke, field.TypeInt, value)
-		_node.ScienceStroke = value
+	if value, ok := nc.mutation.NameScienceChStroke(); ok {
+		_spec.SetField(ncharacter.FieldNameScienceChStroke, field.TypeInt, value)
+		_node.NameScienceChStroke = value
+	}
+	if value, ok := nc.mutation.IsRegular(); ok {
+		_spec.SetField(ncharacter.FieldIsRegular, field.TypeBool, value)
+		_node.IsRegular = value
 	}
 	if value, ok := nc.mutation.WuXing(); ok {
 		_spec.SetField(ncharacter.FieldWuXing, field.TypeString, value)
@@ -310,10 +314,6 @@ func (nc *NCharacterCreate) createSpec() (*NCharacter, *sqlgraph.CreateSpec) {
 	if value, ok := nc.mutation.Lucky(); ok {
 		_spec.SetField(ncharacter.FieldLucky, field.TypeString, value)
 		_node.Lucky = value
-	}
-	if value, ok := nc.mutation.Regular(); ok {
-		_spec.SetField(ncharacter.FieldRegular, field.TypeBool, value)
-		_node.Regular = value
 	}
 	if value, ok := nc.mutation.Comment(); ok {
 		_spec.SetField(ncharacter.FieldComment, field.TypeString, value)
@@ -383,24 +383,6 @@ func (u *NCharacterUpsert) UpdatePinYin() *NCharacterUpsert {
 	return u
 }
 
-// SetChID sets the "ch_id" field.
-func (u *NCharacterUpsert) SetChID(v int64) *NCharacterUpsert {
-	u.Set(ncharacter.FieldChID, v)
-	return u
-}
-
-// UpdateChID sets the "ch_id" field to the value that was provided on create.
-func (u *NCharacterUpsert) UpdateChID() *NCharacterUpsert {
-	u.SetExcluded(ncharacter.FieldChID)
-	return u
-}
-
-// AddChID adds v to the "ch_id" field.
-func (u *NCharacterUpsert) AddChID(v int64) *NCharacterUpsert {
-	u.Add(ncharacter.FieldChID, v)
-	return u
-}
-
 // SetCh sets the "ch" field.
 func (u *NCharacterUpsert) SetCh(v string) *NCharacterUpsert {
 	u.Set(ncharacter.FieldCh, v)
@@ -410,6 +392,42 @@ func (u *NCharacterUpsert) SetCh(v string) *NCharacterUpsert {
 // UpdateCh sets the "ch" field to the value that was provided on create.
 func (u *NCharacterUpsert) UpdateCh() *NCharacterUpsert {
 	u.SetExcluded(ncharacter.FieldCh)
+	return u
+}
+
+// SetChStroke sets the "ch_stroke" field.
+func (u *NCharacterUpsert) SetChStroke(v int) *NCharacterUpsert {
+	u.Set(ncharacter.FieldChStroke, v)
+	return u
+}
+
+// UpdateChStroke sets the "ch_stroke" field to the value that was provided on create.
+func (u *NCharacterUpsert) UpdateChStroke() *NCharacterUpsert {
+	u.SetExcluded(ncharacter.FieldChStroke)
+	return u
+}
+
+// AddChStroke adds v to the "ch_stroke" field.
+func (u *NCharacterUpsert) AddChStroke(v int) *NCharacterUpsert {
+	u.Add(ncharacter.FieldChStroke, v)
+	return u
+}
+
+// SetChType sets the "ch_type" field.
+func (u *NCharacterUpsert) SetChType(v int) *NCharacterUpsert {
+	u.Set(ncharacter.FieldChType, v)
+	return u
+}
+
+// UpdateChType sets the "ch_type" field to the value that was provided on create.
+func (u *NCharacterUpsert) UpdateChType() *NCharacterUpsert {
+	u.SetExcluded(ncharacter.FieldChType)
+	return u
+}
+
+// AddChType adds v to the "ch_type" field.
+func (u *NCharacterUpsert) AddChType(v int) *NCharacterUpsert {
+	u.Add(ncharacter.FieldChType, v)
 	return u
 }
 
@@ -443,33 +461,15 @@ func (u *NCharacterUpsert) AddRadicalStroke(v int) *NCharacterUpsert {
 	return u
 }
 
-// SetTotalStroke sets the "total_stroke" field.
-func (u *NCharacterUpsert) SetTotalStroke(v int) *NCharacterUpsert {
-	u.Set(ncharacter.FieldTotalStroke, v)
+// SetRelate sets the "relate" field.
+func (u *NCharacterUpsert) SetRelate(v string) *NCharacterUpsert {
+	u.Set(ncharacter.FieldRelate, v)
 	return u
 }
 
-// UpdateTotalStroke sets the "total_stroke" field to the value that was provided on create.
-func (u *NCharacterUpsert) UpdateTotalStroke() *NCharacterUpsert {
-	u.SetExcluded(ncharacter.FieldTotalStroke)
-	return u
-}
-
-// AddTotalStroke adds v to the "total_stroke" field.
-func (u *NCharacterUpsert) AddTotalStroke(v int) *NCharacterUpsert {
-	u.Add(ncharacter.FieldTotalStroke, v)
-	return u
-}
-
-// SetIsKangXi sets the "is_kang_xi" field.
-func (u *NCharacterUpsert) SetIsKangXi(v bool) *NCharacterUpsert {
-	u.Set(ncharacter.FieldIsKangXi, v)
-	return u
-}
-
-// UpdateIsKangXi sets the "is_kang_xi" field to the value that was provided on create.
-func (u *NCharacterUpsert) UpdateIsKangXi() *NCharacterUpsert {
-	u.SetExcluded(ncharacter.FieldIsKangXi)
+// UpdateRelate sets the "relate" field to the value that was provided on create.
+func (u *NCharacterUpsert) UpdateRelate() *NCharacterUpsert {
+	u.SetExcluded(ncharacter.FieldRelate)
 	return u
 }
 
@@ -482,18 +482,6 @@ func (u *NCharacterUpsert) SetRelateKangXi(v string) *NCharacterUpsert {
 // UpdateRelateKangXi sets the "relate_kang_xi" field to the value that was provided on create.
 func (u *NCharacterUpsert) UpdateRelateKangXi() *NCharacterUpsert {
 	u.SetExcluded(ncharacter.FieldRelateKangXi)
-	return u
-}
-
-// SetRelateSimple sets the "relate_simple" field.
-func (u *NCharacterUpsert) SetRelateSimple(v string) *NCharacterUpsert {
-	u.Set(ncharacter.FieldRelateSimple, v)
-	return u
-}
-
-// UpdateRelateSimple sets the "relate_simple" field to the value that was provided on create.
-func (u *NCharacterUpsert) UpdateRelateSimple() *NCharacterUpsert {
-	u.SetExcluded(ncharacter.FieldRelateSimple)
 	return u
 }
 
@@ -510,7 +498,7 @@ func (u *NCharacterUpsert) UpdateRelateTraditional() *NCharacterUpsert {
 }
 
 // SetRelateVariant sets the "relate_variant" field.
-func (u *NCharacterUpsert) SetRelateVariant(v string) *NCharacterUpsert {
+func (u *NCharacterUpsert) SetRelateVariant(v []string) *NCharacterUpsert {
 	u.Set(ncharacter.FieldRelateVariant, v)
 	return u
 }
@@ -521,33 +509,45 @@ func (u *NCharacterUpsert) UpdateRelateVariant() *NCharacterUpsert {
 	return u
 }
 
-// SetNameScience sets the "name_science" field.
-func (u *NCharacterUpsert) SetNameScience(v bool) *NCharacterUpsert {
-	u.Set(ncharacter.FieldNameScience, v)
+// SetIsNameScience sets the "is_name_science" field.
+func (u *NCharacterUpsert) SetIsNameScience(v bool) *NCharacterUpsert {
+	u.Set(ncharacter.FieldIsNameScience, v)
 	return u
 }
 
-// UpdateNameScience sets the "name_science" field to the value that was provided on create.
-func (u *NCharacterUpsert) UpdateNameScience() *NCharacterUpsert {
-	u.SetExcluded(ncharacter.FieldNameScience)
+// UpdateIsNameScience sets the "is_name_science" field to the value that was provided on create.
+func (u *NCharacterUpsert) UpdateIsNameScience() *NCharacterUpsert {
+	u.SetExcluded(ncharacter.FieldIsNameScience)
 	return u
 }
 
-// SetScienceStroke sets the "science_stroke" field.
-func (u *NCharacterUpsert) SetScienceStroke(v int) *NCharacterUpsert {
-	u.Set(ncharacter.FieldScienceStroke, v)
+// SetNameScienceChStroke sets the "name_science_ch_stroke" field.
+func (u *NCharacterUpsert) SetNameScienceChStroke(v int) *NCharacterUpsert {
+	u.Set(ncharacter.FieldNameScienceChStroke, v)
 	return u
 }
 
-// UpdateScienceStroke sets the "science_stroke" field to the value that was provided on create.
-func (u *NCharacterUpsert) UpdateScienceStroke() *NCharacterUpsert {
-	u.SetExcluded(ncharacter.FieldScienceStroke)
+// UpdateNameScienceChStroke sets the "name_science_ch_stroke" field to the value that was provided on create.
+func (u *NCharacterUpsert) UpdateNameScienceChStroke() *NCharacterUpsert {
+	u.SetExcluded(ncharacter.FieldNameScienceChStroke)
 	return u
 }
 
-// AddScienceStroke adds v to the "science_stroke" field.
-func (u *NCharacterUpsert) AddScienceStroke(v int) *NCharacterUpsert {
-	u.Add(ncharacter.FieldScienceStroke, v)
+// AddNameScienceChStroke adds v to the "name_science_ch_stroke" field.
+func (u *NCharacterUpsert) AddNameScienceChStroke(v int) *NCharacterUpsert {
+	u.Add(ncharacter.FieldNameScienceChStroke, v)
+	return u
+}
+
+// SetIsRegular sets the "is_regular" field.
+func (u *NCharacterUpsert) SetIsRegular(v bool) *NCharacterUpsert {
+	u.Set(ncharacter.FieldIsRegular, v)
+	return u
+}
+
+// UpdateIsRegular sets the "is_regular" field to the value that was provided on create.
+func (u *NCharacterUpsert) UpdateIsRegular() *NCharacterUpsert {
+	u.SetExcluded(ncharacter.FieldIsRegular)
 	return u
 }
 
@@ -572,18 +572,6 @@ func (u *NCharacterUpsert) SetLucky(v string) *NCharacterUpsert {
 // UpdateLucky sets the "lucky" field to the value that was provided on create.
 func (u *NCharacterUpsert) UpdateLucky() *NCharacterUpsert {
 	u.SetExcluded(ncharacter.FieldLucky)
-	return u
-}
-
-// SetRegular sets the "regular" field.
-func (u *NCharacterUpsert) SetRegular(v bool) *NCharacterUpsert {
-	u.Set(ncharacter.FieldRegular, v)
-	return u
-}
-
-// UpdateRegular sets the "regular" field to the value that was provided on create.
-func (u *NCharacterUpsert) UpdateRegular() *NCharacterUpsert {
-	u.SetExcluded(ncharacter.FieldRegular)
 	return u
 }
 
@@ -661,27 +649,6 @@ func (u *NCharacterUpsertOne) UpdatePinYin() *NCharacterUpsertOne {
 	})
 }
 
-// SetChID sets the "ch_id" field.
-func (u *NCharacterUpsertOne) SetChID(v int64) *NCharacterUpsertOne {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.SetChID(v)
-	})
-}
-
-// AddChID adds v to the "ch_id" field.
-func (u *NCharacterUpsertOne) AddChID(v int64) *NCharacterUpsertOne {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.AddChID(v)
-	})
-}
-
-// UpdateChID sets the "ch_id" field to the value that was provided on create.
-func (u *NCharacterUpsertOne) UpdateChID() *NCharacterUpsertOne {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateChID()
-	})
-}
-
 // SetCh sets the "ch" field.
 func (u *NCharacterUpsertOne) SetCh(v string) *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
@@ -693,6 +660,48 @@ func (u *NCharacterUpsertOne) SetCh(v string) *NCharacterUpsertOne {
 func (u *NCharacterUpsertOne) UpdateCh() *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.UpdateCh()
+	})
+}
+
+// SetChStroke sets the "ch_stroke" field.
+func (u *NCharacterUpsertOne) SetChStroke(v int) *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.SetChStroke(v)
+	})
+}
+
+// AddChStroke adds v to the "ch_stroke" field.
+func (u *NCharacterUpsertOne) AddChStroke(v int) *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.AddChStroke(v)
+	})
+}
+
+// UpdateChStroke sets the "ch_stroke" field to the value that was provided on create.
+func (u *NCharacterUpsertOne) UpdateChStroke() *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.UpdateChStroke()
+	})
+}
+
+// SetChType sets the "ch_type" field.
+func (u *NCharacterUpsertOne) SetChType(v int) *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.SetChType(v)
+	})
+}
+
+// AddChType adds v to the "ch_type" field.
+func (u *NCharacterUpsertOne) AddChType(v int) *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.AddChType(v)
+	})
+}
+
+// UpdateChType sets the "ch_type" field to the value that was provided on create.
+func (u *NCharacterUpsertOne) UpdateChType() *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.UpdateChType()
 	})
 }
 
@@ -731,38 +740,17 @@ func (u *NCharacterUpsertOne) UpdateRadicalStroke() *NCharacterUpsertOne {
 	})
 }
 
-// SetTotalStroke sets the "total_stroke" field.
-func (u *NCharacterUpsertOne) SetTotalStroke(v int) *NCharacterUpsertOne {
+// SetRelate sets the "relate" field.
+func (u *NCharacterUpsertOne) SetRelate(v string) *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.SetTotalStroke(v)
+		s.SetRelate(v)
 	})
 }
 
-// AddTotalStroke adds v to the "total_stroke" field.
-func (u *NCharacterUpsertOne) AddTotalStroke(v int) *NCharacterUpsertOne {
+// UpdateRelate sets the "relate" field to the value that was provided on create.
+func (u *NCharacterUpsertOne) UpdateRelate() *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.AddTotalStroke(v)
-	})
-}
-
-// UpdateTotalStroke sets the "total_stroke" field to the value that was provided on create.
-func (u *NCharacterUpsertOne) UpdateTotalStroke() *NCharacterUpsertOne {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateTotalStroke()
-	})
-}
-
-// SetIsKangXi sets the "is_kang_xi" field.
-func (u *NCharacterUpsertOne) SetIsKangXi(v bool) *NCharacterUpsertOne {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.SetIsKangXi(v)
-	})
-}
-
-// UpdateIsKangXi sets the "is_kang_xi" field to the value that was provided on create.
-func (u *NCharacterUpsertOne) UpdateIsKangXi() *NCharacterUpsertOne {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateIsKangXi()
+		s.UpdateRelate()
 	})
 }
 
@@ -777,20 +765,6 @@ func (u *NCharacterUpsertOne) SetRelateKangXi(v string) *NCharacterUpsertOne {
 func (u *NCharacterUpsertOne) UpdateRelateKangXi() *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.UpdateRelateKangXi()
-	})
-}
-
-// SetRelateSimple sets the "relate_simple" field.
-func (u *NCharacterUpsertOne) SetRelateSimple(v string) *NCharacterUpsertOne {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.SetRelateSimple(v)
-	})
-}
-
-// UpdateRelateSimple sets the "relate_simple" field to the value that was provided on create.
-func (u *NCharacterUpsertOne) UpdateRelateSimple() *NCharacterUpsertOne {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateRelateSimple()
 	})
 }
 
@@ -809,7 +783,7 @@ func (u *NCharacterUpsertOne) UpdateRelateTraditional() *NCharacterUpsertOne {
 }
 
 // SetRelateVariant sets the "relate_variant" field.
-func (u *NCharacterUpsertOne) SetRelateVariant(v string) *NCharacterUpsertOne {
+func (u *NCharacterUpsertOne) SetRelateVariant(v []string) *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.SetRelateVariant(v)
 	})
@@ -822,38 +796,52 @@ func (u *NCharacterUpsertOne) UpdateRelateVariant() *NCharacterUpsertOne {
 	})
 }
 
-// SetNameScience sets the "name_science" field.
-func (u *NCharacterUpsertOne) SetNameScience(v bool) *NCharacterUpsertOne {
+// SetIsNameScience sets the "is_name_science" field.
+func (u *NCharacterUpsertOne) SetIsNameScience(v bool) *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.SetNameScience(v)
+		s.SetIsNameScience(v)
 	})
 }
 
-// UpdateNameScience sets the "name_science" field to the value that was provided on create.
-func (u *NCharacterUpsertOne) UpdateNameScience() *NCharacterUpsertOne {
+// UpdateIsNameScience sets the "is_name_science" field to the value that was provided on create.
+func (u *NCharacterUpsertOne) UpdateIsNameScience() *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateNameScience()
+		s.UpdateIsNameScience()
 	})
 }
 
-// SetScienceStroke sets the "science_stroke" field.
-func (u *NCharacterUpsertOne) SetScienceStroke(v int) *NCharacterUpsertOne {
+// SetNameScienceChStroke sets the "name_science_ch_stroke" field.
+func (u *NCharacterUpsertOne) SetNameScienceChStroke(v int) *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.SetScienceStroke(v)
+		s.SetNameScienceChStroke(v)
 	})
 }
 
-// AddScienceStroke adds v to the "science_stroke" field.
-func (u *NCharacterUpsertOne) AddScienceStroke(v int) *NCharacterUpsertOne {
+// AddNameScienceChStroke adds v to the "name_science_ch_stroke" field.
+func (u *NCharacterUpsertOne) AddNameScienceChStroke(v int) *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.AddScienceStroke(v)
+		s.AddNameScienceChStroke(v)
 	})
 }
 
-// UpdateScienceStroke sets the "science_stroke" field to the value that was provided on create.
-func (u *NCharacterUpsertOne) UpdateScienceStroke() *NCharacterUpsertOne {
+// UpdateNameScienceChStroke sets the "name_science_ch_stroke" field to the value that was provided on create.
+func (u *NCharacterUpsertOne) UpdateNameScienceChStroke() *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateScienceStroke()
+		s.UpdateNameScienceChStroke()
+	})
+}
+
+// SetIsRegular sets the "is_regular" field.
+func (u *NCharacterUpsertOne) SetIsRegular(v bool) *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.SetIsRegular(v)
+	})
+}
+
+// UpdateIsRegular sets the "is_regular" field to the value that was provided on create.
+func (u *NCharacterUpsertOne) UpdateIsRegular() *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.UpdateIsRegular()
 	})
 }
 
@@ -882,20 +870,6 @@ func (u *NCharacterUpsertOne) SetLucky(v string) *NCharacterUpsertOne {
 func (u *NCharacterUpsertOne) UpdateLucky() *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.UpdateLucky()
-	})
-}
-
-// SetRegular sets the "regular" field.
-func (u *NCharacterUpsertOne) SetRegular(v bool) *NCharacterUpsertOne {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.SetRegular(v)
-	})
-}
-
-// UpdateRegular sets the "regular" field to the value that was provided on create.
-func (u *NCharacterUpsertOne) UpdateRegular() *NCharacterUpsertOne {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateRegular()
 	})
 }
 
@@ -929,12 +903,7 @@ func (u *NCharacterUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *NCharacterUpsertOne) ID(ctx context.Context) (id string, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: NCharacterUpsertOne.ID is not supported by MySQL driver. Use NCharacterUpsertOne.Exec instead")
-	}
+func (u *NCharacterUpsertOne) ID(ctx context.Context) (id int32, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -943,7 +912,7 @@ func (u *NCharacterUpsertOne) ID(ctx context.Context) (id string, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *NCharacterUpsertOne) IDX(ctx context.Context) string {
+func (u *NCharacterUpsertOne) IDX(ctx context.Context) int32 {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -970,6 +939,7 @@ func (ncb *NCharacterCreateBulk) Save(ctx context.Context) ([]*NCharacter, error
 	for i := range ncb.builders {
 		func(i int, root context.Context) {
 			builder := ncb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*NCharacterMutation)
 				if !ok {
@@ -997,6 +967,10 @@ func (ncb *NCharacterCreateBulk) Save(ctx context.Context) ([]*NCharacter, error
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int32(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})
@@ -1141,27 +1115,6 @@ func (u *NCharacterUpsertBulk) UpdatePinYin() *NCharacterUpsertBulk {
 	})
 }
 
-// SetChID sets the "ch_id" field.
-func (u *NCharacterUpsertBulk) SetChID(v int64) *NCharacterUpsertBulk {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.SetChID(v)
-	})
-}
-
-// AddChID adds v to the "ch_id" field.
-func (u *NCharacterUpsertBulk) AddChID(v int64) *NCharacterUpsertBulk {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.AddChID(v)
-	})
-}
-
-// UpdateChID sets the "ch_id" field to the value that was provided on create.
-func (u *NCharacterUpsertBulk) UpdateChID() *NCharacterUpsertBulk {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateChID()
-	})
-}
-
 // SetCh sets the "ch" field.
 func (u *NCharacterUpsertBulk) SetCh(v string) *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
@@ -1173,6 +1126,48 @@ func (u *NCharacterUpsertBulk) SetCh(v string) *NCharacterUpsertBulk {
 func (u *NCharacterUpsertBulk) UpdateCh() *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.UpdateCh()
+	})
+}
+
+// SetChStroke sets the "ch_stroke" field.
+func (u *NCharacterUpsertBulk) SetChStroke(v int) *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.SetChStroke(v)
+	})
+}
+
+// AddChStroke adds v to the "ch_stroke" field.
+func (u *NCharacterUpsertBulk) AddChStroke(v int) *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.AddChStroke(v)
+	})
+}
+
+// UpdateChStroke sets the "ch_stroke" field to the value that was provided on create.
+func (u *NCharacterUpsertBulk) UpdateChStroke() *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.UpdateChStroke()
+	})
+}
+
+// SetChType sets the "ch_type" field.
+func (u *NCharacterUpsertBulk) SetChType(v int) *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.SetChType(v)
+	})
+}
+
+// AddChType adds v to the "ch_type" field.
+func (u *NCharacterUpsertBulk) AddChType(v int) *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.AddChType(v)
+	})
+}
+
+// UpdateChType sets the "ch_type" field to the value that was provided on create.
+func (u *NCharacterUpsertBulk) UpdateChType() *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.UpdateChType()
 	})
 }
 
@@ -1211,38 +1206,17 @@ func (u *NCharacterUpsertBulk) UpdateRadicalStroke() *NCharacterUpsertBulk {
 	})
 }
 
-// SetTotalStroke sets the "total_stroke" field.
-func (u *NCharacterUpsertBulk) SetTotalStroke(v int) *NCharacterUpsertBulk {
+// SetRelate sets the "relate" field.
+func (u *NCharacterUpsertBulk) SetRelate(v string) *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.SetTotalStroke(v)
+		s.SetRelate(v)
 	})
 }
 
-// AddTotalStroke adds v to the "total_stroke" field.
-func (u *NCharacterUpsertBulk) AddTotalStroke(v int) *NCharacterUpsertBulk {
+// UpdateRelate sets the "relate" field to the value that was provided on create.
+func (u *NCharacterUpsertBulk) UpdateRelate() *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.AddTotalStroke(v)
-	})
-}
-
-// UpdateTotalStroke sets the "total_stroke" field to the value that was provided on create.
-func (u *NCharacterUpsertBulk) UpdateTotalStroke() *NCharacterUpsertBulk {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateTotalStroke()
-	})
-}
-
-// SetIsKangXi sets the "is_kang_xi" field.
-func (u *NCharacterUpsertBulk) SetIsKangXi(v bool) *NCharacterUpsertBulk {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.SetIsKangXi(v)
-	})
-}
-
-// UpdateIsKangXi sets the "is_kang_xi" field to the value that was provided on create.
-func (u *NCharacterUpsertBulk) UpdateIsKangXi() *NCharacterUpsertBulk {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateIsKangXi()
+		s.UpdateRelate()
 	})
 }
 
@@ -1257,20 +1231,6 @@ func (u *NCharacterUpsertBulk) SetRelateKangXi(v string) *NCharacterUpsertBulk {
 func (u *NCharacterUpsertBulk) UpdateRelateKangXi() *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.UpdateRelateKangXi()
-	})
-}
-
-// SetRelateSimple sets the "relate_simple" field.
-func (u *NCharacterUpsertBulk) SetRelateSimple(v string) *NCharacterUpsertBulk {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.SetRelateSimple(v)
-	})
-}
-
-// UpdateRelateSimple sets the "relate_simple" field to the value that was provided on create.
-func (u *NCharacterUpsertBulk) UpdateRelateSimple() *NCharacterUpsertBulk {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateRelateSimple()
 	})
 }
 
@@ -1289,7 +1249,7 @@ func (u *NCharacterUpsertBulk) UpdateRelateTraditional() *NCharacterUpsertBulk {
 }
 
 // SetRelateVariant sets the "relate_variant" field.
-func (u *NCharacterUpsertBulk) SetRelateVariant(v string) *NCharacterUpsertBulk {
+func (u *NCharacterUpsertBulk) SetRelateVariant(v []string) *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.SetRelateVariant(v)
 	})
@@ -1302,38 +1262,52 @@ func (u *NCharacterUpsertBulk) UpdateRelateVariant() *NCharacterUpsertBulk {
 	})
 }
 
-// SetNameScience sets the "name_science" field.
-func (u *NCharacterUpsertBulk) SetNameScience(v bool) *NCharacterUpsertBulk {
+// SetIsNameScience sets the "is_name_science" field.
+func (u *NCharacterUpsertBulk) SetIsNameScience(v bool) *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.SetNameScience(v)
+		s.SetIsNameScience(v)
 	})
 }
 
-// UpdateNameScience sets the "name_science" field to the value that was provided on create.
-func (u *NCharacterUpsertBulk) UpdateNameScience() *NCharacterUpsertBulk {
+// UpdateIsNameScience sets the "is_name_science" field to the value that was provided on create.
+func (u *NCharacterUpsertBulk) UpdateIsNameScience() *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateNameScience()
+		s.UpdateIsNameScience()
 	})
 }
 
-// SetScienceStroke sets the "science_stroke" field.
-func (u *NCharacterUpsertBulk) SetScienceStroke(v int) *NCharacterUpsertBulk {
+// SetNameScienceChStroke sets the "name_science_ch_stroke" field.
+func (u *NCharacterUpsertBulk) SetNameScienceChStroke(v int) *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.SetScienceStroke(v)
+		s.SetNameScienceChStroke(v)
 	})
 }
 
-// AddScienceStroke adds v to the "science_stroke" field.
-func (u *NCharacterUpsertBulk) AddScienceStroke(v int) *NCharacterUpsertBulk {
+// AddNameScienceChStroke adds v to the "name_science_ch_stroke" field.
+func (u *NCharacterUpsertBulk) AddNameScienceChStroke(v int) *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.AddScienceStroke(v)
+		s.AddNameScienceChStroke(v)
 	})
 }
 
-// UpdateScienceStroke sets the "science_stroke" field to the value that was provided on create.
-func (u *NCharacterUpsertBulk) UpdateScienceStroke() *NCharacterUpsertBulk {
+// UpdateNameScienceChStroke sets the "name_science_ch_stroke" field to the value that was provided on create.
+func (u *NCharacterUpsertBulk) UpdateNameScienceChStroke() *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateScienceStroke()
+		s.UpdateNameScienceChStroke()
+	})
+}
+
+// SetIsRegular sets the "is_regular" field.
+func (u *NCharacterUpsertBulk) SetIsRegular(v bool) *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.SetIsRegular(v)
+	})
+}
+
+// UpdateIsRegular sets the "is_regular" field to the value that was provided on create.
+func (u *NCharacterUpsertBulk) UpdateIsRegular() *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.UpdateIsRegular()
 	})
 }
 
@@ -1362,20 +1336,6 @@ func (u *NCharacterUpsertBulk) SetLucky(v string) *NCharacterUpsertBulk {
 func (u *NCharacterUpsertBulk) UpdateLucky() *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.UpdateLucky()
-	})
-}
-
-// SetRegular sets the "regular" field.
-func (u *NCharacterUpsertBulk) SetRegular(v bool) *NCharacterUpsertBulk {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.SetRegular(v)
-	})
-}
-
-// UpdateRegular sets the "regular" field to the value that was provided on create.
-func (u *NCharacterUpsertBulk) UpdateRegular() *NCharacterUpsertBulk {
-	return u.Update(func(s *NCharacterUpsert) {
-		s.UpdateRegular()
 	})
 }
 

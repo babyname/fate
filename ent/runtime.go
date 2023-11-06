@@ -2,8 +2,19 @@
 
 package ent
 
+import (
+	"github.com/babyname/fate/ent/ncharacter"
+	"github.com/babyname/fate/ent/schema"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	ncharacterFields := schema.NCharacter{}.Fields()
+	_ = ncharacterFields
+	// ncharacterDescChType is the schema descriptor for ch_type field.
+	ncharacterDescChType := ncharacterFields[4].Descriptor()
+	// ncharacter.DefaultChType holds the default value on creation for the ch_type field.
+	ncharacter.DefaultChType = ncharacterDescChType.Default.(int)
 }
