@@ -2,12 +2,12 @@ package log
 
 import (
 	"context"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/babyname/fate/config"
-	"golang.org/x/exp/slog"
 )
 
 const (
@@ -15,7 +15,8 @@ const (
 )
 
 var (
-	opts = slog.HandlerOptions{AddSource: true}
+	opts   = slog.HandlerOptions{AddSource: true}
+	output *os.File
 )
 
 type Logger interface {
@@ -40,52 +41,47 @@ func init() {
 	if !exist {
 		return
 	}
-	err := openLogFile(env)
+	file, err := openLogFile(env)
 	if err != nil {
 		return
 	}
-	defaultLogger = Default()
+	output = file
+	l := slog.New(slog.NewTextHandler(file, &opts))
+	slog.SetDefault(l)
 }
 
-func openLogFile(path string) error {
+func openLogFile(path string) (*os.File, error) {
 	dir, _ := filepath.Split(path)
 	if dir != "" {
 		_ = os.MkdirAll(dir, 0755)
 	}
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	output.File = file
-	//unsafeL := (*unsafe.Pointer)(unsafe.Pointer(output.File))
-	//atomic.SwapPointer(unsafeL, unsafe.Pointer(file))
-	return nil
-}
-
-func SetGlobalOutput(f *os.File) {
-	output.File = f
+	return file, nil
 }
 
 func LoadGlobalConfig(cfg config.LogConfig) error {
-	err := openLogFile(cfg.Path)
+	file, err := openLogFile(cfg.Path)
 	if err != nil {
 		return err
 	}
 
 	opts.AddSource = cfg.ShowSource
-	var h slog.Handler = opts.NewJSONHandler(output.File)
-	if cfg.LogType != "json" {
-		h = opts.NewTextHandler(output.File)
+	var h slog.Handler
+	switch cfg.LogType {
+	case "text":
+		h = slog.NewTextHandler(file, &opts)
+	case "json":
+		h = slog.NewJSONHandler(file, &opts)
 	}
 
 	l := slog.New(h)
-	l.Enabled(stringToLevel(cfg.Level))
-	output.Logger = l
+	l.Enabled(context.Background(), stringToLevel(cfg.Level))
+	slog.SetDefault(l)
 	return nil
-}
 
-func Default() Logger {
-	return output
 }
 
 func stringToLevel(level string) slog.Level {
