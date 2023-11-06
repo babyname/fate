@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/babyname/fate/ent/version"
 )
@@ -18,7 +19,8 @@ type Version struct {
 	// CurrentVersion holds the value of the "current_version" field.
 	CurrentVersion int `json:"current_version,omitempty"`
 	// UpdatedUnix holds the value of the "updated_unix" field.
-	UpdatedUnix int `json:"updated_unix,omitempty"`
+	UpdatedUnix  int `json:"updated_unix,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -29,7 +31,7 @@ func (*Version) scanValues(columns []string) ([]any, error) {
 		case version.FieldID, version.FieldCurrentVersion, version.FieldUpdatedUnix:
 			values[i] = new(sql.NullInt64)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Version", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -61,9 +63,17 @@ func (v *Version) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				v.UpdatedUnix = int(value.Int64)
 			}
+		default:
+			v.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Version.
+// This includes values selected through modifiers, order, etc.
+func (v *Version) Value(name string) (ent.Value, error) {
+	return v.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this Version.

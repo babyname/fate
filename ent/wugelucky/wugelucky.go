@@ -2,6 +2,10 @@
 
 package wugelucky
 
+import (
+	"entgo.io/ent/dialect/sql"
+)
+
 const (
 	// Label holds the string label denoting the wugelucky type in the database.
 	Label = "wu_ge_lucky"
@@ -75,4 +79,97 @@ func ValidColumn(column string) bool {
 		}
 	}
 	return false
+}
+
+// OrderOption defines the ordering options for the WuGeLucky queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByLastStroke1 orders the results by the last_stroke_1 field.
+func ByLastStroke1(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastStroke1, opts...).ToFunc()
+}
+
+// ByLastStroke2 orders the results by the last_stroke_2 field.
+func ByLastStroke2(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastStroke2, opts...).ToFunc()
+}
+
+// ByFirstStroke1 orders the results by the first_stroke_1 field.
+func ByFirstStroke1(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFirstStroke1, opts...).ToFunc()
+}
+
+// ByFirstStroke2 orders the results by the first_stroke_2 field.
+func ByFirstStroke2(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFirstStroke2, opts...).ToFunc()
+}
+
+// ByTianGe orders the results by the tian_ge field.
+func ByTianGe(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTianGe, opts...).ToFunc()
+}
+
+// ByTianDaYan orders the results by the tian_da_yan field.
+func ByTianDaYan(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTianDaYan, opts...).ToFunc()
+}
+
+// ByRenGe orders the results by the ren_ge field.
+func ByRenGe(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRenGe, opts...).ToFunc()
+}
+
+// ByRenDaYan orders the results by the ren_da_yan field.
+func ByRenDaYan(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRenDaYan, opts...).ToFunc()
+}
+
+// ByDiGe orders the results by the di_ge field.
+func ByDiGe(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDiGe, opts...).ToFunc()
+}
+
+// ByDiDaYan orders the results by the di_da_yan field.
+func ByDiDaYan(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDiDaYan, opts...).ToFunc()
+}
+
+// ByWaiGe orders the results by the wai_ge field.
+func ByWaiGe(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWaiGe, opts...).ToFunc()
+}
+
+// ByWaiDaYan orders the results by the wai_da_yan field.
+func ByWaiDaYan(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWaiDaYan, opts...).ToFunc()
+}
+
+// ByZongGe orders the results by the zong_ge field.
+func ByZongGe(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldZongGe, opts...).ToFunc()
+}
+
+// ByZongDaYan orders the results by the zong_da_yan field.
+func ByZongDaYan(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldZongDaYan, opts...).ToFunc()
+}
+
+// ByZongLucky orders the results by the zong_lucky field.
+func ByZongLucky(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldZongLucky, opts...).ToFunc()
+}
+
+// ByZongSex orders the results by the zong_sex field.
+func ByZongSex(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldZongSex, opts...).ToFunc()
+}
+
+// ByZongMax orders the results by the zong_max field.
+func ByZongMax(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldZongMax, opts...).ToFunc()
 }

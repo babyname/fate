@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/babyname/fate/ent/character"
 )
@@ -59,6 +60,7 @@ type Character struct {
 	Comment string `json:"comment,omitempty"`
 	// ScienceStroke holds the value of the "science_stroke" field.
 	ScienceStroke int `json:"science_stroke,omitempty"`
+	selectValues  sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -73,7 +75,7 @@ func (*Character) scanValues(columns []string) ([]any, error) {
 		case character.FieldID, character.FieldPinYin, character.FieldCh, character.FieldRadical, character.FieldKangXi, character.FieldSimpleRadical, character.FieldTraditionalRadical, character.FieldWuXing, character.FieldLucky, character.FieldTraditionalCharacter, character.FieldVariantCharacter, character.FieldComment:
 			values[i] = new(sql.NullString)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Character", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -225,9 +227,17 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.ScienceStroke = int(value.Int64)
 			}
+		default:
+			c.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Character.
+// This includes values selected through modifiers, order, etc.
+func (c *Character) Value(name string) (ent.Value, error) {
+	return c.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this Character.

@@ -21,6 +21,18 @@ func (f CharacterFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CharacterMutation", m)
 }
 
+// The NCharacterFunc type is an adapter to allow the use of ordinary
+// function as NCharacter mutator.
+type NCharacterFunc func(context.Context, *ent.NCharacterMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f NCharacterFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.NCharacterMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.NCharacterMutation", m)
+}
+
 // The VersionFunc type is an adapter to allow the use of ordinary
 // function as Version mutator.
 type VersionFunc func(context.Context, *ent.VersionMutation) (ent.Value, error)

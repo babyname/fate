@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -19,9 +20,10 @@ import (
 type WuGeLuckyQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []wugelucky.OrderOption
 	inters     []Interceptor
 	predicates []predicate.WuGeLucky
+	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -53,7 +55,7 @@ func (wglq *WuGeLuckyQuery) Unique(unique bool) *WuGeLuckyQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (wglq *WuGeLuckyQuery) Order(o ...OrderFunc) *WuGeLuckyQuery {
+func (wglq *WuGeLuckyQuery) Order(o ...wugelucky.OrderOption) *WuGeLuckyQuery {
 	wglq.order = append(wglq.order, o...)
 	return wglq
 }
@@ -247,7 +249,7 @@ func (wglq *WuGeLuckyQuery) Clone() *WuGeLuckyQuery {
 	return &WuGeLuckyQuery{
 		config:     wglq.config,
 		ctx:        wglq.ctx.Clone(),
-		order:      append([]OrderFunc{}, wglq.order...),
+		order:      append([]wugelucky.OrderOption{}, wglq.order...),
 		inters:     append([]Interceptor{}, wglq.inters...),
 		predicates: append([]predicate.WuGeLucky{}, wglq.predicates...),
 		// clone intermediate query.
@@ -343,6 +345,9 @@ func (wglq *WuGeLuckyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
+	if len(wglq.modifiers) > 0 {
+		_spec.Modifiers = wglq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -357,6 +362,9 @@ func (wglq *WuGeLuckyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 
 func (wglq *WuGeLuckyQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := wglq.querySpec()
+	if len(wglq.modifiers) > 0 {
+		_spec.Modifiers = wglq.modifiers
+	}
 	_spec.Node.Columns = wglq.ctx.Fields
 	if len(wglq.ctx.Fields) > 0 {
 		_spec.Unique = wglq.ctx.Unique != nil && *wglq.ctx.Unique
@@ -419,6 +427,9 @@ func (wglq *WuGeLuckyQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if wglq.ctx.Unique != nil && *wglq.ctx.Unique {
 		selector.Distinct()
 	}
+	for _, m := range wglq.modifiers {
+		m(selector)
+	}
 	for _, p := range wglq.predicates {
 		p(selector)
 	}
@@ -434,6 +445,32 @@ func (wglq *WuGeLuckyQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// ForUpdate locks the selected rows against concurrent updates, and prevent them from being
+// updated, deleted or "selected ... for update" by other sessions, until the transaction is
+// either committed or rolled-back.
+func (wglq *WuGeLuckyQuery) ForUpdate(opts ...sql.LockOption) *WuGeLuckyQuery {
+	if wglq.driver.Dialect() == dialect.Postgres {
+		wglq.Unique(false)
+	}
+	wglq.modifiers = append(wglq.modifiers, func(s *sql.Selector) {
+		s.ForUpdate(opts...)
+	})
+	return wglq
+}
+
+// ForShare behaves similarly to ForUpdate, except that it acquires a shared mode lock
+// on any rows that are read. Other sessions can read the rows, but cannot modify them
+// until your transaction commits.
+func (wglq *WuGeLuckyQuery) ForShare(opts ...sql.LockOption) *WuGeLuckyQuery {
+	if wglq.driver.Dialect() == dialect.Postgres {
+		wglq.Unique(false)
+	}
+	wglq.modifiers = append(wglq.modifiers, func(s *sql.Selector) {
+		s.ForShare(opts...)
+	})
+	return wglq
 }
 
 // WuGeLuckyGroupBy is the group-by builder for WuGeLucky entities.

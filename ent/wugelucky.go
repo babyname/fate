@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/babyname/fate/ent/wugelucky"
 	"github.com/google/uuid"
@@ -49,7 +50,8 @@ type WuGeLucky struct {
 	// ZongSex holds the value of the "zong_sex" field.
 	ZongSex bool `json:"zong_sex,omitempty"`
 	// ZongMax holds the value of the "zong_max" field.
-	ZongMax bool `json:"zong_max,omitempty"`
+	ZongMax      bool `json:"zong_max,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -66,7 +68,7 @@ func (*WuGeLucky) scanValues(columns []string) ([]any, error) {
 		case wugelucky.FieldID:
 			values[i] = new(uuid.UUID)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type WuGeLucky", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -188,9 +190,17 @@ func (wgl *WuGeLucky) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				wgl.ZongMax = value.Bool
 			}
+		default:
+			wgl.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the WuGeLucky.
+// This includes values selected through modifiers, order, etc.
+func (wgl *WuGeLucky) Value(name string) (ent.Value, error) {
+	return wgl.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this WuGeLucky.

@@ -60,7 +60,7 @@ func (vu *VersionUpdate) Mutation() *VersionMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (vu *VersionUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, VersionMutation](ctx, vu.sqlSave, vu.mutation, vu.hooks)
+	return withHooks(ctx, vu.sqlSave, vu.mutation, vu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -172,7 +172,7 @@ func (vuo *VersionUpdateOne) Select(field string, fields ...string) *VersionUpda
 
 // Save executes the query and returns the updated Version entity.
 func (vuo *VersionUpdateOne) Save(ctx context.Context) (*Version, error) {
-	return withHooks[*Version, VersionMutation](ctx, vuo.sqlSave, vuo.mutation, vuo.hooks)
+	return withHooks(ctx, vuo.sqlSave, vuo.mutation, vuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

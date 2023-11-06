@@ -27,7 +27,7 @@ func (wxd *WuXingDelete) Where(ps ...predicate.WuXing) *WuXingDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (wxd *WuXingDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, WuXingMutation](ctx, wxd.sqlExec, wxd.mutation, wxd.hooks)
+	return withHooks(ctx, wxd.sqlExec, wxd.mutation, wxd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
