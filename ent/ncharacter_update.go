@@ -94,20 +94,41 @@ func (nu *NCharacterUpdate) AddRadicalStroke(i int) *NCharacterUpdate {
 }
 
 // SetRelate sets the "relate" field.
-func (nu *NCharacterUpdate) SetRelate(s string) *NCharacterUpdate {
-	nu.mutation.SetRelate(s)
+func (nu *NCharacterUpdate) SetRelate(i int32) *NCharacterUpdate {
+	nu.mutation.ResetRelate()
+	nu.mutation.SetRelate(i)
+	return nu
+}
+
+// AddRelate adds i to the "relate" field.
+func (nu *NCharacterUpdate) AddRelate(i int32) *NCharacterUpdate {
+	nu.mutation.AddRelate(i)
 	return nu
 }
 
 // SetRelateKangXi sets the "relate_kang_xi" field.
-func (nu *NCharacterUpdate) SetRelateKangXi(s string) *NCharacterUpdate {
-	nu.mutation.SetRelateKangXi(s)
+func (nu *NCharacterUpdate) SetRelateKangXi(i int32) *NCharacterUpdate {
+	nu.mutation.ResetRelateKangXi()
+	nu.mutation.SetRelateKangXi(i)
+	return nu
+}
+
+// AddRelateKangXi adds i to the "relate_kang_xi" field.
+func (nu *NCharacterUpdate) AddRelateKangXi(i int32) *NCharacterUpdate {
+	nu.mutation.AddRelateKangXi(i)
 	return nu
 }
 
 // SetRelateTraditional sets the "relate_traditional" field.
-func (nu *NCharacterUpdate) SetRelateTraditional(s string) *NCharacterUpdate {
-	nu.mutation.SetRelateTraditional(s)
+func (nu *NCharacterUpdate) SetRelateTraditional(i int32) *NCharacterUpdate {
+	nu.mutation.ResetRelateTraditional()
+	nu.mutation.SetRelateTraditional(i)
+	return nu
+}
+
+// AddRelateTraditional adds i to the "relate_traditional" field.
+func (nu *NCharacterUpdate) AddRelateTraditional(i int32) *NCharacterUpdate {
+	nu.mutation.AddRelateTraditional(i)
 	return nu
 }
 
@@ -235,13 +256,22 @@ func (nu *NCharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.AddField(ncharacter.FieldRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := nu.mutation.Relate(); ok {
-		_spec.SetField(ncharacter.FieldRelate, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldRelate, field.TypeInt32, value)
+	}
+	if value, ok := nu.mutation.AddedRelate(); ok {
+		_spec.AddField(ncharacter.FieldRelate, field.TypeInt32, value)
 	}
 	if value, ok := nu.mutation.RelateKangXi(); ok {
-		_spec.SetField(ncharacter.FieldRelateKangXi, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldRelateKangXi, field.TypeInt32, value)
+	}
+	if value, ok := nu.mutation.AddedRelateKangXi(); ok {
+		_spec.AddField(ncharacter.FieldRelateKangXi, field.TypeInt32, value)
 	}
 	if value, ok := nu.mutation.RelateTraditional(); ok {
-		_spec.SetField(ncharacter.FieldRelateTraditional, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldRelateTraditional, field.TypeInt32, value)
+	}
+	if value, ok := nu.mutation.AddedRelateTraditional(); ok {
+		_spec.AddField(ncharacter.FieldRelateTraditional, field.TypeInt32, value)
 	}
 	if value, ok := nu.mutation.RelateVariant(); ok {
 		_spec.SetField(ncharacter.FieldRelateVariant, field.TypeJSON, value)
@@ -358,20 +388,41 @@ func (nuo *NCharacterUpdateOne) AddRadicalStroke(i int) *NCharacterUpdateOne {
 }
 
 // SetRelate sets the "relate" field.
-func (nuo *NCharacterUpdateOne) SetRelate(s string) *NCharacterUpdateOne {
-	nuo.mutation.SetRelate(s)
+func (nuo *NCharacterUpdateOne) SetRelate(i int32) *NCharacterUpdateOne {
+	nuo.mutation.ResetRelate()
+	nuo.mutation.SetRelate(i)
+	return nuo
+}
+
+// AddRelate adds i to the "relate" field.
+func (nuo *NCharacterUpdateOne) AddRelate(i int32) *NCharacterUpdateOne {
+	nuo.mutation.AddRelate(i)
 	return nuo
 }
 
 // SetRelateKangXi sets the "relate_kang_xi" field.
-func (nuo *NCharacterUpdateOne) SetRelateKangXi(s string) *NCharacterUpdateOne {
-	nuo.mutation.SetRelateKangXi(s)
+func (nuo *NCharacterUpdateOne) SetRelateKangXi(i int32) *NCharacterUpdateOne {
+	nuo.mutation.ResetRelateKangXi()
+	nuo.mutation.SetRelateKangXi(i)
+	return nuo
+}
+
+// AddRelateKangXi adds i to the "relate_kang_xi" field.
+func (nuo *NCharacterUpdateOne) AddRelateKangXi(i int32) *NCharacterUpdateOne {
+	nuo.mutation.AddRelateKangXi(i)
 	return nuo
 }
 
 // SetRelateTraditional sets the "relate_traditional" field.
-func (nuo *NCharacterUpdateOne) SetRelateTraditional(s string) *NCharacterUpdateOne {
-	nuo.mutation.SetRelateTraditional(s)
+func (nuo *NCharacterUpdateOne) SetRelateTraditional(i int32) *NCharacterUpdateOne {
+	nuo.mutation.ResetRelateTraditional()
+	nuo.mutation.SetRelateTraditional(i)
+	return nuo
+}
+
+// AddRelateTraditional adds i to the "relate_traditional" field.
+func (nuo *NCharacterUpdateOne) AddRelateTraditional(i int32) *NCharacterUpdateOne {
+	nuo.mutation.AddRelateTraditional(i)
 	return nuo
 }
 
@@ -529,13 +580,22 @@ func (nuo *NCharacterUpdateOne) sqlSave(ctx context.Context) (_node *NCharacter,
 		_spec.AddField(ncharacter.FieldRadicalStroke, field.TypeInt, value)
 	}
 	if value, ok := nuo.mutation.Relate(); ok {
-		_spec.SetField(ncharacter.FieldRelate, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldRelate, field.TypeInt32, value)
+	}
+	if value, ok := nuo.mutation.AddedRelate(); ok {
+		_spec.AddField(ncharacter.FieldRelate, field.TypeInt32, value)
 	}
 	if value, ok := nuo.mutation.RelateKangXi(); ok {
-		_spec.SetField(ncharacter.FieldRelateKangXi, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldRelateKangXi, field.TypeInt32, value)
+	}
+	if value, ok := nuo.mutation.AddedRelateKangXi(); ok {
+		_spec.AddField(ncharacter.FieldRelateKangXi, field.TypeInt32, value)
 	}
 	if value, ok := nuo.mutation.RelateTraditional(); ok {
-		_spec.SetField(ncharacter.FieldRelateTraditional, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldRelateTraditional, field.TypeInt32, value)
+	}
+	if value, ok := nuo.mutation.AddedRelateTraditional(); ok {
+		_spec.AddField(ncharacter.FieldRelateTraditional, field.TypeInt32, value)
 	}
 	if value, ok := nuo.mutation.RelateVariant(); ok {
 		_spec.SetField(ncharacter.FieldRelateVariant, field.TypeJSON, value)

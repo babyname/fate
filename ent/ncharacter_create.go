@@ -66,20 +66,20 @@ func (nc *NCharacterCreate) SetRadicalStroke(i int) *NCharacterCreate {
 }
 
 // SetRelate sets the "relate" field.
-func (nc *NCharacterCreate) SetRelate(s string) *NCharacterCreate {
-	nc.mutation.SetRelate(s)
+func (nc *NCharacterCreate) SetRelate(i int32) *NCharacterCreate {
+	nc.mutation.SetRelate(i)
 	return nc
 }
 
 // SetRelateKangXi sets the "relate_kang_xi" field.
-func (nc *NCharacterCreate) SetRelateKangXi(s string) *NCharacterCreate {
-	nc.mutation.SetRelateKangXi(s)
+func (nc *NCharacterCreate) SetRelateKangXi(i int32) *NCharacterCreate {
+	nc.mutation.SetRelateKangXi(i)
 	return nc
 }
 
 // SetRelateTraditional sets the "relate_traditional" field.
-func (nc *NCharacterCreate) SetRelateTraditional(s string) *NCharacterCreate {
-	nc.mutation.SetRelateTraditional(s)
+func (nc *NCharacterCreate) SetRelateTraditional(i int32) *NCharacterCreate {
+	nc.mutation.SetRelateTraditional(i)
 	return nc
 }
 
@@ -280,15 +280,15 @@ func (nc *NCharacterCreate) createSpec() (*NCharacter, *sqlgraph.CreateSpec) {
 		_node.RadicalStroke = value
 	}
 	if value, ok := nc.mutation.Relate(); ok {
-		_spec.SetField(ncharacter.FieldRelate, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldRelate, field.TypeInt32, value)
 		_node.Relate = value
 	}
 	if value, ok := nc.mutation.RelateKangXi(); ok {
-		_spec.SetField(ncharacter.FieldRelateKangXi, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldRelateKangXi, field.TypeInt32, value)
 		_node.RelateKangXi = value
 	}
 	if value, ok := nc.mutation.RelateTraditional(); ok {
-		_spec.SetField(ncharacter.FieldRelateTraditional, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldRelateTraditional, field.TypeInt32, value)
 		_node.RelateTraditional = value
 	}
 	if value, ok := nc.mutation.RelateVariant(); ok {
@@ -462,7 +462,7 @@ func (u *NCharacterUpsert) AddRadicalStroke(v int) *NCharacterUpsert {
 }
 
 // SetRelate sets the "relate" field.
-func (u *NCharacterUpsert) SetRelate(v string) *NCharacterUpsert {
+func (u *NCharacterUpsert) SetRelate(v int32) *NCharacterUpsert {
 	u.Set(ncharacter.FieldRelate, v)
 	return u
 }
@@ -473,8 +473,14 @@ func (u *NCharacterUpsert) UpdateRelate() *NCharacterUpsert {
 	return u
 }
 
+// AddRelate adds v to the "relate" field.
+func (u *NCharacterUpsert) AddRelate(v int32) *NCharacterUpsert {
+	u.Add(ncharacter.FieldRelate, v)
+	return u
+}
+
 // SetRelateKangXi sets the "relate_kang_xi" field.
-func (u *NCharacterUpsert) SetRelateKangXi(v string) *NCharacterUpsert {
+func (u *NCharacterUpsert) SetRelateKangXi(v int32) *NCharacterUpsert {
 	u.Set(ncharacter.FieldRelateKangXi, v)
 	return u
 }
@@ -485,8 +491,14 @@ func (u *NCharacterUpsert) UpdateRelateKangXi() *NCharacterUpsert {
 	return u
 }
 
+// AddRelateKangXi adds v to the "relate_kang_xi" field.
+func (u *NCharacterUpsert) AddRelateKangXi(v int32) *NCharacterUpsert {
+	u.Add(ncharacter.FieldRelateKangXi, v)
+	return u
+}
+
 // SetRelateTraditional sets the "relate_traditional" field.
-func (u *NCharacterUpsert) SetRelateTraditional(v string) *NCharacterUpsert {
+func (u *NCharacterUpsert) SetRelateTraditional(v int32) *NCharacterUpsert {
 	u.Set(ncharacter.FieldRelateTraditional, v)
 	return u
 }
@@ -494,6 +506,12 @@ func (u *NCharacterUpsert) SetRelateTraditional(v string) *NCharacterUpsert {
 // UpdateRelateTraditional sets the "relate_traditional" field to the value that was provided on create.
 func (u *NCharacterUpsert) UpdateRelateTraditional() *NCharacterUpsert {
 	u.SetExcluded(ncharacter.FieldRelateTraditional)
+	return u
+}
+
+// AddRelateTraditional adds v to the "relate_traditional" field.
+func (u *NCharacterUpsert) AddRelateTraditional(v int32) *NCharacterUpsert {
+	u.Add(ncharacter.FieldRelateTraditional, v)
 	return u
 }
 
@@ -741,9 +759,16 @@ func (u *NCharacterUpsertOne) UpdateRadicalStroke() *NCharacterUpsertOne {
 }
 
 // SetRelate sets the "relate" field.
-func (u *NCharacterUpsertOne) SetRelate(v string) *NCharacterUpsertOne {
+func (u *NCharacterUpsertOne) SetRelate(v int32) *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.SetRelate(v)
+	})
+}
+
+// AddRelate adds v to the "relate" field.
+func (u *NCharacterUpsertOne) AddRelate(v int32) *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.AddRelate(v)
 	})
 }
 
@@ -755,9 +780,16 @@ func (u *NCharacterUpsertOne) UpdateRelate() *NCharacterUpsertOne {
 }
 
 // SetRelateKangXi sets the "relate_kang_xi" field.
-func (u *NCharacterUpsertOne) SetRelateKangXi(v string) *NCharacterUpsertOne {
+func (u *NCharacterUpsertOne) SetRelateKangXi(v int32) *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.SetRelateKangXi(v)
+	})
+}
+
+// AddRelateKangXi adds v to the "relate_kang_xi" field.
+func (u *NCharacterUpsertOne) AddRelateKangXi(v int32) *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.AddRelateKangXi(v)
 	})
 }
 
@@ -769,9 +801,16 @@ func (u *NCharacterUpsertOne) UpdateRelateKangXi() *NCharacterUpsertOne {
 }
 
 // SetRelateTraditional sets the "relate_traditional" field.
-func (u *NCharacterUpsertOne) SetRelateTraditional(v string) *NCharacterUpsertOne {
+func (u *NCharacterUpsertOne) SetRelateTraditional(v int32) *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.SetRelateTraditional(v)
+	})
+}
+
+// AddRelateTraditional adds v to the "relate_traditional" field.
+func (u *NCharacterUpsertOne) AddRelateTraditional(v int32) *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.AddRelateTraditional(v)
 	})
 }
 
@@ -1207,9 +1246,16 @@ func (u *NCharacterUpsertBulk) UpdateRadicalStroke() *NCharacterUpsertBulk {
 }
 
 // SetRelate sets the "relate" field.
-func (u *NCharacterUpsertBulk) SetRelate(v string) *NCharacterUpsertBulk {
+func (u *NCharacterUpsertBulk) SetRelate(v int32) *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.SetRelate(v)
+	})
+}
+
+// AddRelate adds v to the "relate" field.
+func (u *NCharacterUpsertBulk) AddRelate(v int32) *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.AddRelate(v)
 	})
 }
 
@@ -1221,9 +1267,16 @@ func (u *NCharacterUpsertBulk) UpdateRelate() *NCharacterUpsertBulk {
 }
 
 // SetRelateKangXi sets the "relate_kang_xi" field.
-func (u *NCharacterUpsertBulk) SetRelateKangXi(v string) *NCharacterUpsertBulk {
+func (u *NCharacterUpsertBulk) SetRelateKangXi(v int32) *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.SetRelateKangXi(v)
+	})
+}
+
+// AddRelateKangXi adds v to the "relate_kang_xi" field.
+func (u *NCharacterUpsertBulk) AddRelateKangXi(v int32) *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.AddRelateKangXi(v)
 	})
 }
 
@@ -1235,9 +1288,16 @@ func (u *NCharacterUpsertBulk) UpdateRelateKangXi() *NCharacterUpsertBulk {
 }
 
 // SetRelateTraditional sets the "relate_traditional" field.
-func (u *NCharacterUpsertBulk) SetRelateTraditional(v string) *NCharacterUpsertBulk {
+func (u *NCharacterUpsertBulk) SetRelateTraditional(v int32) *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.SetRelateTraditional(v)
+	})
+}
+
+// AddRelateTraditional adds v to the "relate_traditional" field.
+func (u *NCharacterUpsertBulk) AddRelateTraditional(v int32) *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.AddRelateTraditional(v)
 	})
 }
 

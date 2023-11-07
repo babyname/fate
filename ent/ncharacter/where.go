@@ -83,17 +83,17 @@ func RadicalStroke(v int) predicate.NCharacter {
 }
 
 // Relate applies equality check predicate on the "relate" field. It's identical to RelateEQ.
-func Relate(v string) predicate.NCharacter {
+func Relate(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldEQ(FieldRelate, v))
 }
 
 // RelateKangXi applies equality check predicate on the "relate_kang_xi" field. It's identical to RelateKangXiEQ.
-func RelateKangXi(v string) predicate.NCharacter {
+func RelateKangXi(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldEQ(FieldRelateKangXi, v))
 }
 
 // RelateTraditional applies equality check predicate on the "relate_traditional" field. It's identical to RelateTraditionalEQ.
-func RelateTraditional(v string) predicate.NCharacter {
+func RelateTraditional(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldEQ(FieldRelateTraditional, v))
 }
 
@@ -443,198 +443,123 @@ func RadicalStrokeLTE(v int) predicate.NCharacter {
 }
 
 // RelateEQ applies the EQ predicate on the "relate" field.
-func RelateEQ(v string) predicate.NCharacter {
+func RelateEQ(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldEQ(FieldRelate, v))
 }
 
 // RelateNEQ applies the NEQ predicate on the "relate" field.
-func RelateNEQ(v string) predicate.NCharacter {
+func RelateNEQ(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldNEQ(FieldRelate, v))
 }
 
 // RelateIn applies the In predicate on the "relate" field.
-func RelateIn(vs ...string) predicate.NCharacter {
+func RelateIn(vs ...int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldIn(FieldRelate, vs...))
 }
 
 // RelateNotIn applies the NotIn predicate on the "relate" field.
-func RelateNotIn(vs ...string) predicate.NCharacter {
+func RelateNotIn(vs ...int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldNotIn(FieldRelate, vs...))
 }
 
 // RelateGT applies the GT predicate on the "relate" field.
-func RelateGT(v string) predicate.NCharacter {
+func RelateGT(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldGT(FieldRelate, v))
 }
 
 // RelateGTE applies the GTE predicate on the "relate" field.
-func RelateGTE(v string) predicate.NCharacter {
+func RelateGTE(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldGTE(FieldRelate, v))
 }
 
 // RelateLT applies the LT predicate on the "relate" field.
-func RelateLT(v string) predicate.NCharacter {
+func RelateLT(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldLT(FieldRelate, v))
 }
 
 // RelateLTE applies the LTE predicate on the "relate" field.
-func RelateLTE(v string) predicate.NCharacter {
+func RelateLTE(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldLTE(FieldRelate, v))
 }
 
-// RelateContains applies the Contains predicate on the "relate" field.
-func RelateContains(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldContains(FieldRelate, v))
-}
-
-// RelateHasPrefix applies the HasPrefix predicate on the "relate" field.
-func RelateHasPrefix(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldHasPrefix(FieldRelate, v))
-}
-
-// RelateHasSuffix applies the HasSuffix predicate on the "relate" field.
-func RelateHasSuffix(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldHasSuffix(FieldRelate, v))
-}
-
-// RelateEqualFold applies the EqualFold predicate on the "relate" field.
-func RelateEqualFold(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldEqualFold(FieldRelate, v))
-}
-
-// RelateContainsFold applies the ContainsFold predicate on the "relate" field.
-func RelateContainsFold(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldContainsFold(FieldRelate, v))
-}
-
 // RelateKangXiEQ applies the EQ predicate on the "relate_kang_xi" field.
-func RelateKangXiEQ(v string) predicate.NCharacter {
+func RelateKangXiEQ(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldEQ(FieldRelateKangXi, v))
 }
 
 // RelateKangXiNEQ applies the NEQ predicate on the "relate_kang_xi" field.
-func RelateKangXiNEQ(v string) predicate.NCharacter {
+func RelateKangXiNEQ(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldNEQ(FieldRelateKangXi, v))
 }
 
 // RelateKangXiIn applies the In predicate on the "relate_kang_xi" field.
-func RelateKangXiIn(vs ...string) predicate.NCharacter {
+func RelateKangXiIn(vs ...int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldIn(FieldRelateKangXi, vs...))
 }
 
 // RelateKangXiNotIn applies the NotIn predicate on the "relate_kang_xi" field.
-func RelateKangXiNotIn(vs ...string) predicate.NCharacter {
+func RelateKangXiNotIn(vs ...int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldNotIn(FieldRelateKangXi, vs...))
 }
 
 // RelateKangXiGT applies the GT predicate on the "relate_kang_xi" field.
-func RelateKangXiGT(v string) predicate.NCharacter {
+func RelateKangXiGT(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldGT(FieldRelateKangXi, v))
 }
 
 // RelateKangXiGTE applies the GTE predicate on the "relate_kang_xi" field.
-func RelateKangXiGTE(v string) predicate.NCharacter {
+func RelateKangXiGTE(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldGTE(FieldRelateKangXi, v))
 }
 
 // RelateKangXiLT applies the LT predicate on the "relate_kang_xi" field.
-func RelateKangXiLT(v string) predicate.NCharacter {
+func RelateKangXiLT(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldLT(FieldRelateKangXi, v))
 }
 
 // RelateKangXiLTE applies the LTE predicate on the "relate_kang_xi" field.
-func RelateKangXiLTE(v string) predicate.NCharacter {
+func RelateKangXiLTE(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldLTE(FieldRelateKangXi, v))
 }
 
-// RelateKangXiContains applies the Contains predicate on the "relate_kang_xi" field.
-func RelateKangXiContains(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldContains(FieldRelateKangXi, v))
-}
-
-// RelateKangXiHasPrefix applies the HasPrefix predicate on the "relate_kang_xi" field.
-func RelateKangXiHasPrefix(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldHasPrefix(FieldRelateKangXi, v))
-}
-
-// RelateKangXiHasSuffix applies the HasSuffix predicate on the "relate_kang_xi" field.
-func RelateKangXiHasSuffix(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldHasSuffix(FieldRelateKangXi, v))
-}
-
-// RelateKangXiEqualFold applies the EqualFold predicate on the "relate_kang_xi" field.
-func RelateKangXiEqualFold(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldEqualFold(FieldRelateKangXi, v))
-}
-
-// RelateKangXiContainsFold applies the ContainsFold predicate on the "relate_kang_xi" field.
-func RelateKangXiContainsFold(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldContainsFold(FieldRelateKangXi, v))
-}
-
 // RelateTraditionalEQ applies the EQ predicate on the "relate_traditional" field.
-func RelateTraditionalEQ(v string) predicate.NCharacter {
+func RelateTraditionalEQ(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldEQ(FieldRelateTraditional, v))
 }
 
 // RelateTraditionalNEQ applies the NEQ predicate on the "relate_traditional" field.
-func RelateTraditionalNEQ(v string) predicate.NCharacter {
+func RelateTraditionalNEQ(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldNEQ(FieldRelateTraditional, v))
 }
 
 // RelateTraditionalIn applies the In predicate on the "relate_traditional" field.
-func RelateTraditionalIn(vs ...string) predicate.NCharacter {
+func RelateTraditionalIn(vs ...int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldIn(FieldRelateTraditional, vs...))
 }
 
 // RelateTraditionalNotIn applies the NotIn predicate on the "relate_traditional" field.
-func RelateTraditionalNotIn(vs ...string) predicate.NCharacter {
+func RelateTraditionalNotIn(vs ...int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldNotIn(FieldRelateTraditional, vs...))
 }
 
 // RelateTraditionalGT applies the GT predicate on the "relate_traditional" field.
-func RelateTraditionalGT(v string) predicate.NCharacter {
+func RelateTraditionalGT(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldGT(FieldRelateTraditional, v))
 }
 
 // RelateTraditionalGTE applies the GTE predicate on the "relate_traditional" field.
-func RelateTraditionalGTE(v string) predicate.NCharacter {
+func RelateTraditionalGTE(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldGTE(FieldRelateTraditional, v))
 }
 
 // RelateTraditionalLT applies the LT predicate on the "relate_traditional" field.
-func RelateTraditionalLT(v string) predicate.NCharacter {
+func RelateTraditionalLT(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldLT(FieldRelateTraditional, v))
 }
 
 // RelateTraditionalLTE applies the LTE predicate on the "relate_traditional" field.
-func RelateTraditionalLTE(v string) predicate.NCharacter {
+func RelateTraditionalLTE(v int32) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldLTE(FieldRelateTraditional, v))
-}
-
-// RelateTraditionalContains applies the Contains predicate on the "relate_traditional" field.
-func RelateTraditionalContains(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldContains(FieldRelateTraditional, v))
-}
-
-// RelateTraditionalHasPrefix applies the HasPrefix predicate on the "relate_traditional" field.
-func RelateTraditionalHasPrefix(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldHasPrefix(FieldRelateTraditional, v))
-}
-
-// RelateTraditionalHasSuffix applies the HasSuffix predicate on the "relate_traditional" field.
-func RelateTraditionalHasSuffix(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldHasSuffix(FieldRelateTraditional, v))
-}
-
-// RelateTraditionalEqualFold applies the EqualFold predicate on the "relate_traditional" field.
-func RelateTraditionalEqualFold(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldEqualFold(FieldRelateTraditional, v))
-}
-
-// RelateTraditionalContainsFold applies the ContainsFold predicate on the "relate_traditional" field.
-func RelateTraditionalContainsFold(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldContainsFold(FieldRelateTraditional, v))
 }
 
 // IsNameScienceEQ applies the EQ predicate on the "is_name_science" field.

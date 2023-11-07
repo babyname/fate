@@ -30,11 +30,11 @@ type NCharacter struct {
 	// RadicalStroke holds the value of the "radical_stroke" field.
 	RadicalStroke int `json:"radical_stroke,omitempty"`
 	// Relate holds the value of the "relate" field.
-	Relate string `json:"relate,omitempty"`
+	Relate int32 `json:"relate,omitempty"`
 	// RelateKangXi holds the value of the "relate_kang_xi" field.
-	RelateKangXi string `json:"relate_kang_xi,omitempty"`
+	RelateKangXi int32 `json:"relate_kang_xi,omitempty"`
 	// RelateTraditional holds the value of the "relate_traditional" field.
-	RelateTraditional string `json:"relate_traditional,omitempty"`
+	RelateTraditional int32 `json:"relate_traditional,omitempty"`
 	// RelateVariant holds the value of the "relate_variant" field.
 	RelateVariant []string `json:"relate_variant,omitempty"`
 	// IsNameScience holds the value of the "is_name_science" field.
@@ -61,9 +61,9 @@ func (*NCharacter) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case ncharacter.FieldIsNameScience, ncharacter.FieldIsRegular:
 			values[i] = new(sql.NullBool)
-		case ncharacter.FieldID, ncharacter.FieldChStroke, ncharacter.FieldChType, ncharacter.FieldRadicalStroke, ncharacter.FieldNameScienceChStroke:
+		case ncharacter.FieldID, ncharacter.FieldChStroke, ncharacter.FieldChType, ncharacter.FieldRadicalStroke, ncharacter.FieldRelate, ncharacter.FieldRelateKangXi, ncharacter.FieldRelateTraditional, ncharacter.FieldNameScienceChStroke:
 			values[i] = new(sql.NullInt64)
-		case ncharacter.FieldPinYin, ncharacter.FieldCh, ncharacter.FieldRadical, ncharacter.FieldRelate, ncharacter.FieldRelateKangXi, ncharacter.FieldRelateTraditional, ncharacter.FieldWuXing, ncharacter.FieldLucky, ncharacter.FieldComment:
+		case ncharacter.FieldPinYin, ncharacter.FieldCh, ncharacter.FieldRadical, ncharacter.FieldWuXing, ncharacter.FieldLucky, ncharacter.FieldComment:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -123,22 +123,22 @@ func (n *NCharacter) assignValues(columns []string, values []any) error {
 				n.RadicalStroke = int(value.Int64)
 			}
 		case ncharacter.FieldRelate:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field relate", values[i])
 			} else if value.Valid {
-				n.Relate = value.String
+				n.Relate = int32(value.Int64)
 			}
 		case ncharacter.FieldRelateKangXi:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field relate_kang_xi", values[i])
 			} else if value.Valid {
-				n.RelateKangXi = value.String
+				n.RelateKangXi = int32(value.Int64)
 			}
 		case ncharacter.FieldRelateTraditional:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field relate_traditional", values[i])
 			} else if value.Valid {
-				n.RelateTraditional = value.String
+				n.RelateTraditional = int32(value.Int64)
 			}
 		case ncharacter.FieldRelateVariant:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -239,13 +239,13 @@ func (n *NCharacter) String() string {
 	builder.WriteString(fmt.Sprintf("%v", n.RadicalStroke))
 	builder.WriteString(", ")
 	builder.WriteString("relate=")
-	builder.WriteString(n.Relate)
+	builder.WriteString(fmt.Sprintf("%v", n.Relate))
 	builder.WriteString(", ")
 	builder.WriteString("relate_kang_xi=")
-	builder.WriteString(n.RelateKangXi)
+	builder.WriteString(fmt.Sprintf("%v", n.RelateKangXi))
 	builder.WriteString(", ")
 	builder.WriteString("relate_traditional=")
-	builder.WriteString(n.RelateTraditional)
+	builder.WriteString(fmt.Sprintf("%v", n.RelateTraditional))
 	builder.WriteString(", ")
 	builder.WriteString("relate_variant=")
 	builder.WriteString(fmt.Sprintf("%v", n.RelateVariant))

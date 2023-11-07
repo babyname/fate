@@ -28,9 +28,9 @@ func (NCharacter) Fields() []ent.Field {
 		field.Int("ch_type").Default(CharTypeUnknown),
 		field.String("radical"),
 		field.Int("radical_stroke"),
-		field.String("relate"), // relate simple chinese
-		field.String("relate_kang_xi"),
-		field.String("relate_traditional"),
+		field.Int32("relate"), // relate simple chinese
+		field.Int32("relate_kang_xi"),
+		field.Int32("relate_traditional"),
 		field.Strings("relate_variant"), //relate other variant characters
 		field.Bool("is_name_science"),
 		field.Int("name_science_ch_stroke"),
