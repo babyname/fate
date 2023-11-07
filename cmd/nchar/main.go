@@ -49,17 +49,26 @@ func main() {
 					vc = append(vc, string(vctmp[i]))
 				}
 			}
+			chid := int32([]rune(cs[csi].Ch)[0])
+			kxid := int32(0)
+			if len([]rune(cs[csi].KangXi)) > 0 {
+				kxid = int32([]rune(cs[csi].KangXi)[0])
+			}
+			tcid := int32(0)
+			if len([]rune(cs[csi].TraditionalCharacter)) > 0 {
+				tcid = int32([]rune(cs[csi].TraditionalCharacter)[0])
+			}
 			nc := ent.NCharacter{
-				ID:                  []rune(cs[csi].Ch)[0],
+				ID:                  chid,
 				PinYin:              cs[csi].PinYin,
 				Ch:                  cs[csi].Ch,
 				ChStroke:            cs[csi].Stroke,
 				ChType:              schema.CharTypeSimple,
 				Radical:             cs[csi].Radical,
 				RadicalStroke:       cs[csi].RadicalStroke,
-				Relate:              "",
-				RelateKangXi:        "",
-				RelateTraditional:   "",
+				Relate:              0,
+				RelateKangXi:        kxid,
+				RelateTraditional:   tcid,
 				RelateVariant:       vc,
 				IsNameScience:       cs[csi].NameScience,
 				NameScienceChStroke: cs[csi].ScienceStroke,
@@ -81,9 +90,9 @@ func main() {
 					ChType:              schema.CharTypeKangXi,
 					Radical:             cs[csi].Radical,
 					RadicalStroke:       cs[csi].RadicalStroke,
-					Relate:              nc.Ch,
-					RelateKangXi:        "",
-					RelateTraditional:   "",
+					Relate:              chid,
+					RelateKangXi:        kxid,
+					RelateTraditional:   tcid,
 					RelateVariant:       vc,
 					IsNameScience:       cs[csi].NameScience,
 					NameScienceChStroke: cs[csi].ScienceStroke,
@@ -106,9 +115,9 @@ func main() {
 					ChType:              schema.CharTypeKangXi,
 					Radical:             cs[csi].TraditionalRadical,
 					RadicalStroke:       cs[csi].TraditionalRadicalStroke,
-					Relate:              nc.Ch,
-					RelateKangXi:        "",
-					RelateTraditional:   "",
+					Relate:              chid,
+					RelateKangXi:        tcid,
+					RelateTraditional:   kxid,
 					RelateVariant:       vc,
 					IsNameScience:       cs[csi].NameScience,
 					NameScienceChStroke: cs[csi].ScienceStroke,
