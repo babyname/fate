@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"sort"
 	"strings"
@@ -13,7 +13,7 @@ func loadCharFile(path string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ioutil.ReadAll(opened)
+	return io.ReadAll(opened)
 }
 
 func main() {
@@ -72,5 +72,5 @@ func filterRune(r rune) bool {
 }
 
 func writeDataToFile(path string, data string) error {
-	return ioutil.WriteFile(path, []byte(data), 0755)
+	return os.WriteFile(path, []byte(data), 0755)
 }
