@@ -25,6 +25,17 @@ type Filter interface {
 	CheckSkipStrokeNumberScope(stroke ...int) bool
 }
 
+type CharacterType interface {
+}
+
+type QueryFilter interface {
+	Query(name string, v ...any) func(query *ent.CharacterQuery) *ent.CharacterQuery
+}
+
+type CheckFilter interface {
+	Check(name string, v ...any) bool
+}
+
 type filter struct {
 	characterFilterType        CharacterFilterType
 	checkSkipSexFilter         func(lucky *ent.WuGeLucky) bool
@@ -140,6 +151,13 @@ func newFilter() *filter {
 	}
 }
 
+// NewFilter creates a new Filter based on the given FilterOption.
+//
+// Parameters:
+// - fo: The FilterOption used to configure the Filter.
+//
+// Returns:
+// - Filter: The newly created Filter.
 func NewFilter(fo FilterOption) Filter {
 	f := newFilter()
 	if fo.SexFilter {
