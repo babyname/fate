@@ -1,9 +1,10 @@
-package wuxing
+package core
 
-const sanCai = "水木木火火土土金金水"
-const yinYang = "阴阳"
+var sanCai = []rune("水木木火火土土金金水")
 
-// SanCai ...
+var yinYang = []rune("阴阳")
+
+// SanCai 三才
 type SanCai struct {
 	tianCai        string `bson:"tian_cai"`
 	tianCaiYinYang string `bson:"tian_cai_yin_yang"`
@@ -15,7 +16,7 @@ type SanCai struct {
 	comment        string `bson:"comment"` //说明
 }
 
-// NewSanCai 新建一个三才对象
+// NewSanCai 创建三才
 func NewSanCai(tian, ren, di int) *SanCai {
 	return &SanCai{
 		tianCai:        sanCaiAttr(tian),
@@ -45,6 +46,9 @@ func sanCaiAttr(i int) string {
 	return string([]rune(sanCai)[i%10])
 }
 
+// yinYangAttr returns a string that represents the Yin or Yang attribute based on the given integer.
+//
+// The function takes an integer i as a parameter and returns a string. The integer is used to determine whether to return the Yin or Yang attribute from the yinYang string. The Yin or Yang attribute is selected by using the modulo operator on i with 2. If i is an even number, the Yin attribute is returned. If i is an odd number, the Yang attribute is returned.
 func yinYangAttr(i int) string {
 	return string([]rune(yinYang)[i%2])
 }

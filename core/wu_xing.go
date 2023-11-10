@@ -1,4 +1,4 @@
-package wuxing
+package core
 
 var wuXing = map[string]string{
 	"木木木": "大吉",
@@ -126,6 +126,7 @@ var wuXing = map[string]string{
 	"水水金": "大吉",
 	"水水水": "中吉",
 }
+
 var luckyPoint = map[string]int{
 	"大凶": 1, "凶": 2, "凶多于吉": 3, "吉凶参半": 4, "吉多于凶": 5, "吉": 6, "大吉": 7,
 }
