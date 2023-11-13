@@ -6,14 +6,14 @@ var yinYang = []rune("阴阳")
 
 // SanCai 三才
 type SanCai struct {
-	tianCai        string `bson:"tian_cai"`
-	tianCaiYinYang string `bson:"tian_cai_yin_yang"`
-	renCai         string `bson:"ren_cai"`
-	renCaiYinYang  string `bson:"ren_cai_yin_yang"`
-	diCai          string `bson:"di_cai"`
-	diCaiYingYang  string `bson:"di_cai_ying_yang"`
-	fortune        string `bson:"fortune"` //吉凶
-	comment        string `bson:"comment"` //说明
+	tianCai        string `json:"tian_cai"`
+	tianCaiYinYang string `json:"tian_cai_yin_yang"`
+	renCai         string `json:"ren_cai"`
+	renCaiYinYang  string `json:"ren_cai_yin_yang"`
+	diCai          string `json:"di_cai"`
+	diCaiYingYang  string `json:"di_cai_ying_yang"`
+	fortune        string `json:"fortune"` //吉凶
+	comment        string `json:"comment"` //说明
 }
 
 // NewSanCai 创建三才
@@ -30,7 +30,7 @@ func NewSanCai(tian, ren, di int) *SanCai {
 
 // Check 检查三才属性
 func (s *SanCai) Check(point int) bool {
-	if GetLuckyPoint(s.String()) >= point {
+	if getPoint(s.String()) >= point {
 		return true
 	}
 	return false
