@@ -6,14 +6,14 @@ var yinYang = []rune("阴阳")
 
 // SanCai 三才
 type SanCai struct {
-	tianCai        string `json:"tian_cai"`
-	tianCaiYinYang string `json:"tian_cai_yin_yang"`
-	renCai         string `json:"ren_cai"`
-	renCaiYinYang  string `json:"ren_cai_yin_yang"`
-	diCai          string `json:"di_cai"`
-	diCaiYingYang  string `json:"di_cai_ying_yang"`
-	fortune        string `json:"fortune"` //吉凶
-	comment        string `json:"comment"` //说明
+	tianCai        string
+	tianCaiYinYang string
+	renCai         string
+	renCaiYinYang  string
+	diCai          string
+	diCaiYingYang  string
+	fortune        string
+	comment        string
 }
 
 // NewSanCai 创建三才
@@ -30,7 +30,11 @@ func NewSanCai(tian, ren, di int) *SanCai {
 
 // Check 检查三才属性
 func (s *SanCai) Check(point int) bool {
-	if getPoint(s.String()) >= point {
+	wx, exist := NewWuXing(s.String())
+	if !exist {
+		return false
+	}
+	if wx.Point() >= point {
 		return true
 	}
 	return false
