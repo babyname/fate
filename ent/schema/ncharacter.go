@@ -37,6 +37,7 @@ func (NCharacter) Fields() []ent.Field {
 		field.Bool("is_regular"),
 		field.String("wu_xing"),
 		field.String("lucky"),
+		field.String("explanation"),
 		field.String("comment"),
 	}
 }
