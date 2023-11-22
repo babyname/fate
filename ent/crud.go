@@ -148,6 +148,7 @@ func (nc *NCharacterCreate) SetNCharacter(input *NCharacter) *NCharacterCreate {
 	nc.SetIsRegular(input.IsRegular)
 	nc.SetWuXing(input.WuXing)
 	nc.SetLucky(input.Lucky)
+	nc.SetExplanation(input.Explanation)
 	nc.SetComment(input.Comment)
 	return nc
 }
@@ -168,6 +169,7 @@ func (nc *NCharacterCreate) SetNCharacterWithOptional(input *NCharacter) *NChara
 	nc.SetIsRegular(input.IsRegular)
 	nc.SetWuXing(input.WuXing)
 	nc.SetLucky(input.Lucky)
+	nc.SetExplanation(input.Explanation)
 	nc.SetComment(input.Comment)
 	return nc
 }
@@ -188,6 +190,7 @@ func (nuo *NCharacterUpdateOne) SetNCharacter(input *NCharacter) *NCharacterUpda
 	nuo.SetIsRegular(input.IsRegular)
 	nuo.SetWuXing(input.WuXing)
 	nuo.SetLucky(input.Lucky)
+	nuo.SetExplanation(input.Explanation)
 	nuo.SetComment(input.Comment)
 	return nuo
 }
@@ -208,6 +211,7 @@ func (nu *NCharacterUpdate) SetNCharacter(input *NCharacter) *NCharacterUpdate {
 	nu.SetIsRegular(input.IsRegular)
 	nu.SetWuXing(input.WuXing)
 	nu.SetLucky(input.Lucky)
+	nu.SetExplanation(input.Explanation)
 	nu.SetComment(input.Comment)
 	return nu
 }
@@ -228,6 +232,7 @@ func (nu *NCharacterUpdate) SetNCharacterWithOptional(input *NCharacter) *NChara
 	nu.SetIsRegular(input.IsRegular)
 	nu.SetWuXing(input.WuXing)
 	nu.SetLucky(input.Lucky)
+	nu.SetExplanation(input.Explanation)
 	nu.SetComment(input.Comment)
 	return nu
 }

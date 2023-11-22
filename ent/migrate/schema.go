@@ -59,6 +59,7 @@ var (
 		{Name: "is_regular", Type: field.TypeBool},
 		{Name: "wu_xing", Type: field.TypeString},
 		{Name: "lucky", Type: field.TypeString},
+		{Name: "explanation", Type: field.TypeString},
 		{Name: "comment", Type: field.TypeString},
 	}
 	// NCharacterTable holds the schema information for the "n_character" table.

@@ -47,6 +47,8 @@ type NCharacter struct {
 	WuXing string `json:"wu_xing,omitempty"`
 	// Lucky holds the value of the "lucky" field.
 	Lucky string `json:"lucky,omitempty"`
+	// Explanation holds the value of the "explanation" field.
+	Explanation string `json:"explanation,omitempty"`
 	// Comment holds the value of the "comment" field.
 	Comment      string `json:"comment,omitempty"`
 	selectValues sql.SelectValues
@@ -63,7 +65,7 @@ func (*NCharacter) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case ncharacter.FieldID, ncharacter.FieldChStroke, ncharacter.FieldChType, ncharacter.FieldRadicalStroke, ncharacter.FieldRelate, ncharacter.FieldRelateKangXi, ncharacter.FieldRelateTraditional, ncharacter.FieldNameScienceChStroke:
 			values[i] = new(sql.NullInt64)
-		case ncharacter.FieldPinYin, ncharacter.FieldCh, ncharacter.FieldRadical, ncharacter.FieldWuXing, ncharacter.FieldLucky, ncharacter.FieldComment:
+		case ncharacter.FieldPinYin, ncharacter.FieldCh, ncharacter.FieldRadical, ncharacter.FieldWuXing, ncharacter.FieldLucky, ncharacter.FieldExplanation, ncharacter.FieldComment:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -178,6 +180,12 @@ func (n *NCharacter) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				n.Lucky = value.String
 			}
+		case ncharacter.FieldExplanation:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field explanation", values[i])
+			} else if value.Valid {
+				n.Explanation = value.String
+			}
 		case ncharacter.FieldComment:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field comment", values[i])
@@ -264,6 +272,9 @@ func (n *NCharacter) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("lucky=")
 	builder.WriteString(n.Lucky)
+	builder.WriteString(", ")
+	builder.WriteString("explanation=")
+	builder.WriteString(n.Explanation)
 	builder.WriteString(", ")
 	builder.WriteString("comment=")
 	builder.WriteString(n.Comment)

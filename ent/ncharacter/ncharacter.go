@@ -41,6 +41,8 @@ const (
 	FieldWuXing = "wu_xing"
 	// FieldLucky holds the string denoting the lucky field in the database.
 	FieldLucky = "lucky"
+	// FieldExplanation holds the string denoting the explanation field in the database.
+	FieldExplanation = "explanation"
 	// FieldComment holds the string denoting the comment field in the database.
 	FieldComment = "comment"
 	// Table holds the table name of the ncharacter in the database.
@@ -65,6 +67,7 @@ var Columns = []string{
 	FieldIsRegular,
 	FieldWuXing,
 	FieldLucky,
+	FieldExplanation,
 	FieldComment,
 }
 
@@ -159,6 +162,11 @@ func ByWuXing(opts ...sql.OrderTermOption) OrderOption {
 // ByLucky orders the results by the lucky field.
 func ByLucky(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLucky, opts...).ToFunc()
+}
+
+// ByExplanation orders the results by the explanation field.
+func ByExplanation(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExplanation, opts...).ToFunc()
 }
 
 // ByComment orders the results by the comment field.

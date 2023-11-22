@@ -181,6 +181,12 @@ func (nu *NCharacterUpdate) SetLucky(s string) *NCharacterUpdate {
 	return nu
 }
 
+// SetExplanation sets the "explanation" field.
+func (nu *NCharacterUpdate) SetExplanation(s string) *NCharacterUpdate {
+	nu.mutation.SetExplanation(s)
+	return nu
+}
+
 // SetComment sets the "comment" field.
 func (nu *NCharacterUpdate) SetComment(s string) *NCharacterUpdate {
 	nu.mutation.SetComment(s)
@@ -298,6 +304,9 @@ func (nu *NCharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := nu.mutation.Lucky(); ok {
 		_spec.SetField(ncharacter.FieldLucky, field.TypeString, value)
+	}
+	if value, ok := nu.mutation.Explanation(); ok {
+		_spec.SetField(ncharacter.FieldExplanation, field.TypeString, value)
 	}
 	if value, ok := nu.mutation.Comment(); ok {
 		_spec.SetField(ncharacter.FieldComment, field.TypeString, value)
@@ -475,6 +484,12 @@ func (nuo *NCharacterUpdateOne) SetLucky(s string) *NCharacterUpdateOne {
 	return nuo
 }
 
+// SetExplanation sets the "explanation" field.
+func (nuo *NCharacterUpdateOne) SetExplanation(s string) *NCharacterUpdateOne {
+	nuo.mutation.SetExplanation(s)
+	return nuo
+}
+
 // SetComment sets the "comment" field.
 func (nuo *NCharacterUpdateOne) SetComment(s string) *NCharacterUpdateOne {
 	nuo.mutation.SetComment(s)
@@ -622,6 +637,9 @@ func (nuo *NCharacterUpdateOne) sqlSave(ctx context.Context) (_node *NCharacter,
 	}
 	if value, ok := nuo.mutation.Lucky(); ok {
 		_spec.SetField(ncharacter.FieldLucky, field.TypeString, value)
+	}
+	if value, ok := nuo.mutation.Explanation(); ok {
+		_spec.SetField(ncharacter.FieldExplanation, field.TypeString, value)
 	}
 	if value, ok := nuo.mutation.Comment(); ok {
 		_spec.SetField(ncharacter.FieldComment, field.TypeString, value)

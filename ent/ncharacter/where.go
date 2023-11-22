@@ -122,6 +122,11 @@ func Lucky(v string) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldEQ(FieldLucky, v))
 }
 
+// Explanation applies equality check predicate on the "explanation" field. It's identical to ExplanationEQ.
+func Explanation(v string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldEQ(FieldExplanation, v))
+}
+
 // Comment applies equality check predicate on the "comment" field. It's identical to CommentEQ.
 func Comment(v string) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldEQ(FieldComment, v))
@@ -750,6 +755,71 @@ func LuckyEqualFold(v string) predicate.NCharacter {
 // LuckyContainsFold applies the ContainsFold predicate on the "lucky" field.
 func LuckyContainsFold(v string) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldContainsFold(FieldLucky, v))
+}
+
+// ExplanationEQ applies the EQ predicate on the "explanation" field.
+func ExplanationEQ(v string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldEQ(FieldExplanation, v))
+}
+
+// ExplanationNEQ applies the NEQ predicate on the "explanation" field.
+func ExplanationNEQ(v string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldNEQ(FieldExplanation, v))
+}
+
+// ExplanationIn applies the In predicate on the "explanation" field.
+func ExplanationIn(vs ...string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldIn(FieldExplanation, vs...))
+}
+
+// ExplanationNotIn applies the NotIn predicate on the "explanation" field.
+func ExplanationNotIn(vs ...string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldNotIn(FieldExplanation, vs...))
+}
+
+// ExplanationGT applies the GT predicate on the "explanation" field.
+func ExplanationGT(v string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldGT(FieldExplanation, v))
+}
+
+// ExplanationGTE applies the GTE predicate on the "explanation" field.
+func ExplanationGTE(v string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldGTE(FieldExplanation, v))
+}
+
+// ExplanationLT applies the LT predicate on the "explanation" field.
+func ExplanationLT(v string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldLT(FieldExplanation, v))
+}
+
+// ExplanationLTE applies the LTE predicate on the "explanation" field.
+func ExplanationLTE(v string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldLTE(FieldExplanation, v))
+}
+
+// ExplanationContains applies the Contains predicate on the "explanation" field.
+func ExplanationContains(v string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldContains(FieldExplanation, v))
+}
+
+// ExplanationHasPrefix applies the HasPrefix predicate on the "explanation" field.
+func ExplanationHasPrefix(v string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldHasPrefix(FieldExplanation, v))
+}
+
+// ExplanationHasSuffix applies the HasSuffix predicate on the "explanation" field.
+func ExplanationHasSuffix(v string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldHasSuffix(FieldExplanation, v))
+}
+
+// ExplanationEqualFold applies the EqualFold predicate on the "explanation" field.
+func ExplanationEqualFold(v string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldEqualFold(FieldExplanation, v))
+}
+
+// ExplanationContainsFold applies the ContainsFold predicate on the "explanation" field.
+func ExplanationContainsFold(v string) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldContainsFold(FieldExplanation, v))
 }
 
 // CommentEQ applies the EQ predicate on the "comment" field.

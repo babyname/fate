@@ -119,6 +119,12 @@ func (nc *NCharacterCreate) SetLucky(s string) *NCharacterCreate {
 	return nc
 }
 
+// SetExplanation sets the "explanation" field.
+func (nc *NCharacterCreate) SetExplanation(s string) *NCharacterCreate {
+	nc.mutation.SetExplanation(s)
+	return nc
+}
+
 // SetComment sets the "comment" field.
 func (nc *NCharacterCreate) SetComment(s string) *NCharacterCreate {
 	nc.mutation.SetComment(s)
@@ -219,6 +225,9 @@ func (nc *NCharacterCreate) check() error {
 	if _, ok := nc.mutation.Lucky(); !ok {
 		return &ValidationError{Name: "lucky", err: errors.New(`ent: missing required field "NCharacter.lucky"`)}
 	}
+	if _, ok := nc.mutation.Explanation(); !ok {
+		return &ValidationError{Name: "explanation", err: errors.New(`ent: missing required field "NCharacter.explanation"`)}
+	}
 	if _, ok := nc.mutation.Comment(); !ok {
 		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required field "NCharacter.comment"`)}
 	}
@@ -314,6 +323,10 @@ func (nc *NCharacterCreate) createSpec() (*NCharacter, *sqlgraph.CreateSpec) {
 	if value, ok := nc.mutation.Lucky(); ok {
 		_spec.SetField(ncharacter.FieldLucky, field.TypeString, value)
 		_node.Lucky = value
+	}
+	if value, ok := nc.mutation.Explanation(); ok {
+		_spec.SetField(ncharacter.FieldExplanation, field.TypeString, value)
+		_node.Explanation = value
 	}
 	if value, ok := nc.mutation.Comment(); ok {
 		_spec.SetField(ncharacter.FieldComment, field.TypeString, value)
@@ -590,6 +603,18 @@ func (u *NCharacterUpsert) SetLucky(v string) *NCharacterUpsert {
 // UpdateLucky sets the "lucky" field to the value that was provided on create.
 func (u *NCharacterUpsert) UpdateLucky() *NCharacterUpsert {
 	u.SetExcluded(ncharacter.FieldLucky)
+	return u
+}
+
+// SetExplanation sets the "explanation" field.
+func (u *NCharacterUpsert) SetExplanation(v string) *NCharacterUpsert {
+	u.Set(ncharacter.FieldExplanation, v)
+	return u
+}
+
+// UpdateExplanation sets the "explanation" field to the value that was provided on create.
+func (u *NCharacterUpsert) UpdateExplanation() *NCharacterUpsert {
+	u.SetExcluded(ncharacter.FieldExplanation)
 	return u
 }
 
@@ -909,6 +934,20 @@ func (u *NCharacterUpsertOne) SetLucky(v string) *NCharacterUpsertOne {
 func (u *NCharacterUpsertOne) UpdateLucky() *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.UpdateLucky()
+	})
+}
+
+// SetExplanation sets the "explanation" field.
+func (u *NCharacterUpsertOne) SetExplanation(v string) *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.SetExplanation(v)
+	})
+}
+
+// UpdateExplanation sets the "explanation" field to the value that was provided on create.
+func (u *NCharacterUpsertOne) UpdateExplanation() *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.UpdateExplanation()
 	})
 }
 
@@ -1396,6 +1435,20 @@ func (u *NCharacterUpsertBulk) SetLucky(v string) *NCharacterUpsertBulk {
 func (u *NCharacterUpsertBulk) UpdateLucky() *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.UpdateLucky()
+	})
+}
+
+// SetExplanation sets the "explanation" field.
+func (u *NCharacterUpsertBulk) SetExplanation(v string) *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.SetExplanation(v)
+	})
+}
+
+// UpdateExplanation sets the "explanation" field to the value that was provided on create.
+func (u *NCharacterUpsertBulk) UpdateExplanation() *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.UpdateExplanation()
 	})
 }
 
