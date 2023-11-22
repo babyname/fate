@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
+// NCharacter holds the schema definition for the NCharacter entity.
 type NCharacter struct {
 	ent.Schema
 }
@@ -19,6 +20,7 @@ const (
 	CharTypeVariant     = 0x08
 )
 
+// Fields of the NCharacter.
 func (NCharacter) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int32("id"), //rune code
@@ -41,9 +43,13 @@ func (NCharacter) Fields() []ent.Field {
 		field.String("comment"),
 	}
 }
+
+// Edges of the NCharacter.
 func (NCharacter) Edges() []ent.Edge {
 	return nil
 }
+
+// Annotations of the NCharacter.
 func (NCharacter) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.Annotation{Table: "n_character"},
