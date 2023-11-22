@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/ent/idiom"
 	"github.com/babyname/fate/ent/ncharacter"
 	"github.com/babyname/fate/ent/version"
 	"github.com/babyname/fate/ent/wugelucky"
@@ -78,6 +79,7 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			character.Table:  character.ValidColumn,
+			idiom.Table:      idiom.ValidColumn,
 			ncharacter.Table: ncharacter.ValidColumn,
 			version.Table:    version.ValidColumn,
 			wugelucky.Table:  wugelucky.ValidColumn,

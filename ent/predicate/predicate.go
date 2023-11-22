@@ -9,6 +9,9 @@ import (
 // Character is the predicate function for character builders.
 type Character func(*sql.Selector)
 
+// Idiom is the predicate function for idiom builders.
+type Idiom func(*sql.Selector)
+
 // NCharacter is the predicate function for ncharacter builders.
 type NCharacter func(*sql.Selector)
 

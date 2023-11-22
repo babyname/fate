@@ -132,6 +132,61 @@ func (cu *CharacterUpdate) SetCharacterWithOptional(input *Character) *Character
 	return cu
 }
 
+func (ic *IdiomCreate) SetIdiom(input *Idiom) *IdiomCreate {
+	ic.SetPinYin(input.PinYin)
+	ic.SetWord(input.Word)
+	ic.SetDerivation(input.Derivation)
+	ic.SetExplanation(input.Explanation)
+	ic.SetAbbreviation(input.Abbreviation)
+	ic.SetExample(input.Example)
+	ic.SetComment(input.Comment)
+	return ic
+}
+
+func (ic *IdiomCreate) SetIdiomWithOptional(input *Idiom) *IdiomCreate {
+	ic.SetPinYin(input.PinYin)
+	ic.SetWord(input.Word)
+	ic.SetDerivation(input.Derivation)
+	ic.SetExplanation(input.Explanation)
+	ic.SetAbbreviation(input.Abbreviation)
+	ic.SetExample(input.Example)
+	ic.SetComment(input.Comment)
+	return ic
+}
+
+func (iuo *IdiomUpdateOne) SetIdiom(input *Idiom) *IdiomUpdateOne {
+	iuo.SetPinYin(input.PinYin)
+	iuo.SetWord(input.Word)
+	iuo.SetDerivation(input.Derivation)
+	iuo.SetExplanation(input.Explanation)
+	iuo.SetAbbreviation(input.Abbreviation)
+	iuo.SetExample(input.Example)
+	iuo.SetComment(input.Comment)
+	return iuo
+}
+
+func (iu *IdiomUpdate) SetIdiom(input *Idiom) *IdiomUpdate {
+	iu.SetPinYin(input.PinYin)
+	iu.SetWord(input.Word)
+	iu.SetDerivation(input.Derivation)
+	iu.SetExplanation(input.Explanation)
+	iu.SetAbbreviation(input.Abbreviation)
+	iu.SetExample(input.Example)
+	iu.SetComment(input.Comment)
+	return iu
+}
+
+func (iu *IdiomUpdate) SetIdiomWithOptional(input *Idiom) *IdiomUpdate {
+	iu.SetPinYin(input.PinYin)
+	iu.SetWord(input.Word)
+	iu.SetDerivation(input.Derivation)
+	iu.SetExplanation(input.Explanation)
+	iu.SetAbbreviation(input.Abbreviation)
+	iu.SetExample(input.Example)
+	iu.SetComment(input.Comment)
+	return iu
+}
+
 func (nc *NCharacterCreate) SetNCharacter(input *NCharacter) *NCharacterCreate {
 	nc.SetPinYin(input.PinYin)
 	nc.SetCh(input.Ch)

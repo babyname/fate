@@ -14,22 +14,12 @@ type Idiom struct {
 func (Idiom) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int32("id"), //rune code
-		field.String("pin_yin"),
-		field.String("ch"),
-		field.Int("ch_stroke"),
-		field.Int("ch_type").Default(CharTypeUnknown),
-		field.String("radical"),
-		field.Int("radical_stroke"),
-		field.Int32("relate"), // relate simple chinese
-		field.Int32("relate_kang_xi"),
-		field.Int32("relate_traditional"),
-		field.Strings("relate_variant"), //relate other variant characters
-		field.Bool("is_name_science"),
-		field.Int("name_science_ch_stroke"),
-		field.Bool("is_regular"),
-		field.String("wu_xing"),
-		field.String("lucky"),
+		field.Strings("pin_yin"),
+		field.String("word"),
+		field.Int("derivation"),
 		field.String("explanation"),
+		field.Int("abbreviation"),
+		field.String("example"),
 		field.String("comment"),
 	}
 }

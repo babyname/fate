@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Character is the client for interacting with the Character builders.
 	Character *CharacterClient
+	// Idiom is the client for interacting with the Idiom builders.
+	Idiom *IdiomClient
 	// NCharacter is the client for interacting with the NCharacter builders.
 	NCharacter *NCharacterClient
 	// Version is the client for interacting with the Version builders.
@@ -154,6 +156,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Character = NewCharacterClient(tx.config)
+	tx.Idiom = NewIdiomClient(tx.config)
 	tx.NCharacter = NewNCharacterClient(tx.config)
 	tx.Version = NewVersionClient(tx.config)
 	tx.WuGeLucky = NewWuGeLuckyClient(tx.config)

@@ -41,6 +41,23 @@ var (
 		Columns:    CharacterColumns,
 		PrimaryKey: []*schema.Column{CharacterColumns[0]},
 	}
+	// IdiomsColumns holds the columns for the "idioms" table.
+	IdiomsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt32, Increment: true},
+		{Name: "pin_yin", Type: field.TypeJSON},
+		{Name: "word", Type: field.TypeString},
+		{Name: "derivation", Type: field.TypeInt},
+		{Name: "explanation", Type: field.TypeString},
+		{Name: "abbreviation", Type: field.TypeInt},
+		{Name: "example", Type: field.TypeString},
+		{Name: "comment", Type: field.TypeString},
+	}
+	// IdiomsTable holds the schema information for the "idioms" table.
+	IdiomsTable = &schema.Table{
+		Name:       "idioms",
+		Columns:    IdiomsColumns,
+		PrimaryKey: []*schema.Column{IdiomsColumns[0]},
+	}
 	// NCharacterColumns holds the columns for the "n_character" table.
 	NCharacterColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt32, Increment: true},
@@ -140,6 +157,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CharacterTable,
+		IdiomsTable,
 		NCharacterTable,
 		VersionsTable,
 		WuGeLuckyTable,
