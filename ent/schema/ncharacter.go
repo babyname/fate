@@ -23,22 +23,22 @@ const (
 // Fields of the NCharacter.
 func (NCharacter) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int32("id"), //rune code
-		field.String("pin_yin"),
-		field.String("ch"),
-		field.Int("ch_stroke"),
-		field.Int("ch_type").Default(CharTypeUnknown),
-		field.String("radical"),
-		field.Int("radical_stroke"),
-		field.Int32("relate"), // relate simple chinese
-		field.Int32("relate_kang_xi"),
-		field.Int32("relate_traditional"),
-		field.Strings("relate_variant"), //relate other variant characters
-		field.Bool("is_name_science"),
-		field.Int("name_science_ch_stroke"),
-		field.Bool("is_regular"),
-		field.String("wu_xing"),
-		field.String("lucky"),
+		field.Int("id"),                               //char rune code
+		field.Strings("pin_yin"),                      //pinyin
+		field.String("ch"),                            //char
+		field.Int("ch_stroke"),                        //char stroke
+		field.Int("ch_type").Default(CharTypeUnknown), //char type
+		field.String("radical"),                       //radical
+		field.Int("radical_stroke"),                   //radical stroke
+		field.Ints("relate_simplified"),               // relate simple chinese
+		field.Ints("relate_kang_xi"),                  //relate kang xi chinese
+		field.Ints("relate_traditional"),              //relate traditional chinese
+		field.Ints("relate_variant"),                  //relate other variant characters
+		field.Bool("is_name_science"),                 //is name science
+		field.Int("name_science_ch_stroke"),           //name science stroke
+		field.Bool("is_regular"),                      //is regular
+		field.String("wu_xing"),                       //wu xing
+		field.String("lucky"),                         //lucky
 		field.String("explanation"),
 		field.String("comment"),
 	}
