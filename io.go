@@ -29,12 +29,12 @@ func (i *Input) Output() *Output {
 }
 
 type Output struct {
-	basic *NameBasic
+	basic *BasicInfo
 	cache cache.FilterCache
 	name  chan FirstName
 }
 
-func (o *Output) Basic() *NameBasic {
+func (o *Output) Basic() *BasicInfo {
 	return o.basic
 }
 
@@ -50,7 +50,7 @@ func (o *Output) NextName() (Name, bool) {
 	fn, ok := o.cache.Next()
 	if ok {
 		return Name{
-			NameBasic: o.basic,
+			BasicInfo: o.basic,
 			FirstName: fn,
 		}, true
 	}

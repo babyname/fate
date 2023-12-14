@@ -2,26 +2,24 @@ module github.com/babyname/fate
 
 require (
 	entgo.io/ent v0.11.9
-	github.com/6tail/lunar-go v1.2.21
-	github.com/cespare/xxhash/v2 v2.2.0
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/godcong/chronos v0.0.3
+	github.com/godcong/chronos/v2 v2.0.6
 	github.com/godcong/yi v1.0.2
 	github.com/goextension/log v0.0.2
 	github.com/google/uuid v1.3.0
 	github.com/mattn/go-sqlite3 v1.14.16
-	github.com/rakyll/statik v0.1.6
 	github.com/spf13/cobra v1.6.1
+	github.com/sqlite3ent/sqlite3 v1.0.0
 	github.com/tikafog/jsongs v1.0.2
-	github.com/xormsharp/builder v0.3.8
 	github.com/xormsharp/xorm v1.0.4
-	go.uber.org/zap v1.13.0
-	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
+	golang.org/x/net v0.7.0
+	golang.org/x/sync v0.1.0
 )
 
 require (
 	ariga.io/atlas v0.9.1 // indirect
-	github.com/BurntSushi/toml v0.3.1 // indirect
+	github.com/6tail/lunar-go v1.3.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
@@ -33,23 +31,16 @@ require (
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
+	github.com/rakyll/statik v0.1.6 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/sqlite3ent/sqlite3 v1.0.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
+	github.com/xormsharp/builder v0.3.8 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
-	go.uber.org/atomic v1.5.0 // indirect
-	go.uber.org/multierr v1.3.0 // indirect
-	go.uber.org/tools v0.0.0-20190618225709-2cfd321de3ee // indirect
-	golang.org/x/lint v0.0.0-20190930215403-16217165b5de // indirect
 	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/net v0.7.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/term v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/tools v0.6.1-0.20230222164832-25d2519c8696 // indirect
-	honnef.co/go/tools v0.0.1-2019.2.3 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
 	modernc.org/ccgo/v3 v3.16.13 // indirect

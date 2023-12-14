@@ -4,11 +4,12 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"golang.org/x/net/context"
+	"golang.org/x/sync/errgroup"
+
 	"github.com/babyname/fate/cache"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/model"
-	"golang.org/x/net/context"
-	"golang.org/x/sync/errgroup"
 )
 
 // SessionState ...
@@ -188,7 +189,7 @@ func (s *session) close() {
 	}
 }
 
-func getLastStrokeFromBasic(filter Filter, basic *NameBasic) [2]int {
+func getLastStrokeFromBasic(filter Filter, basic *BasicInfo) [2]int {
 	var strokes [2]int
 	sg := strokeGetFromFilterType(filter.FilterType())
 	strokes[0] = sg(basic.LastName[0])

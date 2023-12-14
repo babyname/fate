@@ -4,10 +4,10 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/babyname/fate/dayan"
+	"github.com/babyname/fate/core"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/character"
-	"github.com/babyname/fate/wuxing"
+	"github.com/babyname/fate/internal/dayan"
 )
 
 var defaultFilter = newFilter()
@@ -264,7 +264,7 @@ func regularFilter(query *ent.CharacterQuery) *ent.CharacterQuery {
 }
 
 func wuXingFilter(ge int, ge2 int, ge3 int) bool {
-	sc := wuxing.NewSanCai(ge, ge2, ge3)
+	sc := core.NewSanCai(ge, ge2, ge3)
 	return sc.Check(5) == false
 }
 
