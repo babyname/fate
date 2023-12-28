@@ -18,7 +18,7 @@ type SessionState int32
 
 type Session interface {
 	Context() context.Context
-	Start(input *Input) error
+	Start(input *Input, cfg *SessionConfig) error
 	Stop() error
 	Err() error
 }
@@ -45,7 +45,7 @@ func (s *session) SetState(state SessionState) {
 	atomic.StoreInt32(&s.state, int32(state))
 }
 
-func (s *session) Start(input *Input) error {
+func (s *session) Start(input *Input, cfg *SessionConfig) error {
 	log.Info("start", "input", input)
 	if s.State() != SessionStateWaiting {
 		return nil
@@ -223,3 +223,5 @@ func strokeGetFromFilterType(ct CharacterFilterType) func(c *ent.Character) int 
 		}
 	}
 }
+
+var _ Session = (*session)(nil)

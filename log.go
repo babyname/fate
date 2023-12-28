@@ -1,7 +1,11 @@
 package fate
 
 import (
-	logger "github.com/babyname/fate/log"
+	"log/slog"
 )
 
-var log logger.Logger
+var log *slog.Logger
+
+func init() {
+	log = slog.Default()
+}

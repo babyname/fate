@@ -6,7 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/babyname/fate/transfer"
+	transfer2 "github.com/babyname/fate/tools/transfer"
 )
 
 const programName = `transfer`
@@ -19,11 +19,11 @@ var rootCmd = &cobra.Command{
 	Short:   "call command for transfer database to other database",
 	Version: version,
 	Run: func(cmd *cobra.Command, args []string) {
-		config, err := transfer.ReadTransferConfig(path)
+		config, err := transfer2.ReadTransferConfig(path)
 		if err != nil {
 			panic(err)
 		}
-		t, err := transfer.NewTransfer(config)
+		t, err := transfer2.NewTransfer(config)
 		if err != nil {
 			panic(err)
 		}
