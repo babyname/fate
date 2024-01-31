@@ -24,9 +24,12 @@ func TestLoad(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := LoadCharJSON(tt.args.path, func(phone PolyPhone) bool {
+			err := LoadCharJSON(tt.args.path, func(phone PolyPhone) bool {
 				return false
 			})
+			if err != nil {
+				t.Error(err)
+			}
 		})
 	}
 }
