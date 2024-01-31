@@ -13,7 +13,7 @@ type PolyPhone struct {
 	Strokes   int      `json:"strokes"`
 }
 
-func LoadCharJSON(path string) []PolyPhone {
+func LoadCharJSON(path string, hook func(phone PolyPhone) bool) error {
 	//load polyphone from json file
 	of, err := os.Open(path)
 	if err != nil {
@@ -24,7 +24,12 @@ func LoadCharJSON(path string) []PolyPhone {
 	var polyphone []PolyPhone
 	err = decoder.Decode(&polyphone)
 	if err != nil {
-		return nil
+		return err
 	}
-	return polyphone
+	for _, phone := range polyphone {
+		if !hook(phone) {
+			return nil
+		}
+	}
+	return nil
 }

@@ -15,15 +15,6 @@ type PinYin struct {
 	Pinyin []string
 }
 
-var test = `# version: 0.13.0
-# source: https://github.com/mozillazg/pinyin-data
-U+3007: líng,yuán,xīng  # 〇
-U+3400: qiū  # 㐀
-U+3401: tiàn  # 㐁
-U+3404: kuà  # 㐄
-U+3405: wǔ  # 㐅
-U+3406: yǐn  # 㐆`
-
 func LoadPinYin(path string, hook func(yin *PinYin) bool) {
 	py, err := os.Open(path)
 	if err != nil {
@@ -33,7 +24,7 @@ func LoadPinYin(path string, hook func(yin *PinYin) bool) {
 	defer py.Close()
 	//readline from open file
 	br := bufio.NewReader(py)
-	//var pys []*PinYin
+
 	for {
 		line, _, err := br.ReadLine()
 		if err != nil {
@@ -52,8 +43,6 @@ func LoadPinYin(path string, hook func(yin *PinYin) bool) {
 			}
 		}
 	}
-	//slog.Info("pinyin list", "size", len(pys))
-	//return pys
 	return
 }
 

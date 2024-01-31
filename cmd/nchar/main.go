@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	_ "github.com/sqlite3ent/sqlite3"
 
@@ -38,10 +37,10 @@ func main() {
 	}
 
 	//per := 500
-	//var cs []*ent.Character
+	//var cs []*ent.Characters
 	//for i := 0; i < count; i += per {
 	//	fmt.Println("update character", "offset", i)
-	//	cs, err = client.Character.Query().Offset(i).Limit(per).All(ctx)
+	//	cs, err = client.Characters.Query().Offset(i).Limit(per).All(ctx)
 	//	if err != nil {
 	//		fmt.Println("found error on", "offset", i, "limit", per, "error", err)
 	//		continue
@@ -76,21 +75,71 @@ func main() {
 	//	return true
 	//})
 
-	source.LoadWord("word.json", func(w source.Word) bool {
-		if len(w.Word) == 0 {
+	//source.LoadWord("word.json", func(w source.Word) bool {
+	//	if len(w.Word) == 0 {
+	//		return true
+	//	}
+	//	exist, err := client.NCharacter.Get(ctx, int([]rune(w.Word)[0]))
+	//	if err != nil {
+	//		fmt.Println("character not exist", "id", int([]rune(w.Word)[0]), "char", w.Word, "pinyin", w.Pinyin)
+	//		s, _ := strconv.ParseInt(w.Strokes, 10, 32)
+	//		_, err = client.NCharacter.Create().
+	//			SetID(int(int([]rune(w.Word)[0]))).
+	//			SetChar(string([]rune{rune(int([]rune(w.Word)[0]))})).
+	//			SetCharStroke(int(s)).
+	//			SetRadicalStroke(0).
+	//			SetRadical(w.Radicals).
+	//			SetPinYin([]string{w.Pinyin}).SetNeedFix(true).Save(ctx)
+	//		if err != nil {
+	//			fmt.Println("something went wrong", "error", err)
+	//		}
+	//		return true
+	//	}
+	//	up := exist.Update()
+	//	need := false
+	//	if exist.Radical != w.Radicals {
+	//		need = true
+	//		fmt.Println("radical is not a equal", "char", w.Word, "source", exist.Radical, "target", w.Radicals)
+	//		if exist.Radical == "" {
+	//			up.SetRadical(w.Radicals)
+	//		}
+	//	}
+	//	s, _ := strconv.ParseInt(w.Strokes, 10, 32)
+	//	if exist.CharStroke != int(s) {
+	//		need = true
+	//		fmt.Println("strokes is not a equal", "char", w.Word, "source", exist.CharStroke, "target", w.Strokes)
+	//		if exist.CharStroke == 0 {
+	//			up.SetCharStroke(int(s))
+	//		}
+	//	}
+	//	_, _ = up.SetNeedFix(need).Save(ctx)
+	//	return true
+	//})
+
+	err = source.LoadCharDetailJSON("char_detail.json", func(ch source.Character) bool {
+		if len(ch.Char) == 0 {
 			return true
 		}
-		exist, err := client.NCharacter.Get(ctx, int([]rune(w.Word)[0]))
+		var pinyin []string
+		for _, pron := range ch.Pronunciations {
+			//fmt.Println("pinyin", pron.Pinyin)
+			//pron.Pinyin
+			//for _, exp := range pron.Explanations {
+
+			//}
+			pinyin = append(pinyin, pron.Pinyin)
+		}
+		exist, err := client.NCharacter.Get(ctx, int([]rune(ch.Char)[0]))
 		if err != nil {
-			fmt.Println("character not exist", "id", int([]rune(w.Word)[0]), "char", w.Word, "pinyin", w.Pinyin)
-			s, _ := strconv.ParseInt(w.Strokes, 10, 32)
+			fmt.Println("character not exist", "id", int([]rune(ch.Char)[0]), "char", ch.Char)
+
 			_, err = client.NCharacter.Create().
-				SetID(int(int([]rune(w.Word)[0]))).
-				SetChar(string([]rune{rune(int([]rune(w.Word)[0]))})).
-				SetCharStroke(int(s)).
+				SetID(int(int([]rune(ch.Char)[0]))).
+				SetChar(string([]rune{rune(int([]rune(ch.Char)[0]))})).
+				//SetCharStroke(int(phone.Strokes)).
 				SetRadicalStroke(0).
-				SetRadical(w.Radicals).
-				SetPinYin([]string{w.Pinyin}).SetNeedFix(true).Save(ctx)
+				//SetRadical(phone.).
+				SetPinYin(pinyin).SetNeedFix(true).Save(ctx)
 			if err != nil {
 				fmt.Println("something went wrong", "error", err)
 			}
@@ -98,24 +147,17 @@ func main() {
 		}
 		up := exist.Update()
 		need := false
-		if exist.Radical != w.Radicals {
+		if len(exist.PinYin) != len(pinyin) {
 			need = true
-			fmt.Println("radical is not a equal", "char", w.Word, "source", exist.Radical, "target", w.Radicals)
-			if exist.Radical == "" {
-				up.SetRadical(w.Radicals)
-			}
-		}
-		s, _ := strconv.ParseInt(w.Strokes, 10, 32)
-		if exist.CharStroke != int(s) {
-			need = true
-			fmt.Println("strokes is not a equal", "char", w.Word, "source", exist.CharStroke, "target", w.Strokes)
-			if exist.CharStroke == 0 {
-				up.SetCharStroke(int(s))
-			}
+			fmt.Println("pinyin is not a equal", "char", ch.Char, "source", exist.PinYin, "pinyin", pinyin)
 		}
 		_, _ = up.SetNeedFix(need).Save(ctx)
 		return true
 	})
+	if err != nil {
+		panic(err)
+	}
+
 }
 
 func mergePinYin(source, target []string) []string {
