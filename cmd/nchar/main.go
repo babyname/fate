@@ -9,6 +9,7 @@ import (
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/database"
 	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/source"
 )
 
 func main() {
@@ -207,46 +208,48 @@ func main() {
 	//}
 	//fmt.Println("char detail count", total)
 
-	//total = 0
-	//err = source.LoadKangXiChar("kangxi-strokecount.csv", func(kx source.KangXi) bool {
-	//	total++
-	//	if len(kx.Character) == 0 {
-	//		return true
-	//	}
-	//	exist, err := client.NCharacter.Get(ctx, int([]rune(kx.Character)[0]))
-	//	if err != nil {
-	//		fmt.Println("character not exist", "id", int([]rune(kx.Character)[0]), "char", kx.Character, "stroke", kx.Strokes)
-	//		_, err = client.NCharacter.Create().
-	//			SetID(int(int([]rune(kx.Character)[0]))).
-	//			SetChar(string([]rune{rune(int([]rune(kx.Character)[0]))})).
-	//			SetCharStroke(int(kx.Strokes)).
-	//			//SetRadicalStroke(0).
-	//			//SetRadical(w.Radicals).
-	//			//SetPinYin([]string{w.Pinyin})
-	//			SetKangXiStroke(kx.Strokes).
-	//			SetIsKangXi(true).
-	//			SetNeedFix(true).Save(ctx)
-	//		if err != nil {
-	//			fmt.Println("something went wrong", "error", err)
-	//		}
-	//		return true
-	//	}
-	//	up := exist.Update()
-	//	up.SetIsKangXi(true)
-	//	need := false
-	//	if exist.CharStroke != kx.Strokes {
-	//		need = true
-	//		fmt.Println("strokes is not a equal", "char", kx.Character, "source", exist.CharStroke, "target", kx.Strokes)
-	//		if exist.CharStroke == 0 {
-	//			up.SetCharStroke(kx.Strokes)
-	//		} else {
-	//			up.SetKangXiStroke(kx.Strokes)
-	//		}
-	//	}
-	//	_, _ = up.SetNeedFix(need).Save(ctx)
-	//	return true
-	//})
-	//fmt.Println("kangxi char count", total)
+	total = 0
+	err = source.LoadKangXiChar("kangxi-strokecount.csv", func(kx source.KangXi) bool {
+		total++
+		if len(kx.Character) == 0 {
+			return true
+		}
+		exist, err := client.NCharacter.Get(ctx, int([]rune(kx.Character)[0]))
+		if err != nil {
+			fmt.Println("character not exist", "id", int([]rune(kx.Character)[0]), "char", kx.Character, "stroke", kx.Strokes)
+			_, err = client.NCharacter.Create().
+				SetID(int(int([]rune(kx.Character)[0]))).
+				SetChar(string([]rune{rune(int([]rune(kx.Character)[0]))})).
+				SetCharStroke(int(kx.Strokes)).
+				//SetRadicalStroke(0).
+				//SetRadical(w.Radicals).
+				//SetPinYin([]string{w.Pinyin})
+				SetKangXiStroke(kx.Strokes).
+				SetIsKangXi(true).
+				SetNeedFix(true).Save(ctx)
+			if err != nil {
+				fmt.Println("something went wrong", "error", err)
+			}
+			return true
+		}
+		up := exist.Update()
+		up.SetIsKangXi(true)
+		up.SetKangXiStroke(kx.Strokes)
+		need := false
+		//fmt.Println("kangxi", "cp", kx.CodePoint, "id", kx.Value)
+		if exist.CharStroke != kx.Strokes {
+			need = true
+			fmt.Println("strokes is not a equal", "char", kx.Character, "source", exist.CharStroke, "target", kx.Strokes)
+			if exist.CharStroke == 0 {
+				up.SetCharStroke(kx.Strokes)
+			} else {
+				up.SetKangXiStroke(kx.Strokes)
+			}
+		}
+		_, _ = up.SetNeedFix(need).Save(ctx)
+		return true
+	})
+	fmt.Println("kangxi char count", total)
 
 }
 

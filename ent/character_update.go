@@ -216,8 +216,14 @@ func (cu *CharacterUpdate) AppendVariantCharacter(s []string) *CharacterUpdate {
 }
 
 // SetComment sets the "comment" field.
-func (cu *CharacterUpdate) SetComment(s string) *CharacterUpdate {
+func (cu *CharacterUpdate) SetComment(s []string) *CharacterUpdate {
 	cu.mutation.SetComment(s)
+	return cu
+}
+
+// AppendComment appends s to the "comment" field.
+func (cu *CharacterUpdate) AppendComment(s []string) *CharacterUpdate {
+	cu.mutation.AppendComment(s)
 	return cu
 }
 
@@ -372,7 +378,12 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		})
 	}
 	if value, ok := cu.mutation.Comment(); ok {
-		_spec.SetField(character.FieldComment, field.TypeString, value)
+		_spec.SetField(character.FieldComment, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.AppendedComment(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, character.FieldComment, value)
+		})
 	}
 	if value, ok := cu.mutation.ScienceStroke(); ok {
 		_spec.SetField(character.FieldScienceStroke, field.TypeInt, value)
@@ -588,8 +599,14 @@ func (cuo *CharacterUpdateOne) AppendVariantCharacter(s []string) *CharacterUpda
 }
 
 // SetComment sets the "comment" field.
-func (cuo *CharacterUpdateOne) SetComment(s string) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) SetComment(s []string) *CharacterUpdateOne {
 	cuo.mutation.SetComment(s)
+	return cuo
+}
+
+// AppendComment appends s to the "comment" field.
+func (cuo *CharacterUpdateOne) AppendComment(s []string) *CharacterUpdateOne {
+	cuo.mutation.AppendComment(s)
 	return cuo
 }
 
@@ -774,7 +791,12 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 		})
 	}
 	if value, ok := cuo.mutation.Comment(); ok {
-		_spec.SetField(character.FieldComment, field.TypeString, value)
+		_spec.SetField(character.FieldComment, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.AppendedComment(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, character.FieldComment, value)
+		})
 	}
 	if value, ok := cuo.mutation.ScienceStroke(); ok {
 		_spec.SetField(character.FieldScienceStroke, field.TypeInt, value)

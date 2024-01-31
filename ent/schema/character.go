@@ -34,7 +34,7 @@ func (Character) Fields() []ent.Field {
 		field.Bool("regular"),
 		field.Strings("traditional_character"),
 		field.Strings("variant_character"),
-		field.String("comment"),
+		field.Strings("comment"),
 		field.Int("science_stroke")}
 }
 

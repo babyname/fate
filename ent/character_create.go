@@ -143,7 +143,7 @@ func (cc *CharacterCreate) SetVariantCharacter(s []string) *CharacterCreate {
 }
 
 // SetComment sets the "comment" field.
-func (cc *CharacterCreate) SetComment(s string) *CharacterCreate {
+func (cc *CharacterCreate) SetComment(s []string) *CharacterCreate {
 	cc.mutation.SetComment(s)
 	return cc
 }
@@ -377,7 +377,7 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		_node.VariantCharacter = value
 	}
 	if value, ok := cc.mutation.Comment(); ok {
-		_spec.SetField(character.FieldComment, field.TypeString, value)
+		_spec.SetField(character.FieldComment, field.TypeJSON, value)
 		_node.Comment = value
 	}
 	if value, ok := cc.mutation.ScienceStroke(); ok {
@@ -719,7 +719,7 @@ func (u *CharacterUpsert) UpdateVariantCharacter() *CharacterUpsert {
 }
 
 // SetComment sets the "comment" field.
-func (u *CharacterUpsert) SetComment(v string) *CharacterUpsert {
+func (u *CharacterUpsert) SetComment(v []string) *CharacterUpsert {
 	u.Set(character.FieldComment, v)
 	return u
 }
@@ -1126,7 +1126,7 @@ func (u *CharacterUpsertOne) UpdateVariantCharacter() *CharacterUpsertOne {
 }
 
 // SetComment sets the "comment" field.
-func (u *CharacterUpsertOne) SetComment(v string) *CharacterUpsertOne {
+func (u *CharacterUpsertOne) SetComment(v []string) *CharacterUpsertOne {
 	return u.Update(func(s *CharacterUpsert) {
 		s.SetComment(v)
 	})
@@ -1700,7 +1700,7 @@ func (u *CharacterUpsertBulk) UpdateVariantCharacter() *CharacterUpsertBulk {
 }
 
 // SetComment sets the "comment" field.
-func (u *CharacterUpsertBulk) SetComment(v string) *CharacterUpsertBulk {
+func (u *CharacterUpsertBulk) SetComment(v []string) *CharacterUpsertBulk {
 	return u.Update(func(s *CharacterUpsert) {
 		s.SetComment(v)
 	})

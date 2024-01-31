@@ -137,11 +137,6 @@ func Regular(v bool) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldRegular, v))
 }
 
-// Comment applies equality check predicate on the "comment" field. It's identical to CommentEQ.
-func Comment(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldComment, v))
-}
-
 // ScienceStroke applies equality check predicate on the "science_stroke" field. It's identical to ScienceStrokeEQ.
 func ScienceStroke(v int) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldScienceStroke, v))
@@ -910,71 +905,6 @@ func RegularEQ(v bool) predicate.Character {
 // RegularNEQ applies the NEQ predicate on the "regular" field.
 func RegularNEQ(v bool) predicate.Character {
 	return predicate.Character(sql.FieldNEQ(FieldRegular, v))
-}
-
-// CommentEQ applies the EQ predicate on the "comment" field.
-func CommentEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldComment, v))
-}
-
-// CommentNEQ applies the NEQ predicate on the "comment" field.
-func CommentNEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldComment, v))
-}
-
-// CommentIn applies the In predicate on the "comment" field.
-func CommentIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldComment, vs...))
-}
-
-// CommentNotIn applies the NotIn predicate on the "comment" field.
-func CommentNotIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldComment, vs...))
-}
-
-// CommentGT applies the GT predicate on the "comment" field.
-func CommentGT(v string) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldComment, v))
-}
-
-// CommentGTE applies the GTE predicate on the "comment" field.
-func CommentGTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldComment, v))
-}
-
-// CommentLT applies the LT predicate on the "comment" field.
-func CommentLT(v string) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldComment, v))
-}
-
-// CommentLTE applies the LTE predicate on the "comment" field.
-func CommentLTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldComment, v))
-}
-
-// CommentContains applies the Contains predicate on the "comment" field.
-func CommentContains(v string) predicate.Character {
-	return predicate.Character(sql.FieldContains(FieldComment, v))
-}
-
-// CommentHasPrefix applies the HasPrefix predicate on the "comment" field.
-func CommentHasPrefix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasPrefix(FieldComment, v))
-}
-
-// CommentHasSuffix applies the HasSuffix predicate on the "comment" field.
-func CommentHasSuffix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasSuffix(FieldComment, v))
-}
-
-// CommentEqualFold applies the EqualFold predicate on the "comment" field.
-func CommentEqualFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldEqualFold(FieldComment, v))
-}
-
-// CommentContainsFold applies the ContainsFold predicate on the "comment" field.
-func CommentContainsFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldContainsFold(FieldComment, v))
 }
 
 // ScienceStrokeEQ applies the EQ predicate on the "science_stroke" field.

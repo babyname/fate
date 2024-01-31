@@ -74,7 +74,8 @@ type CharacterMutation struct {
 	appendtraditional_character   []string
 	variant_character             *[]string
 	appendvariant_character       []string
-	comment                       *string
+	comment                       *[]string
+	appendcomment                 []string
 	science_stroke                *int
 	addscience_stroke             *int
 	clearedFields                 map[string]struct{}
@@ -1093,12 +1094,13 @@ func (m *CharacterMutation) ResetVariantCharacter() {
 }
 
 // SetComment sets the "comment" field.
-func (m *CharacterMutation) SetComment(s string) {
+func (m *CharacterMutation) SetComment(s []string) {
 	m.comment = &s
+	m.appendcomment = nil
 }
 
 // Comment returns the value of the "comment" field in the mutation.
-func (m *CharacterMutation) Comment() (r string, exists bool) {
+func (m *CharacterMutation) Comment() (r []string, exists bool) {
 	v := m.comment
 	if v == nil {
 		return
@@ -1109,7 +1111,7 @@ func (m *CharacterMutation) Comment() (r string, exists bool) {
 // OldComment returns the old "comment" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldComment(ctx context.Context) (v string, err error) {
+func (m *CharacterMutation) OldComment(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldComment is only allowed on UpdateOne operations")
 	}
@@ -1123,9 +1125,23 @@ func (m *CharacterMutation) OldComment(ctx context.Context) (v string, err error
 	return oldValue.Comment, nil
 }
 
+// AppendComment adds s to the "comment" field.
+func (m *CharacterMutation) AppendComment(s []string) {
+	m.appendcomment = append(m.appendcomment, s...)
+}
+
+// AppendedComment returns the list of values that were appended to the "comment" field in this mutation.
+func (m *CharacterMutation) AppendedComment() ([]string, bool) {
+	if len(m.appendcomment) == 0 {
+		return nil, false
+	}
+	return m.appendcomment, true
+}
+
 // ResetComment resets all changes to the "comment" field.
 func (m *CharacterMutation) ResetComment() {
 	m.comment = nil
+	m.appendcomment = nil
 }
 
 // SetScienceStroke sets the "science_stroke" field.
@@ -1540,7 +1556,7 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetVariantCharacter(v)
 		return nil
 	case character.FieldComment:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

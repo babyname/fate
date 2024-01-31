@@ -32,7 +32,7 @@ var (
 		{Name: "regular", Type: field.TypeBool},
 		{Name: "traditional_character", Type: field.TypeJSON},
 		{Name: "variant_character", Type: field.TypeJSON},
-		{Name: "comment", Type: field.TypeString},
+		{Name: "comment", Type: field.TypeJSON},
 		{Name: "science_stroke", Type: field.TypeInt},
 	}
 	// CharacterTable holds the schema information for the "character" table.

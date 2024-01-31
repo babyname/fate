@@ -57,7 +57,7 @@ type Character struct {
 	// VariantCharacter holds the value of the "variant_character" field.
 	VariantCharacter []string `json:"variant_character,omitempty"`
 	// Comment holds the value of the "comment" field.
-	Comment string `json:"comment,omitempty"`
+	Comment []string `json:"comment,omitempty"`
 	// ScienceStroke holds the value of the "science_stroke" field.
 	ScienceStroke int `json:"science_stroke,omitempty"`
 }
@@ -67,13 +67,13 @@ func (*Character) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case character.FieldPinYin, character.FieldTraditionalCharacter, character.FieldVariantCharacter:
+		case character.FieldPinYin, character.FieldTraditionalCharacter, character.FieldVariantCharacter, character.FieldComment:
 			values[i] = new([]byte)
 		case character.FieldIsKangXi, character.FieldNameScience, character.FieldRegular:
 			values[i] = new(sql.NullBool)
 		case character.FieldRadicalStroke, character.FieldStroke, character.FieldKangXiStroke, character.FieldSimpleRadicalStroke, character.FieldSimpleTotalStroke, character.FieldTraditionalRadicalStroke, character.FieldTraditionalTotalStroke, character.FieldScienceStroke:
 			values[i] = new(sql.NullInt64)
-		case character.FieldID, character.FieldCh, character.FieldRadical, character.FieldKangXi, character.FieldSimpleRadical, character.FieldTraditionalRadical, character.FieldWuXing, character.FieldLucky, character.FieldComment:
+		case character.FieldID, character.FieldCh, character.FieldRadical, character.FieldKangXi, character.FieldSimpleRadical, character.FieldTraditionalRadical, character.FieldWuXing, character.FieldLucky:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Character", columns[i])
@@ -223,10 +223,12 @@ func (c *Character) assignValues(columns []string, values []any) error {
 				}
 			}
 		case character.FieldComment:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field comment", values[i])
-			} else if value.Valid {
-				c.Comment = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.Comment); err != nil {
+					return fmt.Errorf("unmarshal field comment: %w", err)
+				}
 			}
 		case character.FieldScienceStroke:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -323,7 +325,7 @@ func (c *Character) String() string {
 	builder.WriteString(fmt.Sprintf("%v", c.VariantCharacter))
 	builder.WriteString(", ")
 	builder.WriteString("comment=")
-	builder.WriteString(c.Comment)
+	builder.WriteString(fmt.Sprintf("%v", c.Comment))
 	builder.WriteString(", ")
 	builder.WriteString("science_stroke=")
 	builder.WriteString(fmt.Sprintf("%v", c.ScienceStroke))

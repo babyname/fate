@@ -38,11 +38,11 @@ func LoadKangXiChar(path string, hook func(kx KangXi) bool) error {
 			continue
 		}
 		kx := decodeKangXi(string(line))
-		if kx.CodePoint != 0 {
-			if !hook(kx) {
-				return nil
-			}
+		//if kx.CodePoint != 0 {
+		if !hook(kx) {
+			return nil
 		}
+		//}
 	}
 	return nil
 }
@@ -53,7 +53,7 @@ func decodeKangXi(line string) KangXi {
 		return KangXi{}
 	}
 	//fmt.Println("kangxi", chs[0][2:], "1:", chs[1], "2:", chs[2])
-	cp, _ := strconv.ParseInt(chs[0][2:], 10, 32)
+	cp, _ := strconv.ParseUint(chs[0][2:], 16, 32)
 	v, _ := strconv.ParseInt(chs[1], 10, 32)
 	stk, _ := strconv.ParseInt(chs[3], 10, 32)
 	return KangXi{
