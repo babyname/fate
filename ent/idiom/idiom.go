@@ -2,10 +2,6 @@
 
 package idiom
 
-import (
-	"entgo.io/ent/dialect/sql"
-)
-
 const (
 	// Label holds the string label denoting the idiom type in the database.
 	Label = "idiom"
@@ -49,42 +45,4 @@ func ValidColumn(column string) bool {
 		}
 	}
 	return false
-}
-
-// OrderOption defines the ordering options for the Idiom queries.
-type OrderOption func(*sql.Selector)
-
-// ByID orders the results by the id field.
-func ByID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByWord orders the results by the word field.
-func ByWord(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldWord, opts...).ToFunc()
-}
-
-// ByDerivation orders the results by the derivation field.
-func ByDerivation(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDerivation, opts...).ToFunc()
-}
-
-// ByExplanation orders the results by the explanation field.
-func ByExplanation(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldExplanation, opts...).ToFunc()
-}
-
-// ByAbbreviation orders the results by the abbreviation field.
-func ByAbbreviation(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAbbreviation, opts...).ToFunc()
-}
-
-// ByExample orders the results by the example field.
-func ByExample(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldExample, opts...).ToFunc()
-}
-
-// ByComment orders the results by the comment field.
-func ByComment(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldComment, opts...).ToFunc()
 }

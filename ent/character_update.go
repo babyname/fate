@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/babyname/fate/ent/character"
 	"github.com/babyname/fate/ent/predicate"
@@ -28,8 +29,14 @@ func (cu *CharacterUpdate) Where(ps ...predicate.Character) *CharacterUpdate {
 }
 
 // SetPinYin sets the "pin_yin" field.
-func (cu *CharacterUpdate) SetPinYin(s string) *CharacterUpdate {
+func (cu *CharacterUpdate) SetPinYin(s []string) *CharacterUpdate {
 	cu.mutation.SetPinYin(s)
+	return cu
+}
+
+// AppendPinYin appends s to the "pin_yin" field.
+func (cu *CharacterUpdate) AppendPinYin(s []string) *CharacterUpdate {
+	cu.mutation.AppendPinYin(s)
 	return cu
 }
 
@@ -185,14 +192,26 @@ func (cu *CharacterUpdate) SetRegular(b bool) *CharacterUpdate {
 }
 
 // SetTraditionalCharacter sets the "traditional_character" field.
-func (cu *CharacterUpdate) SetTraditionalCharacter(s string) *CharacterUpdate {
+func (cu *CharacterUpdate) SetTraditionalCharacter(s []string) *CharacterUpdate {
 	cu.mutation.SetTraditionalCharacter(s)
 	return cu
 }
 
+// AppendTraditionalCharacter appends s to the "traditional_character" field.
+func (cu *CharacterUpdate) AppendTraditionalCharacter(s []string) *CharacterUpdate {
+	cu.mutation.AppendTraditionalCharacter(s)
+	return cu
+}
+
 // SetVariantCharacter sets the "variant_character" field.
-func (cu *CharacterUpdate) SetVariantCharacter(s string) *CharacterUpdate {
+func (cu *CharacterUpdate) SetVariantCharacter(s []string) *CharacterUpdate {
 	cu.mutation.SetVariantCharacter(s)
+	return cu
+}
+
+// AppendVariantCharacter appends s to the "variant_character" field.
+func (cu *CharacterUpdate) AppendVariantCharacter(s []string) *CharacterUpdate {
+	cu.mutation.AppendVariantCharacter(s)
 	return cu
 }
 
@@ -222,7 +241,7 @@ func (cu *CharacterUpdate) Mutation() *CharacterMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cu *CharacterUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
+	return withHooks[int, CharacterMutation](ctx, cu.sqlSave, cu.mutation, cu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -257,7 +276,12 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := cu.mutation.PinYin(); ok {
-		_spec.SetField(character.FieldPinYin, field.TypeString, value)
+		_spec.SetField(character.FieldPinYin, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.AppendedPinYin(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, character.FieldPinYin, value)
+		})
 	}
 	if value, ok := cu.mutation.Ch(); ok {
 		_spec.SetField(character.FieldCh, field.TypeString, value)
@@ -332,10 +356,20 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(character.FieldRegular, field.TypeBool, value)
 	}
 	if value, ok := cu.mutation.TraditionalCharacter(); ok {
-		_spec.SetField(character.FieldTraditionalCharacter, field.TypeString, value)
+		_spec.SetField(character.FieldTraditionalCharacter, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.AppendedTraditionalCharacter(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, character.FieldTraditionalCharacter, value)
+		})
 	}
 	if value, ok := cu.mutation.VariantCharacter(); ok {
-		_spec.SetField(character.FieldVariantCharacter, field.TypeString, value)
+		_spec.SetField(character.FieldVariantCharacter, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.AppendedVariantCharacter(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, character.FieldVariantCharacter, value)
+		})
 	}
 	if value, ok := cu.mutation.Comment(); ok {
 		_spec.SetField(character.FieldComment, field.TypeString, value)
@@ -367,8 +401,14 @@ type CharacterUpdateOne struct {
 }
 
 // SetPinYin sets the "pin_yin" field.
-func (cuo *CharacterUpdateOne) SetPinYin(s string) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) SetPinYin(s []string) *CharacterUpdateOne {
 	cuo.mutation.SetPinYin(s)
+	return cuo
+}
+
+// AppendPinYin appends s to the "pin_yin" field.
+func (cuo *CharacterUpdateOne) AppendPinYin(s []string) *CharacterUpdateOne {
+	cuo.mutation.AppendPinYin(s)
 	return cuo
 }
 
@@ -524,14 +564,26 @@ func (cuo *CharacterUpdateOne) SetRegular(b bool) *CharacterUpdateOne {
 }
 
 // SetTraditionalCharacter sets the "traditional_character" field.
-func (cuo *CharacterUpdateOne) SetTraditionalCharacter(s string) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) SetTraditionalCharacter(s []string) *CharacterUpdateOne {
 	cuo.mutation.SetTraditionalCharacter(s)
 	return cuo
 }
 
+// AppendTraditionalCharacter appends s to the "traditional_character" field.
+func (cuo *CharacterUpdateOne) AppendTraditionalCharacter(s []string) *CharacterUpdateOne {
+	cuo.mutation.AppendTraditionalCharacter(s)
+	return cuo
+}
+
 // SetVariantCharacter sets the "variant_character" field.
-func (cuo *CharacterUpdateOne) SetVariantCharacter(s string) *CharacterUpdateOne {
+func (cuo *CharacterUpdateOne) SetVariantCharacter(s []string) *CharacterUpdateOne {
 	cuo.mutation.SetVariantCharacter(s)
+	return cuo
+}
+
+// AppendVariantCharacter appends s to the "variant_character" field.
+func (cuo *CharacterUpdateOne) AppendVariantCharacter(s []string) *CharacterUpdateOne {
+	cuo.mutation.AppendVariantCharacter(s)
 	return cuo
 }
 
@@ -574,7 +626,7 @@ func (cuo *CharacterUpdateOne) Select(field string, fields ...string) *Character
 
 // Save executes the query and returns the updated Character entity.
 func (cuo *CharacterUpdateOne) Save(ctx context.Context) (*Character, error) {
-	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+	return withHooks[*Character, CharacterMutation](ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -626,7 +678,12 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 		}
 	}
 	if value, ok := cuo.mutation.PinYin(); ok {
-		_spec.SetField(character.FieldPinYin, field.TypeString, value)
+		_spec.SetField(character.FieldPinYin, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.AppendedPinYin(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, character.FieldPinYin, value)
+		})
 	}
 	if value, ok := cuo.mutation.Ch(); ok {
 		_spec.SetField(character.FieldCh, field.TypeString, value)
@@ -701,10 +758,20 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 		_spec.SetField(character.FieldRegular, field.TypeBool, value)
 	}
 	if value, ok := cuo.mutation.TraditionalCharacter(); ok {
-		_spec.SetField(character.FieldTraditionalCharacter, field.TypeString, value)
+		_spec.SetField(character.FieldTraditionalCharacter, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.AppendedTraditionalCharacter(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, character.FieldTraditionalCharacter, value)
+		})
 	}
 	if value, ok := cuo.mutation.VariantCharacter(); ok {
-		_spec.SetField(character.FieldVariantCharacter, field.TypeString, value)
+		_spec.SetField(character.FieldVariantCharacter, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.AppendedVariantCharacter(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, character.FieldVariantCharacter, value)
+		})
 	}
 	if value, ok := cuo.mutation.Comment(); ok {
 		_spec.SetField(character.FieldComment, field.TypeString, value)

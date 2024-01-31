@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"strings"
 
-	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/babyname/fate/ent/ncharacter"
 )
@@ -16,33 +15,39 @@ import (
 type NCharacter struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int32 `json:"id,omitempty"`
+	ID int `json:"id,omitempty"`
 	// PinYin holds the value of the "pin_yin" field.
-	PinYin string `json:"pin_yin,omitempty"`
-	// Ch holds the value of the "ch" field.
-	Ch string `json:"ch,omitempty"`
-	// ChStroke holds the value of the "ch_stroke" field.
-	ChStroke int `json:"ch_stroke,omitempty"`
-	// ChType holds the value of the "ch_type" field.
-	ChType int `json:"ch_type,omitempty"`
+	PinYin []string `json:"pin_yin,omitempty"`
+	// Char holds the value of the "char" field.
+	Char string `json:"char,omitempty"`
+	// CharStroke holds the value of the "char_stroke" field.
+	CharStroke int `json:"char_stroke,omitempty"`
 	// Radical holds the value of the "radical" field.
 	Radical string `json:"radical,omitempty"`
 	// RadicalStroke holds the value of the "radical_stroke" field.
 	RadicalStroke int `json:"radical_stroke,omitempty"`
-	// Relate holds the value of the "relate" field.
-	Relate int32 `json:"relate,omitempty"`
-	// RelateKangXi holds the value of the "relate_kang_xi" field.
-	RelateKangXi int32 `json:"relate_kang_xi,omitempty"`
-	// RelateTraditional holds the value of the "relate_traditional" field.
-	RelateTraditional int32 `json:"relate_traditional,omitempty"`
-	// RelateVariant holds the value of the "relate_variant" field.
-	RelateVariant []string `json:"relate_variant,omitempty"`
-	// IsNameScience holds the value of the "is_name_science" field.
-	IsNameScience bool `json:"is_name_science,omitempty"`
-	// NameScienceChStroke holds the value of the "name_science_ch_stroke" field.
-	NameScienceChStroke int `json:"name_science_ch_stroke,omitempty"`
 	// IsRegular holds the value of the "is_regular" field.
 	IsRegular bool `json:"is_regular,omitempty"`
+	// IsSimplified holds the value of the "is_simplified" field.
+	IsSimplified bool `json:"is_simplified,omitempty"`
+	// SimplifiedID holds the value of the "simplified_id" field.
+	SimplifiedID []int `json:"simplified_id,omitempty"`
+	// IsTraditional holds the value of the "is_traditional" field.
+	IsTraditional bool `json:"is_traditional,omitempty"`
+	// TraditionalID holds the value of the "traditional_id" field.
+	TraditionalID []int `json:"traditional_id,omitempty"`
+	// IsKangXi holds the value of the "is_kang_xi" field.
+	IsKangXi bool `json:"is_kang_xi,omitempty"`
+	// KangXiID holds the value of the "kang_xi_id" field.
+	KangXiID []int `json:"kang_xi_id,omitempty"`
+	// IsVariant holds the value of the "is_variant" field.
+	IsVariant bool `json:"is_variant,omitempty"`
+	// VariantID holds the value of the "variant_id" field.
+	VariantID []int `json:"variant_id,omitempty"`
+	// IsScience holds the value of the "is_science" field.
+	IsScience bool `json:"is_science,omitempty"`
+	// ScienceStroke holds the value of the "science_stroke" field.
+	ScienceStroke int `json:"science_stroke,omitempty"`
 	// WuXing holds the value of the "wu_xing" field.
 	WuXing string `json:"wu_xing,omitempty"`
 	// Lucky holds the value of the "lucky" field.
@@ -50,8 +55,9 @@ type NCharacter struct {
 	// Explanation holds the value of the "explanation" field.
 	Explanation string `json:"explanation,omitempty"`
 	// Comment holds the value of the "comment" field.
-	Comment      string `json:"comment,omitempty"`
-	selectValues sql.SelectValues
+	Comment string `json:"comment,omitempty"`
+	// NeedFix holds the value of the "need_fix" field.
+	NeedFix bool `json:"need_fix,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -59,16 +65,16 @@ func (*NCharacter) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case ncharacter.FieldRelateVariant:
+		case ncharacter.FieldPinYin, ncharacter.FieldSimplifiedID, ncharacter.FieldTraditionalID, ncharacter.FieldKangXiID, ncharacter.FieldVariantID:
 			values[i] = new([]byte)
-		case ncharacter.FieldIsNameScience, ncharacter.FieldIsRegular:
+		case ncharacter.FieldIsRegular, ncharacter.FieldIsSimplified, ncharacter.FieldIsTraditional, ncharacter.FieldIsKangXi, ncharacter.FieldIsVariant, ncharacter.FieldIsScience, ncharacter.FieldNeedFix:
 			values[i] = new(sql.NullBool)
-		case ncharacter.FieldID, ncharacter.FieldChStroke, ncharacter.FieldChType, ncharacter.FieldRadicalStroke, ncharacter.FieldRelate, ncharacter.FieldRelateKangXi, ncharacter.FieldRelateTraditional, ncharacter.FieldNameScienceChStroke:
+		case ncharacter.FieldID, ncharacter.FieldCharStroke, ncharacter.FieldRadicalStroke, ncharacter.FieldScienceStroke:
 			values[i] = new(sql.NullInt64)
-		case ncharacter.FieldPinYin, ncharacter.FieldCh, ncharacter.FieldRadical, ncharacter.FieldWuXing, ncharacter.FieldLucky, ncharacter.FieldExplanation, ncharacter.FieldComment:
+		case ncharacter.FieldChar, ncharacter.FieldRadical, ncharacter.FieldWuXing, ncharacter.FieldLucky, ncharacter.FieldExplanation, ncharacter.FieldComment:
 			values[i] = new(sql.NullString)
 		default:
-			values[i] = new(sql.UnknownType)
+			return nil, fmt.Errorf("unexpected column %q for type NCharacter", columns[i])
 		}
 	}
 	return values, nil
@@ -87,30 +93,26 @@ func (n *NCharacter) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			n.ID = int32(value.Int64)
+			n.ID = int(value.Int64)
 		case ncharacter.FieldPinYin:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field pin_yin", values[i])
-			} else if value.Valid {
-				n.PinYin = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.PinYin); err != nil {
+					return fmt.Errorf("unmarshal field pin_yin: %w", err)
+				}
 			}
-		case ncharacter.FieldCh:
+		case ncharacter.FieldChar:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field ch", values[i])
+				return fmt.Errorf("unexpected type %T for field char", values[i])
 			} else if value.Valid {
-				n.Ch = value.String
+				n.Char = value.String
 			}
-		case ncharacter.FieldChStroke:
+		case ncharacter.FieldCharStroke:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field ch_stroke", values[i])
+				return fmt.Errorf("unexpected type %T for field char_stroke", values[i])
 			} else if value.Valid {
-				n.ChStroke = int(value.Int64)
-			}
-		case ncharacter.FieldChType:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field ch_type", values[i])
-			} else if value.Valid {
-				n.ChType = int(value.Int64)
+				n.CharStroke = int(value.Int64)
 			}
 		case ncharacter.FieldRadical:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -124,49 +126,79 @@ func (n *NCharacter) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				n.RadicalStroke = int(value.Int64)
 			}
-		case ncharacter.FieldRelate:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field relate", values[i])
-			} else if value.Valid {
-				n.Relate = int32(value.Int64)
-			}
-		case ncharacter.FieldRelateKangXi:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field relate_kang_xi", values[i])
-			} else if value.Valid {
-				n.RelateKangXi = int32(value.Int64)
-			}
-		case ncharacter.FieldRelateTraditional:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field relate_traditional", values[i])
-			} else if value.Valid {
-				n.RelateTraditional = int32(value.Int64)
-			}
-		case ncharacter.FieldRelateVariant:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field relate_variant", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &n.RelateVariant); err != nil {
-					return fmt.Errorf("unmarshal field relate_variant: %w", err)
-				}
-			}
-		case ncharacter.FieldIsNameScience:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_name_science", values[i])
-			} else if value.Valid {
-				n.IsNameScience = value.Bool
-			}
-		case ncharacter.FieldNameScienceChStroke:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field name_science_ch_stroke", values[i])
-			} else if value.Valid {
-				n.NameScienceChStroke = int(value.Int64)
-			}
 		case ncharacter.FieldIsRegular:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_regular", values[i])
 			} else if value.Valid {
 				n.IsRegular = value.Bool
+			}
+		case ncharacter.FieldIsSimplified:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_simplified", values[i])
+			} else if value.Valid {
+				n.IsSimplified = value.Bool
+			}
+		case ncharacter.FieldSimplifiedID:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field simplified_id", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.SimplifiedID); err != nil {
+					return fmt.Errorf("unmarshal field simplified_id: %w", err)
+				}
+			}
+		case ncharacter.FieldIsTraditional:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_traditional", values[i])
+			} else if value.Valid {
+				n.IsTraditional = value.Bool
+			}
+		case ncharacter.FieldTraditionalID:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field traditional_id", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.TraditionalID); err != nil {
+					return fmt.Errorf("unmarshal field traditional_id: %w", err)
+				}
+			}
+		case ncharacter.FieldIsKangXi:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_kang_xi", values[i])
+			} else if value.Valid {
+				n.IsKangXi = value.Bool
+			}
+		case ncharacter.FieldKangXiID:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field kang_xi_id", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.KangXiID); err != nil {
+					return fmt.Errorf("unmarshal field kang_xi_id: %w", err)
+				}
+			}
+		case ncharacter.FieldIsVariant:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_variant", values[i])
+			} else if value.Valid {
+				n.IsVariant = value.Bool
+			}
+		case ncharacter.FieldVariantID:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field variant_id", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.VariantID); err != nil {
+					return fmt.Errorf("unmarshal field variant_id: %w", err)
+				}
+			}
+		case ncharacter.FieldIsScience:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_science", values[i])
+			} else if value.Valid {
+				n.IsScience = value.Bool
+			}
+		case ncharacter.FieldScienceStroke:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field science_stroke", values[i])
+			} else if value.Valid {
+				n.ScienceStroke = int(value.Int64)
 			}
 		case ncharacter.FieldWuXing:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -192,17 +224,15 @@ func (n *NCharacter) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				n.Comment = value.String
 			}
-		default:
-			n.selectValues.Set(columns[i], values[i])
+		case ncharacter.FieldNeedFix:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field need_fix", values[i])
+			} else if value.Valid {
+				n.NeedFix = value.Bool
+			}
 		}
 	}
 	return nil
-}
-
-// Value returns the ent.Value that was dynamically selected and assigned to the NCharacter.
-// This includes values selected through modifiers, order, etc.
-func (n *NCharacter) Value(name string) (ent.Value, error) {
-	return n.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this NCharacter.
@@ -229,16 +259,13 @@ func (n *NCharacter) String() string {
 	builder.WriteString("NCharacter(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", n.ID))
 	builder.WriteString("pin_yin=")
-	builder.WriteString(n.PinYin)
+	builder.WriteString(fmt.Sprintf("%v", n.PinYin))
 	builder.WriteString(", ")
-	builder.WriteString("ch=")
-	builder.WriteString(n.Ch)
+	builder.WriteString("char=")
+	builder.WriteString(n.Char)
 	builder.WriteString(", ")
-	builder.WriteString("ch_stroke=")
-	builder.WriteString(fmt.Sprintf("%v", n.ChStroke))
-	builder.WriteString(", ")
-	builder.WriteString("ch_type=")
-	builder.WriteString(fmt.Sprintf("%v", n.ChType))
+	builder.WriteString("char_stroke=")
+	builder.WriteString(fmt.Sprintf("%v", n.CharStroke))
 	builder.WriteString(", ")
 	builder.WriteString("radical=")
 	builder.WriteString(n.Radical)
@@ -246,26 +273,38 @@ func (n *NCharacter) String() string {
 	builder.WriteString("radical_stroke=")
 	builder.WriteString(fmt.Sprintf("%v", n.RadicalStroke))
 	builder.WriteString(", ")
-	builder.WriteString("relate=")
-	builder.WriteString(fmt.Sprintf("%v", n.Relate))
-	builder.WriteString(", ")
-	builder.WriteString("relate_kang_xi=")
-	builder.WriteString(fmt.Sprintf("%v", n.RelateKangXi))
-	builder.WriteString(", ")
-	builder.WriteString("relate_traditional=")
-	builder.WriteString(fmt.Sprintf("%v", n.RelateTraditional))
-	builder.WriteString(", ")
-	builder.WriteString("relate_variant=")
-	builder.WriteString(fmt.Sprintf("%v", n.RelateVariant))
-	builder.WriteString(", ")
-	builder.WriteString("is_name_science=")
-	builder.WriteString(fmt.Sprintf("%v", n.IsNameScience))
-	builder.WriteString(", ")
-	builder.WriteString("name_science_ch_stroke=")
-	builder.WriteString(fmt.Sprintf("%v", n.NameScienceChStroke))
-	builder.WriteString(", ")
 	builder.WriteString("is_regular=")
 	builder.WriteString(fmt.Sprintf("%v", n.IsRegular))
+	builder.WriteString(", ")
+	builder.WriteString("is_simplified=")
+	builder.WriteString(fmt.Sprintf("%v", n.IsSimplified))
+	builder.WriteString(", ")
+	builder.WriteString("simplified_id=")
+	builder.WriteString(fmt.Sprintf("%v", n.SimplifiedID))
+	builder.WriteString(", ")
+	builder.WriteString("is_traditional=")
+	builder.WriteString(fmt.Sprintf("%v", n.IsTraditional))
+	builder.WriteString(", ")
+	builder.WriteString("traditional_id=")
+	builder.WriteString(fmt.Sprintf("%v", n.TraditionalID))
+	builder.WriteString(", ")
+	builder.WriteString("is_kang_xi=")
+	builder.WriteString(fmt.Sprintf("%v", n.IsKangXi))
+	builder.WriteString(", ")
+	builder.WriteString("kang_xi_id=")
+	builder.WriteString(fmt.Sprintf("%v", n.KangXiID))
+	builder.WriteString(", ")
+	builder.WriteString("is_variant=")
+	builder.WriteString(fmt.Sprintf("%v", n.IsVariant))
+	builder.WriteString(", ")
+	builder.WriteString("variant_id=")
+	builder.WriteString(fmt.Sprintf("%v", n.VariantID))
+	builder.WriteString(", ")
+	builder.WriteString("is_science=")
+	builder.WriteString(fmt.Sprintf("%v", n.IsScience))
+	builder.WriteString(", ")
+	builder.WriteString("science_stroke=")
+	builder.WriteString(fmt.Sprintf("%v", n.ScienceStroke))
 	builder.WriteString(", ")
 	builder.WriteString("wu_xing=")
 	builder.WriteString(n.WuXing)
@@ -278,6 +317,9 @@ func (n *NCharacter) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("comment=")
 	builder.WriteString(n.Comment)
+	builder.WriteString(", ")
+	builder.WriteString("need_fix=")
+	builder.WriteString(fmt.Sprintf("%v", n.NeedFix))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -76,7 +76,7 @@ func (ic *IdiomCreate) Mutation() *IdiomMutation {
 
 // Save creates the Idiom in the database.
 func (ic *IdiomCreate) Save(ctx context.Context) (*Idiom, error) {
-	return withHooks(ctx, ic.sqlSave, ic.mutation, ic.hooks)
+	return withHooks[*Idiom, IdiomMutation](ctx, ic.sqlSave, ic.mutation, ic.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -529,16 +529,12 @@ func (u *IdiomUpsertOne) IDX(ctx context.Context) int32 {
 // IdiomCreateBulk is the builder for creating many Idiom entities in bulk.
 type IdiomCreateBulk struct {
 	config
-	err      error
 	builders []*IdiomCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Idiom entities in the database.
 func (icb *IdiomCreateBulk) Save(ctx context.Context) ([]*Idiom, error) {
-	if icb.err != nil {
-		return nil, icb.err
-	}
 	specs := make([]*sqlgraph.CreateSpec, len(icb.builders))
 	nodes := make([]*Idiom, len(icb.builders))
 	mutators := make([]Mutator, len(icb.builders))
@@ -554,8 +550,8 @@ func (icb *IdiomCreateBulk) Save(ctx context.Context) ([]*Idiom, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				var err error
 				nodes[i], specs[i] = builder.createSpec()
+				var err error
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, icb.builders[i+1].mutation)
 				} else {
@@ -820,9 +816,6 @@ func (u *IdiomUpsertBulk) UpdateComment() *IdiomUpsertBulk {
 
 // Exec executes the query.
 func (u *IdiomUpsertBulk) Exec(ctx context.Context) error {
-	if u.create.err != nil {
-		return u.create.err
-	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the IdiomCreateBulk instead", i)

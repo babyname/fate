@@ -24,9 +24,9 @@ func TestLoad(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Load(tt.args.path)
+			got := LoadCharJSON(tt.args.path)
 			if len(got) == 0 {
-				t.Errorf("Load() = %v", got)
+				t.Errorf("LoadCharJSON() = %v", got)
 			}
 			fmt.Println("total count: ", len(got))
 		})

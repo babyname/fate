@@ -27,7 +27,7 @@ func (id *IdiomDelete) Where(ps ...predicate.Idiom) *IdiomDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (id *IdiomDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, id.sqlExec, id.mutation, id.hooks)
+	return withHooks[int, IdiomMutation](ctx, id.sqlExec, id.mutation, id.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

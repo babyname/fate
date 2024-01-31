@@ -23,24 +23,28 @@ const (
 // Fields of the NCharacter.
 func (NCharacter) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id"),                               //char rune code
-		field.Strings("pin_yin"),                      //pinyin
-		field.String("ch"),                            //char
-		field.Int("ch_stroke"),                        //char stroke
-		field.Int("ch_type").Default(CharTypeUnknown), //char type
-		field.String("radical"),                       //radical
-		field.Int("radical_stroke"),                   //radical stroke
-		field.Ints("relate_simplified"),               // relate simple chinese
-		field.Ints("relate_kang_xi"),                  //relate kang xi chinese
-		field.Ints("relate_traditional"),              //relate traditional chinese
-		field.Ints("relate_variant"),                  //relate other variant characters
-		field.Bool("is_name_science"),                 //is name science
-		field.Int("name_science_ch_stroke"),           //name science stroke
-		field.Bool("is_regular"),                      //is regular
-		field.String("wu_xing"),                       //wu xing
-		field.String("lucky"),                         //lucky
-		field.String("explanation"),
-		field.String("comment"),
+		field.Int("id").Default(0),                    //char rune code
+		field.Strings("pin_yin").Default([]string{}),  //pinyin
+		field.String("char").Default(""),              //char
+		field.Int("char_stroke").Default(0),           //char stroke
+		field.String("radical").Default(""),           //radical
+		field.Int("radical_stroke").Default(0),        //radical stroke
+		field.Bool("is_regular").Default(false),       //is regular
+		field.Bool("is_simplified").Default(false),    //relate simple chinese
+		field.Ints("simplified_id").Default([]int{}),  //relate simple chinese
+		field.Bool("is_traditional").Default(false),   //relate traditional chinese
+		field.Ints("traditional_id").Default([]int{}), //relate traditional chinese
+		field.Bool("is_kang_xi").Default(false),       //relate kang xi chinese
+		field.Ints("kang_xi_id").Default([]int{}),     //relate kang xi chinese
+		field.Bool("is_variant").Default(false),       //relate other variant characters
+		field.Ints("variant_id").Default([]int{}),     //relate other variant characters
+		field.Bool("is_science").Default(false),       //is name science
+		field.Int("science_stroke").Default(0),        //name science stroke
+		field.String("wu_xing").Default(""),           //wu xing
+		field.String("lucky").Default(""),             //lucky
+		field.String("explanation").Default(""),
+		field.String("comment").Default(""),
+		field.Bool("need_fix").Default(false),
 	}
 }
 

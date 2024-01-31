@@ -54,16 +54,6 @@ func IDLTE(id string) predicate.WuXing {
 	return predicate.WuXing(sql.FieldLTE(FieldID, id))
 }
 
-// IDEqualFold applies the EqualFold predicate on the ID field.
-func IDEqualFold(id string) predicate.WuXing {
-	return predicate.WuXing(sql.FieldEqualFold(FieldID, id))
-}
-
-// IDContainsFold applies the ContainsFold predicate on the ID field.
-func IDContainsFold(id string) predicate.WuXing {
-	return predicate.WuXing(sql.FieldContainsFold(FieldID, id))
-}
-
 // Created applies equality check predicate on the "created" field. It's identical to CreatedEQ.
 func Created(v time.Time) predicate.WuXing {
 	return predicate.WuXing(sql.FieldEQ(FieldCreated, v))
@@ -606,15 +596,32 @@ func FortuneContainsFold(v string) predicate.WuXing {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.WuXing) predicate.WuXing {
-	return predicate.WuXing(sql.AndPredicates(predicates...))
+	return predicate.WuXing(func(s *sql.Selector) {
+		s1 := s.Clone().SetP(nil)
+		for _, p := range predicates {
+			p(s1)
+		}
+		s.Where(s1.P())
+	})
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.WuXing) predicate.WuXing {
-	return predicate.WuXing(sql.OrPredicates(predicates...))
+	return predicate.WuXing(func(s *sql.Selector) {
+		s1 := s.Clone().SetP(nil)
+		for i, p := range predicates {
+			if i > 0 {
+				s1.Or()
+			}
+			p(s1)
+		}
+		s.Where(s1.P())
+	})
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.WuXing) predicate.WuXing {
-	return predicate.WuXing(sql.NotPredicates(p))
+	return predicate.WuXing(func(s *sql.Selector) {
+		p(s.Not())
+	})
 }

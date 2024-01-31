@@ -20,7 +20,7 @@ import (
 type WuGeLuckyQuery struct {
 	config
 	ctx        *QueryContext
-	order      []wugelucky.OrderOption
+	order      []OrderFunc
 	inters     []Interceptor
 	predicates []predicate.WuGeLucky
 	modifiers  []func(*sql.Selector)
@@ -55,7 +55,7 @@ func (wglq *WuGeLuckyQuery) Unique(unique bool) *WuGeLuckyQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (wglq *WuGeLuckyQuery) Order(o ...wugelucky.OrderOption) *WuGeLuckyQuery {
+func (wglq *WuGeLuckyQuery) Order(o ...OrderFunc) *WuGeLuckyQuery {
 	wglq.order = append(wglq.order, o...)
 	return wglq
 }
@@ -249,7 +249,7 @@ func (wglq *WuGeLuckyQuery) Clone() *WuGeLuckyQuery {
 	return &WuGeLuckyQuery{
 		config:     wglq.config,
 		ctx:        wglq.ctx.Clone(),
-		order:      append([]wugelucky.OrderOption{}, wglq.order...),
+		order:      append([]OrderFunc{}, wglq.order...),
 		inters:     append([]Interceptor{}, wglq.inters...),
 		predicates: append([]predicate.WuGeLucky{}, wglq.predicates...),
 		// clone intermediate query.

@@ -23,7 +23,7 @@ type CharacterCreate struct {
 }
 
 // SetPinYin sets the "pin_yin" field.
-func (cc *CharacterCreate) SetPinYin(s string) *CharacterCreate {
+func (cc *CharacterCreate) SetPinYin(s []string) *CharacterCreate {
 	cc.mutation.SetPinYin(s)
 	return cc
 }
@@ -131,13 +131,13 @@ func (cc *CharacterCreate) SetRegular(b bool) *CharacterCreate {
 }
 
 // SetTraditionalCharacter sets the "traditional_character" field.
-func (cc *CharacterCreate) SetTraditionalCharacter(s string) *CharacterCreate {
+func (cc *CharacterCreate) SetTraditionalCharacter(s []string) *CharacterCreate {
 	cc.mutation.SetTraditionalCharacter(s)
 	return cc
 }
 
 // SetVariantCharacter sets the "variant_character" field.
-func (cc *CharacterCreate) SetVariantCharacter(s string) *CharacterCreate {
+func (cc *CharacterCreate) SetVariantCharacter(s []string) *CharacterCreate {
 	cc.mutation.SetVariantCharacter(s)
 	return cc
 }
@@ -167,7 +167,7 @@ func (cc *CharacterCreate) Mutation() *CharacterMutation {
 
 // Save creates the Character in the database.
 func (cc *CharacterCreate) Save(ctx context.Context) (*Character, error) {
-	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
+	return withHooks[*Character, CharacterMutation](ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -297,7 +297,7 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = id
 	}
 	if value, ok := cc.mutation.PinYin(); ok {
-		_spec.SetField(character.FieldPinYin, field.TypeString, value)
+		_spec.SetField(character.FieldPinYin, field.TypeJSON, value)
 		_node.PinYin = value
 	}
 	if value, ok := cc.mutation.Ch(); ok {
@@ -369,11 +369,11 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		_node.Regular = value
 	}
 	if value, ok := cc.mutation.TraditionalCharacter(); ok {
-		_spec.SetField(character.FieldTraditionalCharacter, field.TypeString, value)
+		_spec.SetField(character.FieldTraditionalCharacter, field.TypeJSON, value)
 		_node.TraditionalCharacter = value
 	}
 	if value, ok := cc.mutation.VariantCharacter(); ok {
-		_spec.SetField(character.FieldVariantCharacter, field.TypeString, value)
+		_spec.SetField(character.FieldVariantCharacter, field.TypeJSON, value)
 		_node.VariantCharacter = value
 	}
 	if value, ok := cc.mutation.Comment(); ok {
@@ -437,7 +437,7 @@ type (
 )
 
 // SetPinYin sets the "pin_yin" field.
-func (u *CharacterUpsert) SetPinYin(v string) *CharacterUpsert {
+func (u *CharacterUpsert) SetPinYin(v []string) *CharacterUpsert {
 	u.Set(character.FieldPinYin, v)
 	return u
 }
@@ -695,7 +695,7 @@ func (u *CharacterUpsert) UpdateRegular() *CharacterUpsert {
 }
 
 // SetTraditionalCharacter sets the "traditional_character" field.
-func (u *CharacterUpsert) SetTraditionalCharacter(v string) *CharacterUpsert {
+func (u *CharacterUpsert) SetTraditionalCharacter(v []string) *CharacterUpsert {
 	u.Set(character.FieldTraditionalCharacter, v)
 	return u
 }
@@ -707,7 +707,7 @@ func (u *CharacterUpsert) UpdateTraditionalCharacter() *CharacterUpsert {
 }
 
 // SetVariantCharacter sets the "variant_character" field.
-func (u *CharacterUpsert) SetVariantCharacter(v string) *CharacterUpsert {
+func (u *CharacterUpsert) SetVariantCharacter(v []string) *CharacterUpsert {
 	u.Set(character.FieldVariantCharacter, v)
 	return u
 }
@@ -797,7 +797,7 @@ func (u *CharacterUpsertOne) Update(set func(*CharacterUpsert)) *CharacterUpsert
 }
 
 // SetPinYin sets the "pin_yin" field.
-func (u *CharacterUpsertOne) SetPinYin(v string) *CharacterUpsertOne {
+func (u *CharacterUpsertOne) SetPinYin(v []string) *CharacterUpsertOne {
 	return u.Update(func(s *CharacterUpsert) {
 		s.SetPinYin(v)
 	})
@@ -1098,7 +1098,7 @@ func (u *CharacterUpsertOne) UpdateRegular() *CharacterUpsertOne {
 }
 
 // SetTraditionalCharacter sets the "traditional_character" field.
-func (u *CharacterUpsertOne) SetTraditionalCharacter(v string) *CharacterUpsertOne {
+func (u *CharacterUpsertOne) SetTraditionalCharacter(v []string) *CharacterUpsertOne {
 	return u.Update(func(s *CharacterUpsert) {
 		s.SetTraditionalCharacter(v)
 	})
@@ -1112,7 +1112,7 @@ func (u *CharacterUpsertOne) UpdateTraditionalCharacter() *CharacterUpsertOne {
 }
 
 // SetVariantCharacter sets the "variant_character" field.
-func (u *CharacterUpsertOne) SetVariantCharacter(v string) *CharacterUpsertOne {
+func (u *CharacterUpsertOne) SetVariantCharacter(v []string) *CharacterUpsertOne {
 	return u.Update(func(s *CharacterUpsert) {
 		s.SetVariantCharacter(v)
 	})
@@ -1201,16 +1201,12 @@ func (u *CharacterUpsertOne) IDX(ctx context.Context) string {
 // CharacterCreateBulk is the builder for creating many Character entities in bulk.
 type CharacterCreateBulk struct {
 	config
-	err      error
 	builders []*CharacterCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Character entities in the database.
 func (ccb *CharacterCreateBulk) Save(ctx context.Context) ([]*Character, error) {
-	if ccb.err != nil {
-		return nil, ccb.err
-	}
 	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
 	nodes := make([]*Character, len(ccb.builders))
 	mutators := make([]Mutator, len(ccb.builders))
@@ -1226,8 +1222,8 @@ func (ccb *CharacterCreateBulk) Save(ctx context.Context) ([]*Character, error) 
 					return nil, err
 				}
 				builder.mutation = mutation
-				var err error
 				nodes[i], specs[i] = builder.createSpec()
+				var err error
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
 				} else {
@@ -1375,7 +1371,7 @@ func (u *CharacterUpsertBulk) Update(set func(*CharacterUpsert)) *CharacterUpser
 }
 
 // SetPinYin sets the "pin_yin" field.
-func (u *CharacterUpsertBulk) SetPinYin(v string) *CharacterUpsertBulk {
+func (u *CharacterUpsertBulk) SetPinYin(v []string) *CharacterUpsertBulk {
 	return u.Update(func(s *CharacterUpsert) {
 		s.SetPinYin(v)
 	})
@@ -1676,7 +1672,7 @@ func (u *CharacterUpsertBulk) UpdateRegular() *CharacterUpsertBulk {
 }
 
 // SetTraditionalCharacter sets the "traditional_character" field.
-func (u *CharacterUpsertBulk) SetTraditionalCharacter(v string) *CharacterUpsertBulk {
+func (u *CharacterUpsertBulk) SetTraditionalCharacter(v []string) *CharacterUpsertBulk {
 	return u.Update(func(s *CharacterUpsert) {
 		s.SetTraditionalCharacter(v)
 	})
@@ -1690,7 +1686,7 @@ func (u *CharacterUpsertBulk) UpdateTraditionalCharacter() *CharacterUpsertBulk 
 }
 
 // SetVariantCharacter sets the "variant_character" field.
-func (u *CharacterUpsertBulk) SetVariantCharacter(v string) *CharacterUpsertBulk {
+func (u *CharacterUpsertBulk) SetVariantCharacter(v []string) *CharacterUpsertBulk {
 	return u.Update(func(s *CharacterUpsert) {
 		s.SetVariantCharacter(v)
 	})
@@ -1740,9 +1736,6 @@ func (u *CharacterUpsertBulk) UpdateScienceStroke() *CharacterUpsertBulk {
 
 // Exec executes the query.
 func (u *CharacterUpsertBulk) Exec(ctx context.Context) error {
-	if u.create.err != nil {
-		return u.create.err
-	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the CharacterCreateBulk instead", i)

@@ -19,7 +19,7 @@ import (
 type WuXingQuery struct {
 	config
 	ctx        *QueryContext
-	order      []wuxing.OrderOption
+	order      []OrderFunc
 	inters     []Interceptor
 	predicates []predicate.WuXing
 	modifiers  []func(*sql.Selector)
@@ -54,7 +54,7 @@ func (wxq *WuXingQuery) Unique(unique bool) *WuXingQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (wxq *WuXingQuery) Order(o ...wuxing.OrderOption) *WuXingQuery {
+func (wxq *WuXingQuery) Order(o ...OrderFunc) *WuXingQuery {
 	wxq.order = append(wxq.order, o...)
 	return wxq
 }
@@ -248,7 +248,7 @@ func (wxq *WuXingQuery) Clone() *WuXingQuery {
 	return &WuXingQuery{
 		config:     wxq.config,
 		ctx:        wxq.ctx.Clone(),
-		order:      append([]wuxing.OrderOption{}, wxq.order...),
+		order:      append([]OrderFunc{}, wxq.order...),
 		inters:     append([]Interceptor{}, wxq.inters...),
 		predicates: append([]predicate.WuXing{}, wxq.predicates...),
 		// clone intermediate query.

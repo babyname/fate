@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"strings"
 
-	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/babyname/fate/ent/idiom"
 )
@@ -30,8 +29,7 @@ type Idiom struct {
 	// Example holds the value of the "example" field.
 	Example string `json:"example,omitempty"`
 	// Comment holds the value of the "comment" field.
-	Comment      string `json:"comment,omitempty"`
-	selectValues sql.SelectValues
+	Comment string `json:"comment,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -46,7 +44,7 @@ func (*Idiom) scanValues(columns []string) ([]any, error) {
 		case idiom.FieldWord, idiom.FieldExplanation, idiom.FieldExample, idiom.FieldComment:
 			values[i] = new(sql.NullString)
 		default:
-			values[i] = new(sql.UnknownType)
+			return nil, fmt.Errorf("unexpected column %q for type Idiom", columns[i])
 		}
 	}
 	return values, nil
@@ -110,17 +108,9 @@ func (i *Idiom) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.Comment = value.String
 			}
-		default:
-			i.selectValues.Set(columns[j], values[j])
 		}
 	}
 	return nil
-}
-
-// Value returns the ent.Value that was dynamically selected and assigned to the Idiom.
-// This includes values selected through modifiers, order, etc.
-func (i *Idiom) Value(name string) (ent.Value, error) {
-	return i.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this Idiom.

@@ -14,21 +14,24 @@ func TestLoadPinYin(t *testing.T) {
 		args args
 		want []*PinYin
 	}{
-		// TODO: Add test cases.
 		{
 			name: "",
 			args: args{
-				path: "pinyin.txt",
+				path: "zdic.txt",
 			},
 			want: nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := LoadPinYin(tt.args.path)
-			for _, py := range got {
-				fmt.Println("id", py.ID, "char", py.Char, "py", py.Pinyin)
-			}
+			LoadPinYin(tt.args.path, func(yin *PinYin) bool {
+				if yin.ID < 10000 {
+					fmt.Println("log string", "id", yin.ID, "pinyin", yin.Pinyin, "char", yin.Char)
+				}
+
+				return true
+			})
+
 		})
 	}
 }

@@ -19,7 +19,7 @@ import (
 type VersionQuery struct {
 	config
 	ctx        *QueryContext
-	order      []version.OrderOption
+	order      []OrderFunc
 	inters     []Interceptor
 	predicates []predicate.Version
 	modifiers  []func(*sql.Selector)
@@ -54,7 +54,7 @@ func (vq *VersionQuery) Unique(unique bool) *VersionQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (vq *VersionQuery) Order(o ...version.OrderOption) *VersionQuery {
+func (vq *VersionQuery) Order(o ...OrderFunc) *VersionQuery {
 	vq.order = append(vq.order, o...)
 	return vq
 }
@@ -248,7 +248,7 @@ func (vq *VersionQuery) Clone() *VersionQuery {
 	return &VersionQuery{
 		config:     vq.config,
 		ctx:        vq.ctx.Clone(),
-		order:      append([]version.OrderOption{}, vq.order...),
+		order:      append([]OrderFunc{}, vq.order...),
 		inters:     append([]Interceptor{}, vq.inters...),
 		predicates: append([]predicate.Version{}, vq.predicates...),
 		// clone intermediate query.

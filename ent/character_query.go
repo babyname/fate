@@ -19,7 +19,7 @@ import (
 type CharacterQuery struct {
 	config
 	ctx        *QueryContext
-	order      []character.OrderOption
+	order      []OrderFunc
 	inters     []Interceptor
 	predicates []predicate.Character
 	modifiers  []func(*sql.Selector)
@@ -54,7 +54,7 @@ func (cq *CharacterQuery) Unique(unique bool) *CharacterQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (cq *CharacterQuery) Order(o ...character.OrderOption) *CharacterQuery {
+func (cq *CharacterQuery) Order(o ...OrderFunc) *CharacterQuery {
 	cq.order = append(cq.order, o...)
 	return cq
 }
@@ -248,7 +248,7 @@ func (cq *CharacterQuery) Clone() *CharacterQuery {
 	return &CharacterQuery{
 		config:     cq.config,
 		ctx:        cq.ctx.Clone(),
-		order:      append([]character.OrderOption{}, cq.order...),
+		order:      append([]OrderFunc{}, cq.order...),
 		inters:     append([]Interceptor{}, cq.inters...),
 		predicates: append([]predicate.Character{}, cq.predicates...),
 		// clone intermediate query.
@@ -263,7 +263,7 @@ func (cq *CharacterQuery) Clone() *CharacterQuery {
 // Example:
 //
 //	var v []struct {
-//		PinYin string `json:"pin_yin,omitempty"`
+//		PinYin []string `json:"pin_yin,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -286,7 +286,7 @@ func (cq *CharacterQuery) GroupBy(field string, fields ...string) *CharacterGrou
 // Example:
 //
 //	var v []struct {
-//		PinYin string `json:"pin_yin,omitempty"`
+//		PinYin []string `json:"pin_yin,omitempty"`
 //	}
 //
 //	client.Character.Query().

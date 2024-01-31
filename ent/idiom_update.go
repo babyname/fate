@@ -97,7 +97,7 @@ func (iu *IdiomUpdate) Mutation() *IdiomMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (iu *IdiomUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, iu.sqlSave, iu.mutation, iu.hooks)
+	return withHooks[int, IdiomMutation](ctx, iu.sqlSave, iu.mutation, iu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -265,7 +265,7 @@ func (iuo *IdiomUpdateOne) Select(field string, fields ...string) *IdiomUpdateOn
 
 // Save executes the query and returns the updated Idiom entity.
 func (iuo *IdiomUpdateOne) Save(ctx context.Context) (*Idiom, error) {
-	return withHooks(ctx, iuo.sqlSave, iuo.mutation, iuo.hooks)
+	return withHooks[*Idiom, IdiomMutation](ctx, iuo.sqlSave, iuo.mutation, iuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

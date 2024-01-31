@@ -24,16 +24,16 @@ U+3404: kuà  # 㐄
 U+3405: wǔ  # 㐅
 U+3406: yǐn  # 㐆`
 
-func LoadPinYin(path string) []*PinYin {
+func LoadPinYin(path string, hook func(yin *PinYin) bool) {
 	py, err := os.Open(path)
 	if err != nil {
 		slog.Error("open file error:", err)
-		return nil
+		return
 	}
 	defer py.Close()
 	//readline from open file
 	br := bufio.NewReader(py)
-	var pys []*PinYin
+	//var pys []*PinYin
 	for {
 		line, _, err := br.ReadLine()
 		if err != nil {
@@ -42,16 +42,19 @@ func LoadPinYin(path string) []*PinYin {
 			}
 			break
 		}
-		if line[0] == '#' {
+		if len(line) == 0 || line[0] == '#' {
 			continue
 		}
 		pinyin := decodePinYin(string(line))
 		if pinyin.ID != 0 {
-			pys = append(pys, pinyin)
+			if !hook(pinyin) {
+				return
+			}
 		}
 	}
-	slog.Info("pinyin list", "size", len(pys))
-	return pys
+	//slog.Info("pinyin list", "size", len(pys))
+	//return pys
+	return
 }
 
 func decodePinYin(s string) *PinYin {
@@ -59,18 +62,18 @@ func decodePinYin(s string) *PinYin {
 	//get id
 	idx := strings.Index(s, ":")
 	id := s[2:idx]
-	slog.Debug("decode pinyin", "id", id)
+	//slog.Debug("decode pinyin", "id", id)
 	idInt, _ := strconv.ParseUint(id, 16, 32)
 	//get pinyin
 	if len(s) < idx+1 {
 		return &PinYin{}
 	}
-	slog.Debug("decode pinyin", "id", idInt)
+	//slog.Debug("decode pinyin", "id", idInt)
 	s = s[idx+1:]
-	slog.Debug("decode pinyin", "pinyin", s)
+	//slog.Debug("decode pinyin", "pinyin", s)
 	idx = strings.Index(s, "#")
 	py := s[:idx]
-	slog.Debug("decode pinyin", "pinyin", py)
+	//slog.Debug("decode pinyin", "pinyin", py)
 	py = strings.TrimSpace(py)
 	pinyin := strings.Split(py, ",")
 
@@ -79,7 +82,7 @@ func decodePinYin(s string) *PinYin {
 		return &PinYin{}
 	}
 	s = s[idx+1:]
-	slog.Debug("decode pinyin", "char", s)
+	//slog.Debug("decode pinyin", "char", s)
 	c := strings.TrimSpace(s)
 	return &PinYin{
 		ID:     int32(idInt),

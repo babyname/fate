@@ -13,7 +13,7 @@ type PolyPhone struct {
 	Strokes   int      `json:"strokes"`
 }
 
-func Load(path string) []PolyPhone {
+func LoadCharJSON(path string) []PolyPhone {
 	//load polyphone from json file
 	of, err := os.Open(path)
 	if err != nil {

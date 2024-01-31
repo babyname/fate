@@ -202,7 +202,7 @@ func (wxu *WuXingUpdate) Mutation() *WuXingMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (wxu *WuXingUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, wxu.sqlSave, wxu.mutation, wxu.hooks)
+	return withHooks[int, WuXingMutation](ctx, wxu.sqlSave, wxu.mutation, wxu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -494,7 +494,7 @@ func (wxuo *WuXingUpdateOne) Select(field string, fields ...string) *WuXingUpdat
 
 // Save executes the query and returns the updated WuXing entity.
 func (wxuo *WuXingUpdateOne) Save(ctx context.Context) (*WuXing, error) {
-	return withHooks(ctx, wxuo.sqlSave, wxuo.mutation, wxuo.hooks)
+	return withHooks[*WuXing, WuXingMutation](ctx, wxuo.sqlSave, wxuo.mutation, wxuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

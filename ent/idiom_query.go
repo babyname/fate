@@ -19,7 +19,7 @@ import (
 type IdiomQuery struct {
 	config
 	ctx        *QueryContext
-	order      []idiom.OrderOption
+	order      []OrderFunc
 	inters     []Interceptor
 	predicates []predicate.Idiom
 	modifiers  []func(*sql.Selector)
@@ -54,7 +54,7 @@ func (iq *IdiomQuery) Unique(unique bool) *IdiomQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (iq *IdiomQuery) Order(o ...idiom.OrderOption) *IdiomQuery {
+func (iq *IdiomQuery) Order(o ...OrderFunc) *IdiomQuery {
 	iq.order = append(iq.order, o...)
 	return iq
 }
@@ -248,7 +248,7 @@ func (iq *IdiomQuery) Clone() *IdiomQuery {
 	return &IdiomQuery{
 		config:     iq.config,
 		ctx:        iq.ctx.Clone(),
-		order:      append([]idiom.OrderOption{}, iq.order...),
+		order:      append([]OrderFunc{}, iq.order...),
 		inters:     append([]Interceptor{}, iq.inters...),
 		predicates: append([]predicate.Idiom{}, iq.predicates...),
 		// clone intermediate query.

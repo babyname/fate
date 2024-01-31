@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/babyname/fate/ent/wuxing"
 )
@@ -32,8 +31,7 @@ type WuXing struct {
 	// Third holds the value of the "third" field.
 	Third string `json:"third,omitempty"`
 	// Fortune holds the value of the "fortune" field.
-	Fortune      string `json:"fortune,omitempty"`
-	selectValues sql.SelectValues
+	Fortune string `json:"fortune,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -48,7 +46,7 @@ func (*WuXing) scanValues(columns []string) ([]any, error) {
 		case wuxing.FieldCreated, wuxing.FieldUpdated, wuxing.FieldDeleted:
 			values[i] = new(sql.NullTime)
 		default:
-			values[i] = new(sql.UnknownType)
+			return nil, fmt.Errorf("unexpected column %q for type WuXing", columns[i])
 		}
 	}
 	return values, nil
@@ -116,17 +114,9 @@ func (wx *WuXing) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				wx.Fortune = value.String
 			}
-		default:
-			wx.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
-}
-
-// Value returns the ent.Value that was dynamically selected and assigned to the WuXing.
-// This includes values selected through modifiers, order, etc.
-func (wx *WuXing) Value(name string) (ent.Value, error) {
-	return wx.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this WuXing.

@@ -3,10 +3,10 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
-	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/babyname/fate/ent/character"
 )
@@ -17,7 +17,7 @@ type Character struct {
 	// ID of the ent.
 	ID string `json:"id,omitempty"`
 	// PinYin holds the value of the "pin_yin" field.
-	PinYin string `json:"pin_yin,omitempty"`
+	PinYin []string `json:"pin_yin,omitempty"`
 	// Ch holds the value of the "ch" field.
 	Ch string `json:"ch,omitempty"`
 	// Radical holds the value of the "radical" field.
@@ -53,14 +53,13 @@ type Character struct {
 	// Regular holds the value of the "regular" field.
 	Regular bool `json:"regular,omitempty"`
 	// TraditionalCharacter holds the value of the "traditional_character" field.
-	TraditionalCharacter string `json:"traditional_character,omitempty"`
+	TraditionalCharacter []string `json:"traditional_character,omitempty"`
 	// VariantCharacter holds the value of the "variant_character" field.
-	VariantCharacter string `json:"variant_character,omitempty"`
+	VariantCharacter []string `json:"variant_character,omitempty"`
 	// Comment holds the value of the "comment" field.
 	Comment string `json:"comment,omitempty"`
 	// ScienceStroke holds the value of the "science_stroke" field.
 	ScienceStroke int `json:"science_stroke,omitempty"`
-	selectValues  sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -68,14 +67,16 @@ func (*Character) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case character.FieldPinYin, character.FieldTraditionalCharacter, character.FieldVariantCharacter:
+			values[i] = new([]byte)
 		case character.FieldIsKangXi, character.FieldNameScience, character.FieldRegular:
 			values[i] = new(sql.NullBool)
 		case character.FieldRadicalStroke, character.FieldStroke, character.FieldKangXiStroke, character.FieldSimpleRadicalStroke, character.FieldSimpleTotalStroke, character.FieldTraditionalRadicalStroke, character.FieldTraditionalTotalStroke, character.FieldScienceStroke:
 			values[i] = new(sql.NullInt64)
-		case character.FieldID, character.FieldPinYin, character.FieldCh, character.FieldRadical, character.FieldKangXi, character.FieldSimpleRadical, character.FieldTraditionalRadical, character.FieldWuXing, character.FieldLucky, character.FieldTraditionalCharacter, character.FieldVariantCharacter, character.FieldComment:
+		case character.FieldID, character.FieldCh, character.FieldRadical, character.FieldKangXi, character.FieldSimpleRadical, character.FieldTraditionalRadical, character.FieldWuXing, character.FieldLucky, character.FieldComment:
 			values[i] = new(sql.NullString)
 		default:
-			values[i] = new(sql.UnknownType)
+			return nil, fmt.Errorf("unexpected column %q for type Character", columns[i])
 		}
 	}
 	return values, nil
@@ -96,10 +97,12 @@ func (c *Character) assignValues(columns []string, values []any) error {
 				c.ID = value.String
 			}
 		case character.FieldPinYin:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field pin_yin", values[i])
-			} else if value.Valid {
-				c.PinYin = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.PinYin); err != nil {
+					return fmt.Errorf("unmarshal field pin_yin: %w", err)
+				}
 			}
 		case character.FieldCh:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -204,16 +207,20 @@ func (c *Character) assignValues(columns []string, values []any) error {
 				c.Regular = value.Bool
 			}
 		case character.FieldTraditionalCharacter:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field traditional_character", values[i])
-			} else if value.Valid {
-				c.TraditionalCharacter = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.TraditionalCharacter); err != nil {
+					return fmt.Errorf("unmarshal field traditional_character: %w", err)
+				}
 			}
 		case character.FieldVariantCharacter:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field variant_character", values[i])
-			} else if value.Valid {
-				c.VariantCharacter = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.VariantCharacter); err != nil {
+					return fmt.Errorf("unmarshal field variant_character: %w", err)
+				}
 			}
 		case character.FieldComment:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -227,17 +234,9 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.ScienceStroke = int(value.Int64)
 			}
-		default:
-			c.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
-}
-
-// Value returns the ent.Value that was dynamically selected and assigned to the Character.
-// This includes values selected through modifiers, order, etc.
-func (c *Character) Value(name string) (ent.Value, error) {
-	return c.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this Character.
@@ -264,7 +263,7 @@ func (c *Character) String() string {
 	builder.WriteString("Character(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
 	builder.WriteString("pin_yin=")
-	builder.WriteString(c.PinYin)
+	builder.WriteString(fmt.Sprintf("%v", c.PinYin))
 	builder.WriteString(", ")
 	builder.WriteString("ch=")
 	builder.WriteString(c.Ch)
@@ -318,10 +317,10 @@ func (c *Character) String() string {
 	builder.WriteString(fmt.Sprintf("%v", c.Regular))
 	builder.WriteString(", ")
 	builder.WriteString("traditional_character=")
-	builder.WriteString(c.TraditionalCharacter)
+	builder.WriteString(fmt.Sprintf("%v", c.TraditionalCharacter))
 	builder.WriteString(", ")
 	builder.WriteString("variant_character=")
-	builder.WriteString(c.VariantCharacter)
+	builder.WriteString(fmt.Sprintf("%v", c.VariantCharacter))
 	builder.WriteString(", ")
 	builder.WriteString("comment=")
 	builder.WriteString(c.Comment)

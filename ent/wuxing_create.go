@@ -148,7 +148,7 @@ func (wxc *WuXingCreate) Mutation() *WuXingMutation {
 
 // Save creates the WuXing in the database.
 func (wxc *WuXingCreate) Save(ctx context.Context) (*WuXing, error) {
-	return withHooks(ctx, wxc.sqlSave, wxc.mutation, wxc.hooks)
+	return withHooks[*WuXing, WuXingMutation](ctx, wxc.sqlSave, wxc.mutation, wxc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -709,16 +709,12 @@ func (u *WuXingUpsertOne) IDX(ctx context.Context) string {
 // WuXingCreateBulk is the builder for creating many WuXing entities in bulk.
 type WuXingCreateBulk struct {
 	config
-	err      error
 	builders []*WuXingCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the WuXing entities in the database.
 func (wxcb *WuXingCreateBulk) Save(ctx context.Context) ([]*WuXing, error) {
-	if wxcb.err != nil {
-		return nil, wxcb.err
-	}
 	specs := make([]*sqlgraph.CreateSpec, len(wxcb.builders))
 	nodes := make([]*WuXing, len(wxcb.builders))
 	mutators := make([]Mutator, len(wxcb.builders))
@@ -734,8 +730,8 @@ func (wxcb *WuXingCreateBulk) Save(ctx context.Context) ([]*WuXing, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				var err error
 				nodes[i], specs[i] = builder.createSpec()
+				var err error
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, wxcb.builders[i+1].mutation)
 				} else {
@@ -1059,9 +1055,6 @@ func (u *WuXingUpsertBulk) ClearFortune() *WuXingUpsertBulk {
 
 // Exec executes the query.
 func (u *WuXingUpsertBulk) Exec(ctx context.Context) error {
-	if u.create.err != nil {
-		return u.create.err
-	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the WuXingCreateBulk instead", i)

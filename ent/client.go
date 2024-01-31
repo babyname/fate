@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"reflect"
 
 	"github.com/babyname/fate/ent/migrate"
 	"github.com/google/uuid"
@@ -126,14 +125,11 @@ func Open(driverName, dataSourceName string, options ...Option) (*Client, error)
 	}
 }
 
-// ErrTxStarted is returned when trying to start a new transaction from a transactional client.
-var ErrTxStarted = errors.New("ent: cannot start a transaction within a transaction")
-
 // Tx returns a new transactional client. The provided context
 // is used until the transaction is committed or rolled back.
 func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	if _, ok := c.driver.(*txDriver); ok {
-		return nil, ErrTxStarted
+		return nil, errors.New("ent: cannot start a transaction within a transaction")
 	}
 	tx, err := newTx(ctx, c.driver)
 	if err != nil {
@@ -273,21 +269,6 @@ func (c *CharacterClient) CreateBulk(builders ...*CharacterCreate) *CharacterCre
 	return &CharacterCreateBulk{config: c.config, builders: builders}
 }
 
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *CharacterClient) MapCreateBulk(slice any, setFunc func(*CharacterCreate, int)) *CharacterCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &CharacterCreateBulk{err: fmt.Errorf("calling to CharacterClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*CharacterCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &CharacterCreateBulk{config: c.config, builders: builders}
-}
-
 // Update returns an update builder for Character.
 func (c *CharacterClient) Update() *CharacterUpdate {
 	mutation := newCharacterMutation(c.config, OpUpdate)
@@ -403,21 +384,6 @@ func (c *IdiomClient) Create() *IdiomCreate {
 
 // CreateBulk returns a builder for creating a bulk of Idiom entities.
 func (c *IdiomClient) CreateBulk(builders ...*IdiomCreate) *IdiomCreateBulk {
-	return &IdiomCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *IdiomClient) MapCreateBulk(slice any, setFunc func(*IdiomCreate, int)) *IdiomCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &IdiomCreateBulk{err: fmt.Errorf("calling to IdiomClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*IdiomCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
 	return &IdiomCreateBulk{config: c.config, builders: builders}
 }
 
@@ -539,21 +505,6 @@ func (c *NCharacterClient) CreateBulk(builders ...*NCharacterCreate) *NCharacter
 	return &NCharacterCreateBulk{config: c.config, builders: builders}
 }
 
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *NCharacterClient) MapCreateBulk(slice any, setFunc func(*NCharacterCreate, int)) *NCharacterCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &NCharacterCreateBulk{err: fmt.Errorf("calling to NCharacterClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*NCharacterCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &NCharacterCreateBulk{config: c.config, builders: builders}
-}
-
 // Update returns an update builder for NCharacter.
 func (c *NCharacterClient) Update() *NCharacterUpdate {
 	mutation := newNCharacterMutation(c.config, OpUpdate)
@@ -567,7 +518,7 @@ func (c *NCharacterClient) UpdateOne(n *NCharacter) *NCharacterUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *NCharacterClient) UpdateOneID(id int32) *NCharacterUpdateOne {
+func (c *NCharacterClient) UpdateOneID(id int) *NCharacterUpdateOne {
 	mutation := newNCharacterMutation(c.config, OpUpdateOne, withNCharacterID(id))
 	return &NCharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -584,7 +535,7 @@ func (c *NCharacterClient) DeleteOne(n *NCharacter) *NCharacterDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *NCharacterClient) DeleteOneID(id int32) *NCharacterDeleteOne {
+func (c *NCharacterClient) DeleteOneID(id int) *NCharacterDeleteOne {
 	builder := c.Delete().Where(ncharacter.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -601,12 +552,12 @@ func (c *NCharacterClient) Query() *NCharacterQuery {
 }
 
 // Get returns a NCharacter entity by its id.
-func (c *NCharacterClient) Get(ctx context.Context, id int32) (*NCharacter, error) {
+func (c *NCharacterClient) Get(ctx context.Context, id int) (*NCharacter, error) {
 	return c.Query().Where(ncharacter.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *NCharacterClient) GetX(ctx context.Context, id int32) *NCharacter {
+func (c *NCharacterClient) GetX(ctx context.Context, id int) *NCharacter {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -669,21 +620,6 @@ func (c *VersionClient) Create() *VersionCreate {
 
 // CreateBulk returns a builder for creating a bulk of Version entities.
 func (c *VersionClient) CreateBulk(builders ...*VersionCreate) *VersionCreateBulk {
-	return &VersionCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *VersionClient) MapCreateBulk(slice any, setFunc func(*VersionCreate, int)) *VersionCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &VersionCreateBulk{err: fmt.Errorf("calling to VersionClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*VersionCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
 	return &VersionCreateBulk{config: c.config, builders: builders}
 }
 
@@ -805,21 +741,6 @@ func (c *WuGeLuckyClient) CreateBulk(builders ...*WuGeLuckyCreate) *WuGeLuckyCre
 	return &WuGeLuckyCreateBulk{config: c.config, builders: builders}
 }
 
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *WuGeLuckyClient) MapCreateBulk(slice any, setFunc func(*WuGeLuckyCreate, int)) *WuGeLuckyCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &WuGeLuckyCreateBulk{err: fmt.Errorf("calling to WuGeLuckyClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*WuGeLuckyCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &WuGeLuckyCreateBulk{config: c.config, builders: builders}
-}
-
 // Update returns an update builder for WuGeLucky.
 func (c *WuGeLuckyClient) Update() *WuGeLuckyUpdate {
 	mutation := newWuGeLuckyMutation(c.config, OpUpdate)
@@ -935,21 +856,6 @@ func (c *WuXingClient) Create() *WuXingCreate {
 
 // CreateBulk returns a builder for creating a bulk of WuXing entities.
 func (c *WuXingClient) CreateBulk(builders ...*WuXingCreate) *WuXingCreateBulk {
-	return &WuXingCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *WuXingClient) MapCreateBulk(slice any, setFunc func(*WuXingCreate, int)) *WuXingCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &WuXingCreateBulk{err: fmt.Errorf("calling to WuXingClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*WuXingCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
 	return &WuXingCreateBulk{config: c.config, builders: builders}
 }
 

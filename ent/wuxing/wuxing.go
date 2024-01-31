@@ -2,10 +2,6 @@
 
 package wuxing
 
-import (
-	"entgo.io/ent/dialect/sql"
-)
-
 const (
 	// Label holds the string label denoting the wuxing type in the database.
 	Label = "wu_xing"
@@ -52,52 +48,4 @@ func ValidColumn(column string) bool {
 		}
 	}
 	return false
-}
-
-// OrderOption defines the ordering options for the WuXing queries.
-type OrderOption func(*sql.Selector)
-
-// ByID orders the results by the id field.
-func ByID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByCreated orders the results by the created field.
-func ByCreated(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreated, opts...).ToFunc()
-}
-
-// ByUpdated orders the results by the updated field.
-func ByUpdated(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdated, opts...).ToFunc()
-}
-
-// ByDeleted orders the results by the deleted field.
-func ByDeleted(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDeleted, opts...).ToFunc()
-}
-
-// ByVersion orders the results by the version field.
-func ByVersion(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldVersion, opts...).ToFunc()
-}
-
-// ByFirst orders the results by the first field.
-func ByFirst(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFirst, opts...).ToFunc()
-}
-
-// BySecond orders the results by the second field.
-func BySecond(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSecond, opts...).ToFunc()
-}
-
-// ByThird orders the results by the third field.
-func ByThird(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldThird, opts...).ToFunc()
-}
-
-// ByFortune orders the results by the fortune field.
-func ByFortune(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFortune, opts...).ToFunc()
 }

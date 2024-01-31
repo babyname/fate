@@ -27,7 +27,7 @@ func (wgld *WuGeLuckyDelete) Where(ps ...predicate.WuGeLucky) *WuGeLuckyDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (wgld *WuGeLuckyDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, wgld.sqlExec, wgld.mutation, wgld.hooks)
+	return withHooks[int, WuGeLuckyMutation](ctx, wgld.sqlExec, wgld.mutation, wgld.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

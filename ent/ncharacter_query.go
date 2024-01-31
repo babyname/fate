@@ -19,7 +19,7 @@ import (
 type NCharacterQuery struct {
 	config
 	ctx        *QueryContext
-	order      []ncharacter.OrderOption
+	order      []OrderFunc
 	inters     []Interceptor
 	predicates []predicate.NCharacter
 	modifiers  []func(*sql.Selector)
@@ -54,7 +54,7 @@ func (nq *NCharacterQuery) Unique(unique bool) *NCharacterQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (nq *NCharacterQuery) Order(o ...ncharacter.OrderOption) *NCharacterQuery {
+func (nq *NCharacterQuery) Order(o ...OrderFunc) *NCharacterQuery {
 	nq.order = append(nq.order, o...)
 	return nq
 }
@@ -83,8 +83,8 @@ func (nq *NCharacterQuery) FirstX(ctx context.Context) *NCharacter {
 
 // FirstID returns the first NCharacter ID from the query.
 // Returns a *NotFoundError when no NCharacter ID was found.
-func (nq *NCharacterQuery) FirstID(ctx context.Context) (id int32, err error) {
-	var ids []int32
+func (nq *NCharacterQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = nq.Limit(1).IDs(setContextOp(ctx, nq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -96,7 +96,7 @@ func (nq *NCharacterQuery) FirstID(ctx context.Context) (id int32, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (nq *NCharacterQuery) FirstIDX(ctx context.Context) int32 {
+func (nq *NCharacterQuery) FirstIDX(ctx context.Context) int {
 	id, err := nq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -134,8 +134,8 @@ func (nq *NCharacterQuery) OnlyX(ctx context.Context) *NCharacter {
 // OnlyID is like Only, but returns the only NCharacter ID in the query.
 // Returns a *NotSingularError when more than one NCharacter ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (nq *NCharacterQuery) OnlyID(ctx context.Context) (id int32, err error) {
-	var ids []int32
+func (nq *NCharacterQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = nq.Limit(2).IDs(setContextOp(ctx, nq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -151,7 +151,7 @@ func (nq *NCharacterQuery) OnlyID(ctx context.Context) (id int32, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (nq *NCharacterQuery) OnlyIDX(ctx context.Context) int32 {
+func (nq *NCharacterQuery) OnlyIDX(ctx context.Context) int {
 	id, err := nq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -179,7 +179,7 @@ func (nq *NCharacterQuery) AllX(ctx context.Context) []*NCharacter {
 }
 
 // IDs executes the query and returns a list of NCharacter IDs.
-func (nq *NCharacterQuery) IDs(ctx context.Context) (ids []int32, err error) {
+func (nq *NCharacterQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if nq.ctx.Unique == nil && nq.path != nil {
 		nq.Unique(true)
 	}
@@ -191,7 +191,7 @@ func (nq *NCharacterQuery) IDs(ctx context.Context) (ids []int32, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (nq *NCharacterQuery) IDsX(ctx context.Context) []int32 {
+func (nq *NCharacterQuery) IDsX(ctx context.Context) []int {
 	ids, err := nq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -248,7 +248,7 @@ func (nq *NCharacterQuery) Clone() *NCharacterQuery {
 	return &NCharacterQuery{
 		config:     nq.config,
 		ctx:        nq.ctx.Clone(),
-		order:      append([]ncharacter.OrderOption{}, nq.order...),
+		order:      append([]OrderFunc{}, nq.order...),
 		inters:     append([]Interceptor{}, nq.inters...),
 		predicates: append([]predicate.NCharacter{}, nq.predicates...),
 		// clone intermediate query.
@@ -263,7 +263,7 @@ func (nq *NCharacterQuery) Clone() *NCharacterQuery {
 // Example:
 //
 //	var v []struct {
-//		PinYin string `json:"pin_yin,omitempty"`
+//		PinYin []string `json:"pin_yin,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -286,7 +286,7 @@ func (nq *NCharacterQuery) GroupBy(field string, fields ...string) *NCharacterGr
 // Example:
 //
 //	var v []struct {
-//		PinYin string `json:"pin_yin,omitempty"`
+//		PinYin []string `json:"pin_yin,omitempty"`
 //	}
 //
 //	client.NCharacter.Query().
@@ -372,7 +372,7 @@ func (nq *NCharacterQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (nq *NCharacterQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(ncharacter.Table, ncharacter.Columns, sqlgraph.NewFieldSpec(ncharacter.FieldID, field.TypeInt32))
+	_spec := sqlgraph.NewQuerySpec(ncharacter.Table, ncharacter.Columns, sqlgraph.NewFieldSpec(ncharacter.FieldID, field.TypeInt))
 	_spec.From = nq.sql
 	if unique := nq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

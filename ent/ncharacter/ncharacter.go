@@ -2,10 +2,6 @@
 
 package ncharacter
 
-import (
-	"entgo.io/ent/dialect/sql"
-)
-
 const (
 	// Label holds the string label denoting the ncharacter type in the database.
 	Label = "ncharacter"
@@ -13,30 +9,36 @@ const (
 	FieldID = "id"
 	// FieldPinYin holds the string denoting the pin_yin field in the database.
 	FieldPinYin = "pin_yin"
-	// FieldCh holds the string denoting the ch field in the database.
-	FieldCh = "ch"
-	// FieldChStroke holds the string denoting the ch_stroke field in the database.
-	FieldChStroke = "ch_stroke"
-	// FieldChType holds the string denoting the ch_type field in the database.
-	FieldChType = "ch_type"
+	// FieldChar holds the string denoting the char field in the database.
+	FieldChar = "char"
+	// FieldCharStroke holds the string denoting the char_stroke field in the database.
+	FieldCharStroke = "char_stroke"
 	// FieldRadical holds the string denoting the radical field in the database.
 	FieldRadical = "radical"
 	// FieldRadicalStroke holds the string denoting the radical_stroke field in the database.
 	FieldRadicalStroke = "radical_stroke"
-	// FieldRelate holds the string denoting the relate field in the database.
-	FieldRelate = "relate"
-	// FieldRelateKangXi holds the string denoting the relate_kang_xi field in the database.
-	FieldRelateKangXi = "relate_kang_xi"
-	// FieldRelateTraditional holds the string denoting the relate_traditional field in the database.
-	FieldRelateTraditional = "relate_traditional"
-	// FieldRelateVariant holds the string denoting the relate_variant field in the database.
-	FieldRelateVariant = "relate_variant"
-	// FieldIsNameScience holds the string denoting the is_name_science field in the database.
-	FieldIsNameScience = "is_name_science"
-	// FieldNameScienceChStroke holds the string denoting the name_science_ch_stroke field in the database.
-	FieldNameScienceChStroke = "name_science_ch_stroke"
 	// FieldIsRegular holds the string denoting the is_regular field in the database.
 	FieldIsRegular = "is_regular"
+	// FieldIsSimplified holds the string denoting the is_simplified field in the database.
+	FieldIsSimplified = "is_simplified"
+	// FieldSimplifiedID holds the string denoting the simplified_id field in the database.
+	FieldSimplifiedID = "simplified_id"
+	// FieldIsTraditional holds the string denoting the is_traditional field in the database.
+	FieldIsTraditional = "is_traditional"
+	// FieldTraditionalID holds the string denoting the traditional_id field in the database.
+	FieldTraditionalID = "traditional_id"
+	// FieldIsKangXi holds the string denoting the is_kang_xi field in the database.
+	FieldIsKangXi = "is_kang_xi"
+	// FieldKangXiID holds the string denoting the kang_xi_id field in the database.
+	FieldKangXiID = "kang_xi_id"
+	// FieldIsVariant holds the string denoting the is_variant field in the database.
+	FieldIsVariant = "is_variant"
+	// FieldVariantID holds the string denoting the variant_id field in the database.
+	FieldVariantID = "variant_id"
+	// FieldIsScience holds the string denoting the is_science field in the database.
+	FieldIsScience = "is_science"
+	// FieldScienceStroke holds the string denoting the science_stroke field in the database.
+	FieldScienceStroke = "science_stroke"
 	// FieldWuXing holds the string denoting the wu_xing field in the database.
 	FieldWuXing = "wu_xing"
 	// FieldLucky holds the string denoting the lucky field in the database.
@@ -45,6 +47,8 @@ const (
 	FieldExplanation = "explanation"
 	// FieldComment holds the string denoting the comment field in the database.
 	FieldComment = "comment"
+	// FieldNeedFix holds the string denoting the need_fix field in the database.
+	FieldNeedFix = "need_fix"
 	// Table holds the table name of the ncharacter in the database.
 	Table = "n_character"
 )
@@ -53,22 +57,26 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldPinYin,
-	FieldCh,
-	FieldChStroke,
-	FieldChType,
+	FieldChar,
+	FieldCharStroke,
 	FieldRadical,
 	FieldRadicalStroke,
-	FieldRelate,
-	FieldRelateKangXi,
-	FieldRelateTraditional,
-	FieldRelateVariant,
-	FieldIsNameScience,
-	FieldNameScienceChStroke,
 	FieldIsRegular,
+	FieldIsSimplified,
+	FieldSimplifiedID,
+	FieldIsTraditional,
+	FieldTraditionalID,
+	FieldIsKangXi,
+	FieldKangXiID,
+	FieldIsVariant,
+	FieldVariantID,
+	FieldIsScience,
+	FieldScienceStroke,
 	FieldWuXing,
 	FieldLucky,
 	FieldExplanation,
 	FieldComment,
+	FieldNeedFix,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -82,94 +90,48 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultChType holds the default value on creation for the "ch_type" field.
-	DefaultChType int
+	// DefaultPinYin holds the default value on creation for the "pin_yin" field.
+	DefaultPinYin []string
+	// DefaultChar holds the default value on creation for the "char" field.
+	DefaultChar string
+	// DefaultCharStroke holds the default value on creation for the "char_stroke" field.
+	DefaultCharStroke int
+	// DefaultRadical holds the default value on creation for the "radical" field.
+	DefaultRadical string
+	// DefaultRadicalStroke holds the default value on creation for the "radical_stroke" field.
+	DefaultRadicalStroke int
+	// DefaultIsRegular holds the default value on creation for the "is_regular" field.
+	DefaultIsRegular bool
+	// DefaultIsSimplified holds the default value on creation for the "is_simplified" field.
+	DefaultIsSimplified bool
+	// DefaultSimplifiedID holds the default value on creation for the "simplified_id" field.
+	DefaultSimplifiedID []int
+	// DefaultIsTraditional holds the default value on creation for the "is_traditional" field.
+	DefaultIsTraditional bool
+	// DefaultTraditionalID holds the default value on creation for the "traditional_id" field.
+	DefaultTraditionalID []int
+	// DefaultIsKangXi holds the default value on creation for the "is_kang_xi" field.
+	DefaultIsKangXi bool
+	// DefaultKangXiID holds the default value on creation for the "kang_xi_id" field.
+	DefaultKangXiID []int
+	// DefaultIsVariant holds the default value on creation for the "is_variant" field.
+	DefaultIsVariant bool
+	// DefaultVariantID holds the default value on creation for the "variant_id" field.
+	DefaultVariantID []int
+	// DefaultIsScience holds the default value on creation for the "is_science" field.
+	DefaultIsScience bool
+	// DefaultScienceStroke holds the default value on creation for the "science_stroke" field.
+	DefaultScienceStroke int
+	// DefaultWuXing holds the default value on creation for the "wu_xing" field.
+	DefaultWuXing string
+	// DefaultLucky holds the default value on creation for the "lucky" field.
+	DefaultLucky string
+	// DefaultExplanation holds the default value on creation for the "explanation" field.
+	DefaultExplanation string
+	// DefaultComment holds the default value on creation for the "comment" field.
+	DefaultComment string
+	// DefaultNeedFix holds the default value on creation for the "need_fix" field.
+	DefaultNeedFix bool
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID int
 )
-
-// OrderOption defines the ordering options for the NCharacter queries.
-type OrderOption func(*sql.Selector)
-
-// ByID orders the results by the id field.
-func ByID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByPinYin orders the results by the pin_yin field.
-func ByPinYin(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPinYin, opts...).ToFunc()
-}
-
-// ByCh orders the results by the ch field.
-func ByCh(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCh, opts...).ToFunc()
-}
-
-// ByChStroke orders the results by the ch_stroke field.
-func ByChStroke(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldChStroke, opts...).ToFunc()
-}
-
-// ByChType orders the results by the ch_type field.
-func ByChType(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldChType, opts...).ToFunc()
-}
-
-// ByRadical orders the results by the radical field.
-func ByRadical(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRadical, opts...).ToFunc()
-}
-
-// ByRadicalStroke orders the results by the radical_stroke field.
-func ByRadicalStroke(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRadicalStroke, opts...).ToFunc()
-}
-
-// ByRelate orders the results by the relate field.
-func ByRelate(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRelate, opts...).ToFunc()
-}
-
-// ByRelateKangXi orders the results by the relate_kang_xi field.
-func ByRelateKangXi(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRelateKangXi, opts...).ToFunc()
-}
-
-// ByRelateTraditional orders the results by the relate_traditional field.
-func ByRelateTraditional(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRelateTraditional, opts...).ToFunc()
-}
-
-// ByIsNameScience orders the results by the is_name_science field.
-func ByIsNameScience(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIsNameScience, opts...).ToFunc()
-}
-
-// ByNameScienceChStroke orders the results by the name_science_ch_stroke field.
-func ByNameScienceChStroke(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldNameScienceChStroke, opts...).ToFunc()
-}
-
-// ByIsRegular orders the results by the is_regular field.
-func ByIsRegular(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIsRegular, opts...).ToFunc()
-}
-
-// ByWuXing orders the results by the wu_xing field.
-func ByWuXing(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldWuXing, opts...).ToFunc()
-}
-
-// ByLucky orders the results by the lucky field.
-func ByLucky(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldLucky, opts...).ToFunc()
-}
-
-// ByExplanation orders the results by the explanation field.
-func ByExplanation(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldExplanation, opts...).ToFunc()
-}
-
-// ByComment orders the results by the comment field.
-func ByComment(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldComment, opts...).ToFunc()
-}

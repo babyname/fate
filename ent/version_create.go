@@ -40,7 +40,7 @@ func (vc *VersionCreate) Mutation() *VersionMutation {
 
 // Save creates the Version in the database.
 func (vc *VersionCreate) Save(ctx context.Context) (*Version, error) {
-	return withHooks(ctx, vc.sqlSave, vc.mutation, vc.hooks)
+	return withHooks[*Version, VersionMutation](ctx, vc.sqlSave, vc.mutation, vc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -314,16 +314,12 @@ func (u *VersionUpsertOne) IDX(ctx context.Context) int {
 // VersionCreateBulk is the builder for creating many Version entities in bulk.
 type VersionCreateBulk struct {
 	config
-	err      error
 	builders []*VersionCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Version entities in the database.
 func (vcb *VersionCreateBulk) Save(ctx context.Context) ([]*Version, error) {
-	if vcb.err != nil {
-		return nil, vcb.err
-	}
 	specs := make([]*sqlgraph.CreateSpec, len(vcb.builders))
 	nodes := make([]*Version, len(vcb.builders))
 	mutators := make([]Mutator, len(vcb.builders))
@@ -339,8 +335,8 @@ func (vcb *VersionCreateBulk) Save(ctx context.Context) ([]*Version, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				var err error
 				nodes[i], specs[i] = builder.createSpec()
+				var err error
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, vcb.builders[i+1].mutation)
 				} else {
@@ -525,9 +521,6 @@ func (u *VersionUpsertBulk) UpdateUpdatedUnix() *VersionUpsertBulk {
 
 // Exec executes the query.
 func (u *VersionUpsertBulk) Exec(ctx context.Context) error {
-	if u.create.err != nil {
-		return u.create.err
-	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the VersionCreateBulk instead", i)
