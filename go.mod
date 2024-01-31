@@ -2,7 +2,7 @@ module github.com/babyname/fate
 
 require (
 	entgo.io/ent v0.11.9
-	github.com/go-sql-driver/mysql v1.7.0
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/godcong/chronos v0.0.3
 	github.com/godcong/chronos/v2 v2.0.6
 	github.com/godcong/yi v1.0.2
