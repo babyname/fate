@@ -73,6 +73,7 @@ var (
 		{Name: "traditional_id", Type: field.TypeJSON},
 		{Name: "is_kang_xi", Type: field.TypeBool, Default: false},
 		{Name: "kang_xi_id", Type: field.TypeJSON},
+		{Name: "kang_xi_stroke", Type: field.TypeInt, Default: 0},
 		{Name: "is_variant", Type: field.TypeBool, Default: false},
 		{Name: "variant_id", Type: field.TypeJSON},
 		{Name: "is_science", Type: field.TypeBool, Default: false},
@@ -80,7 +81,7 @@ var (
 		{Name: "wu_xing", Type: field.TypeString, Default: ""},
 		{Name: "lucky", Type: field.TypeString, Default: ""},
 		{Name: "explanation", Type: field.TypeString, Default: ""},
-		{Name: "comment", Type: field.TypeString, Default: ""},
+		{Name: "comment", Type: field.TypeJSON},
 		{Name: "need_fix", Type: field.TypeBool, Default: false},
 	}
 	// NCharacterTable holds the schema information for the "n_character" table.

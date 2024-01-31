@@ -31,6 +31,8 @@ const (
 	FieldIsKangXi = "is_kang_xi"
 	// FieldKangXiID holds the string denoting the kang_xi_id field in the database.
 	FieldKangXiID = "kang_xi_id"
+	// FieldKangXiStroke holds the string denoting the kang_xi_stroke field in the database.
+	FieldKangXiStroke = "kang_xi_stroke"
 	// FieldIsVariant holds the string denoting the is_variant field in the database.
 	FieldIsVariant = "is_variant"
 	// FieldVariantID holds the string denoting the variant_id field in the database.
@@ -68,6 +70,7 @@ var Columns = []string{
 	FieldTraditionalID,
 	FieldIsKangXi,
 	FieldKangXiID,
+	FieldKangXiStroke,
 	FieldIsVariant,
 	FieldVariantID,
 	FieldIsScience,
@@ -114,6 +117,8 @@ var (
 	DefaultIsKangXi bool
 	// DefaultKangXiID holds the default value on creation for the "kang_xi_id" field.
 	DefaultKangXiID []int
+	// DefaultKangXiStroke holds the default value on creation for the "kang_xi_stroke" field.
+	DefaultKangXiStroke int
 	// DefaultIsVariant holds the default value on creation for the "is_variant" field.
 	DefaultIsVariant bool
 	// DefaultVariantID holds the default value on creation for the "variant_id" field.
@@ -129,7 +134,7 @@ var (
 	// DefaultExplanation holds the default value on creation for the "explanation" field.
 	DefaultExplanation string
 	// DefaultComment holds the default value on creation for the "comment" field.
-	DefaultComment string
+	DefaultComment []string
 	// DefaultNeedFix holds the default value on creation for the "need_fix" field.
 	DefaultNeedFix bool
 	// DefaultID holds the default value on creation for the "id" field.

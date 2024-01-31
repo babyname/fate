@@ -2584,6 +2584,8 @@ type NCharacterMutation struct {
 	is_kang_xi           *bool
 	kang_xi_id           *[]int
 	appendkang_xi_id     []int
+	kang_xi_stroke       *int
+	addkang_xi_stroke    *int
 	is_variant           *bool
 	variant_id           *[]int
 	appendvariant_id     []int
@@ -2593,7 +2595,8 @@ type NCharacterMutation struct {
 	wu_xing              *string
 	lucky                *string
 	explanation          *string
-	comment              *string
+	comment              *[]string
+	appendcomment        []string
 	need_fix             *bool
 	clearedFields        map[string]struct{}
 	done                 bool
@@ -3237,6 +3240,62 @@ func (m *NCharacterMutation) ResetKangXiID() {
 	m.appendkang_xi_id = nil
 }
 
+// SetKangXiStroke sets the "kang_xi_stroke" field.
+func (m *NCharacterMutation) SetKangXiStroke(i int) {
+	m.kang_xi_stroke = &i
+	m.addkang_xi_stroke = nil
+}
+
+// KangXiStroke returns the value of the "kang_xi_stroke" field in the mutation.
+func (m *NCharacterMutation) KangXiStroke() (r int, exists bool) {
+	v := m.kang_xi_stroke
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKangXiStroke returns the old "kang_xi_stroke" field's value of the NCharacter entity.
+// If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NCharacterMutation) OldKangXiStroke(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKangXiStroke is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKangXiStroke requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKangXiStroke: %w", err)
+	}
+	return oldValue.KangXiStroke, nil
+}
+
+// AddKangXiStroke adds i to the "kang_xi_stroke" field.
+func (m *NCharacterMutation) AddKangXiStroke(i int) {
+	if m.addkang_xi_stroke != nil {
+		*m.addkang_xi_stroke += i
+	} else {
+		m.addkang_xi_stroke = &i
+	}
+}
+
+// AddedKangXiStroke returns the value that was added to the "kang_xi_stroke" field in this mutation.
+func (m *NCharacterMutation) AddedKangXiStroke() (r int, exists bool) {
+	v := m.addkang_xi_stroke
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetKangXiStroke resets all changes to the "kang_xi_stroke" field.
+func (m *NCharacterMutation) ResetKangXiStroke() {
+	m.kang_xi_stroke = nil
+	m.addkang_xi_stroke = nil
+}
+
 // SetIsVariant sets the "is_variant" field.
 func (m *NCharacterMutation) SetIsVariant(b bool) {
 	m.is_variant = &b
@@ -3525,12 +3584,13 @@ func (m *NCharacterMutation) ResetExplanation() {
 }
 
 // SetComment sets the "comment" field.
-func (m *NCharacterMutation) SetComment(s string) {
+func (m *NCharacterMutation) SetComment(s []string) {
 	m.comment = &s
+	m.appendcomment = nil
 }
 
 // Comment returns the value of the "comment" field in the mutation.
-func (m *NCharacterMutation) Comment() (r string, exists bool) {
+func (m *NCharacterMutation) Comment() (r []string, exists bool) {
 	v := m.comment
 	if v == nil {
 		return
@@ -3541,7 +3601,7 @@ func (m *NCharacterMutation) Comment() (r string, exists bool) {
 // OldComment returns the old "comment" field's value of the NCharacter entity.
 // If the NCharacter object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NCharacterMutation) OldComment(ctx context.Context) (v string, err error) {
+func (m *NCharacterMutation) OldComment(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldComment is only allowed on UpdateOne operations")
 	}
@@ -3555,9 +3615,23 @@ func (m *NCharacterMutation) OldComment(ctx context.Context) (v string, err erro
 	return oldValue.Comment, nil
 }
 
+// AppendComment adds s to the "comment" field.
+func (m *NCharacterMutation) AppendComment(s []string) {
+	m.appendcomment = append(m.appendcomment, s...)
+}
+
+// AppendedComment returns the list of values that were appended to the "comment" field in this mutation.
+func (m *NCharacterMutation) AppendedComment() ([]string, bool) {
+	if len(m.appendcomment) == 0 {
+		return nil, false
+	}
+	return m.appendcomment, true
+}
+
 // ResetComment resets all changes to the "comment" field.
 func (m *NCharacterMutation) ResetComment() {
 	m.comment = nil
+	m.appendcomment = nil
 }
 
 // SetNeedFix sets the "need_fix" field.
@@ -3630,7 +3704,7 @@ func (m *NCharacterMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NCharacterMutation) Fields() []string {
-	fields := make([]string, 0, 21)
+	fields := make([]string, 0, 22)
 	if m.pin_yin != nil {
 		fields = append(fields, ncharacter.FieldPinYin)
 	}
@@ -3666,6 +3740,9 @@ func (m *NCharacterMutation) Fields() []string {
 	}
 	if m.kang_xi_id != nil {
 		fields = append(fields, ncharacter.FieldKangXiID)
+	}
+	if m.kang_xi_stroke != nil {
+		fields = append(fields, ncharacter.FieldKangXiStroke)
 	}
 	if m.is_variant != nil {
 		fields = append(fields, ncharacter.FieldIsVariant)
@@ -3726,6 +3803,8 @@ func (m *NCharacterMutation) Field(name string) (ent.Value, bool) {
 		return m.IsKangXi()
 	case ncharacter.FieldKangXiID:
 		return m.KangXiID()
+	case ncharacter.FieldKangXiStroke:
+		return m.KangXiStroke()
 	case ncharacter.FieldIsVariant:
 		return m.IsVariant()
 	case ncharacter.FieldVariantID:
@@ -3777,6 +3856,8 @@ func (m *NCharacterMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldIsKangXi(ctx)
 	case ncharacter.FieldKangXiID:
 		return m.OldKangXiID(ctx)
+	case ncharacter.FieldKangXiStroke:
+		return m.OldKangXiStroke(ctx)
 	case ncharacter.FieldIsVariant:
 		return m.OldIsVariant(ctx)
 	case ncharacter.FieldVariantID:
@@ -3888,6 +3969,13 @@ func (m *NCharacterMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetKangXiID(v)
 		return nil
+	case ncharacter.FieldKangXiStroke:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKangXiStroke(v)
+		return nil
 	case ncharacter.FieldIsVariant:
 		v, ok := value.(bool)
 		if !ok {
@@ -3938,7 +4026,7 @@ func (m *NCharacterMutation) SetField(name string, value ent.Value) error {
 		m.SetExplanation(v)
 		return nil
 	case ncharacter.FieldComment:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3965,6 +4053,9 @@ func (m *NCharacterMutation) AddedFields() []string {
 	if m.addradical_stroke != nil {
 		fields = append(fields, ncharacter.FieldRadicalStroke)
 	}
+	if m.addkang_xi_stroke != nil {
+		fields = append(fields, ncharacter.FieldKangXiStroke)
+	}
 	if m.addscience_stroke != nil {
 		fields = append(fields, ncharacter.FieldScienceStroke)
 	}
@@ -3980,6 +4071,8 @@ func (m *NCharacterMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedCharStroke()
 	case ncharacter.FieldRadicalStroke:
 		return m.AddedRadicalStroke()
+	case ncharacter.FieldKangXiStroke:
+		return m.AddedKangXiStroke()
 	case ncharacter.FieldScienceStroke:
 		return m.AddedScienceStroke()
 	}
@@ -4004,6 +4097,13 @@ func (m *NCharacterMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddRadicalStroke(v)
+		return nil
+	case ncharacter.FieldKangXiStroke:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddKangXiStroke(v)
 		return nil
 	case ncharacter.FieldScienceStroke:
 		v, ok := value.(int)
@@ -4074,6 +4174,9 @@ func (m *NCharacterMutation) ResetField(name string) error {
 		return nil
 	case ncharacter.FieldKangXiID:
 		m.ResetKangXiID()
+		return nil
+	case ncharacter.FieldKangXiStroke:
+		m.ResetKangXiStroke()
 		return nil
 	case ncharacter.FieldIsVariant:
 		m.ResetIsVariant()

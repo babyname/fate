@@ -40,6 +40,8 @@ type NCharacter struct {
 	IsKangXi bool `json:"is_kang_xi,omitempty"`
 	// KangXiID holds the value of the "kang_xi_id" field.
 	KangXiID []int `json:"kang_xi_id,omitempty"`
+	// KangXiStroke holds the value of the "kang_xi_stroke" field.
+	KangXiStroke int `json:"kang_xi_stroke,omitempty"`
 	// IsVariant holds the value of the "is_variant" field.
 	IsVariant bool `json:"is_variant,omitempty"`
 	// VariantID holds the value of the "variant_id" field.
@@ -55,7 +57,7 @@ type NCharacter struct {
 	// Explanation holds the value of the "explanation" field.
 	Explanation string `json:"explanation,omitempty"`
 	// Comment holds the value of the "comment" field.
-	Comment string `json:"comment,omitempty"`
+	Comment []string `json:"comment,omitempty"`
 	// NeedFix holds the value of the "need_fix" field.
 	NeedFix bool `json:"need_fix,omitempty"`
 }
@@ -65,13 +67,13 @@ func (*NCharacter) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case ncharacter.FieldPinYin, ncharacter.FieldSimplifiedID, ncharacter.FieldTraditionalID, ncharacter.FieldKangXiID, ncharacter.FieldVariantID:
+		case ncharacter.FieldPinYin, ncharacter.FieldSimplifiedID, ncharacter.FieldTraditionalID, ncharacter.FieldKangXiID, ncharacter.FieldVariantID, ncharacter.FieldComment:
 			values[i] = new([]byte)
 		case ncharacter.FieldIsRegular, ncharacter.FieldIsSimplified, ncharacter.FieldIsTraditional, ncharacter.FieldIsKangXi, ncharacter.FieldIsVariant, ncharacter.FieldIsScience, ncharacter.FieldNeedFix:
 			values[i] = new(sql.NullBool)
-		case ncharacter.FieldID, ncharacter.FieldCharStroke, ncharacter.FieldRadicalStroke, ncharacter.FieldScienceStroke:
+		case ncharacter.FieldID, ncharacter.FieldCharStroke, ncharacter.FieldRadicalStroke, ncharacter.FieldKangXiStroke, ncharacter.FieldScienceStroke:
 			values[i] = new(sql.NullInt64)
-		case ncharacter.FieldChar, ncharacter.FieldRadical, ncharacter.FieldWuXing, ncharacter.FieldLucky, ncharacter.FieldExplanation, ncharacter.FieldComment:
+		case ncharacter.FieldChar, ncharacter.FieldRadical, ncharacter.FieldWuXing, ncharacter.FieldLucky, ncharacter.FieldExplanation:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type NCharacter", columns[i])
@@ -174,6 +176,12 @@ func (n *NCharacter) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field kang_xi_id: %w", err)
 				}
 			}
+		case ncharacter.FieldKangXiStroke:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field kang_xi_stroke", values[i])
+			} else if value.Valid {
+				n.KangXiStroke = int(value.Int64)
+			}
 		case ncharacter.FieldIsVariant:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_variant", values[i])
@@ -219,10 +227,12 @@ func (n *NCharacter) assignValues(columns []string, values []any) error {
 				n.Explanation = value.String
 			}
 		case ncharacter.FieldComment:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field comment", values[i])
-			} else if value.Valid {
-				n.Comment = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &n.Comment); err != nil {
+					return fmt.Errorf("unmarshal field comment: %w", err)
+				}
 			}
 		case ncharacter.FieldNeedFix:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -294,6 +304,9 @@ func (n *NCharacter) String() string {
 	builder.WriteString("kang_xi_id=")
 	builder.WriteString(fmt.Sprintf("%v", n.KangXiID))
 	builder.WriteString(", ")
+	builder.WriteString("kang_xi_stroke=")
+	builder.WriteString(fmt.Sprintf("%v", n.KangXiStroke))
+	builder.WriteString(", ")
 	builder.WriteString("is_variant=")
 	builder.WriteString(fmt.Sprintf("%v", n.IsVariant))
 	builder.WriteString(", ")
@@ -316,7 +329,7 @@ func (n *NCharacter) String() string {
 	builder.WriteString(n.Explanation)
 	builder.WriteString(", ")
 	builder.WriteString("comment=")
-	builder.WriteString(n.Comment)
+	builder.WriteString(fmt.Sprintf("%v", n.Comment))
 	builder.WriteString(", ")
 	builder.WriteString("need_fix=")
 	builder.WriteString(fmt.Sprintf("%v", n.NeedFix))

@@ -92,6 +92,11 @@ func IsKangXi(v bool) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldEQ(FieldIsKangXi, v))
 }
 
+// KangXiStroke applies equality check predicate on the "kang_xi_stroke" field. It's identical to KangXiStrokeEQ.
+func KangXiStroke(v int) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldEQ(FieldKangXiStroke, v))
+}
+
 // IsVariant applies equality check predicate on the "is_variant" field. It's identical to IsVariantEQ.
 func IsVariant(v bool) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldEQ(FieldIsVariant, v))
@@ -120,11 +125,6 @@ func Lucky(v string) predicate.NCharacter {
 // Explanation applies equality check predicate on the "explanation" field. It's identical to ExplanationEQ.
 func Explanation(v string) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldEQ(FieldExplanation, v))
-}
-
-// Comment applies equality check predicate on the "comment" field. It's identical to CommentEQ.
-func Comment(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldEQ(FieldComment, v))
 }
 
 // NeedFix applies equality check predicate on the "need_fix" field. It's identical to NeedFixEQ.
@@ -382,6 +382,46 @@ func IsKangXiNEQ(v bool) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldNEQ(FieldIsKangXi, v))
 }
 
+// KangXiStrokeEQ applies the EQ predicate on the "kang_xi_stroke" field.
+func KangXiStrokeEQ(v int) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldEQ(FieldKangXiStroke, v))
+}
+
+// KangXiStrokeNEQ applies the NEQ predicate on the "kang_xi_stroke" field.
+func KangXiStrokeNEQ(v int) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldNEQ(FieldKangXiStroke, v))
+}
+
+// KangXiStrokeIn applies the In predicate on the "kang_xi_stroke" field.
+func KangXiStrokeIn(vs ...int) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldIn(FieldKangXiStroke, vs...))
+}
+
+// KangXiStrokeNotIn applies the NotIn predicate on the "kang_xi_stroke" field.
+func KangXiStrokeNotIn(vs ...int) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldNotIn(FieldKangXiStroke, vs...))
+}
+
+// KangXiStrokeGT applies the GT predicate on the "kang_xi_stroke" field.
+func KangXiStrokeGT(v int) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldGT(FieldKangXiStroke, v))
+}
+
+// KangXiStrokeGTE applies the GTE predicate on the "kang_xi_stroke" field.
+func KangXiStrokeGTE(v int) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldGTE(FieldKangXiStroke, v))
+}
+
+// KangXiStrokeLT applies the LT predicate on the "kang_xi_stroke" field.
+func KangXiStrokeLT(v int) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldLT(FieldKangXiStroke, v))
+}
+
+// KangXiStrokeLTE applies the LTE predicate on the "kang_xi_stroke" field.
+func KangXiStrokeLTE(v int) predicate.NCharacter {
+	return predicate.NCharacter(sql.FieldLTE(FieldKangXiStroke, v))
+}
+
 // IsVariantEQ applies the EQ predicate on the "is_variant" field.
 func IsVariantEQ(v bool) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldEQ(FieldIsVariant, v))
@@ -635,71 +675,6 @@ func ExplanationEqualFold(v string) predicate.NCharacter {
 // ExplanationContainsFold applies the ContainsFold predicate on the "explanation" field.
 func ExplanationContainsFold(v string) predicate.NCharacter {
 	return predicate.NCharacter(sql.FieldContainsFold(FieldExplanation, v))
-}
-
-// CommentEQ applies the EQ predicate on the "comment" field.
-func CommentEQ(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldEQ(FieldComment, v))
-}
-
-// CommentNEQ applies the NEQ predicate on the "comment" field.
-func CommentNEQ(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldNEQ(FieldComment, v))
-}
-
-// CommentIn applies the In predicate on the "comment" field.
-func CommentIn(vs ...string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldIn(FieldComment, vs...))
-}
-
-// CommentNotIn applies the NotIn predicate on the "comment" field.
-func CommentNotIn(vs ...string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldNotIn(FieldComment, vs...))
-}
-
-// CommentGT applies the GT predicate on the "comment" field.
-func CommentGT(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldGT(FieldComment, v))
-}
-
-// CommentGTE applies the GTE predicate on the "comment" field.
-func CommentGTE(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldGTE(FieldComment, v))
-}
-
-// CommentLT applies the LT predicate on the "comment" field.
-func CommentLT(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldLT(FieldComment, v))
-}
-
-// CommentLTE applies the LTE predicate on the "comment" field.
-func CommentLTE(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldLTE(FieldComment, v))
-}
-
-// CommentContains applies the Contains predicate on the "comment" field.
-func CommentContains(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldContains(FieldComment, v))
-}
-
-// CommentHasPrefix applies the HasPrefix predicate on the "comment" field.
-func CommentHasPrefix(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldHasPrefix(FieldComment, v))
-}
-
-// CommentHasSuffix applies the HasSuffix predicate on the "comment" field.
-func CommentHasSuffix(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldHasSuffix(FieldComment, v))
-}
-
-// CommentEqualFold applies the EqualFold predicate on the "comment" field.
-func CommentEqualFold(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldEqualFold(FieldComment, v))
-}
-
-// CommentContainsFold applies the ContainsFold predicate on the "comment" field.
-func CommentContainsFold(v string) predicate.NCharacter {
-	return predicate.NCharacter(sql.FieldContainsFold(FieldComment, v))
 }
 
 // NeedFixEQ applies the EQ predicate on the "need_fix" field.

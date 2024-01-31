@@ -202,6 +202,27 @@ func (nu *NCharacterUpdate) AppendKangXiID(i []int) *NCharacterUpdate {
 	return nu
 }
 
+// SetKangXiStroke sets the "kang_xi_stroke" field.
+func (nu *NCharacterUpdate) SetKangXiStroke(i int) *NCharacterUpdate {
+	nu.mutation.ResetKangXiStroke()
+	nu.mutation.SetKangXiStroke(i)
+	return nu
+}
+
+// SetNillableKangXiStroke sets the "kang_xi_stroke" field if the given value is not nil.
+func (nu *NCharacterUpdate) SetNillableKangXiStroke(i *int) *NCharacterUpdate {
+	if i != nil {
+		nu.SetKangXiStroke(*i)
+	}
+	return nu
+}
+
+// AddKangXiStroke adds i to the "kang_xi_stroke" field.
+func (nu *NCharacterUpdate) AddKangXiStroke(i int) *NCharacterUpdate {
+	nu.mutation.AddKangXiStroke(i)
+	return nu
+}
+
 // SetIsVariant sets the "is_variant" field.
 func (nu *NCharacterUpdate) SetIsVariant(b bool) *NCharacterUpdate {
 	nu.mutation.SetIsVariant(b)
@@ -306,16 +327,14 @@ func (nu *NCharacterUpdate) SetNillableExplanation(s *string) *NCharacterUpdate 
 }
 
 // SetComment sets the "comment" field.
-func (nu *NCharacterUpdate) SetComment(s string) *NCharacterUpdate {
+func (nu *NCharacterUpdate) SetComment(s []string) *NCharacterUpdate {
 	nu.mutation.SetComment(s)
 	return nu
 }
 
-// SetNillableComment sets the "comment" field if the given value is not nil.
-func (nu *NCharacterUpdate) SetNillableComment(s *string) *NCharacterUpdate {
-	if s != nil {
-		nu.SetComment(*s)
-	}
+// AppendComment appends s to the "comment" field.
+func (nu *NCharacterUpdate) AppendComment(s []string) *NCharacterUpdate {
+	nu.mutation.AppendComment(s)
 	return nu
 }
 
@@ -436,6 +455,12 @@ func (nu *NCharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, ncharacter.FieldKangXiID, value)
 		})
 	}
+	if value, ok := nu.mutation.KangXiStroke(); ok {
+		_spec.SetField(ncharacter.FieldKangXiStroke, field.TypeInt, value)
+	}
+	if value, ok := nu.mutation.AddedKangXiStroke(); ok {
+		_spec.AddField(ncharacter.FieldKangXiStroke, field.TypeInt, value)
+	}
 	if value, ok := nu.mutation.IsVariant(); ok {
 		_spec.SetField(ncharacter.FieldIsVariant, field.TypeBool, value)
 	}
@@ -466,7 +491,12 @@ func (nu *NCharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(ncharacter.FieldExplanation, field.TypeString, value)
 	}
 	if value, ok := nu.mutation.Comment(); ok {
-		_spec.SetField(ncharacter.FieldComment, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldComment, field.TypeJSON, value)
+	}
+	if value, ok := nu.mutation.AppendedComment(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, ncharacter.FieldComment, value)
+		})
 	}
 	if value, ok := nu.mutation.NeedFix(); ok {
 		_spec.SetField(ncharacter.FieldNeedFix, field.TypeBool, value)
@@ -665,6 +695,27 @@ func (nuo *NCharacterUpdateOne) AppendKangXiID(i []int) *NCharacterUpdateOne {
 	return nuo
 }
 
+// SetKangXiStroke sets the "kang_xi_stroke" field.
+func (nuo *NCharacterUpdateOne) SetKangXiStroke(i int) *NCharacterUpdateOne {
+	nuo.mutation.ResetKangXiStroke()
+	nuo.mutation.SetKangXiStroke(i)
+	return nuo
+}
+
+// SetNillableKangXiStroke sets the "kang_xi_stroke" field if the given value is not nil.
+func (nuo *NCharacterUpdateOne) SetNillableKangXiStroke(i *int) *NCharacterUpdateOne {
+	if i != nil {
+		nuo.SetKangXiStroke(*i)
+	}
+	return nuo
+}
+
+// AddKangXiStroke adds i to the "kang_xi_stroke" field.
+func (nuo *NCharacterUpdateOne) AddKangXiStroke(i int) *NCharacterUpdateOne {
+	nuo.mutation.AddKangXiStroke(i)
+	return nuo
+}
+
 // SetIsVariant sets the "is_variant" field.
 func (nuo *NCharacterUpdateOne) SetIsVariant(b bool) *NCharacterUpdateOne {
 	nuo.mutation.SetIsVariant(b)
@@ -769,16 +820,14 @@ func (nuo *NCharacterUpdateOne) SetNillableExplanation(s *string) *NCharacterUpd
 }
 
 // SetComment sets the "comment" field.
-func (nuo *NCharacterUpdateOne) SetComment(s string) *NCharacterUpdateOne {
+func (nuo *NCharacterUpdateOne) SetComment(s []string) *NCharacterUpdateOne {
 	nuo.mutation.SetComment(s)
 	return nuo
 }
 
-// SetNillableComment sets the "comment" field if the given value is not nil.
-func (nuo *NCharacterUpdateOne) SetNillableComment(s *string) *NCharacterUpdateOne {
-	if s != nil {
-		nuo.SetComment(*s)
-	}
+// AppendComment appends s to the "comment" field.
+func (nuo *NCharacterUpdateOne) AppendComment(s []string) *NCharacterUpdateOne {
+	nuo.mutation.AppendComment(s)
 	return nuo
 }
 
@@ -929,6 +978,12 @@ func (nuo *NCharacterUpdateOne) sqlSave(ctx context.Context) (_node *NCharacter,
 			sqljson.Append(u, ncharacter.FieldKangXiID, value)
 		})
 	}
+	if value, ok := nuo.mutation.KangXiStroke(); ok {
+		_spec.SetField(ncharacter.FieldKangXiStroke, field.TypeInt, value)
+	}
+	if value, ok := nuo.mutation.AddedKangXiStroke(); ok {
+		_spec.AddField(ncharacter.FieldKangXiStroke, field.TypeInt, value)
+	}
 	if value, ok := nuo.mutation.IsVariant(); ok {
 		_spec.SetField(ncharacter.FieldIsVariant, field.TypeBool, value)
 	}
@@ -959,7 +1014,12 @@ func (nuo *NCharacterUpdateOne) sqlSave(ctx context.Context) (_node *NCharacter,
 		_spec.SetField(ncharacter.FieldExplanation, field.TypeString, value)
 	}
 	if value, ok := nuo.mutation.Comment(); ok {
-		_spec.SetField(ncharacter.FieldComment, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldComment, field.TypeJSON, value)
+	}
+	if value, ok := nuo.mutation.AppendedComment(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, ncharacter.FieldComment, value)
+		})
 	}
 	if value, ok := nuo.mutation.NeedFix(); ok {
 		_spec.SetField(ncharacter.FieldNeedFix, field.TypeBool, value)

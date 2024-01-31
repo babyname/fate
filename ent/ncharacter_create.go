@@ -157,6 +157,20 @@ func (nc *NCharacterCreate) SetKangXiID(i []int) *NCharacterCreate {
 	return nc
 }
 
+// SetKangXiStroke sets the "kang_xi_stroke" field.
+func (nc *NCharacterCreate) SetKangXiStroke(i int) *NCharacterCreate {
+	nc.mutation.SetKangXiStroke(i)
+	return nc
+}
+
+// SetNillableKangXiStroke sets the "kang_xi_stroke" field if the given value is not nil.
+func (nc *NCharacterCreate) SetNillableKangXiStroke(i *int) *NCharacterCreate {
+	if i != nil {
+		nc.SetKangXiStroke(*i)
+	}
+	return nc
+}
+
 // SetIsVariant sets the "is_variant" field.
 func (nc *NCharacterCreate) SetIsVariant(b bool) *NCharacterCreate {
 	nc.mutation.SetIsVariant(b)
@@ -248,16 +262,8 @@ func (nc *NCharacterCreate) SetNillableExplanation(s *string) *NCharacterCreate 
 }
 
 // SetComment sets the "comment" field.
-func (nc *NCharacterCreate) SetComment(s string) *NCharacterCreate {
+func (nc *NCharacterCreate) SetComment(s []string) *NCharacterCreate {
 	nc.mutation.SetComment(s)
-	return nc
-}
-
-// SetNillableComment sets the "comment" field if the given value is not nil.
-func (nc *NCharacterCreate) SetNillableComment(s *string) *NCharacterCreate {
-	if s != nil {
-		nc.SetComment(*s)
-	}
 	return nc
 }
 
@@ -372,6 +378,10 @@ func (nc *NCharacterCreate) defaults() {
 		v := ncharacter.DefaultKangXiID
 		nc.mutation.SetKangXiID(v)
 	}
+	if _, ok := nc.mutation.KangXiStroke(); !ok {
+		v := ncharacter.DefaultKangXiStroke
+		nc.mutation.SetKangXiStroke(v)
+	}
 	if _, ok := nc.mutation.IsVariant(); !ok {
 		v := ncharacter.DefaultIsVariant
 		nc.mutation.SetIsVariant(v)
@@ -451,6 +461,9 @@ func (nc *NCharacterCreate) check() error {
 	}
 	if _, ok := nc.mutation.KangXiID(); !ok {
 		return &ValidationError{Name: "kang_xi_id", err: errors.New(`ent: missing required field "NCharacter.kang_xi_id"`)}
+	}
+	if _, ok := nc.mutation.KangXiStroke(); !ok {
+		return &ValidationError{Name: "kang_xi_stroke", err: errors.New(`ent: missing required field "NCharacter.kang_xi_stroke"`)}
 	}
 	if _, ok := nc.mutation.IsVariant(); !ok {
 		return &ValidationError{Name: "is_variant", err: errors.New(`ent: missing required field "NCharacter.is_variant"`)}
@@ -560,6 +573,10 @@ func (nc *NCharacterCreate) createSpec() (*NCharacter, *sqlgraph.CreateSpec) {
 		_spec.SetField(ncharacter.FieldKangXiID, field.TypeJSON, value)
 		_node.KangXiID = value
 	}
+	if value, ok := nc.mutation.KangXiStroke(); ok {
+		_spec.SetField(ncharacter.FieldKangXiStroke, field.TypeInt, value)
+		_node.KangXiStroke = value
+	}
 	if value, ok := nc.mutation.IsVariant(); ok {
 		_spec.SetField(ncharacter.FieldIsVariant, field.TypeBool, value)
 		_node.IsVariant = value
@@ -589,7 +606,7 @@ func (nc *NCharacterCreate) createSpec() (*NCharacter, *sqlgraph.CreateSpec) {
 		_node.Explanation = value
 	}
 	if value, ok := nc.mutation.Comment(); ok {
-		_spec.SetField(ncharacter.FieldComment, field.TypeString, value)
+		_spec.SetField(ncharacter.FieldComment, field.TypeJSON, value)
 		_node.Comment = value
 	}
 	if value, ok := nc.mutation.NeedFix(); ok {
@@ -804,6 +821,24 @@ func (u *NCharacterUpsert) UpdateKangXiID() *NCharacterUpsert {
 	return u
 }
 
+// SetKangXiStroke sets the "kang_xi_stroke" field.
+func (u *NCharacterUpsert) SetKangXiStroke(v int) *NCharacterUpsert {
+	u.Set(ncharacter.FieldKangXiStroke, v)
+	return u
+}
+
+// UpdateKangXiStroke sets the "kang_xi_stroke" field to the value that was provided on create.
+func (u *NCharacterUpsert) UpdateKangXiStroke() *NCharacterUpsert {
+	u.SetExcluded(ncharacter.FieldKangXiStroke)
+	return u
+}
+
+// AddKangXiStroke adds v to the "kang_xi_stroke" field.
+func (u *NCharacterUpsert) AddKangXiStroke(v int) *NCharacterUpsert {
+	u.Add(ncharacter.FieldKangXiStroke, v)
+	return u
+}
+
 // SetIsVariant sets the "is_variant" field.
 func (u *NCharacterUpsert) SetIsVariant(v bool) *NCharacterUpsert {
 	u.Set(ncharacter.FieldIsVariant, v)
@@ -895,7 +930,7 @@ func (u *NCharacterUpsert) UpdateExplanation() *NCharacterUpsert {
 }
 
 // SetComment sets the "comment" field.
-func (u *NCharacterUpsert) SetComment(v string) *NCharacterUpsert {
+func (u *NCharacterUpsert) SetComment(v []string) *NCharacterUpsert {
 	u.Set(ncharacter.FieldComment, v)
 	return u
 }
@@ -1148,6 +1183,27 @@ func (u *NCharacterUpsertOne) UpdateKangXiID() *NCharacterUpsertOne {
 	})
 }
 
+// SetKangXiStroke sets the "kang_xi_stroke" field.
+func (u *NCharacterUpsertOne) SetKangXiStroke(v int) *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.SetKangXiStroke(v)
+	})
+}
+
+// AddKangXiStroke adds v to the "kang_xi_stroke" field.
+func (u *NCharacterUpsertOne) AddKangXiStroke(v int) *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.AddKangXiStroke(v)
+	})
+}
+
+// UpdateKangXiStroke sets the "kang_xi_stroke" field to the value that was provided on create.
+func (u *NCharacterUpsertOne) UpdateKangXiStroke() *NCharacterUpsertOne {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.UpdateKangXiStroke()
+	})
+}
+
 // SetIsVariant sets the "is_variant" field.
 func (u *NCharacterUpsertOne) SetIsVariant(v bool) *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
@@ -1254,7 +1310,7 @@ func (u *NCharacterUpsertOne) UpdateExplanation() *NCharacterUpsertOne {
 }
 
 // SetComment sets the "comment" field.
-func (u *NCharacterUpsertOne) SetComment(v string) *NCharacterUpsertOne {
+func (u *NCharacterUpsertOne) SetComment(v []string) *NCharacterUpsertOne {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.SetComment(v)
 	})
@@ -1673,6 +1729,27 @@ func (u *NCharacterUpsertBulk) UpdateKangXiID() *NCharacterUpsertBulk {
 	})
 }
 
+// SetKangXiStroke sets the "kang_xi_stroke" field.
+func (u *NCharacterUpsertBulk) SetKangXiStroke(v int) *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.SetKangXiStroke(v)
+	})
+}
+
+// AddKangXiStroke adds v to the "kang_xi_stroke" field.
+func (u *NCharacterUpsertBulk) AddKangXiStroke(v int) *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.AddKangXiStroke(v)
+	})
+}
+
+// UpdateKangXiStroke sets the "kang_xi_stroke" field to the value that was provided on create.
+func (u *NCharacterUpsertBulk) UpdateKangXiStroke() *NCharacterUpsertBulk {
+	return u.Update(func(s *NCharacterUpsert) {
+		s.UpdateKangXiStroke()
+	})
+}
+
 // SetIsVariant sets the "is_variant" field.
 func (u *NCharacterUpsertBulk) SetIsVariant(v bool) *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
@@ -1779,7 +1856,7 @@ func (u *NCharacterUpsertBulk) UpdateExplanation() *NCharacterUpsertBulk {
 }
 
 // SetComment sets the "comment" field.
-func (u *NCharacterUpsertBulk) SetComment(v string) *NCharacterUpsertBulk {
+func (u *NCharacterUpsertBulk) SetComment(v []string) *NCharacterUpsertBulk {
 	return u.Update(func(s *NCharacterUpsert) {
 		s.SetComment(v)
 	})

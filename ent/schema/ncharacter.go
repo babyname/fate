@@ -36,6 +36,7 @@ func (NCharacter) Fields() []ent.Field {
 		field.Ints("traditional_id").Default([]int{}), //relate traditional chinese
 		field.Bool("is_kang_xi").Default(false),       //relate kang xi chinese
 		field.Ints("kang_xi_id").Default([]int{}),     //relate kang xi chinese
+		field.Int("kang_xi_stroke").Default(0),        //relate kang xi chinese
 		field.Bool("is_variant").Default(false),       //relate other variant characters
 		field.Ints("variant_id").Default([]int{}),     //relate other variant characters
 		field.Bool("is_science").Default(false),       //is name science
@@ -43,7 +44,7 @@ func (NCharacter) Fields() []ent.Field {
 		field.String("wu_xing").Default(""),           //wu xing
 		field.String("lucky").Default(""),             //lucky
 		field.String("explanation").Default(""),
-		field.String("comment").Default(""),
+		field.Strings("comment").Default([]string{}),
 		field.Bool("need_fix").Default(false),
 	}
 }

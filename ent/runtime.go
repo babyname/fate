@@ -61,40 +61,44 @@ func init() {
 	ncharacterDescKangXiID := ncharacterFields[12].Descriptor()
 	// ncharacter.DefaultKangXiID holds the default value on creation for the kang_xi_id field.
 	ncharacter.DefaultKangXiID = ncharacterDescKangXiID.Default.([]int)
+	// ncharacterDescKangXiStroke is the schema descriptor for kang_xi_stroke field.
+	ncharacterDescKangXiStroke := ncharacterFields[13].Descriptor()
+	// ncharacter.DefaultKangXiStroke holds the default value on creation for the kang_xi_stroke field.
+	ncharacter.DefaultKangXiStroke = ncharacterDescKangXiStroke.Default.(int)
 	// ncharacterDescIsVariant is the schema descriptor for is_variant field.
-	ncharacterDescIsVariant := ncharacterFields[13].Descriptor()
+	ncharacterDescIsVariant := ncharacterFields[14].Descriptor()
 	// ncharacter.DefaultIsVariant holds the default value on creation for the is_variant field.
 	ncharacter.DefaultIsVariant = ncharacterDescIsVariant.Default.(bool)
 	// ncharacterDescVariantID is the schema descriptor for variant_id field.
-	ncharacterDescVariantID := ncharacterFields[14].Descriptor()
+	ncharacterDescVariantID := ncharacterFields[15].Descriptor()
 	// ncharacter.DefaultVariantID holds the default value on creation for the variant_id field.
 	ncharacter.DefaultVariantID = ncharacterDescVariantID.Default.([]int)
 	// ncharacterDescIsScience is the schema descriptor for is_science field.
-	ncharacterDescIsScience := ncharacterFields[15].Descriptor()
+	ncharacterDescIsScience := ncharacterFields[16].Descriptor()
 	// ncharacter.DefaultIsScience holds the default value on creation for the is_science field.
 	ncharacter.DefaultIsScience = ncharacterDescIsScience.Default.(bool)
 	// ncharacterDescScienceStroke is the schema descriptor for science_stroke field.
-	ncharacterDescScienceStroke := ncharacterFields[16].Descriptor()
+	ncharacterDescScienceStroke := ncharacterFields[17].Descriptor()
 	// ncharacter.DefaultScienceStroke holds the default value on creation for the science_stroke field.
 	ncharacter.DefaultScienceStroke = ncharacterDescScienceStroke.Default.(int)
 	// ncharacterDescWuXing is the schema descriptor for wu_xing field.
-	ncharacterDescWuXing := ncharacterFields[17].Descriptor()
+	ncharacterDescWuXing := ncharacterFields[18].Descriptor()
 	// ncharacter.DefaultWuXing holds the default value on creation for the wu_xing field.
 	ncharacter.DefaultWuXing = ncharacterDescWuXing.Default.(string)
 	// ncharacterDescLucky is the schema descriptor for lucky field.
-	ncharacterDescLucky := ncharacterFields[18].Descriptor()
+	ncharacterDescLucky := ncharacterFields[19].Descriptor()
 	// ncharacter.DefaultLucky holds the default value on creation for the lucky field.
 	ncharacter.DefaultLucky = ncharacterDescLucky.Default.(string)
 	// ncharacterDescExplanation is the schema descriptor for explanation field.
-	ncharacterDescExplanation := ncharacterFields[19].Descriptor()
+	ncharacterDescExplanation := ncharacterFields[20].Descriptor()
 	// ncharacter.DefaultExplanation holds the default value on creation for the explanation field.
 	ncharacter.DefaultExplanation = ncharacterDescExplanation.Default.(string)
 	// ncharacterDescComment is the schema descriptor for comment field.
-	ncharacterDescComment := ncharacterFields[20].Descriptor()
+	ncharacterDescComment := ncharacterFields[21].Descriptor()
 	// ncharacter.DefaultComment holds the default value on creation for the comment field.
-	ncharacter.DefaultComment = ncharacterDescComment.Default.(string)
+	ncharacter.DefaultComment = ncharacterDescComment.Default.([]string)
 	// ncharacterDescNeedFix is the schema descriptor for need_fix field.
-	ncharacterDescNeedFix := ncharacterFields[21].Descriptor()
+	ncharacterDescNeedFix := ncharacterFields[22].Descriptor()
 	// ncharacter.DefaultNeedFix holds the default value on creation for the need_fix field.
 	ncharacter.DefaultNeedFix = ncharacterDescNeedFix.Default.(bool)
 	// ncharacterDescID is the schema descriptor for id field.
