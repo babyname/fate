@@ -1,87 +1,65 @@
 package log
 
 import (
-	"context"
 	"log/slog"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/babyname/fate/config"
 )
 
-const (
-	envLogFile = "ENV_LOG_FILE"
-)
-
 var (
-	opts   = slog.HandlerOptions{AddSource: true}
-	output *os.File
+	sourceAttr func() slog.Attr
 )
 
-type Logger interface {
-	Handler() slog.Handler
-	Context() context.Context
-	With(args ...any) *slog.Logger
-	WithGroup(name string) *slog.Logger
-	WithContext(ctx context.Context) *slog.Logger
-	Enabled(level slog.Level) bool
-	Log(level slog.Level, msg string, args ...any)
-	LogDepth(calldepth int, level slog.Level, msg string, args ...any)
-	LogAttrs(level slog.Level, msg string, attrs ...slog.Attr)
-	LogAttrsDepth(calldepth int, level slog.Level, msg string, attrs ...slog.Attr)
-	Debug(msg string, args ...any)
-	Info(msg string, args ...any)
-	Warn(msg string, args ...any)
-	Error(msg string, err error, args ...any)
+func Logger(name string, attr ...any) *slog.Logger {
+	if sourceAttr != nil {
+		attr = append(attr, sourceAttr())
+	}
+	return slog.With(attr...).WithGroup(name)
 }
 
-func init() {
-	env, exist := os.LookupEnv(envLogFile)
-	if !exist {
-		return
-	}
-	file, err := openLogFile(env)
-	if err != nil {
-		return
-	}
-	output = file
-	l := slog.New(slog.NewTextHandler(file, &opts))
-	slog.SetDefault(l)
+func retSourceAttr() slog.Attr {
+	_, file, line, _ := runtime.Caller(1)
+	return slog.Group("source",
+		slog.String("file", file),
+		slog.Int("line", line),
+	)
 }
 
-func openLogFile(path string) (*os.File, error) {
+func SetGlobalLogger(cfg config.LogConfig) error {
+	if cfg.ShowSource {
+		sourceAttr = retSourceAttr
+	}
+	file := openLogFile(cfg.Path)
+
+	opts := slog.HandlerOptions{
+		Level: stringToLevel(cfg.Level),
+	}
+	var h slog.Handler
+	switch cfg.LogType {
+	default:
+		h = slog.NewTextHandler(file, &opts)
+	case "json":
+		h = slog.NewJSONHandler(file, &opts)
+	}
+	slog.SetDefault(slog.New(h))
+	return nil
+}
+
+func openLogFile(path string) *os.File {
 	dir, _ := filepath.Split(path)
 	if dir != "" {
 		_ = os.MkdirAll(dir, 0755)
 	}
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
-		return nil, err
+		slog.Error("failed to open log file", "error", err)
+		return os.Stderr
 	}
-	return file, nil
-}
-
-func LoadGlobalConfig(cfg config.LogConfig) error {
-	file, err := openLogFile(cfg.Path)
-	if err != nil {
-		return err
-	}
-
-	opts.AddSource = cfg.ShowSource
-	var h slog.Handler
-	switch cfg.LogType {
-	case "text":
-		h = slog.NewTextHandler(file, &opts)
-	case "json":
-		h = slog.NewJSONHandler(file, &opts)
-	}
-
-	l := slog.New(h)
-	l.Enabled(context.Background(), stringToLevel(cfg.Level))
-	slog.SetDefault(l)
-	return nil
-
+	return file
 }
 
 func stringToLevel(level string) slog.Level {

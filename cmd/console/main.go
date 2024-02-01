@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/babyname/fate"
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/log"
-	"github.com/spf13/cobra"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/sqlite3ent/sqlite3"
@@ -44,7 +45,7 @@ var rootCmd = &cobra.Command{
 		}
 		cfg = config.LoadConfig(flagConfigPath)
 		fmt.Printf("Config file: %+v\n", cfg)
-		err := log.LoadGlobalConfig(cfg.Log)
+		err := log.SetGlobalLogger(cfg.Log)
 		if err != nil {
 			return
 		}

@@ -9,7 +9,7 @@ import (
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/database"
 	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/source"
+	"github.com/babyname/fate/scripts"
 )
 
 func main() {
@@ -27,6 +27,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	total := 0
+	scripts.NeedFix(ctx, client, func(fix scripts.Fix) bool {
+		total++
+		fmt.Println("need fix", fix)
+		return true
+	})
+	fmt.Println("all fixable count", total)
 
 	count, err := client.Character.Query().Count(ctx)
 	if err != nil {
@@ -36,7 +43,6 @@ func main() {
 	if count == 0 {
 		return
 	}
-	total := 0
 
 	per := 500
 	//var cs []*ent.Characters
@@ -209,7 +215,7 @@ func main() {
 	//fmt.Println("char detail count", total)
 
 	total = 0
-	err = source.LoadKangXiChar("kangxi-strokecount.csv", func(kx source.KangXi) bool {
+	err = scripts.LoadKangXiChar("kangxi-strokecount.csv", func(kx scripts.KangXi) bool {
 		total++
 		if len(kx.Character) == 0 {
 			return true
