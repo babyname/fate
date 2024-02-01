@@ -5,7 +5,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-const CurrentDataVersion = 1
+const CurrentDataVersion = 2
 
 // Version holds the schema definition for the Version entity.
 type Version struct {
