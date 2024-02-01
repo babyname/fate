@@ -1,12 +1,11 @@
 package scripts
 
 import (
-	"fmt"
-
 	"golang.org/x/net/context"
 
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/ncharacter"
+	"github.com/babyname/fate/log"
 )
 
 func NewCharacterUpdate(client *ent.Client, character *ent.Character) *CharacterUpdate {
@@ -50,7 +49,7 @@ func (c *CharacterUpdate) insertSimple(ctx context.Context) error {
 		return err
 	}
 	if exist {
-		fmt.Println("simple characters already exist", "id", c.Simps[0])
+		log.Logger("scripts").Info("simple characters already exist", "id", c.Simps[0])
 		return nil
 	}
 	nc := &ent.NCharacter{
@@ -93,7 +92,7 @@ func (c *CharacterUpdate) insertKangxi(ctx context.Context) error {
 		return err
 	}
 	if exist {
-		fmt.Println("kangxi characters already exist", "id", c.KangXis[0])
+		log.Logger("scripts").Info("kangxi characters already exist", "id", c.KangXis[0])
 		return nil
 	}
 	nc := &ent.NCharacter{
@@ -136,7 +135,7 @@ func (c *CharacterUpdate) insertTraditional(ctx context.Context) error {
 			return err
 		}
 		if exist {
-			fmt.Println("trad characters already exist", "id", trad)
+			log.Logger("scripts").Info("trad characters already exist", "id", trad)
 			continue
 		}
 		nc := &ent.NCharacter{
@@ -182,7 +181,7 @@ func (c *CharacterUpdate) insertVariant(ctx context.Context) error {
 			return err
 		}
 		if exist {
-			fmt.Println("vari characters already exist", "id", vari)
+			log.Logger("scripts").Info("vari characters already exist", "id", vari)
 			continue
 		}
 		nc := &ent.NCharacter{
@@ -272,22 +271,22 @@ func (c *CharacterUpdate) Update(ctx context.Context) error {
 	c.parseID()
 	err := c.insertSimple(ctx)
 	if err != nil {
-		fmt.Println("failed to insert simple", "error:", err)
+		log.Logger("scripts").Info("failed to insert simple", "error:", err)
 		return err
 	}
 	err = c.insertKangxi(ctx)
 	if err != nil {
-		fmt.Println("failed to insert kangxi", "error:", err)
+		log.Logger("scripts").Info("failed to insert kangxi", "error:", err)
 		return err
 	}
 	err = c.insertTraditional(ctx)
 	if err != nil {
-		fmt.Println("failed to insert translation", "error:", err)
+		log.Logger("scripts").Info("failed to insert translation", "error:", err)
 		return err
 	}
 	err = c.insertVariant(ctx)
 	if err != nil {
-		fmt.Println("failed to insert variant", "error:", err)
+		log.Logger("scripts").Info("failed to insert variant", "error:", err)
 		return err
 	}
 	return nil

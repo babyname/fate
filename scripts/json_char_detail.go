@@ -80,7 +80,7 @@ func LoadCharDetailJSON(path string, hook func(ch Character) bool) error {
 	//load polyphone from json file
 	of, err := os.Open(path)
 	if err != nil {
-		return nil
+		return err
 	}
 	defer of.Close()
 	decoder := json.NewDecoder(of)

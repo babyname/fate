@@ -17,7 +17,7 @@ func LoadCharJSON(path string, hook func(phone PolyPhone) bool) error {
 	//load polyphone from json file
 	of, err := os.Open(path)
 	if err != nil {
-		return nil
+		return err
 	}
 	defer of.Close()
 	decoder := json.NewDecoder(of)

@@ -15,11 +15,10 @@ type PinYin struct {
 	Pinyin []string
 }
 
-func LoadPinYin(path string, hook func(yin *PinYin) bool) {
+func LoadPinYin(path string, hook func(yin *PinYin) bool) error {
 	py, err := os.Open(path)
 	if err != nil {
-		slog.Error("open file error:", err)
-		return
+		return err
 	}
 	defer py.Close()
 	//readline from open file
@@ -39,11 +38,11 @@ func LoadPinYin(path string, hook func(yin *PinYin) bool) {
 		pinyin := decodePinYin(string(line))
 		if pinyin.ID != 0 {
 			if !hook(pinyin) {
-				return
+				return nil
 			}
 		}
 	}
-	return
+	return nil
 }
 
 func decodePinYin(s string) *PinYin {

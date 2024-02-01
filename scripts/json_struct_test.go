@@ -35,6 +35,6 @@ func TestLoad(t *testing.T) {
 }
 
 func TestCharCode(t *testing.T) {
-	fmt.Println(int32(rune('靐')))
+	//log.Logger("scripts").Info((int32(rune('靐')))
 	fmt.Printf("%0x", int32(rune('靐')))
 }

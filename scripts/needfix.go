@@ -13,17 +13,17 @@ import (
 
 const perLimit = 500
 
-type Fix struct {
+type NeedFix struct {
 	ID      int      `json:"id"`
 	Char    string   `json:"char"`
 	FixType []string `json:"fix"`
 }
 
-func (f Fix) String() string {
+func (f NeedFix) String() string {
 	return fmt.Sprintf("id: %v, char: %v, fix: [%v]", f.ID, f.Char, strings.Join(f.FixType, ","))
 }
 
-func NeedFix(ctx context.Context, client *ent.Client, hook func(Fix) bool) error {
+func FindCharNeedFix(ctx context.Context, client *ent.Client, hook func(NeedFix) bool) error {
 	count, err := client.NCharacter.Query().Count(ctx)
 	if err != nil {
 		return err
@@ -31,7 +31,6 @@ func NeedFix(ctx context.Context, client *ent.Client, hook func(Fix) bool) error
 
 	var ncs []*ent.NCharacter
 	for i := 0; i < count; i += perLimit {
-		slog.Info("update character", "offset", i)
 		ncs, err = client.NCharacter.Query().Offset(i).Limit(perLimit).All(ctx)
 		if err != nil {
 			slog.Info("found error on", "offset", i, "limit", perLimit, "error", err)
@@ -39,7 +38,7 @@ func NeedFix(ctx context.Context, client *ent.Client, hook func(Fix) bool) error
 		}
 
 		for _, nc := range ncs {
-			fix := Fix{
+			fix := NeedFix{
 				ID:   nc.ID,
 				Char: nc.Char,
 			}

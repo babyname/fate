@@ -18,7 +18,7 @@ type Word struct {
 func LoadWord(path string, hook func(w Word) bool) error {
 	of, err := os.Open(path)
 	if err != nil {
-		return nil
+		return err
 	}
 	defer of.Close()
 

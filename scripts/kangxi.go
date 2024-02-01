@@ -20,7 +20,7 @@ func LoadKangXiChar(path string, hook func(kx KangXi) bool) error {
 	//load polyphone from json file
 	of, err := os.Open(path)
 	if err != nil {
-		return nil
+		return err
 	}
 	defer of.Close()
 	//readline from open file
@@ -52,7 +52,7 @@ func decodeKangXi(line string) KangXi {
 	if len(chs) != 4 {
 		return KangXi{}
 	}
-	//fmt.Println("kangxi", chs[0][2:], "1:", chs[1], "2:", chs[2])
+	//log.Logger("scripts").Info("kangxi", chs[0][2:], "1:", chs[1], "2:", chs[2])
 	cp, _ := strconv.ParseUint(chs[0][2:], 16, 32)
 	v, _ := strconv.ParseInt(chs[1], 10, 32)
 	stk, _ := strconv.ParseInt(chs[3], 10, 32)
