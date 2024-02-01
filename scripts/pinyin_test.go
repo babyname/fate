@@ -2,6 +2,8 @@ package scripts
 
 import (
 	"testing"
+
+	"github.com/babyname/fate/log"
 )
 
 func TestLoadPinYin(t *testing.T) {
@@ -27,7 +29,6 @@ func TestLoadPinYin(t *testing.T) {
 				if yin.ID < 10000 {
 					log.Logger("scripts").Info("log string", "id", yin.ID, "pinyin", yin.Pinyin, "char", yin.Char)
 				}
-
 				return true
 			})
 
