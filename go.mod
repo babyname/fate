@@ -7,7 +7,7 @@ require (
 	github.com/godcong/chronos/v2 v2.0.6
 	github.com/godcong/yi v1.0.2
 	github.com/goextension/log v0.0.2
-	github.com/google/uuid v1.3.0
+	github.com/google/uuid v1.6.0
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.6.1
 	github.com/sqlite3ent/sqlite3 v1.0.0
