@@ -13,7 +13,7 @@ require (
 	github.com/sqlite3ent/sqlite3 v1.1.0
 	github.com/tikafog/jsongs v1.0.2
 	github.com/xormsharp/xorm v1.0.4
-	golang.org/x/net v0.22.0
+	golang.org/x/net v0.24.0
 	golang.org/x/sync v0.7.0
 )
 
@@ -40,7 +40,7 @@ require (
 	github.com/xormsharp/builder v0.3.8 // indirect
 	github.com/zclconf/go-cty v1.14.3 // indirect
 	golang.org/x/mod v0.16.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.19.0 // indirect
 	modernc.org/gc/v3 v3.0.0-20240304020402-f0dba7c97c2b // indirect
