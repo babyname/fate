@@ -2,7 +2,7 @@
 
 ![FATE](docs/fate.png)
 
-![Go](https://github.com/babyname/fate/workflows/Go/badge.svg)
+![Go Version](https://img.shields.io/badge/go%20version-%3E=1.22.1-blue.svg?style=flat-square)
 [![GoDoc](https://godoc.org/github.com/babyname/fate?status.svg)](http://godoc.org/github.com/babyname/fate)
 [![license](https://img.shields.io/github/license/babyname/fate.svg)](https://github.com/babyname/fate/blob/master/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/babyname/fate)](https://goreportcard.com/report/github.com/babyname/fate)
@@ -81,13 +81,26 @@ fate.exe name -l 张 -b "2020/02/06 15:04"
 **MYSQL 配置:**
 
 ```json
-"database": { "host": "127.0.0.1", "port": "3306", "user": "root", "pwd": "111111", "name": "fate", "max_idle_con": 0, "max_open_con": 0, "driver": "mysql", "file": "", "dsn": "", "show_sql": false, "show_exec_time": false },
+"database": {
+  "host": "127.0.0.1",
+  "port": "3306",
+  "user": "root",
+  "pwd": "111111",
+  "name": "fate",
+  "max_idle_con": 0,
+  "max_open_con": 0,
+  "driver": "mysql",
+  "file": "",
+  "dsn": "",
+  "show_sql": false,
+  "show_exec_time": false
+}
 ```
 
 **SQLITE3 配置:**
 
 ```json
-"database": { "name": "fate", "driver": "sqlite3", },
+"database": { "name": "fate", "driver": "sqlite3" }
 ```
 
 ## 版本计划
