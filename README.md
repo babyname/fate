@@ -165,3 +165,29 @@ FATE 使用了以下算法，查询字典库自动生成匹配规则的名字。
 [本仓库地址](./docs/chinese_name_query.md)
 
 ### 贡献者
+
+<table>
+<tr>
+    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
+        <a href=https://github.com/godcong>
+            <img src=https://avatars.githubusercontent.com/u/2727298?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=godcong/>
+            <br />
+            <sub style="font-size:14px"><b>godcong</b></sub>
+        </a>
+    </td>
+    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
+        <a href=https://github.com/Z-fly>
+            <img src=https://avatars.githubusercontent.com/u/10470892?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Z-fly/>
+            <br />
+            <sub style="font-size:14px"><b>Z-fly</b></sub>
+        </a>
+    </td>
+    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
+        <a href=https://github.com/fesiong>
+            <img src=https://avatars.githubusercontent.com/u/9912496?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Sinclair/>
+            <br />
+            <sub style="font-size:14px"><b>Sinclair</b></sub>
+        </a>
+    </td>
+</tr>
+</table>
