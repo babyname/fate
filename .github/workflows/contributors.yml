@@ -9,7 +9,7 @@ jobs:
   add-contributors:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: BobAnkh/add-contributors@master
         with:
           CONTRIBUTOR: "### 贡献者"
@@ -20,6 +20,7 @@ jobs:
           PATH: "/README.md"
           COMMIT_MESSAGE: "docs(README): update contributors"
           AVATAR_SHAPE: "round"
+          BRANCH: "feat-ent"
       - uses: BobAnkh/add-contributors@master
         with:
           CONTRIBUTOR: "### Contributors"
@@ -30,3 +31,4 @@ jobs:
           PATH: "/README_EN.md"
           COMMIT_MESSAGE: "docs(README_EN): update contributors"
           AVATAR_SHAPE: "round"
+          BRANCH: "feat-ent"
