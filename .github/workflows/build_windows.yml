@@ -2,9 +2,9 @@ name: Build Windows
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 env:
   UPLOAD_BIN_FILE: true
 
