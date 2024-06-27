@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/babyname/fate/config"
-	"github.com/goextension/log"
-	"github.com/xormsharp/xorm"
 	"strings"
 	"time"
+
+	"github.com/goextension/log"
+	"github.com/xormsharp/xorm"
+
+	"github.com/babyname/fate/config"
 
 	"github.com/godcong/chronos"
 	"github.com/godcong/yi"
@@ -87,7 +89,7 @@ func Debug() Options {
 	}
 }
 
-//NewFate 所有的入口,新建一个fate对象
+// NewFate 所有的入口,新建一个fate对象
 func NewFate(lastName string, born time.Time, options ...Options) Fate {
 	f := &fateImpl{
 		last: strings.Split(lastName, ""),
@@ -119,7 +121,7 @@ func (f *fateImpl) getLastCharacter() error {
 	} else if size > 2 {
 		return fmt.Errorf("%d characters last name was not supported", size)
 	} else {
-		//ok
+		// ok
 	}
 
 	for i, c := range f.last {
@@ -139,6 +141,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 	if e != nil {
 		return Wrap(e, "write head failed")
 	}
+	defer f.out.Finish()
 	e = f.RunInit()
 	if e != nil {
 		return Wrap(e, "init failed")
@@ -161,7 +164,7 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 	}()
 
 	var tmpChar []*Character
-	//supplyFilter := false
+	// supplyFilter := false
 	for n := range name {
 		select {
 		case <-ctx.Done():
@@ -172,19 +175,19 @@ func (f *fateImpl) MakeName(ctx context.Context) (e error) {
 
 		tmpChar = n.FirstName
 		tmpChar = append(tmpChar, n.LastName...)
-		//filter bazi
+		// filter bazi
 		if f.config.SupplyFilter && !filterXiYong(f.XiYong().Shen(), tmpChar...) {
-			//log.Infow("supply", "name", n.String())
+			// log.Infow("supply", "name", n.String())
 			continue
 		}
-		//filter zodiac
+		// filter zodiac
 		if f.config.ZodiacFilter && !filterZodiac(f.born, n.FirstName...) {
-			//log.Infow("zodiac", "name", n.String())
+			// log.Infow("zodiac", "name", n.String())
 			continue
 		}
-		//filter bagua
+		// filter bagua
 		if f.config.BaguaFilter && !filterYao(n.BaGua(), "凶") {
-			//log.Infow("bagua", "name", n.String())
+			// log.Infow("bagua", "name", n.String())
 			continue
 		}
 		ben := n.BaGua().Get(yi.BenGua)
@@ -227,7 +230,7 @@ func (f *fateImpl) init() {
 	f.out = initOutputWithConfig(f.config.FileOutput)
 }
 
-//SetBornData 设定生日
+// SetBornData 设定生日
 func (f *fateImpl) SetBornData(t time.Time) {
 	f.born = chronos.New(t)
 }
@@ -250,7 +253,7 @@ func (f *fateImpl) getWugeName(name chan<- *Name) (e error) {
 	bazi := NewBazi(f.born)
 	for l := range lucky {
 		if f.config.FilterMode == config.FilterModeCustom {
-			//TODO
+			// TODO
 		}
 
 		if bool(f.sex) && filterSex(l) {

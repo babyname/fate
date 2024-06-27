@@ -13,11 +13,11 @@ type SanCai struct {
 	renCaiYinYang  string `bson:"ren_cai_yin_yang"`
 	diCai          string `bson:"di_cai"`
 	diCaiYingYang  string `bson:"di_cai_ying_yang"`
-	fortune        string `bson:"fortune"` //吉凶
-	comment        string `bson:"comment"` //说明
+	fortune        string `bson:"fortune"` // 吉凶
+	comment        string `bson:"comment"` // 说明
 }
 
-//NewSanCai 新建一个三才对象
+// NewSanCai 新建一个三才对象
 func NewSanCai(tian, ren, di int) *SanCai {
 	return &SanCai{
 		tianCai:        sanCaiAttr(tian),
@@ -29,7 +29,7 @@ func NewSanCai(tian, ren, di int) *SanCai {
 	}
 }
 
-//Check 检查三才属性
+// Check 检查三才属性
 func Check(engine *xorm.Engine, cai *SanCai, point int) bool {
 	wx := FindWuXing(engine, cai.tianCai, cai.renCai, cai.diCai)
 	if wx.Luck.Point() >= point {

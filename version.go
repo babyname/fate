@@ -1,4 +1,4 @@
 package fate
 
 // Version ...
-const Version = "v3.5.3"
+const Version = "v3.5.7"

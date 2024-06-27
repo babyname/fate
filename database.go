@@ -123,8 +123,8 @@ func initSQL(database config.Database) *xorm.Engine {
 		eng.ShowSQL(true)
 	}
 
-	//if database.ShowExecTime {
+	// if database.ShowExecTime {
 	//	eng.ShowExecTime(true)
-	//}
+	// }
 	return eng
 }

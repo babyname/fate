@@ -4,8 +4,8 @@ import "github.com/godcong/yi"
 
 // GuaYao ...
 type GuaYao struct {
-	Yao     string `bson:"er_yao"`          //二爻
-	JiXiong string `bson:"er_yao_ji_xiong"` //二爻吉凶
+	Yao     string `bson:"er_yao"`          // 二爻
+	JiXiong string `bson:"er_yao_ji_xiong"` // 二爻吉凶
 }
 
 func getYao(xiang *yi.GuaXiang, yao int) GuaYao {

@@ -98,22 +98,22 @@ type DaYan struct {
 	Number  int
 	Lucky   string
 	Max     bool
-	Sex     Sex //male(false),female(true)
+	Sex     Sex // male(false),female(true)
 	SkyNine string
 	Comment string
 }
 
-//IsNotSuitableSex 女性不宜此数
+// IsNotSuitableSex 女性不宜此数
 func (dy DaYan) IsNotSuitableSex() bool {
 	return dy.Sex == SexGirl
 }
 
-//IsMax 是否最大好运数
+// IsMax 是否最大好运数
 func (dy DaYan) IsMax() bool {
 	return dy.Max
 }
 
-//GetDaYan 获取大衍之数
+// GetDaYan 获取大衍之数
 func GetDaYan(idx int) DaYan {
 	if idx <= 0 {
 		panic("wrong idx")

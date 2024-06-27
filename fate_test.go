@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	//trait.NewZapFileSugar("fate.log")
+	// trait.NewZapFileSugar("fate.log")
 }
 
 func TestFate_RunMakeName(t *testing.T) {
@@ -46,7 +46,7 @@ func TestFate_RunMakeName(t *testing.T) {
 	}
 	f := fate.NewFate(last, born, fate.ConfigOption(cfg), fate.SexOption(fate.SexGirl))
 
-	//f.SetDB(eng)
+	// f.SetDB(eng)
 	e := f.MakeName(context.Background())
 	if e != nil {
 		t.Fatal(e)
@@ -85,7 +85,7 @@ func TestFate_RunMakeNameWithLocalDatabase(t *testing.T) {
 	}
 	f := fate.NewFate(last, born, fate.ConfigOption(cfg), fate.SexOption(fate.SexGirl))
 
-	//f.SetDB(eng)
+	// f.SetDB(eng)
 	e := f.MakeName(context.Background())
 	if e != nil {
 		t.Fatal(e)

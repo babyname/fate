@@ -23,12 +23,12 @@ const (
 	ZodiacPig     = "猪"
 )
 
-//Zodiac 生肖
+// Zodiac 生肖
 type Zodiac struct {
 	Name      string
-	Xi        string //喜
+	Xi        string // 喜
 	XiRadical string
-	Ji        string //忌
+	Ji        string // 忌
 	JiRadical string
 }
 
@@ -125,7 +125,7 @@ func filterZodiac(c chronos.Calendar, chars ...*Character) bool {
 	return GetZodiac(c).PointCheck(3, chars...)
 }
 
-//PointCheck 检查point
+// PointCheck 检查point
 func (z *Zodiac) PointCheck(limit int, chars ...*Character) bool {
 	for _, c := range chars {
 		if z.Point(c) < limit {
@@ -135,7 +135,7 @@ func (z *Zodiac) PointCheck(limit int, chars ...*Character) bool {
 	return true
 }
 
-//Point 喜忌对冲，理论上喜忌都有的话，最好不要选给1，忌给0，喜给5，都没有给3
+// Point 喜忌对冲，理论上喜忌都有的话，最好不要选给1，忌给0，喜给5，都没有给3
 func (z *Zodiac) Point(character *Character) int {
 	dp := 3
 	dp += z.zodiacJi(character)
