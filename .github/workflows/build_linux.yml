@@ -2,9 +2,9 @@ name: Build Linux
 
 on:
   push:
-    branches: [main]
+    branches: [v3]
   pull_request:
-    branches: [main]
+    branches: [v3]
 env:
   UPLOAD_BIN_FILE: true
 
