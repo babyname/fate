@@ -6,11 +6,10 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/goextension/log"
-	"github.com/mattn/go-sqlite3"
+	"github.com/sqlite3ent/sqlite3"
+	"github.com/xormsharp/xorm"
 
 	"github.com/babyname/fate/config"
-
-	"github.com/xormsharp/xorm"
 )
 
 const mysqlSource = "%s:%s@tcp(%s)/%s?loc=%s&charset=utf8mb4&parseTime=true"

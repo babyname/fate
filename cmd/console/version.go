@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/babyname/fate"
+
 	"github.com/spf13/cobra"
+
+	"github.com/babyname/fate"
 )
 
 func versionCMD() *cobra.Command {

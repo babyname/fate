@@ -13,7 +13,7 @@ jobs:
     name: Build
     strategy:
       matrix:
-        go-version: [1.19.x]
+        go-version: [1.22.x]
         platform: [macos-latest]
         arch: [386, amd64]
     runs-on: ${{ matrix.platform }}
@@ -34,7 +34,6 @@ jobs:
         run: |
           go mod tidy
           export GOARCH=${{ matrix.arch }}
-          export CGO_ENABLED=1
           echo "FATENAME=fate_$(go env GOOS)_$(go env GOARCH)" >> $GITHUB_ENV
           echo "$(go env GOOS) $(go env GOARCH)"
 
@@ -52,11 +51,6 @@ jobs:
         run: |
           go mod tidy
           export GOARCH=${{ matrix.arch }}
-          export CGO_ENABLED=1
-          sudo apt-get install -y gcc-i686-linux-gnu g++-i686-linux-gnu
-          export AR="/usr/bin/i686-linux-gnu-ar -m32"
-          export CXX="/usr/bin/i686-linux-gnu-cpp -m32"
-          export CC="/usr/bin/i686-linux-gnu-gcc -m32"
           echo "FATENAME=fate_$(go env GOOS)_$(go env GOARCH)" >> $GITHUB_ENV
           echo "$(go env GOOS) $(go env GOARCH)"
 
