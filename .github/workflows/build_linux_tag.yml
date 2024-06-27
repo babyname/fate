@@ -1,10 +1,9 @@
-name: Build Macos
+name: Build Linux
 
 on:
   push:
-    branches: [v3]
-  pull_request:
-    branches: [v3]
+    tags:
+      - "*"
 env:
   UPLOAD_BIN_FILE: true
 
@@ -14,12 +13,14 @@ jobs:
     strategy:
       matrix:
         go-version: [1.22.x]
-        platform: [macos-latest]
+        platform: [ubuntu-latest]
         arch: [386, amd64]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v3
+        with:
+          ref: v3
 
       - name: Install Go
         uses: actions/setup-go@v3
@@ -79,11 +80,8 @@ jobs:
         with:
           artifacts: "${{ env.FATENAME }}.tar.gz"
           allowUpdates: true
-          commit: master
-          tag: auto_build
+          commit: v3
           body: |
             This is only a latest build from master
-            **Version: https://github.com/babyname/fate/commit/${{ github.sha }}**
+            ** Version: https://github.com/babyname/fate/commit/${{ github.sha }} **
           token: ${{ secrets.GITHUB_TOKEN }}
-          draft: false
-          prerelease: false
