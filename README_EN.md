@@ -8,6 +8,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/babyname/fate)](https://goreportcard.com/report/github.com/babyname/fate)
 
 ## Introduce
+
 A modern science chinese name create tool.
 The first chinese name create tool in github
 It uses some traditional Chinese algorithms. It is used to get a good name for a newborn baby.

@@ -2,9 +2,10 @@ package fate_test
 
 import (
 	"fmt"
-	"github.com/babyname/fate"
 	"log"
 	"testing"
+
+	"github.com/babyname/fate"
 )
 
 // TestWuGe_WaiGe ...

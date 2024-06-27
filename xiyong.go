@@ -5,19 +5,19 @@ import (
 	"strings"
 )
 
-//XiYong 喜用神
+// XiYong 喜用神
 type XiYong struct {
 	WuXingFen          map[string]int
-	Similar            []string //同类
+	Similar            []string // 同类
 	SimilarPoint       int
-	Heterogeneous      []string //异类
+	Heterogeneous      []string // 异类
 	HeterogeneousPoint int
 }
 
 var sheng = []string{"木", "火", "土", "金", "水"}
 var ke = []string{"木", "土", "水", "火", "金"}
 
-//AddFen 五行分
+// AddFen 五行分
 func (xy *XiYong) AddFen(s string, point int) {
 	if xy.WuXingFen == nil {
 		xy.WuXingFen = make(map[string]int)
@@ -30,7 +30,7 @@ func (xy *XiYong) AddFen(s string, point int) {
 	}
 }
 
-//GetFen 取得分
+// GetFen 取得分
 func (xy *XiYong) GetFen(s string) (point int) {
 	if xy.WuXingFen == nil {
 		return 0
@@ -54,7 +54,7 @@ func (xy *XiYong) minFenWuXing(ss ...string) (wx string) {
 	return
 }
 
-//Shen 喜用神
+// Shen 喜用神
 func (xy *XiYong) Shen() string {
 	if !xy.QiangRuo() {
 		return xy.minFenWuXing(xy.Similar...)
@@ -62,7 +62,7 @@ func (xy *XiYong) Shen() string {
 	return xy.minFenWuXing(xy.Heterogeneous...)
 }
 
-//QiangRuo 八字偏强（true)弱（false）
+// QiangRuo 八字偏强（true)弱（false）
 func (xy *XiYong) QiangRuo() bool {
 	return xy.SimilarPoint > xy.HeterogeneousPoint
 }

@@ -1,10 +1,12 @@
 package fate_test
 
 import (
-	"github.com/godcong/chronos"
-	"github.com/babyname/fate"
 	"log"
 	"testing"
+
+	"github.com/godcong/chronos"
+
+	"github.com/babyname/fate"
 )
 
 func TestPoint(t *testing.T) {

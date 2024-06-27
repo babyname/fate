@@ -2,6 +2,7 @@ package fate
 
 import (
 	"errors"
+
 	"github.com/xormsharp/xorm"
 )
 
@@ -25,14 +26,14 @@ func ToLuck(s string) (l Luck, e error) {
 	return Luck(0), errors.New("parse error")
 }
 
-//WuXing 五行：five elements of metal,wood,water,fire and earth
+// WuXing 五行：five elements of metal,wood,water,fire and earth
 type WuXing struct {
 	WuXing  string `json:"wu_xing"`
 	Luck    Luck   `json:"luck"`
 	Comment string `json:"comment"`
 }
 
-//FindWuXing find a wuxing
+// FindWuXing find a wuxing
 func FindWuXing(engine *xorm.Engine, s ...string) *WuXing {
 	var wx WuXing
 	_, e := engine.Where("first = ?", s[0]).And("second = ?", s[1]).And("third = ?", s[2]).Get(&wx)

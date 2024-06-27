@@ -1,19 +1,20 @@
 package fate
 
 import (
-	"github.com/godcong/chronos"
-	"github.com/godcong/yi"
 	"strconv"
 	"strings"
+
+	"github.com/godcong/chronos"
+	"github.com/godcong/yi"
 )
 
-//Name 姓名
+// Name 姓名
 type Name struct {
-	FirstName   []*Character //名姓
+	FirstName   []*Character // 名姓
 	LastName    []*Character
 	born        *chronos.Calendar
 	baZi        *BaZi
-	baGua       *yi.Yi //周易八卦
+	baGua       *yi.Yi // 周易八卦
 	zodiac      *Zodiac
 	zodiacPoint int
 }
