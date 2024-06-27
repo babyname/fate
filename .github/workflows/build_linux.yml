@@ -2,21 +2,20 @@ name: Build Linux
 
 on:
   push:
-    branches: [ master ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 env:
   UPLOAD_BIN_FILE: true
 
 jobs:
-
   build:
     name: Build
     strategy:
       matrix:
-        go-version: [ 1.19.x ]
-        platform: [ ubuntu-latest ]
-        arch: [ 386, amd64 ]
+        go-version: [1.19.x]
+        platform: [ubuntu-latest]
+        arch: [386, amd64]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Check out code into the Go module directory
@@ -31,17 +30,17 @@ jobs:
         if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && matrix.arch == 'amd64' && env.UPLOAD_BIN_FILE
         id: build_linux_amd64
         env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         run: |
           go mod tidy
           export GOARCH=${{ matrix.arch }}
           export CGO_ENABLED=1
           echo "FATENAME=fate_$(go env GOOS)_$(go env GOARCH)" >> $GITHUB_ENV
           echo "$(go env GOOS) $(go env GOARCH)"
-          
+
           echo "building"
           go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
-          
+
           echo "compress"
           tar -zcvf fate_$(go env GOOS)_$(go env GOARCH).tar.gz ./fate_$(go env GOOS)_$(go env GOARCH)
 
@@ -49,7 +48,7 @@ jobs:
         if: matrix.platform == 'ubuntu-latest' && matrix.arch == '386' && env.UPLOAD_BIN_FILE
         id: build_linux_386
         env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         run: |
           go mod tidy
           export GOARCH=${{ matrix.arch }}
@@ -60,10 +59,10 @@ jobs:
           export CC="/usr/bin/i686-linux-gnu-gcc -m32"
           echo "FATENAME=fate_$(go env GOOS)_$(go env GOARCH)" >> $GITHUB_ENV
           echo "$(go env GOOS) $(go env GOARCH)"
-          
+
           echo "building"
           go build -o fate_$(go env GOOS)_$(go env GOARCH) -v ./cmd/console
-          
+
           echo "compress"
           tar -zcvf fate_$(go env GOOS)_$(go env GOARCH).tar.gz ./fate_$(go env GOOS)_$(go env GOARCH)
 
@@ -71,7 +70,7 @@ jobs:
         uses: actions/upload-artifact@master
         if: (matrix.platform == 'ubuntu-latest' || matrix.platform == 'macos-latest') && env.UPLOAD_BIN_FILE
         env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         with:
           name: ${{ env.FATENAME }}.tar.gz
           path: ${{ env.FATENAME }}.tar.gz
@@ -82,7 +81,7 @@ jobs:
         uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         with:
           artifacts: "${{ env.FATENAME }}.tar.gz"
           allowUpdates: true
@@ -94,4 +93,3 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: false
           prerelease: false
-        
