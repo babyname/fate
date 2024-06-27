@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/babyname/fate/config"
+	"path/filepath"
+
 	"github.com/goextension/log"
 	"github.com/spf13/cobra"
-	"path/filepath"
+
+	"github.com/babyname/fate/config"
 )
 
 func cmdInit() *cobra.Command {

@@ -7,11 +7,12 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/babyname/fate"
-	"github.com/babyname/fate/config"
 	"github.com/godcong/chronos"
 	"github.com/goextension/log"
 	"github.com/spf13/cobra"
+
+	"github.com/babyname/fate"
+	"github.com/babyname/fate/config"
 )
 
 func cmdName() *cobra.Command {
