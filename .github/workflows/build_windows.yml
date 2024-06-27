@@ -2,21 +2,20 @@ name: Build Windows
 
 on:
   push:
-    branches: [ main ]
+    branches: [v3]
   pull_request:
-    branches: [ main ]
+    branches: [v3]
 env:
   UPLOAD_BIN_FILE: true
 
 jobs:
-
   build:
     name: Build
     strategy:
       matrix:
-        go-version: [ 1.19.x ]
-        platform: [ windows-latest ]
-        arch: [ 386, amd64 ]
+        go-version: [1.19.x]
+        platform: [windows-latest]
+        arch: [386, amd64]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Cleanup pre-installed tools
@@ -40,7 +39,7 @@ jobs:
         if: matrix.platform == 'windows-latest' && matrix.arch == 'amd64' && env.UPLOAD_BIN_FILE
         id: build_windows_amd64
         env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
@@ -48,7 +47,7 @@ jobs:
           echo "FATENAME=fate_windows_amd64" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "building"
           go build -o fate_windows_amd64.exe -v ./cmd/console
-          
+
           echo "compress"
           Compress-Archive -Path fate_windows_amd64.exe -DestinationPath fate_windows_amd64.zip
 
@@ -56,7 +55,7 @@ jobs:
         if: matrix.platform == 'windows-latest' && matrix.arch == '386' && env.UPLOAD_BIN_FILE
         id: build_windows_386
         env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         run: |
           go mod tidy
           set GOARCH=${{ matrix.arch }}
@@ -64,7 +63,7 @@ jobs:
           echo "FATENAME=fate_windows_386" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "building"
           go build -o fate_windows_386.exe -v ./cmd/console
-          
+
           echo "compress"
           Compress-Archive -Path fate_windows_386.exe -DestinationPath fate_windows_386.zip
 
@@ -72,7 +71,7 @@ jobs:
         uses: actions/upload-artifact@master
         if: matrix.platform == 'windows-latest' && env.UPLOAD_BIN_FILE
         env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         with:
           name: ${{ env.FATENAME }}.zip
           path: ${{ env.FATENAME }}.zip
@@ -83,7 +82,7 @@ jobs:
         uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         with:
           artifacts: "${{ env.FATENAME }}.zip"
           allowUpdates: true
