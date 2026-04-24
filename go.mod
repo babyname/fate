@@ -1,7 +1,7 @@
 module github.com/babyname/fate
 
 require (
-	github.com/go-sql-driver/mysql v1.7.1
+	github.com/go-sql-driver/mysql v1.9.3
 	github.com/godcong/chronos v0.0.3
 	github.com/godcong/yi v1.0.2
 	github.com/goextension/log v0.0.2
@@ -14,4 +14,16 @@ require (
 	go.uber.org/zap v1.24.0
 )
 
-go 1.16
+require (
+	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/syndtr/goleveldb v1.0.0 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.6.0 // indirect
+	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
+	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
+)
+
+go 1.21.0
