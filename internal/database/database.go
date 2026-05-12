@@ -1,8 +1,6 @@
 package database
 
 import (
-	"database/sql"
-	"database/sql/driver"
 	"errors"
 	"fmt"
 	"time"
@@ -12,30 +10,7 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/babyname/fate/ent"
-	"modernc.org/sqlite"
 )
-
-type sqlite3Driver struct {
-	drv *sqlite.Driver
-}
-
-func (d *sqlite3Driver) Open(name string) (driver.Conn, error) {
-	conn, err := d.drv.Open(name)
-	if err != nil {
-		return nil, err
-	}
-	c, ok := conn.(interface{ Exec(string, []driver.Value) (driver.Result, error) })
-	if !ok {
-		return conn, nil
-	}
-	_, _ = c.Exec("PRAGMA foreign_keys = ON;", nil)
-	_, _ = c.Exec("PRAGMA journal_mode = WAL;", nil)
-	return conn, nil
-}
-
-func init() {
-	sql.Register("sqlite3", &sqlite3Driver{drv: &sqlite.Driver{}})
-}
 
 const (
 	mysqlDSN   = "%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=true"
