@@ -2,13 +2,13 @@ package fate
 
 import (
 	"github.com/babyname/fate/config"
-	"github.com/babyname/fate/database"
-	"github.com/babyname/fate/ent"
-	logger "github.com/babyname/fate/log"
-	"github.com/babyname/fate/model"
+	"github.com/babyname/fate/internal/database"
+	filterpkg "github.com/babyname/fate/internal/filter"
+	"github.com/babyname/fate/internal/naming"
+	"github.com/babyname/fate/internal/repository"
+	"github.com/babyname/fate/internal/session"
 )
 
-// Fate ...
 type Fate interface {
 	NewSession() Session
 	NewSessionWithFilter(f Filter) Session
@@ -16,36 +16,61 @@ type Fate interface {
 
 type fateImpl struct {
 	cfg *config.Config
-	db  *model.Model
+	db  *repository.Repository
 }
 
-func (f *fateImpl) NewSessionWithFilter(filter Filter) Session {
-	return &session{
-		db:     f.db,
-		chars:  make(map[int][]*ent.Character, 128),
-		filter: filter,
-	}
+func (f *fateImpl) NewSessionWithFilter(flt Filter) Session {
+	return session.NewSession(f.db, flt)
 }
 
 func (f *fateImpl) NewSession() Session {
-	return f.NewSessionWithFilter(DefaultFilter())
+	return f.NewSessionWithFilter(filterpkg.DefaultFilter())
 }
 
-// New creates a new instance of Fate
-// @param *config.Config
-// @return Fate
-// @return error
 func New(cfg *config.Config) (Fate, error) {
-	log = logger.WithGroup("fate")
-	c := database.New(cfg.Database)
-	client, err := c.Client()
+	b := database.New(cfg.Database)
+	client, err := b.Client()
 	if err != nil {
 		return nil, err
 	}
 	return &fateImpl{
 		cfg: cfg,
-		db:  model.New(client),
+		db:  repository.New(client),
 	}, nil
 }
+
+type Session = session.Session
+type Input = session.Input
+type Output = session.Output
+type SessionState = session.SessionState
+
+type Filter = filterpkg.Filter
+type FilterOption = filterpkg.FilterOption
+type CharacterFilterType = filterpkg.CharacterFilterType
+
+type Sex = naming.Sex
+type Name = naming.Name
+type NameBasic = naming.NameBasic
+type FirstName = naming.FirstName
+
+var (
+	NewFilter     = filterpkg.NewFilter
+	DefaultFilter = filterpkg.DefaultFilter
+)
+
+const (
+	SessionStateWaiting    SessionState = session.SessionStateWaiting
+	SessionStateGenerating SessionState = session.SessionStateGenerating
+	SessionStateFinish     SessionState = session.SessionStateFinish
+	SessionStateCanceled   SessionState = session.SessionStateCanceled
+	SessionStateFailed     SessionState = session.SessionStateFailed
+)
+
+const (
+	CharacterFilterTypeDefault CharacterFilterType = filterpkg.CharacterFilterTypeDefault
+	CharacterFilterTypeChs     CharacterFilterType = filterpkg.CharacterFilterTypeChs
+	CharacterFilterTypeCht     CharacterFilterType = filterpkg.CharacterFilterTypeCht
+	CharacterFilterTypeKangxi  CharacterFilterType = filterpkg.CharacterFilterTypeKangxi
+)
 
 var _ Fate = (*fateImpl)(nil)

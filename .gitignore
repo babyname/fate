@@ -32,3 +32,15 @@ _ReSharper*/
 packages/
 /.idea
 go.sum
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+
+# Database files
+fate_db/
+fate
+fate-shm
+fate-wal
+*.zip

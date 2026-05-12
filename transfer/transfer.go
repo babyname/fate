@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/babyname/fate/database"
+	"github.com/babyname/fate/internal/database"
 	"github.com/babyname/fate/ent"
 )
 

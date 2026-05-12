@@ -1,65 +1,59 @@
 package config
 
 import (
-	"reflect"
 	"testing"
 )
 
-func TestLoadConfig(t *testing.T) {
-	type args struct {
-		path string
+func TestDefaultConfig(t *testing.T) {
+	cfg := DefaultConfig()
+	if cfg == nil {
+		t.Fatal("DefaultConfig() returned nil")
 	}
-	tests := []struct {
-		name  string
-		args  args
-		wantC *Config
-	}{
-		{
-			name:  "",
-			args:  args{},
-			wantC: nil,
-		},
+	if cfg.Database.Driver != "sqlite3" {
+		t.Errorf("DefaultConfig().Database.Driver = %v, want sqlite3", cfg.Database.Driver)
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if gotC := LoadConfig(tt.args.path); !reflect.DeepEqual(gotC, tt.wantC) {
-				t.Errorf("LoadConfig() = %v, want %v", gotC, tt.wantC)
-			}
-		})
+	if cfg.Database.Name != "fate" {
+		t.Errorf("DefaultConfig().Database.Name = %v, want fate", cfg.Database.Name)
 	}
 }
 
-func TestGetPath(t *testing.T) {
-	type args struct {
-		root  string
-		paths []string
+func TestLoadConfig(t *testing.T) {
+	cfg, err := LoadConfig("")
+	if err != nil {
+		t.Fatalf("LoadConfig() error = %v", err)
 	}
+	if cfg == nil {
+		t.Fatal("LoadConfig() returned nil")
+	}
+
+	def := DefaultConfig()
+	if cfg.Database.Driver != def.Database.Driver {
+		t.Errorf("LoadConfig().Database.Driver = %v, want %v", cfg.Database.Driver, def.Database.Driver)
+	}
+}
+
+func TestValidateConfig(t *testing.T) {
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		cfg     *Config
+		wantErr bool
 	}{
 		{
-			name: "",
-			args: args{
-				root:  "E:\\",
-				paths: []string{"test", "fate"},
-			},
-			want: `E:\test\fate`,
+			name:    "valid default",
+			cfg:     DefaultConfig(),
+			wantErr: false,
 		},
 		{
-			name: "",
-			args: args{
-				root:  "",
-				paths: []string{"test", "fate"},
-			},
-			want: "",
+			name:    "nil config",
+			cfg:     nil,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetPath(tt.args.root, tt.args.paths...); got != tt.want {
-				t.Errorf("GetPath() = %v, want %v", got, tt.want)
+			err := ValidateConfig(tt.cfg)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ValidateConfig() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

@@ -2,8 +2,93 @@
 
 package ent
 
+import (
+	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/ent/poem"
+	"github.com/babyname/fate/ent/poemchar"
+	"github.com/babyname/fate/ent/schema"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	characterFields := schema.Character{}.Fields()
+	_ = characterFields
+	// characterDescChar is the schema descriptor for char field.
+	characterDescChar := characterFields[1].Descriptor()
+	// character.CharValidator is a validator for the "char" field. It is called by the builders before save.
+	character.CharValidator = characterDescChar.Validators[0].(func(string) error)
+	// characterDescIsSimplified is the schema descriptor for is_simplified field.
+	characterDescIsSimplified := characterFields[3].Descriptor()
+	// character.DefaultIsSimplified holds the default value on creation for the is_simplified field.
+	character.DefaultIsSimplified = characterDescIsSimplified.Default.(bool)
+	// characterDescIsTraditional is the schema descriptor for is_traditional field.
+	characterDescIsTraditional := characterFields[4].Descriptor()
+	// character.DefaultIsTraditional holds the default value on creation for the is_traditional field.
+	character.DefaultIsTraditional = characterDescIsTraditional.Default.(bool)
+	// characterDescIsKangxi is the schema descriptor for is_kangxi field.
+	characterDescIsKangxi := characterFields[5].Descriptor()
+	// character.DefaultIsKangxi holds the default value on creation for the is_kangxi field.
+	character.DefaultIsKangxi = characterDescIsKangxi.Default.(bool)
+	// characterDescIsVariant is the schema descriptor for is_variant field.
+	characterDescIsVariant := characterFields[6].Descriptor()
+	// character.DefaultIsVariant holds the default value on creation for the is_variant field.
+	character.DefaultIsVariant = characterDescIsVariant.Default.(bool)
+	// characterDescIsAncient is the schema descriptor for is_ancient field.
+	characterDescIsAncient := characterFields[7].Descriptor()
+	// character.DefaultIsAncient holds the default value on creation for the is_ancient field.
+	character.DefaultIsAncient = characterDescIsAncient.Default.(bool)
+	// characterDescRadicalStroke is the schema descriptor for radical_stroke field.
+	characterDescRadicalStroke := characterFields[10].Descriptor()
+	// character.RadicalStrokeValidator is a validator for the "radical_stroke" field. It is called by the builders before save.
+	character.RadicalStrokeValidator = characterDescRadicalStroke.Validators[0].(func(int) error)
+	// characterDescSimplifiedStroke is the schema descriptor for simplified_stroke field.
+	characterDescSimplifiedStroke := characterFields[11].Descriptor()
+	// character.SimplifiedStrokeValidator is a validator for the "simplified_stroke" field. It is called by the builders before save.
+	character.SimplifiedStrokeValidator = characterDescSimplifiedStroke.Validators[0].(func(int) error)
+	// characterDescTraditionalStroke is the schema descriptor for traditional_stroke field.
+	characterDescTraditionalStroke := characterFields[12].Descriptor()
+	// character.TraditionalStrokeValidator is a validator for the "traditional_stroke" field. It is called by the builders before save.
+	character.TraditionalStrokeValidator = characterDescTraditionalStroke.Validators[0].(func(int) error)
+	// characterDescKangxiStroke is the schema descriptor for kangxi_stroke field.
+	characterDescKangxiStroke := characterFields[13].Descriptor()
+	// character.KangxiStrokeValidator is a validator for the "kangxi_stroke" field. It is called by the builders before save.
+	character.KangxiStrokeValidator = characterDescKangxiStroke.Validators[0].(func(int) error)
+	// characterDescScienceStroke is the schema descriptor for science_stroke field.
+	characterDescScienceStroke := characterFields[14].Descriptor()
+	// character.ScienceStrokeValidator is a validator for the "science_stroke" field. It is called by the builders before save.
+	character.ScienceStrokeValidator = characterDescScienceStroke.Validators[0].(func(int) error)
+	// characterDescRegular is the schema descriptor for regular field.
+	characterDescRegular := characterFields[16].Descriptor()
+	// character.DefaultRegular holds the default value on creation for the regular field.
+	character.DefaultRegular = characterDescRegular.Default.(bool)
+	// characterDescCommonLevel is the schema descriptor for common_level field.
+	characterDescCommonLevel := characterFields[17].Descriptor()
+	// character.CommonLevelValidator is a validator for the "common_level" field. It is called by the builders before save.
+	character.CommonLevelValidator = characterDescCommonLevel.Validators[0].(func(int) error)
+	// characterDescNameable is the schema descriptor for nameable field.
+	characterDescNameable := characterFields[19].Descriptor()
+	// character.DefaultNameable holds the default value on creation for the nameable field.
+	character.DefaultNameable = characterDescNameable.Default.(bool)
+	poemFields := schema.Poem{}.Fields()
+	_ = poemFields
+	// poemDescTitle is the schema descriptor for title field.
+	poemDescTitle := poemFields[1].Descriptor()
+	// poem.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	poem.TitleValidator = poemDescTitle.Validators[0].(func(string) error)
+	// poemDescContent is the schema descriptor for content field.
+	poemDescContent := poemFields[4].Descriptor()
+	// poem.ContentValidator is a validator for the "content" field. It is called by the builders before save.
+	poem.ContentValidator = poemDescContent.Validators[0].(func(string) error)
+	poemcharFields := schema.PoemChar{}.Fields()
+	_ = poemcharFields
+	// poemcharDescChar is the schema descriptor for char field.
+	poemcharDescChar := poemcharFields[2].Descriptor()
+	// poemchar.CharValidator is a validator for the "char" field. It is called by the builders before save.
+	poemchar.CharValidator = poemcharDescChar.Validators[0].(func(string) error)
+	// poemcharDescPosition is the schema descriptor for position field.
+	poemcharDescPosition := poemcharFields[3].Descriptor()
+	// poemchar.PositionValidator is a validator for the "position" field. It is called by the builders before save.
+	poemchar.PositionValidator = poemcharDescPosition.Validators[0].(func(int) error)
 }

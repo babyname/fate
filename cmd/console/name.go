@@ -8,7 +8,7 @@ import (
 
 	"github.com/babyname/fate"
 	"github.com/babyname/fate/log"
-	"github.com/godcong/chronos"
+	v2 "github.com/godcong/chronos/v2"
 
 	"github.com/spf13/cobra"
 )
@@ -46,7 +46,7 @@ func cmdName() *cobra.Command {
 				return
 			}
 			fmt.Println("born", born)
-			b, err := time.Parse(chronos.DateFormat, born)
+			b, err := time.Parse(v2.DateFormatYMDHMS, born)
 			if err != nil {
 				fmt.Println("请输入正确的出生日期")
 				return
@@ -95,7 +95,7 @@ func cmdName() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVarP(&last, "last", "l", "", "指定姓氏")
-	cmd.Flags().StringVarP(&born, "born", "b", time.Now().Format(chronos.DateFormat), "设置新生儿生日 2016/01/02 15:04")
+	cmd.Flags().StringVarP(&born, "born", "b", time.Now().Format(v2.DateFormatYMDHMS), "设置新生儿生日 2016/01/02 15:04")
 	cmd.Flags().StringVarP(&sex, "sex", "s", "boy", "设置新生儿性别")
 	cmd.Flags().StringVarP(&filter, "filter", "f", "", "从结果中过滤掉指定汉字")
 	cmd.Flags().StringVarP(&output, "output", "o", "", "设置输出路径")
