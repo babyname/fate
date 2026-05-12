@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/babyname/fate/config"
+	_ "github.com/sqlite3ent/sqlite3"
 )
 
 func TestNew(t *testing.T) {

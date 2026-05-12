@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/sqlite3ent/sqlite3"
 
 	"github.com/babyname/fate/transfer"
 )
