@@ -12,6 +12,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/ent/poem"
+	"github.com/babyname/fate/ent/poemchar"
 	"github.com/babyname/fate/ent/predicate"
 	"github.com/babyname/fate/ent/version"
 	"github.com/babyname/fate/ent/wugelucky"
@@ -29,6 +31,8 @@ const (
 
 	// Node types.
 	TypeCharacter = "Character"
+	TypePoem      = "Poem"
+	TypePoemChar  = "PoemChar"
 	TypeVersion   = "Version"
 	TypeWuGeLucky = "WuGeLucky"
 	TypeWuXing    = "WuXing"
@@ -37,43 +41,53 @@ const (
 // CharacterMutation represents an operation that mutates the Character nodes in the graph.
 type CharacterMutation struct {
 	config
-	op                            Op
-	typ                           string
-	id                            *string
-	pin_yin                       *string
-	ch                            *string
-	radical                       *string
-	radical_stroke                *int
-	addradical_stroke             *int
-	stroke                        *int
-	addstroke                     *int
-	is_kang_xi                    *bool
-	kang_xi                       *string
-	kang_xi_stroke                *int
-	addkang_xi_stroke             *int
-	simple_radical                *string
-	simple_radical_stroke         *int
-	addsimple_radical_stroke      *int
-	simple_total_stroke           *int
-	addsimple_total_stroke        *int
-	traditional_radical           *string
-	traditional_radical_stroke    *int
-	addtraditional_radical_stroke *int
-	traditional_total_stroke      *int
-	addtraditional_total_stroke   *int
-	name_science                  *bool
-	wu_xing                       *string
-	lucky                         *string
-	regular                       *bool
-	traditional_character         *string
-	variant_character             *string
-	comment                       *string
-	science_stroke                *int
-	addscience_stroke             *int
-	clearedFields                 map[string]struct{}
-	done                          bool
-	oldValue                      func(context.Context) (*Character, error)
-	predicates                    []predicate.Character
+	op                               Op
+	typ                              string
+	id                               *int
+	char                             *string
+	unicode                          *string
+	is_simplified                    *bool
+	is_traditional                   *bool
+	is_kangxi                        *bool
+	is_variant                       *bool
+	is_ancient                       *bool
+	pinyin                           *[]string
+	appendpinyin                     []string
+	radical                          *string
+	radical_stroke                   *int
+	addradical_stroke                *int
+	simplified_stroke                *int
+	addsimplified_stroke             *int
+	traditional_stroke               *int
+	addtraditional_stroke            *int
+	kangxi_stroke                    *int
+	addkangxi_stroke                 *int
+	science_stroke                   *int
+	addscience_stroke                *int
+	wu_xing                          *string
+	regular                          *bool
+	common_level                     *int
+	addcommon_level                  *int
+	gender_hint                      *string
+	nameable                         *bool
+	meaning                          *string
+	source                           *string
+	source_confidence                *float64
+	addsource_confidence             *float64
+	comment                          *string
+	clearedFields                    map[string]struct{}
+	simplified_of                    *int
+	clearedsimplified_of             bool
+	traditional_to_simplified        *int
+	clearedtraditional_to_simplified bool
+	variant_of                       *int
+	clearedvariant_of                bool
+	standard_to_variant              map[int]struct{}
+	removedstandard_to_variant       map[int]struct{}
+	clearedstandard_to_variant       bool
+	done                             bool
+	oldValue                         func(context.Context) (*Character, error)
+	predicates                       []predicate.Character
 }
 
 var _ ent.Mutation = (*CharacterMutation)(nil)
@@ -96,7 +110,7 @@ func newCharacterMutation(c config, op Op, opts ...characterOption) *CharacterMu
 }
 
 // withCharacterID sets the ID field of the mutation.
-func withCharacterID(id string) characterOption {
+func withCharacterID(id int) characterOption {
 	return func(m *CharacterMutation) {
 		var (
 			err   error
@@ -148,13 +162,13 @@ func (m CharacterMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Character entities.
-func (m *CharacterMutation) SetID(id string) {
+func (m *CharacterMutation) SetID(id int) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *CharacterMutation) ID() (id string, exists bool) {
+func (m *CharacterMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -165,12 +179,12 @@ func (m *CharacterMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *CharacterMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *CharacterMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []string{id}, nil
+			return []int{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -180,76 +194,334 @@ func (m *CharacterMutation) IDs(ctx context.Context) ([]string, error) {
 	}
 }
 
-// SetPinYin sets the "pin_yin" field.
-func (m *CharacterMutation) SetPinYin(s string) {
-	m.pin_yin = &s
+// SetChar sets the "char" field.
+func (m *CharacterMutation) SetChar(s string) {
+	m.char = &s
 }
 
-// PinYin returns the value of the "pin_yin" field in the mutation.
-func (m *CharacterMutation) PinYin() (r string, exists bool) {
-	v := m.pin_yin
+// Char returns the value of the "char" field in the mutation.
+func (m *CharacterMutation) Char() (r string, exists bool) {
+	v := m.char
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPinYin returns the old "pin_yin" field's value of the Character entity.
+// OldChar returns the old "char" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldPinYin(ctx context.Context) (v string, err error) {
+func (m *CharacterMutation) OldChar(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPinYin is only allowed on UpdateOne operations")
+		return v, errors.New("OldChar is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPinYin requires an ID field in the mutation")
+		return v, errors.New("OldChar requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPinYin: %w", err)
+		return v, fmt.Errorf("querying old value for OldChar: %w", err)
 	}
-	return oldValue.PinYin, nil
+	return oldValue.Char, nil
 }
 
-// ResetPinYin resets all changes to the "pin_yin" field.
-func (m *CharacterMutation) ResetPinYin() {
-	m.pin_yin = nil
+// ResetChar resets all changes to the "char" field.
+func (m *CharacterMutation) ResetChar() {
+	m.char = nil
 }
 
-// SetCh sets the "ch" field.
-func (m *CharacterMutation) SetCh(s string) {
-	m.ch = &s
+// SetUnicode sets the "unicode" field.
+func (m *CharacterMutation) SetUnicode(s string) {
+	m.unicode = &s
 }
 
-// Ch returns the value of the "ch" field in the mutation.
-func (m *CharacterMutation) Ch() (r string, exists bool) {
-	v := m.ch
+// Unicode returns the value of the "unicode" field in the mutation.
+func (m *CharacterMutation) Unicode() (r string, exists bool) {
+	v := m.unicode
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCh returns the old "ch" field's value of the Character entity.
+// OldUnicode returns the old "unicode" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldCh(ctx context.Context) (v string, err error) {
+func (m *CharacterMutation) OldUnicode(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCh is only allowed on UpdateOne operations")
+		return v, errors.New("OldUnicode is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCh requires an ID field in the mutation")
+		return v, errors.New("OldUnicode requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCh: %w", err)
+		return v, fmt.Errorf("querying old value for OldUnicode: %w", err)
 	}
-	return oldValue.Ch, nil
+	return oldValue.Unicode, nil
 }
 
-// ResetCh resets all changes to the "ch" field.
-func (m *CharacterMutation) ResetCh() {
-	m.ch = nil
+// ClearUnicode clears the value of the "unicode" field.
+func (m *CharacterMutation) ClearUnicode() {
+	m.unicode = nil
+	m.clearedFields[character.FieldUnicode] = struct{}{}
+}
+
+// UnicodeCleared returns if the "unicode" field was cleared in this mutation.
+func (m *CharacterMutation) UnicodeCleared() bool {
+	_, ok := m.clearedFields[character.FieldUnicode]
+	return ok
+}
+
+// ResetUnicode resets all changes to the "unicode" field.
+func (m *CharacterMutation) ResetUnicode() {
+	m.unicode = nil
+	delete(m.clearedFields, character.FieldUnicode)
+}
+
+// SetIsSimplified sets the "is_simplified" field.
+func (m *CharacterMutation) SetIsSimplified(b bool) {
+	m.is_simplified = &b
+}
+
+// IsSimplified returns the value of the "is_simplified" field in the mutation.
+func (m *CharacterMutation) IsSimplified() (r bool, exists bool) {
+	v := m.is_simplified
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsSimplified returns the old "is_simplified" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldIsSimplified(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsSimplified is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsSimplified requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsSimplified: %w", err)
+	}
+	return oldValue.IsSimplified, nil
+}
+
+// ResetIsSimplified resets all changes to the "is_simplified" field.
+func (m *CharacterMutation) ResetIsSimplified() {
+	m.is_simplified = nil
+}
+
+// SetIsTraditional sets the "is_traditional" field.
+func (m *CharacterMutation) SetIsTraditional(b bool) {
+	m.is_traditional = &b
+}
+
+// IsTraditional returns the value of the "is_traditional" field in the mutation.
+func (m *CharacterMutation) IsTraditional() (r bool, exists bool) {
+	v := m.is_traditional
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsTraditional returns the old "is_traditional" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldIsTraditional(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsTraditional is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsTraditional requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsTraditional: %w", err)
+	}
+	return oldValue.IsTraditional, nil
+}
+
+// ResetIsTraditional resets all changes to the "is_traditional" field.
+func (m *CharacterMutation) ResetIsTraditional() {
+	m.is_traditional = nil
+}
+
+// SetIsKangxi sets the "is_kangxi" field.
+func (m *CharacterMutation) SetIsKangxi(b bool) {
+	m.is_kangxi = &b
+}
+
+// IsKangxi returns the value of the "is_kangxi" field in the mutation.
+func (m *CharacterMutation) IsKangxi() (r bool, exists bool) {
+	v := m.is_kangxi
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsKangxi returns the old "is_kangxi" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldIsKangxi(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsKangxi is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsKangxi requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsKangxi: %w", err)
+	}
+	return oldValue.IsKangxi, nil
+}
+
+// ResetIsKangxi resets all changes to the "is_kangxi" field.
+func (m *CharacterMutation) ResetIsKangxi() {
+	m.is_kangxi = nil
+}
+
+// SetIsVariant sets the "is_variant" field.
+func (m *CharacterMutation) SetIsVariant(b bool) {
+	m.is_variant = &b
+}
+
+// IsVariant returns the value of the "is_variant" field in the mutation.
+func (m *CharacterMutation) IsVariant() (r bool, exists bool) {
+	v := m.is_variant
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsVariant returns the old "is_variant" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldIsVariant(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsVariant is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsVariant requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsVariant: %w", err)
+	}
+	return oldValue.IsVariant, nil
+}
+
+// ResetIsVariant resets all changes to the "is_variant" field.
+func (m *CharacterMutation) ResetIsVariant() {
+	m.is_variant = nil
+}
+
+// SetIsAncient sets the "is_ancient" field.
+func (m *CharacterMutation) SetIsAncient(b bool) {
+	m.is_ancient = &b
+}
+
+// IsAncient returns the value of the "is_ancient" field in the mutation.
+func (m *CharacterMutation) IsAncient() (r bool, exists bool) {
+	v := m.is_ancient
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsAncient returns the old "is_ancient" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldIsAncient(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsAncient is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsAncient requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsAncient: %w", err)
+	}
+	return oldValue.IsAncient, nil
+}
+
+// ResetIsAncient resets all changes to the "is_ancient" field.
+func (m *CharacterMutation) ResetIsAncient() {
+	m.is_ancient = nil
+}
+
+// SetPinyin sets the "pinyin" field.
+func (m *CharacterMutation) SetPinyin(s []string) {
+	m.pinyin = &s
+	m.appendpinyin = nil
+}
+
+// Pinyin returns the value of the "pinyin" field in the mutation.
+func (m *CharacterMutation) Pinyin() (r []string, exists bool) {
+	v := m.pinyin
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPinyin returns the old "pinyin" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldPinyin(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPinyin is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPinyin requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPinyin: %w", err)
+	}
+	return oldValue.Pinyin, nil
+}
+
+// AppendPinyin adds s to the "pinyin" field.
+func (m *CharacterMutation) AppendPinyin(s []string) {
+	m.appendpinyin = append(m.appendpinyin, s...)
+}
+
+// AppendedPinyin returns the list of values that were appended to the "pinyin" field in this mutation.
+func (m *CharacterMutation) AppendedPinyin() ([]string, bool) {
+	if len(m.appendpinyin) == 0 {
+		return nil, false
+	}
+	return m.appendpinyin, true
+}
+
+// ClearPinyin clears the value of the "pinyin" field.
+func (m *CharacterMutation) ClearPinyin() {
+	m.pinyin = nil
+	m.appendpinyin = nil
+	m.clearedFields[character.FieldPinyin] = struct{}{}
+}
+
+// PinyinCleared returns if the "pinyin" field was cleared in this mutation.
+func (m *CharacterMutation) PinyinCleared() bool {
+	_, ok := m.clearedFields[character.FieldPinyin]
+	return ok
+}
+
+// ResetPinyin resets all changes to the "pinyin" field.
+func (m *CharacterMutation) ResetPinyin() {
+	m.pinyin = nil
+	m.appendpinyin = nil
+	delete(m.clearedFields, character.FieldPinyin)
 }
 
 // SetRadical sets the "radical" field.
@@ -283,9 +555,22 @@ func (m *CharacterMutation) OldRadical(ctx context.Context) (v string, err error
 	return oldValue.Radical, nil
 }
 
+// ClearRadical clears the value of the "radical" field.
+func (m *CharacterMutation) ClearRadical() {
+	m.radical = nil
+	m.clearedFields[character.FieldRadical] = struct{}{}
+}
+
+// RadicalCleared returns if the "radical" field was cleared in this mutation.
+func (m *CharacterMutation) RadicalCleared() bool {
+	_, ok := m.clearedFields[character.FieldRadical]
+	return ok
+}
+
 // ResetRadical resets all changes to the "radical" field.
 func (m *CharacterMutation) ResetRadical() {
 	m.radical = nil
+	delete(m.clearedFields, character.FieldRadical)
 }
 
 // SetRadicalStroke sets the "radical_stroke" field.
@@ -338,742 +623,234 @@ func (m *CharacterMutation) AddedRadicalStroke() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearRadicalStroke clears the value of the "radical_stroke" field.
+func (m *CharacterMutation) ClearRadicalStroke() {
+	m.radical_stroke = nil
+	m.addradical_stroke = nil
+	m.clearedFields[character.FieldRadicalStroke] = struct{}{}
+}
+
+// RadicalStrokeCleared returns if the "radical_stroke" field was cleared in this mutation.
+func (m *CharacterMutation) RadicalStrokeCleared() bool {
+	_, ok := m.clearedFields[character.FieldRadicalStroke]
+	return ok
+}
+
 // ResetRadicalStroke resets all changes to the "radical_stroke" field.
 func (m *CharacterMutation) ResetRadicalStroke() {
 	m.radical_stroke = nil
 	m.addradical_stroke = nil
+	delete(m.clearedFields, character.FieldRadicalStroke)
 }
 
-// SetStroke sets the "stroke" field.
-func (m *CharacterMutation) SetStroke(i int) {
-	m.stroke = &i
-	m.addstroke = nil
+// SetSimplifiedStroke sets the "simplified_stroke" field.
+func (m *CharacterMutation) SetSimplifiedStroke(i int) {
+	m.simplified_stroke = &i
+	m.addsimplified_stroke = nil
 }
 
-// Stroke returns the value of the "stroke" field in the mutation.
-func (m *CharacterMutation) Stroke() (r int, exists bool) {
-	v := m.stroke
+// SimplifiedStroke returns the value of the "simplified_stroke" field in the mutation.
+func (m *CharacterMutation) SimplifiedStroke() (r int, exists bool) {
+	v := m.simplified_stroke
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldStroke returns the old "stroke" field's value of the Character entity.
+// OldSimplifiedStroke returns the old "simplified_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldStroke(ctx context.Context) (v int, err error) {
+func (m *CharacterMutation) OldSimplifiedStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStroke is only allowed on UpdateOne operations")
+		return v, errors.New("OldSimplifiedStroke is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStroke requires an ID field in the mutation")
+		return v, errors.New("OldSimplifiedStroke requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStroke: %w", err)
+		return v, fmt.Errorf("querying old value for OldSimplifiedStroke: %w", err)
 	}
-	return oldValue.Stroke, nil
+	return oldValue.SimplifiedStroke, nil
 }
 
-// AddStroke adds i to the "stroke" field.
-func (m *CharacterMutation) AddStroke(i int) {
-	if m.addstroke != nil {
-		*m.addstroke += i
+// AddSimplifiedStroke adds i to the "simplified_stroke" field.
+func (m *CharacterMutation) AddSimplifiedStroke(i int) {
+	if m.addsimplified_stroke != nil {
+		*m.addsimplified_stroke += i
 	} else {
-		m.addstroke = &i
+		m.addsimplified_stroke = &i
 	}
 }
 
-// AddedStroke returns the value that was added to the "stroke" field in this mutation.
-func (m *CharacterMutation) AddedStroke() (r int, exists bool) {
-	v := m.addstroke
+// AddedSimplifiedStroke returns the value that was added to the "simplified_stroke" field in this mutation.
+func (m *CharacterMutation) AddedSimplifiedStroke() (r int, exists bool) {
+	v := m.addsimplified_stroke
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetStroke resets all changes to the "stroke" field.
-func (m *CharacterMutation) ResetStroke() {
-	m.stroke = nil
-	m.addstroke = nil
+// ClearSimplifiedStroke clears the value of the "simplified_stroke" field.
+func (m *CharacterMutation) ClearSimplifiedStroke() {
+	m.simplified_stroke = nil
+	m.addsimplified_stroke = nil
+	m.clearedFields[character.FieldSimplifiedStroke] = struct{}{}
 }
 
-// SetIsKangXi sets the "is_kang_xi" field.
-func (m *CharacterMutation) SetIsKangXi(b bool) {
-	m.is_kang_xi = &b
+// SimplifiedStrokeCleared returns if the "simplified_stroke" field was cleared in this mutation.
+func (m *CharacterMutation) SimplifiedStrokeCleared() bool {
+	_, ok := m.clearedFields[character.FieldSimplifiedStroke]
+	return ok
 }
 
-// IsKangXi returns the value of the "is_kang_xi" field in the mutation.
-func (m *CharacterMutation) IsKangXi() (r bool, exists bool) {
-	v := m.is_kang_xi
+// ResetSimplifiedStroke resets all changes to the "simplified_stroke" field.
+func (m *CharacterMutation) ResetSimplifiedStroke() {
+	m.simplified_stroke = nil
+	m.addsimplified_stroke = nil
+	delete(m.clearedFields, character.FieldSimplifiedStroke)
+}
+
+// SetTraditionalStroke sets the "traditional_stroke" field.
+func (m *CharacterMutation) SetTraditionalStroke(i int) {
+	m.traditional_stroke = &i
+	m.addtraditional_stroke = nil
+}
+
+// TraditionalStroke returns the value of the "traditional_stroke" field in the mutation.
+func (m *CharacterMutation) TraditionalStroke() (r int, exists bool) {
+	v := m.traditional_stroke
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldIsKangXi returns the old "is_kang_xi" field's value of the Character entity.
+// OldTraditionalStroke returns the old "traditional_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldIsKangXi(ctx context.Context) (v bool, err error) {
+func (m *CharacterMutation) OldTraditionalStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIsKangXi is only allowed on UpdateOne operations")
+		return v, errors.New("OldTraditionalStroke is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIsKangXi requires an ID field in the mutation")
+		return v, errors.New("OldTraditionalStroke requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsKangXi: %w", err)
+		return v, fmt.Errorf("querying old value for OldTraditionalStroke: %w", err)
 	}
-	return oldValue.IsKangXi, nil
+	return oldValue.TraditionalStroke, nil
 }
 
-// ResetIsKangXi resets all changes to the "is_kang_xi" field.
-func (m *CharacterMutation) ResetIsKangXi() {
-	m.is_kang_xi = nil
-}
-
-// SetKangXi sets the "kang_xi" field.
-func (m *CharacterMutation) SetKangXi(s string) {
-	m.kang_xi = &s
-}
-
-// KangXi returns the value of the "kang_xi" field in the mutation.
-func (m *CharacterMutation) KangXi() (r string, exists bool) {
-	v := m.kang_xi
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldKangXi returns the old "kang_xi" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldKangXi(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldKangXi is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldKangXi requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldKangXi: %w", err)
-	}
-	return oldValue.KangXi, nil
-}
-
-// ResetKangXi resets all changes to the "kang_xi" field.
-func (m *CharacterMutation) ResetKangXi() {
-	m.kang_xi = nil
-}
-
-// SetKangXiStroke sets the "kang_xi_stroke" field.
-func (m *CharacterMutation) SetKangXiStroke(i int) {
-	m.kang_xi_stroke = &i
-	m.addkang_xi_stroke = nil
-}
-
-// KangXiStroke returns the value of the "kang_xi_stroke" field in the mutation.
-func (m *CharacterMutation) KangXiStroke() (r int, exists bool) {
-	v := m.kang_xi_stroke
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldKangXiStroke returns the old "kang_xi_stroke" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldKangXiStroke(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldKangXiStroke is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldKangXiStroke requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldKangXiStroke: %w", err)
-	}
-	return oldValue.KangXiStroke, nil
-}
-
-// AddKangXiStroke adds i to the "kang_xi_stroke" field.
-func (m *CharacterMutation) AddKangXiStroke(i int) {
-	if m.addkang_xi_stroke != nil {
-		*m.addkang_xi_stroke += i
+// AddTraditionalStroke adds i to the "traditional_stroke" field.
+func (m *CharacterMutation) AddTraditionalStroke(i int) {
+	if m.addtraditional_stroke != nil {
+		*m.addtraditional_stroke += i
 	} else {
-		m.addkang_xi_stroke = &i
+		m.addtraditional_stroke = &i
 	}
 }
 
-// AddedKangXiStroke returns the value that was added to the "kang_xi_stroke" field in this mutation.
-func (m *CharacterMutation) AddedKangXiStroke() (r int, exists bool) {
-	v := m.addkang_xi_stroke
+// AddedTraditionalStroke returns the value that was added to the "traditional_stroke" field in this mutation.
+func (m *CharacterMutation) AddedTraditionalStroke() (r int, exists bool) {
+	v := m.addtraditional_stroke
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetKangXiStroke resets all changes to the "kang_xi_stroke" field.
-func (m *CharacterMutation) ResetKangXiStroke() {
-	m.kang_xi_stroke = nil
-	m.addkang_xi_stroke = nil
+// ClearTraditionalStroke clears the value of the "traditional_stroke" field.
+func (m *CharacterMutation) ClearTraditionalStroke() {
+	m.traditional_stroke = nil
+	m.addtraditional_stroke = nil
+	m.clearedFields[character.FieldTraditionalStroke] = struct{}{}
 }
 
-// SetSimpleRadical sets the "simple_radical" field.
-func (m *CharacterMutation) SetSimpleRadical(s string) {
-	m.simple_radical = &s
+// TraditionalStrokeCleared returns if the "traditional_stroke" field was cleared in this mutation.
+func (m *CharacterMutation) TraditionalStrokeCleared() bool {
+	_, ok := m.clearedFields[character.FieldTraditionalStroke]
+	return ok
 }
 
-// SimpleRadical returns the value of the "simple_radical" field in the mutation.
-func (m *CharacterMutation) SimpleRadical() (r string, exists bool) {
-	v := m.simple_radical
+// ResetTraditionalStroke resets all changes to the "traditional_stroke" field.
+func (m *CharacterMutation) ResetTraditionalStroke() {
+	m.traditional_stroke = nil
+	m.addtraditional_stroke = nil
+	delete(m.clearedFields, character.FieldTraditionalStroke)
+}
+
+// SetKangxiStroke sets the "kangxi_stroke" field.
+func (m *CharacterMutation) SetKangxiStroke(i int) {
+	m.kangxi_stroke = &i
+	m.addkangxi_stroke = nil
+}
+
+// KangxiStroke returns the value of the "kangxi_stroke" field in the mutation.
+func (m *CharacterMutation) KangxiStroke() (r int, exists bool) {
+	v := m.kangxi_stroke
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldSimpleRadical returns the old "simple_radical" field's value of the Character entity.
+// OldKangxiStroke returns the old "kangxi_stroke" field's value of the Character entity.
 // If the Character object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldSimpleRadical(ctx context.Context) (v string, err error) {
+func (m *CharacterMutation) OldKangxiStroke(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSimpleRadical is only allowed on UpdateOne operations")
+		return v, errors.New("OldKangxiStroke is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSimpleRadical requires an ID field in the mutation")
+		return v, errors.New("OldKangxiStroke requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSimpleRadical: %w", err)
+		return v, fmt.Errorf("querying old value for OldKangxiStroke: %w", err)
 	}
-	return oldValue.SimpleRadical, nil
+	return oldValue.KangxiStroke, nil
 }
 
-// ResetSimpleRadical resets all changes to the "simple_radical" field.
-func (m *CharacterMutation) ResetSimpleRadical() {
-	m.simple_radical = nil
-}
-
-// SetSimpleRadicalStroke sets the "simple_radical_stroke" field.
-func (m *CharacterMutation) SetSimpleRadicalStroke(i int) {
-	m.simple_radical_stroke = &i
-	m.addsimple_radical_stroke = nil
-}
-
-// SimpleRadicalStroke returns the value of the "simple_radical_stroke" field in the mutation.
-func (m *CharacterMutation) SimpleRadicalStroke() (r int, exists bool) {
-	v := m.simple_radical_stroke
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSimpleRadicalStroke returns the old "simple_radical_stroke" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldSimpleRadicalStroke(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSimpleRadicalStroke is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSimpleRadicalStroke requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSimpleRadicalStroke: %w", err)
-	}
-	return oldValue.SimpleRadicalStroke, nil
-}
-
-// AddSimpleRadicalStroke adds i to the "simple_radical_stroke" field.
-func (m *CharacterMutation) AddSimpleRadicalStroke(i int) {
-	if m.addsimple_radical_stroke != nil {
-		*m.addsimple_radical_stroke += i
+// AddKangxiStroke adds i to the "kangxi_stroke" field.
+func (m *CharacterMutation) AddKangxiStroke(i int) {
+	if m.addkangxi_stroke != nil {
+		*m.addkangxi_stroke += i
 	} else {
-		m.addsimple_radical_stroke = &i
+		m.addkangxi_stroke = &i
 	}
 }
 
-// AddedSimpleRadicalStroke returns the value that was added to the "simple_radical_stroke" field in this mutation.
-func (m *CharacterMutation) AddedSimpleRadicalStroke() (r int, exists bool) {
-	v := m.addsimple_radical_stroke
+// AddedKangxiStroke returns the value that was added to the "kangxi_stroke" field in this mutation.
+func (m *CharacterMutation) AddedKangxiStroke() (r int, exists bool) {
+	v := m.addkangxi_stroke
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetSimpleRadicalStroke resets all changes to the "simple_radical_stroke" field.
-func (m *CharacterMutation) ResetSimpleRadicalStroke() {
-	m.simple_radical_stroke = nil
-	m.addsimple_radical_stroke = nil
+// ClearKangxiStroke clears the value of the "kangxi_stroke" field.
+func (m *CharacterMutation) ClearKangxiStroke() {
+	m.kangxi_stroke = nil
+	m.addkangxi_stroke = nil
+	m.clearedFields[character.FieldKangxiStroke] = struct{}{}
 }
 
-// SetSimpleTotalStroke sets the "simple_total_stroke" field.
-func (m *CharacterMutation) SetSimpleTotalStroke(i int) {
-	m.simple_total_stroke = &i
-	m.addsimple_total_stroke = nil
+// KangxiStrokeCleared returns if the "kangxi_stroke" field was cleared in this mutation.
+func (m *CharacterMutation) KangxiStrokeCleared() bool {
+	_, ok := m.clearedFields[character.FieldKangxiStroke]
+	return ok
 }
 
-// SimpleTotalStroke returns the value of the "simple_total_stroke" field in the mutation.
-func (m *CharacterMutation) SimpleTotalStroke() (r int, exists bool) {
-	v := m.simple_total_stroke
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSimpleTotalStroke returns the old "simple_total_stroke" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldSimpleTotalStroke(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSimpleTotalStroke is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSimpleTotalStroke requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSimpleTotalStroke: %w", err)
-	}
-	return oldValue.SimpleTotalStroke, nil
-}
-
-// AddSimpleTotalStroke adds i to the "simple_total_stroke" field.
-func (m *CharacterMutation) AddSimpleTotalStroke(i int) {
-	if m.addsimple_total_stroke != nil {
-		*m.addsimple_total_stroke += i
-	} else {
-		m.addsimple_total_stroke = &i
-	}
-}
-
-// AddedSimpleTotalStroke returns the value that was added to the "simple_total_stroke" field in this mutation.
-func (m *CharacterMutation) AddedSimpleTotalStroke() (r int, exists bool) {
-	v := m.addsimple_total_stroke
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetSimpleTotalStroke resets all changes to the "simple_total_stroke" field.
-func (m *CharacterMutation) ResetSimpleTotalStroke() {
-	m.simple_total_stroke = nil
-	m.addsimple_total_stroke = nil
-}
-
-// SetTraditionalRadical sets the "traditional_radical" field.
-func (m *CharacterMutation) SetTraditionalRadical(s string) {
-	m.traditional_radical = &s
-}
-
-// TraditionalRadical returns the value of the "traditional_radical" field in the mutation.
-func (m *CharacterMutation) TraditionalRadical() (r string, exists bool) {
-	v := m.traditional_radical
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTraditionalRadical returns the old "traditional_radical" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldTraditionalRadical(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTraditionalRadical is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTraditionalRadical requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTraditionalRadical: %w", err)
-	}
-	return oldValue.TraditionalRadical, nil
-}
-
-// ResetTraditionalRadical resets all changes to the "traditional_radical" field.
-func (m *CharacterMutation) ResetTraditionalRadical() {
-	m.traditional_radical = nil
-}
-
-// SetTraditionalRadicalStroke sets the "traditional_radical_stroke" field.
-func (m *CharacterMutation) SetTraditionalRadicalStroke(i int) {
-	m.traditional_radical_stroke = &i
-	m.addtraditional_radical_stroke = nil
-}
-
-// TraditionalRadicalStroke returns the value of the "traditional_radical_stroke" field in the mutation.
-func (m *CharacterMutation) TraditionalRadicalStroke() (r int, exists bool) {
-	v := m.traditional_radical_stroke
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTraditionalRadicalStroke returns the old "traditional_radical_stroke" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldTraditionalRadicalStroke(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTraditionalRadicalStroke is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTraditionalRadicalStroke requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTraditionalRadicalStroke: %w", err)
-	}
-	return oldValue.TraditionalRadicalStroke, nil
-}
-
-// AddTraditionalRadicalStroke adds i to the "traditional_radical_stroke" field.
-func (m *CharacterMutation) AddTraditionalRadicalStroke(i int) {
-	if m.addtraditional_radical_stroke != nil {
-		*m.addtraditional_radical_stroke += i
-	} else {
-		m.addtraditional_radical_stroke = &i
-	}
-}
-
-// AddedTraditionalRadicalStroke returns the value that was added to the "traditional_radical_stroke" field in this mutation.
-func (m *CharacterMutation) AddedTraditionalRadicalStroke() (r int, exists bool) {
-	v := m.addtraditional_radical_stroke
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetTraditionalRadicalStroke resets all changes to the "traditional_radical_stroke" field.
-func (m *CharacterMutation) ResetTraditionalRadicalStroke() {
-	m.traditional_radical_stroke = nil
-	m.addtraditional_radical_stroke = nil
-}
-
-// SetTraditionalTotalStroke sets the "traditional_total_stroke" field.
-func (m *CharacterMutation) SetTraditionalTotalStroke(i int) {
-	m.traditional_total_stroke = &i
-	m.addtraditional_total_stroke = nil
-}
-
-// TraditionalTotalStroke returns the value of the "traditional_total_stroke" field in the mutation.
-func (m *CharacterMutation) TraditionalTotalStroke() (r int, exists bool) {
-	v := m.traditional_total_stroke
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTraditionalTotalStroke returns the old "traditional_total_stroke" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldTraditionalTotalStroke(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTraditionalTotalStroke is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTraditionalTotalStroke requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTraditionalTotalStroke: %w", err)
-	}
-	return oldValue.TraditionalTotalStroke, nil
-}
-
-// AddTraditionalTotalStroke adds i to the "traditional_total_stroke" field.
-func (m *CharacterMutation) AddTraditionalTotalStroke(i int) {
-	if m.addtraditional_total_stroke != nil {
-		*m.addtraditional_total_stroke += i
-	} else {
-		m.addtraditional_total_stroke = &i
-	}
-}
-
-// AddedTraditionalTotalStroke returns the value that was added to the "traditional_total_stroke" field in this mutation.
-func (m *CharacterMutation) AddedTraditionalTotalStroke() (r int, exists bool) {
-	v := m.addtraditional_total_stroke
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetTraditionalTotalStroke resets all changes to the "traditional_total_stroke" field.
-func (m *CharacterMutation) ResetTraditionalTotalStroke() {
-	m.traditional_total_stroke = nil
-	m.addtraditional_total_stroke = nil
-}
-
-// SetNameScience sets the "name_science" field.
-func (m *CharacterMutation) SetNameScience(b bool) {
-	m.name_science = &b
-}
-
-// NameScience returns the value of the "name_science" field in the mutation.
-func (m *CharacterMutation) NameScience() (r bool, exists bool) {
-	v := m.name_science
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldNameScience returns the old "name_science" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldNameScience(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldNameScience is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldNameScience requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldNameScience: %w", err)
-	}
-	return oldValue.NameScience, nil
-}
-
-// ResetNameScience resets all changes to the "name_science" field.
-func (m *CharacterMutation) ResetNameScience() {
-	m.name_science = nil
-}
-
-// SetWuXing sets the "wu_xing" field.
-func (m *CharacterMutation) SetWuXing(s string) {
-	m.wu_xing = &s
-}
-
-// WuXing returns the value of the "wu_xing" field in the mutation.
-func (m *CharacterMutation) WuXing() (r string, exists bool) {
-	v := m.wu_xing
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldWuXing returns the old "wu_xing" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldWuXing(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldWuXing is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldWuXing requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldWuXing: %w", err)
-	}
-	return oldValue.WuXing, nil
-}
-
-// ResetWuXing resets all changes to the "wu_xing" field.
-func (m *CharacterMutation) ResetWuXing() {
-	m.wu_xing = nil
-}
-
-// SetLucky sets the "lucky" field.
-func (m *CharacterMutation) SetLucky(s string) {
-	m.lucky = &s
-}
-
-// Lucky returns the value of the "lucky" field in the mutation.
-func (m *CharacterMutation) Lucky() (r string, exists bool) {
-	v := m.lucky
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLucky returns the old "lucky" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldLucky(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLucky is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLucky requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLucky: %w", err)
-	}
-	return oldValue.Lucky, nil
-}
-
-// ResetLucky resets all changes to the "lucky" field.
-func (m *CharacterMutation) ResetLucky() {
-	m.lucky = nil
-}
-
-// SetRegular sets the "regular" field.
-func (m *CharacterMutation) SetRegular(b bool) {
-	m.regular = &b
-}
-
-// Regular returns the value of the "regular" field in the mutation.
-func (m *CharacterMutation) Regular() (r bool, exists bool) {
-	v := m.regular
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRegular returns the old "regular" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldRegular(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRegular is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRegular requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRegular: %w", err)
-	}
-	return oldValue.Regular, nil
-}
-
-// ResetRegular resets all changes to the "regular" field.
-func (m *CharacterMutation) ResetRegular() {
-	m.regular = nil
-}
-
-// SetTraditionalCharacter sets the "traditional_character" field.
-func (m *CharacterMutation) SetTraditionalCharacter(s string) {
-	m.traditional_character = &s
-}
-
-// TraditionalCharacter returns the value of the "traditional_character" field in the mutation.
-func (m *CharacterMutation) TraditionalCharacter() (r string, exists bool) {
-	v := m.traditional_character
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTraditionalCharacter returns the old "traditional_character" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldTraditionalCharacter(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTraditionalCharacter is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTraditionalCharacter requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTraditionalCharacter: %w", err)
-	}
-	return oldValue.TraditionalCharacter, nil
-}
-
-// ResetTraditionalCharacter resets all changes to the "traditional_character" field.
-func (m *CharacterMutation) ResetTraditionalCharacter() {
-	m.traditional_character = nil
-}
-
-// SetVariantCharacter sets the "variant_character" field.
-func (m *CharacterMutation) SetVariantCharacter(s string) {
-	m.variant_character = &s
-}
-
-// VariantCharacter returns the value of the "variant_character" field in the mutation.
-func (m *CharacterMutation) VariantCharacter() (r string, exists bool) {
-	v := m.variant_character
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldVariantCharacter returns the old "variant_character" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldVariantCharacter(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldVariantCharacter is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldVariantCharacter requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldVariantCharacter: %w", err)
-	}
-	return oldValue.VariantCharacter, nil
-}
-
-// ResetVariantCharacter resets all changes to the "variant_character" field.
-func (m *CharacterMutation) ResetVariantCharacter() {
-	m.variant_character = nil
-}
-
-// SetComment sets the "comment" field.
-func (m *CharacterMutation) SetComment(s string) {
-	m.comment = &s
-}
-
-// Comment returns the value of the "comment" field in the mutation.
-func (m *CharacterMutation) Comment() (r string, exists bool) {
-	v := m.comment
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldComment returns the old "comment" field's value of the Character entity.
-// If the Character object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CharacterMutation) OldComment(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldComment is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldComment requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldComment: %w", err)
-	}
-	return oldValue.Comment, nil
-}
-
-// ResetComment resets all changes to the "comment" field.
-func (m *CharacterMutation) ResetComment() {
-	m.comment = nil
+// ResetKangxiStroke resets all changes to the "kangxi_stroke" field.
+func (m *CharacterMutation) ResetKangxiStroke() {
+	m.kangxi_stroke = nil
+	m.addkangxi_stroke = nil
+	delete(m.clearedFields, character.FieldKangxiStroke)
 }
 
 // SetScienceStroke sets the "science_stroke" field.
@@ -1126,10 +903,652 @@ func (m *CharacterMutation) AddedScienceStroke() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearScienceStroke clears the value of the "science_stroke" field.
+func (m *CharacterMutation) ClearScienceStroke() {
+	m.science_stroke = nil
+	m.addscience_stroke = nil
+	m.clearedFields[character.FieldScienceStroke] = struct{}{}
+}
+
+// ScienceStrokeCleared returns if the "science_stroke" field was cleared in this mutation.
+func (m *CharacterMutation) ScienceStrokeCleared() bool {
+	_, ok := m.clearedFields[character.FieldScienceStroke]
+	return ok
+}
+
 // ResetScienceStroke resets all changes to the "science_stroke" field.
 func (m *CharacterMutation) ResetScienceStroke() {
 	m.science_stroke = nil
 	m.addscience_stroke = nil
+	delete(m.clearedFields, character.FieldScienceStroke)
+}
+
+// SetWuXing sets the "wu_xing" field.
+func (m *CharacterMutation) SetWuXing(s string) {
+	m.wu_xing = &s
+}
+
+// WuXing returns the value of the "wu_xing" field in the mutation.
+func (m *CharacterMutation) WuXing() (r string, exists bool) {
+	v := m.wu_xing
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWuXing returns the old "wu_xing" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldWuXing(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWuXing is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWuXing requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWuXing: %w", err)
+	}
+	return oldValue.WuXing, nil
+}
+
+// ClearWuXing clears the value of the "wu_xing" field.
+func (m *CharacterMutation) ClearWuXing() {
+	m.wu_xing = nil
+	m.clearedFields[character.FieldWuXing] = struct{}{}
+}
+
+// WuXingCleared returns if the "wu_xing" field was cleared in this mutation.
+func (m *CharacterMutation) WuXingCleared() bool {
+	_, ok := m.clearedFields[character.FieldWuXing]
+	return ok
+}
+
+// ResetWuXing resets all changes to the "wu_xing" field.
+func (m *CharacterMutation) ResetWuXing() {
+	m.wu_xing = nil
+	delete(m.clearedFields, character.FieldWuXing)
+}
+
+// SetRegular sets the "regular" field.
+func (m *CharacterMutation) SetRegular(b bool) {
+	m.regular = &b
+}
+
+// Regular returns the value of the "regular" field in the mutation.
+func (m *CharacterMutation) Regular() (r bool, exists bool) {
+	v := m.regular
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRegular returns the old "regular" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldRegular(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRegular is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRegular requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRegular: %w", err)
+	}
+	return oldValue.Regular, nil
+}
+
+// ResetRegular resets all changes to the "regular" field.
+func (m *CharacterMutation) ResetRegular() {
+	m.regular = nil
+}
+
+// SetCommonLevel sets the "common_level" field.
+func (m *CharacterMutation) SetCommonLevel(i int) {
+	m.common_level = &i
+	m.addcommon_level = nil
+}
+
+// CommonLevel returns the value of the "common_level" field in the mutation.
+func (m *CharacterMutation) CommonLevel() (r int, exists bool) {
+	v := m.common_level
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCommonLevel returns the old "common_level" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldCommonLevel(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCommonLevel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCommonLevel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCommonLevel: %w", err)
+	}
+	return oldValue.CommonLevel, nil
+}
+
+// AddCommonLevel adds i to the "common_level" field.
+func (m *CharacterMutation) AddCommonLevel(i int) {
+	if m.addcommon_level != nil {
+		*m.addcommon_level += i
+	} else {
+		m.addcommon_level = &i
+	}
+}
+
+// AddedCommonLevel returns the value that was added to the "common_level" field in this mutation.
+func (m *CharacterMutation) AddedCommonLevel() (r int, exists bool) {
+	v := m.addcommon_level
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearCommonLevel clears the value of the "common_level" field.
+func (m *CharacterMutation) ClearCommonLevel() {
+	m.common_level = nil
+	m.addcommon_level = nil
+	m.clearedFields[character.FieldCommonLevel] = struct{}{}
+}
+
+// CommonLevelCleared returns if the "common_level" field was cleared in this mutation.
+func (m *CharacterMutation) CommonLevelCleared() bool {
+	_, ok := m.clearedFields[character.FieldCommonLevel]
+	return ok
+}
+
+// ResetCommonLevel resets all changes to the "common_level" field.
+func (m *CharacterMutation) ResetCommonLevel() {
+	m.common_level = nil
+	m.addcommon_level = nil
+	delete(m.clearedFields, character.FieldCommonLevel)
+}
+
+// SetGenderHint sets the "gender_hint" field.
+func (m *CharacterMutation) SetGenderHint(s string) {
+	m.gender_hint = &s
+}
+
+// GenderHint returns the value of the "gender_hint" field in the mutation.
+func (m *CharacterMutation) GenderHint() (r string, exists bool) {
+	v := m.gender_hint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGenderHint returns the old "gender_hint" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldGenderHint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGenderHint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGenderHint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGenderHint: %w", err)
+	}
+	return oldValue.GenderHint, nil
+}
+
+// ClearGenderHint clears the value of the "gender_hint" field.
+func (m *CharacterMutation) ClearGenderHint() {
+	m.gender_hint = nil
+	m.clearedFields[character.FieldGenderHint] = struct{}{}
+}
+
+// GenderHintCleared returns if the "gender_hint" field was cleared in this mutation.
+func (m *CharacterMutation) GenderHintCleared() bool {
+	_, ok := m.clearedFields[character.FieldGenderHint]
+	return ok
+}
+
+// ResetGenderHint resets all changes to the "gender_hint" field.
+func (m *CharacterMutation) ResetGenderHint() {
+	m.gender_hint = nil
+	delete(m.clearedFields, character.FieldGenderHint)
+}
+
+// SetNameable sets the "nameable" field.
+func (m *CharacterMutation) SetNameable(b bool) {
+	m.nameable = &b
+}
+
+// Nameable returns the value of the "nameable" field in the mutation.
+func (m *CharacterMutation) Nameable() (r bool, exists bool) {
+	v := m.nameable
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNameable returns the old "nameable" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldNameable(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNameable is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNameable requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNameable: %w", err)
+	}
+	return oldValue.Nameable, nil
+}
+
+// ResetNameable resets all changes to the "nameable" field.
+func (m *CharacterMutation) ResetNameable() {
+	m.nameable = nil
+}
+
+// SetMeaning sets the "meaning" field.
+func (m *CharacterMutation) SetMeaning(s string) {
+	m.meaning = &s
+}
+
+// Meaning returns the value of the "meaning" field in the mutation.
+func (m *CharacterMutation) Meaning() (r string, exists bool) {
+	v := m.meaning
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMeaning returns the old "meaning" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldMeaning(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMeaning is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMeaning requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMeaning: %w", err)
+	}
+	return oldValue.Meaning, nil
+}
+
+// ClearMeaning clears the value of the "meaning" field.
+func (m *CharacterMutation) ClearMeaning() {
+	m.meaning = nil
+	m.clearedFields[character.FieldMeaning] = struct{}{}
+}
+
+// MeaningCleared returns if the "meaning" field was cleared in this mutation.
+func (m *CharacterMutation) MeaningCleared() bool {
+	_, ok := m.clearedFields[character.FieldMeaning]
+	return ok
+}
+
+// ResetMeaning resets all changes to the "meaning" field.
+func (m *CharacterMutation) ResetMeaning() {
+	m.meaning = nil
+	delete(m.clearedFields, character.FieldMeaning)
+}
+
+// SetSource sets the "source" field.
+func (m *CharacterMutation) SetSource(s string) {
+	m.source = &s
+}
+
+// Source returns the value of the "source" field in the mutation.
+func (m *CharacterMutation) Source() (r string, exists bool) {
+	v := m.source
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSource returns the old "source" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldSource(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSource is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSource requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSource: %w", err)
+	}
+	return oldValue.Source, nil
+}
+
+// ClearSource clears the value of the "source" field.
+func (m *CharacterMutation) ClearSource() {
+	m.source = nil
+	m.clearedFields[character.FieldSource] = struct{}{}
+}
+
+// SourceCleared returns if the "source" field was cleared in this mutation.
+func (m *CharacterMutation) SourceCleared() bool {
+	_, ok := m.clearedFields[character.FieldSource]
+	return ok
+}
+
+// ResetSource resets all changes to the "source" field.
+func (m *CharacterMutation) ResetSource() {
+	m.source = nil
+	delete(m.clearedFields, character.FieldSource)
+}
+
+// SetSourceConfidence sets the "source_confidence" field.
+func (m *CharacterMutation) SetSourceConfidence(f float64) {
+	m.source_confidence = &f
+	m.addsource_confidence = nil
+}
+
+// SourceConfidence returns the value of the "source_confidence" field in the mutation.
+func (m *CharacterMutation) SourceConfidence() (r float64, exists bool) {
+	v := m.source_confidence
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSourceConfidence returns the old "source_confidence" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldSourceConfidence(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSourceConfidence is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSourceConfidence requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSourceConfidence: %w", err)
+	}
+	return oldValue.SourceConfidence, nil
+}
+
+// AddSourceConfidence adds f to the "source_confidence" field.
+func (m *CharacterMutation) AddSourceConfidence(f float64) {
+	if m.addsource_confidence != nil {
+		*m.addsource_confidence += f
+	} else {
+		m.addsource_confidence = &f
+	}
+}
+
+// AddedSourceConfidence returns the value that was added to the "source_confidence" field in this mutation.
+func (m *CharacterMutation) AddedSourceConfidence() (r float64, exists bool) {
+	v := m.addsource_confidence
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSourceConfidence clears the value of the "source_confidence" field.
+func (m *CharacterMutation) ClearSourceConfidence() {
+	m.source_confidence = nil
+	m.addsource_confidence = nil
+	m.clearedFields[character.FieldSourceConfidence] = struct{}{}
+}
+
+// SourceConfidenceCleared returns if the "source_confidence" field was cleared in this mutation.
+func (m *CharacterMutation) SourceConfidenceCleared() bool {
+	_, ok := m.clearedFields[character.FieldSourceConfidence]
+	return ok
+}
+
+// ResetSourceConfidence resets all changes to the "source_confidence" field.
+func (m *CharacterMutation) ResetSourceConfidence() {
+	m.source_confidence = nil
+	m.addsource_confidence = nil
+	delete(m.clearedFields, character.FieldSourceConfidence)
+}
+
+// SetComment sets the "comment" field.
+func (m *CharacterMutation) SetComment(s string) {
+	m.comment = &s
+}
+
+// Comment returns the value of the "comment" field in the mutation.
+func (m *CharacterMutation) Comment() (r string, exists bool) {
+	v := m.comment
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldComment returns the old "comment" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldComment(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldComment is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldComment requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldComment: %w", err)
+	}
+	return oldValue.Comment, nil
+}
+
+// ClearComment clears the value of the "comment" field.
+func (m *CharacterMutation) ClearComment() {
+	m.comment = nil
+	m.clearedFields[character.FieldComment] = struct{}{}
+}
+
+// CommentCleared returns if the "comment" field was cleared in this mutation.
+func (m *CharacterMutation) CommentCleared() bool {
+	_, ok := m.clearedFields[character.FieldComment]
+	return ok
+}
+
+// ResetComment resets all changes to the "comment" field.
+func (m *CharacterMutation) ResetComment() {
+	m.comment = nil
+	delete(m.clearedFields, character.FieldComment)
+}
+
+// SetSimplifiedOfID sets the "simplified_of" edge to the Character entity by id.
+func (m *CharacterMutation) SetSimplifiedOfID(id int) {
+	m.simplified_of = &id
+}
+
+// ClearSimplifiedOf clears the "simplified_of" edge to the Character entity.
+func (m *CharacterMutation) ClearSimplifiedOf() {
+	m.clearedsimplified_of = true
+}
+
+// SimplifiedOfCleared reports if the "simplified_of" edge to the Character entity was cleared.
+func (m *CharacterMutation) SimplifiedOfCleared() bool {
+	return m.clearedsimplified_of
+}
+
+// SimplifiedOfID returns the "simplified_of" edge ID in the mutation.
+func (m *CharacterMutation) SimplifiedOfID() (id int, exists bool) {
+	if m.simplified_of != nil {
+		return *m.simplified_of, true
+	}
+	return
+}
+
+// SimplifiedOfIDs returns the "simplified_of" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SimplifiedOfID instead. It exists only for internal usage by the builders.
+func (m *CharacterMutation) SimplifiedOfIDs() (ids []int) {
+	if id := m.simplified_of; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSimplifiedOf resets all changes to the "simplified_of" edge.
+func (m *CharacterMutation) ResetSimplifiedOf() {
+	m.simplified_of = nil
+	m.clearedsimplified_of = false
+}
+
+// SetTraditionalToSimplifiedID sets the "traditional_to_simplified" edge to the Character entity by id.
+func (m *CharacterMutation) SetTraditionalToSimplifiedID(id int) {
+	m.traditional_to_simplified = &id
+}
+
+// ClearTraditionalToSimplified clears the "traditional_to_simplified" edge to the Character entity.
+func (m *CharacterMutation) ClearTraditionalToSimplified() {
+	m.clearedtraditional_to_simplified = true
+}
+
+// TraditionalToSimplifiedCleared reports if the "traditional_to_simplified" edge to the Character entity was cleared.
+func (m *CharacterMutation) TraditionalToSimplifiedCleared() bool {
+	return m.clearedtraditional_to_simplified
+}
+
+// TraditionalToSimplifiedID returns the "traditional_to_simplified" edge ID in the mutation.
+func (m *CharacterMutation) TraditionalToSimplifiedID() (id int, exists bool) {
+	if m.traditional_to_simplified != nil {
+		return *m.traditional_to_simplified, true
+	}
+	return
+}
+
+// TraditionalToSimplifiedIDs returns the "traditional_to_simplified" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TraditionalToSimplifiedID instead. It exists only for internal usage by the builders.
+func (m *CharacterMutation) TraditionalToSimplifiedIDs() (ids []int) {
+	if id := m.traditional_to_simplified; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTraditionalToSimplified resets all changes to the "traditional_to_simplified" edge.
+func (m *CharacterMutation) ResetTraditionalToSimplified() {
+	m.traditional_to_simplified = nil
+	m.clearedtraditional_to_simplified = false
+}
+
+// SetVariantOfID sets the "variant_of" edge to the Character entity by id.
+func (m *CharacterMutation) SetVariantOfID(id int) {
+	m.variant_of = &id
+}
+
+// ClearVariantOf clears the "variant_of" edge to the Character entity.
+func (m *CharacterMutation) ClearVariantOf() {
+	m.clearedvariant_of = true
+}
+
+// VariantOfCleared reports if the "variant_of" edge to the Character entity was cleared.
+func (m *CharacterMutation) VariantOfCleared() bool {
+	return m.clearedvariant_of
+}
+
+// VariantOfID returns the "variant_of" edge ID in the mutation.
+func (m *CharacterMutation) VariantOfID() (id int, exists bool) {
+	if m.variant_of != nil {
+		return *m.variant_of, true
+	}
+	return
+}
+
+// VariantOfIDs returns the "variant_of" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// VariantOfID instead. It exists only for internal usage by the builders.
+func (m *CharacterMutation) VariantOfIDs() (ids []int) {
+	if id := m.variant_of; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetVariantOf resets all changes to the "variant_of" edge.
+func (m *CharacterMutation) ResetVariantOf() {
+	m.variant_of = nil
+	m.clearedvariant_of = false
+}
+
+// AddStandardToVariantIDs adds the "standard_to_variant" edge to the Character entity by ids.
+func (m *CharacterMutation) AddStandardToVariantIDs(ids ...int) {
+	if m.standard_to_variant == nil {
+		m.standard_to_variant = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.standard_to_variant[ids[i]] = struct{}{}
+	}
+}
+
+// ClearStandardToVariant clears the "standard_to_variant" edge to the Character entity.
+func (m *CharacterMutation) ClearStandardToVariant() {
+	m.clearedstandard_to_variant = true
+}
+
+// StandardToVariantCleared reports if the "standard_to_variant" edge to the Character entity was cleared.
+func (m *CharacterMutation) StandardToVariantCleared() bool {
+	return m.clearedstandard_to_variant
+}
+
+// RemoveStandardToVariantIDs removes the "standard_to_variant" edge to the Character entity by IDs.
+func (m *CharacterMutation) RemoveStandardToVariantIDs(ids ...int) {
+	if m.removedstandard_to_variant == nil {
+		m.removedstandard_to_variant = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.standard_to_variant, ids[i])
+		m.removedstandard_to_variant[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedStandardToVariant returns the removed IDs of the "standard_to_variant" edge to the Character entity.
+func (m *CharacterMutation) RemovedStandardToVariantIDs() (ids []int) {
+	for id := range m.removedstandard_to_variant {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// StandardToVariantIDs returns the "standard_to_variant" edge IDs in the mutation.
+func (m *CharacterMutation) StandardToVariantIDs() (ids []int) {
+	for id := range m.standard_to_variant {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetStandardToVariant resets all changes to the "standard_to_variant" edge.
+func (m *CharacterMutation) ResetStandardToVariant() {
+	m.standard_to_variant = nil
+	m.clearedstandard_to_variant = false
+	m.removedstandard_to_variant = nil
 }
 
 // Where appends a list predicates to the CharacterMutation builder.
@@ -1166,12 +1585,30 @@ func (m *CharacterMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CharacterMutation) Fields() []string {
-	fields := make([]string, 0, 22)
-	if m.pin_yin != nil {
-		fields = append(fields, character.FieldPinYin)
+	fields := make([]string, 0, 23)
+	if m.char != nil {
+		fields = append(fields, character.FieldChar)
 	}
-	if m.ch != nil {
-		fields = append(fields, character.FieldCh)
+	if m.unicode != nil {
+		fields = append(fields, character.FieldUnicode)
+	}
+	if m.is_simplified != nil {
+		fields = append(fields, character.FieldIsSimplified)
+	}
+	if m.is_traditional != nil {
+		fields = append(fields, character.FieldIsTraditional)
+	}
+	if m.is_kangxi != nil {
+		fields = append(fields, character.FieldIsKangxi)
+	}
+	if m.is_variant != nil {
+		fields = append(fields, character.FieldIsVariant)
+	}
+	if m.is_ancient != nil {
+		fields = append(fields, character.FieldIsAncient)
+	}
+	if m.pinyin != nil {
+		fields = append(fields, character.FieldPinyin)
 	}
 	if m.radical != nil {
 		fields = append(fields, character.FieldRadical)
@@ -1179,59 +1616,44 @@ func (m *CharacterMutation) Fields() []string {
 	if m.radical_stroke != nil {
 		fields = append(fields, character.FieldRadicalStroke)
 	}
-	if m.stroke != nil {
-		fields = append(fields, character.FieldStroke)
+	if m.simplified_stroke != nil {
+		fields = append(fields, character.FieldSimplifiedStroke)
 	}
-	if m.is_kang_xi != nil {
-		fields = append(fields, character.FieldIsKangXi)
+	if m.traditional_stroke != nil {
+		fields = append(fields, character.FieldTraditionalStroke)
 	}
-	if m.kang_xi != nil {
-		fields = append(fields, character.FieldKangXi)
+	if m.kangxi_stroke != nil {
+		fields = append(fields, character.FieldKangxiStroke)
 	}
-	if m.kang_xi_stroke != nil {
-		fields = append(fields, character.FieldKangXiStroke)
-	}
-	if m.simple_radical != nil {
-		fields = append(fields, character.FieldSimpleRadical)
-	}
-	if m.simple_radical_stroke != nil {
-		fields = append(fields, character.FieldSimpleRadicalStroke)
-	}
-	if m.simple_total_stroke != nil {
-		fields = append(fields, character.FieldSimpleTotalStroke)
-	}
-	if m.traditional_radical != nil {
-		fields = append(fields, character.FieldTraditionalRadical)
-	}
-	if m.traditional_radical_stroke != nil {
-		fields = append(fields, character.FieldTraditionalRadicalStroke)
-	}
-	if m.traditional_total_stroke != nil {
-		fields = append(fields, character.FieldTraditionalTotalStroke)
-	}
-	if m.name_science != nil {
-		fields = append(fields, character.FieldNameScience)
+	if m.science_stroke != nil {
+		fields = append(fields, character.FieldScienceStroke)
 	}
 	if m.wu_xing != nil {
 		fields = append(fields, character.FieldWuXing)
 	}
-	if m.lucky != nil {
-		fields = append(fields, character.FieldLucky)
-	}
 	if m.regular != nil {
 		fields = append(fields, character.FieldRegular)
 	}
-	if m.traditional_character != nil {
-		fields = append(fields, character.FieldTraditionalCharacter)
+	if m.common_level != nil {
+		fields = append(fields, character.FieldCommonLevel)
 	}
-	if m.variant_character != nil {
-		fields = append(fields, character.FieldVariantCharacter)
+	if m.gender_hint != nil {
+		fields = append(fields, character.FieldGenderHint)
+	}
+	if m.nameable != nil {
+		fields = append(fields, character.FieldNameable)
+	}
+	if m.meaning != nil {
+		fields = append(fields, character.FieldMeaning)
+	}
+	if m.source != nil {
+		fields = append(fields, character.FieldSource)
+	}
+	if m.source_confidence != nil {
+		fields = append(fields, character.FieldSourceConfidence)
 	}
 	if m.comment != nil {
 		fields = append(fields, character.FieldComment)
-	}
-	if m.science_stroke != nil {
-		fields = append(fields, character.FieldScienceStroke)
 	}
 	return fields
 }
@@ -1241,50 +1663,52 @@ func (m *CharacterMutation) Fields() []string {
 // schema.
 func (m *CharacterMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case character.FieldPinYin:
-		return m.PinYin()
-	case character.FieldCh:
-		return m.Ch()
+	case character.FieldChar:
+		return m.Char()
+	case character.FieldUnicode:
+		return m.Unicode()
+	case character.FieldIsSimplified:
+		return m.IsSimplified()
+	case character.FieldIsTraditional:
+		return m.IsTraditional()
+	case character.FieldIsKangxi:
+		return m.IsKangxi()
+	case character.FieldIsVariant:
+		return m.IsVariant()
+	case character.FieldIsAncient:
+		return m.IsAncient()
+	case character.FieldPinyin:
+		return m.Pinyin()
 	case character.FieldRadical:
 		return m.Radical()
 	case character.FieldRadicalStroke:
 		return m.RadicalStroke()
-	case character.FieldStroke:
-		return m.Stroke()
-	case character.FieldIsKangXi:
-		return m.IsKangXi()
-	case character.FieldKangXi:
-		return m.KangXi()
-	case character.FieldKangXiStroke:
-		return m.KangXiStroke()
-	case character.FieldSimpleRadical:
-		return m.SimpleRadical()
-	case character.FieldSimpleRadicalStroke:
-		return m.SimpleRadicalStroke()
-	case character.FieldSimpleTotalStroke:
-		return m.SimpleTotalStroke()
-	case character.FieldTraditionalRadical:
-		return m.TraditionalRadical()
-	case character.FieldTraditionalRadicalStroke:
-		return m.TraditionalRadicalStroke()
-	case character.FieldTraditionalTotalStroke:
-		return m.TraditionalTotalStroke()
-	case character.FieldNameScience:
-		return m.NameScience()
-	case character.FieldWuXing:
-		return m.WuXing()
-	case character.FieldLucky:
-		return m.Lucky()
-	case character.FieldRegular:
-		return m.Regular()
-	case character.FieldTraditionalCharacter:
-		return m.TraditionalCharacter()
-	case character.FieldVariantCharacter:
-		return m.VariantCharacter()
-	case character.FieldComment:
-		return m.Comment()
+	case character.FieldSimplifiedStroke:
+		return m.SimplifiedStroke()
+	case character.FieldTraditionalStroke:
+		return m.TraditionalStroke()
+	case character.FieldKangxiStroke:
+		return m.KangxiStroke()
 	case character.FieldScienceStroke:
 		return m.ScienceStroke()
+	case character.FieldWuXing:
+		return m.WuXing()
+	case character.FieldRegular:
+		return m.Regular()
+	case character.FieldCommonLevel:
+		return m.CommonLevel()
+	case character.FieldGenderHint:
+		return m.GenderHint()
+	case character.FieldNameable:
+		return m.Nameable()
+	case character.FieldMeaning:
+		return m.Meaning()
+	case character.FieldSource:
+		return m.Source()
+	case character.FieldSourceConfidence:
+		return m.SourceConfidence()
+	case character.FieldComment:
+		return m.Comment()
 	}
 	return nil, false
 }
@@ -1294,50 +1718,52 @@ func (m *CharacterMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *CharacterMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case character.FieldPinYin:
-		return m.OldPinYin(ctx)
-	case character.FieldCh:
-		return m.OldCh(ctx)
+	case character.FieldChar:
+		return m.OldChar(ctx)
+	case character.FieldUnicode:
+		return m.OldUnicode(ctx)
+	case character.FieldIsSimplified:
+		return m.OldIsSimplified(ctx)
+	case character.FieldIsTraditional:
+		return m.OldIsTraditional(ctx)
+	case character.FieldIsKangxi:
+		return m.OldIsKangxi(ctx)
+	case character.FieldIsVariant:
+		return m.OldIsVariant(ctx)
+	case character.FieldIsAncient:
+		return m.OldIsAncient(ctx)
+	case character.FieldPinyin:
+		return m.OldPinyin(ctx)
 	case character.FieldRadical:
 		return m.OldRadical(ctx)
 	case character.FieldRadicalStroke:
 		return m.OldRadicalStroke(ctx)
-	case character.FieldStroke:
-		return m.OldStroke(ctx)
-	case character.FieldIsKangXi:
-		return m.OldIsKangXi(ctx)
-	case character.FieldKangXi:
-		return m.OldKangXi(ctx)
-	case character.FieldKangXiStroke:
-		return m.OldKangXiStroke(ctx)
-	case character.FieldSimpleRadical:
-		return m.OldSimpleRadical(ctx)
-	case character.FieldSimpleRadicalStroke:
-		return m.OldSimpleRadicalStroke(ctx)
-	case character.FieldSimpleTotalStroke:
-		return m.OldSimpleTotalStroke(ctx)
-	case character.FieldTraditionalRadical:
-		return m.OldTraditionalRadical(ctx)
-	case character.FieldTraditionalRadicalStroke:
-		return m.OldTraditionalRadicalStroke(ctx)
-	case character.FieldTraditionalTotalStroke:
-		return m.OldTraditionalTotalStroke(ctx)
-	case character.FieldNameScience:
-		return m.OldNameScience(ctx)
-	case character.FieldWuXing:
-		return m.OldWuXing(ctx)
-	case character.FieldLucky:
-		return m.OldLucky(ctx)
-	case character.FieldRegular:
-		return m.OldRegular(ctx)
-	case character.FieldTraditionalCharacter:
-		return m.OldTraditionalCharacter(ctx)
-	case character.FieldVariantCharacter:
-		return m.OldVariantCharacter(ctx)
-	case character.FieldComment:
-		return m.OldComment(ctx)
+	case character.FieldSimplifiedStroke:
+		return m.OldSimplifiedStroke(ctx)
+	case character.FieldTraditionalStroke:
+		return m.OldTraditionalStroke(ctx)
+	case character.FieldKangxiStroke:
+		return m.OldKangxiStroke(ctx)
 	case character.FieldScienceStroke:
 		return m.OldScienceStroke(ctx)
+	case character.FieldWuXing:
+		return m.OldWuXing(ctx)
+	case character.FieldRegular:
+		return m.OldRegular(ctx)
+	case character.FieldCommonLevel:
+		return m.OldCommonLevel(ctx)
+	case character.FieldGenderHint:
+		return m.OldGenderHint(ctx)
+	case character.FieldNameable:
+		return m.OldNameable(ctx)
+	case character.FieldMeaning:
+		return m.OldMeaning(ctx)
+	case character.FieldSource:
+		return m.OldSource(ctx)
+	case character.FieldSourceConfidence:
+		return m.OldSourceConfidence(ctx)
+	case character.FieldComment:
+		return m.OldComment(ctx)
 	}
 	return nil, fmt.Errorf("unknown Character field %s", name)
 }
@@ -1347,19 +1773,61 @@ func (m *CharacterMutation) OldField(ctx context.Context, name string) (ent.Valu
 // type.
 func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case character.FieldPinYin:
+	case character.FieldChar:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPinYin(v)
+		m.SetChar(v)
 		return nil
-	case character.FieldCh:
+	case character.FieldUnicode:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetCh(v)
+		m.SetUnicode(v)
+		return nil
+	case character.FieldIsSimplified:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsSimplified(v)
+		return nil
+	case character.FieldIsTraditional:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsTraditional(v)
+		return nil
+	case character.FieldIsKangxi:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsKangxi(v)
+		return nil
+	case character.FieldIsVariant:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsVariant(v)
+		return nil
+	case character.FieldIsAncient:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsAncient(v)
+		return nil
+	case character.FieldPinyin:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPinyin(v)
 		return nil
 	case character.FieldRadical:
 		v, ok := value.(string)
@@ -1375,82 +1843,33 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRadicalStroke(v)
 		return nil
-	case character.FieldStroke:
+	case character.FieldSimplifiedStroke:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetStroke(v)
+		m.SetSimplifiedStroke(v)
 		return nil
-	case character.FieldIsKangXi:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIsKangXi(v)
-		return nil
-	case character.FieldKangXi:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetKangXi(v)
-		return nil
-	case character.FieldKangXiStroke:
+	case character.FieldTraditionalStroke:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetKangXiStroke(v)
+		m.SetTraditionalStroke(v)
 		return nil
-	case character.FieldSimpleRadical:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSimpleRadical(v)
-		return nil
-	case character.FieldSimpleRadicalStroke:
+	case character.FieldKangxiStroke:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetSimpleRadicalStroke(v)
+		m.SetKangxiStroke(v)
 		return nil
-	case character.FieldSimpleTotalStroke:
+	case character.FieldScienceStroke:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetSimpleTotalStroke(v)
-		return nil
-	case character.FieldTraditionalRadical:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTraditionalRadical(v)
-		return nil
-	case character.FieldTraditionalRadicalStroke:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTraditionalRadicalStroke(v)
-		return nil
-	case character.FieldTraditionalTotalStroke:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTraditionalTotalStroke(v)
-		return nil
-	case character.FieldNameScience:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetNameScience(v)
+		m.SetScienceStroke(v)
 		return nil
 	case character.FieldWuXing:
 		v, ok := value.(string)
@@ -1459,13 +1878,6 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetWuXing(v)
 		return nil
-	case character.FieldLucky:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLucky(v)
-		return nil
 	case character.FieldRegular:
 		v, ok := value.(bool)
 		if !ok {
@@ -1473,19 +1885,47 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRegular(v)
 		return nil
-	case character.FieldTraditionalCharacter:
-		v, ok := value.(string)
+	case character.FieldCommonLevel:
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTraditionalCharacter(v)
+		m.SetCommonLevel(v)
 		return nil
-	case character.FieldVariantCharacter:
+	case character.FieldGenderHint:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetVariantCharacter(v)
+		m.SetGenderHint(v)
+		return nil
+	case character.FieldNameable:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNameable(v)
+		return nil
+	case character.FieldMeaning:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMeaning(v)
+		return nil
+	case character.FieldSource:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSource(v)
+		return nil
+	case character.FieldSourceConfidence:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSourceConfidence(v)
 		return nil
 	case character.FieldComment:
 		v, ok := value.(string)
@@ -1493,13 +1933,6 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetComment(v)
-		return nil
-	case character.FieldScienceStroke:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetScienceStroke(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Character field %s", name)
@@ -1512,26 +1945,23 @@ func (m *CharacterMutation) AddedFields() []string {
 	if m.addradical_stroke != nil {
 		fields = append(fields, character.FieldRadicalStroke)
 	}
-	if m.addstroke != nil {
-		fields = append(fields, character.FieldStroke)
+	if m.addsimplified_stroke != nil {
+		fields = append(fields, character.FieldSimplifiedStroke)
 	}
-	if m.addkang_xi_stroke != nil {
-		fields = append(fields, character.FieldKangXiStroke)
+	if m.addtraditional_stroke != nil {
+		fields = append(fields, character.FieldTraditionalStroke)
 	}
-	if m.addsimple_radical_stroke != nil {
-		fields = append(fields, character.FieldSimpleRadicalStroke)
-	}
-	if m.addsimple_total_stroke != nil {
-		fields = append(fields, character.FieldSimpleTotalStroke)
-	}
-	if m.addtraditional_radical_stroke != nil {
-		fields = append(fields, character.FieldTraditionalRadicalStroke)
-	}
-	if m.addtraditional_total_stroke != nil {
-		fields = append(fields, character.FieldTraditionalTotalStroke)
+	if m.addkangxi_stroke != nil {
+		fields = append(fields, character.FieldKangxiStroke)
 	}
 	if m.addscience_stroke != nil {
 		fields = append(fields, character.FieldScienceStroke)
+	}
+	if m.addcommon_level != nil {
+		fields = append(fields, character.FieldCommonLevel)
+	}
+	if m.addsource_confidence != nil {
+		fields = append(fields, character.FieldSourceConfidence)
 	}
 	return fields
 }
@@ -1543,20 +1973,18 @@ func (m *CharacterMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case character.FieldRadicalStroke:
 		return m.AddedRadicalStroke()
-	case character.FieldStroke:
-		return m.AddedStroke()
-	case character.FieldKangXiStroke:
-		return m.AddedKangXiStroke()
-	case character.FieldSimpleRadicalStroke:
-		return m.AddedSimpleRadicalStroke()
-	case character.FieldSimpleTotalStroke:
-		return m.AddedSimpleTotalStroke()
-	case character.FieldTraditionalRadicalStroke:
-		return m.AddedTraditionalRadicalStroke()
-	case character.FieldTraditionalTotalStroke:
-		return m.AddedTraditionalTotalStroke()
+	case character.FieldSimplifiedStroke:
+		return m.AddedSimplifiedStroke()
+	case character.FieldTraditionalStroke:
+		return m.AddedTraditionalStroke()
+	case character.FieldKangxiStroke:
+		return m.AddedKangxiStroke()
 	case character.FieldScienceStroke:
 		return m.AddedScienceStroke()
+	case character.FieldCommonLevel:
+		return m.AddedCommonLevel()
+	case character.FieldSourceConfidence:
+		return m.AddedSourceConfidence()
 	}
 	return nil, false
 }
@@ -1573,47 +2001,26 @@ func (m *CharacterMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddRadicalStroke(v)
 		return nil
-	case character.FieldStroke:
+	case character.FieldSimplifiedStroke:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddStroke(v)
+		m.AddSimplifiedStroke(v)
 		return nil
-	case character.FieldKangXiStroke:
+	case character.FieldTraditionalStroke:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddKangXiStroke(v)
+		m.AddTraditionalStroke(v)
 		return nil
-	case character.FieldSimpleRadicalStroke:
+	case character.FieldKangxiStroke:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddSimpleRadicalStroke(v)
-		return nil
-	case character.FieldSimpleTotalStroke:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddSimpleTotalStroke(v)
-		return nil
-	case character.FieldTraditionalRadicalStroke:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddTraditionalRadicalStroke(v)
-		return nil
-	case character.FieldTraditionalTotalStroke:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddTraditionalTotalStroke(v)
+		m.AddKangxiStroke(v)
 		return nil
 	case character.FieldScienceStroke:
 		v, ok := value.(int)
@@ -1622,6 +2029,20 @@ func (m *CharacterMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddScienceStroke(v)
 		return nil
+	case character.FieldCommonLevel:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCommonLevel(v)
+		return nil
+	case character.FieldSourceConfidence:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSourceConfidence(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Character numeric field %s", name)
 }
@@ -1629,7 +2050,53 @@ func (m *CharacterMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *CharacterMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(character.FieldUnicode) {
+		fields = append(fields, character.FieldUnicode)
+	}
+	if m.FieldCleared(character.FieldPinyin) {
+		fields = append(fields, character.FieldPinyin)
+	}
+	if m.FieldCleared(character.FieldRadical) {
+		fields = append(fields, character.FieldRadical)
+	}
+	if m.FieldCleared(character.FieldRadicalStroke) {
+		fields = append(fields, character.FieldRadicalStroke)
+	}
+	if m.FieldCleared(character.FieldSimplifiedStroke) {
+		fields = append(fields, character.FieldSimplifiedStroke)
+	}
+	if m.FieldCleared(character.FieldTraditionalStroke) {
+		fields = append(fields, character.FieldTraditionalStroke)
+	}
+	if m.FieldCleared(character.FieldKangxiStroke) {
+		fields = append(fields, character.FieldKangxiStroke)
+	}
+	if m.FieldCleared(character.FieldScienceStroke) {
+		fields = append(fields, character.FieldScienceStroke)
+	}
+	if m.FieldCleared(character.FieldWuXing) {
+		fields = append(fields, character.FieldWuXing)
+	}
+	if m.FieldCleared(character.FieldCommonLevel) {
+		fields = append(fields, character.FieldCommonLevel)
+	}
+	if m.FieldCleared(character.FieldGenderHint) {
+		fields = append(fields, character.FieldGenderHint)
+	}
+	if m.FieldCleared(character.FieldMeaning) {
+		fields = append(fields, character.FieldMeaning)
+	}
+	if m.FieldCleared(character.FieldSource) {
+		fields = append(fields, character.FieldSource)
+	}
+	if m.FieldCleared(character.FieldSourceConfidence) {
+		fields = append(fields, character.FieldSourceConfidence)
+	}
+	if m.FieldCleared(character.FieldComment) {
+		fields = append(fields, character.FieldComment)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1642,6 +2109,53 @@ func (m *CharacterMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *CharacterMutation) ClearField(name string) error {
+	switch name {
+	case character.FieldUnicode:
+		m.ClearUnicode()
+		return nil
+	case character.FieldPinyin:
+		m.ClearPinyin()
+		return nil
+	case character.FieldRadical:
+		m.ClearRadical()
+		return nil
+	case character.FieldRadicalStroke:
+		m.ClearRadicalStroke()
+		return nil
+	case character.FieldSimplifiedStroke:
+		m.ClearSimplifiedStroke()
+		return nil
+	case character.FieldTraditionalStroke:
+		m.ClearTraditionalStroke()
+		return nil
+	case character.FieldKangxiStroke:
+		m.ClearKangxiStroke()
+		return nil
+	case character.FieldScienceStroke:
+		m.ClearScienceStroke()
+		return nil
+	case character.FieldWuXing:
+		m.ClearWuXing()
+		return nil
+	case character.FieldCommonLevel:
+		m.ClearCommonLevel()
+		return nil
+	case character.FieldGenderHint:
+		m.ClearGenderHint()
+		return nil
+	case character.FieldMeaning:
+		m.ClearMeaning()
+		return nil
+	case character.FieldSource:
+		m.ClearSource()
+		return nil
+	case character.FieldSourceConfidence:
+		m.ClearSourceConfidence()
+		return nil
+	case character.FieldComment:
+		m.ClearComment()
+		return nil
+	}
 	return fmt.Errorf("unknown Character nullable field %s", name)
 }
 
@@ -1649,11 +2163,29 @@ func (m *CharacterMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *CharacterMutation) ResetField(name string) error {
 	switch name {
-	case character.FieldPinYin:
-		m.ResetPinYin()
+	case character.FieldChar:
+		m.ResetChar()
 		return nil
-	case character.FieldCh:
-		m.ResetCh()
+	case character.FieldUnicode:
+		m.ResetUnicode()
+		return nil
+	case character.FieldIsSimplified:
+		m.ResetIsSimplified()
+		return nil
+	case character.FieldIsTraditional:
+		m.ResetIsTraditional()
+		return nil
+	case character.FieldIsKangxi:
+		m.ResetIsKangxi()
+		return nil
+	case character.FieldIsVariant:
+		m.ResetIsVariant()
+		return nil
+	case character.FieldIsAncient:
+		m.ResetIsAncient()
+		return nil
+	case character.FieldPinyin:
+		m.ResetPinyin()
 		return nil
 	case character.FieldRadical:
 		m.ResetRadical()
@@ -1661,59 +2193,44 @@ func (m *CharacterMutation) ResetField(name string) error {
 	case character.FieldRadicalStroke:
 		m.ResetRadicalStroke()
 		return nil
-	case character.FieldStroke:
-		m.ResetStroke()
+	case character.FieldSimplifiedStroke:
+		m.ResetSimplifiedStroke()
 		return nil
-	case character.FieldIsKangXi:
-		m.ResetIsKangXi()
+	case character.FieldTraditionalStroke:
+		m.ResetTraditionalStroke()
 		return nil
-	case character.FieldKangXi:
-		m.ResetKangXi()
+	case character.FieldKangxiStroke:
+		m.ResetKangxiStroke()
 		return nil
-	case character.FieldKangXiStroke:
-		m.ResetKangXiStroke()
-		return nil
-	case character.FieldSimpleRadical:
-		m.ResetSimpleRadical()
-		return nil
-	case character.FieldSimpleRadicalStroke:
-		m.ResetSimpleRadicalStroke()
-		return nil
-	case character.FieldSimpleTotalStroke:
-		m.ResetSimpleTotalStroke()
-		return nil
-	case character.FieldTraditionalRadical:
-		m.ResetTraditionalRadical()
-		return nil
-	case character.FieldTraditionalRadicalStroke:
-		m.ResetTraditionalRadicalStroke()
-		return nil
-	case character.FieldTraditionalTotalStroke:
-		m.ResetTraditionalTotalStroke()
-		return nil
-	case character.FieldNameScience:
-		m.ResetNameScience()
+	case character.FieldScienceStroke:
+		m.ResetScienceStroke()
 		return nil
 	case character.FieldWuXing:
 		m.ResetWuXing()
 		return nil
-	case character.FieldLucky:
-		m.ResetLucky()
-		return nil
 	case character.FieldRegular:
 		m.ResetRegular()
 		return nil
-	case character.FieldTraditionalCharacter:
-		m.ResetTraditionalCharacter()
+	case character.FieldCommonLevel:
+		m.ResetCommonLevel()
 		return nil
-	case character.FieldVariantCharacter:
-		m.ResetVariantCharacter()
+	case character.FieldGenderHint:
+		m.ResetGenderHint()
+		return nil
+	case character.FieldNameable:
+		m.ResetNameable()
+		return nil
+	case character.FieldMeaning:
+		m.ResetMeaning()
+		return nil
+	case character.FieldSource:
+		m.ResetSource()
+		return nil
+	case character.FieldSourceConfidence:
+		m.ResetSourceConfidence()
 		return nil
 	case character.FieldComment:
 		m.ResetComment()
-		return nil
-	case character.FieldScienceStroke:
-		m.ResetScienceStroke()
 		return nil
 	}
 	return fmt.Errorf("unknown Character field %s", name)
@@ -1721,50 +2238,1826 @@ func (m *CharacterMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CharacterMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 4)
+	if m.simplified_of != nil {
+		edges = append(edges, character.EdgeSimplifiedOf)
+	}
+	if m.traditional_to_simplified != nil {
+		edges = append(edges, character.EdgeTraditionalToSimplified)
+	}
+	if m.variant_of != nil {
+		edges = append(edges, character.EdgeVariantOf)
+	}
+	if m.standard_to_variant != nil {
+		edges = append(edges, character.EdgeStandardToVariant)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *CharacterMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case character.EdgeSimplifiedOf:
+		if id := m.simplified_of; id != nil {
+			return []ent.Value{*id}
+		}
+	case character.EdgeTraditionalToSimplified:
+		if id := m.traditional_to_simplified; id != nil {
+			return []ent.Value{*id}
+		}
+	case character.EdgeVariantOf:
+		if id := m.variant_of; id != nil {
+			return []ent.Value{*id}
+		}
+	case character.EdgeStandardToVariant:
+		ids := make([]ent.Value, 0, len(m.standard_to_variant))
+		for id := range m.standard_to_variant {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CharacterMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 4)
+	if m.removedstandard_to_variant != nil {
+		edges = append(edges, character.EdgeStandardToVariant)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *CharacterMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case character.EdgeStandardToVariant:
+		ids := make([]ent.Value, 0, len(m.removedstandard_to_variant))
+		for id := range m.removedstandard_to_variant {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CharacterMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 4)
+	if m.clearedsimplified_of {
+		edges = append(edges, character.EdgeSimplifiedOf)
+	}
+	if m.clearedtraditional_to_simplified {
+		edges = append(edges, character.EdgeTraditionalToSimplified)
+	}
+	if m.clearedvariant_of {
+		edges = append(edges, character.EdgeVariantOf)
+	}
+	if m.clearedstandard_to_variant {
+		edges = append(edges, character.EdgeStandardToVariant)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *CharacterMutation) EdgeCleared(name string) bool {
+	switch name {
+	case character.EdgeSimplifiedOf:
+		return m.clearedsimplified_of
+	case character.EdgeTraditionalToSimplified:
+		return m.clearedtraditional_to_simplified
+	case character.EdgeVariantOf:
+		return m.clearedvariant_of
+	case character.EdgeStandardToVariant:
+		return m.clearedstandard_to_variant
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *CharacterMutation) ClearEdge(name string) error {
+	switch name {
+	case character.EdgeSimplifiedOf:
+		m.ClearSimplifiedOf()
+		return nil
+	case character.EdgeTraditionalToSimplified:
+		m.ClearTraditionalToSimplified()
+		return nil
+	case character.EdgeVariantOf:
+		m.ClearVariantOf()
+		return nil
+	}
 	return fmt.Errorf("unknown Character unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *CharacterMutation) ResetEdge(name string) error {
+	switch name {
+	case character.EdgeSimplifiedOf:
+		m.ResetSimplifiedOf()
+		return nil
+	case character.EdgeTraditionalToSimplified:
+		m.ResetTraditionalToSimplified()
+		return nil
+	case character.EdgeVariantOf:
+		m.ResetVariantOf()
+		return nil
+	case character.EdgeStandardToVariant:
+		m.ResetStandardToVariant()
+		return nil
+	}
 	return fmt.Errorf("unknown Character edge %s", name)
+}
+
+// PoemMutation represents an operation that mutates the Poem nodes in the graph.
+type PoemMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *int
+	title             *string
+	author            *string
+	dynasty           *string
+	content           *string
+	preface           *string
+	keywords          *[]string
+	appendkeywords    []string
+	tags              *[]string
+	appendtags        []string
+	_type             *poem.Type
+	source            *string
+	clearedFields     map[string]struct{}
+	poem_chars        map[int]struct{}
+	removedpoem_chars map[int]struct{}
+	clearedpoem_chars bool
+	done              bool
+	oldValue          func(context.Context) (*Poem, error)
+	predicates        []predicate.Poem
+}
+
+var _ ent.Mutation = (*PoemMutation)(nil)
+
+// poemOption allows management of the mutation configuration using functional options.
+type poemOption func(*PoemMutation)
+
+// newPoemMutation creates new mutation for the Poem entity.
+func newPoemMutation(c config, op Op, opts ...poemOption) *PoemMutation {
+	m := &PoemMutation{
+		config:        c,
+		op:            op,
+		typ:           TypePoem,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withPoemID sets the ID field of the mutation.
+func withPoemID(id int) poemOption {
+	return func(m *PoemMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Poem
+		)
+		m.oldValue = func(ctx context.Context) (*Poem, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Poem.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withPoem sets the old Poem of the mutation.
+func withPoem(node *Poem) poemOption {
+	return func(m *PoemMutation) {
+		m.oldValue = func(context.Context) (*Poem, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m PoemMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m PoemMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Poem entities.
+func (m *PoemMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *PoemMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *PoemMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Poem.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTitle sets the "title" field.
+func (m *PoemMutation) SetTitle(s string) {
+	m.title = &s
+}
+
+// Title returns the value of the "title" field in the mutation.
+func (m *PoemMutation) Title() (r string, exists bool) {
+	v := m.title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "title" field's value of the Poem entity.
+// If the Poem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ResetTitle resets all changes to the "title" field.
+func (m *PoemMutation) ResetTitle() {
+	m.title = nil
+}
+
+// SetAuthor sets the "author" field.
+func (m *PoemMutation) SetAuthor(s string) {
+	m.author = &s
+}
+
+// Author returns the value of the "author" field in the mutation.
+func (m *PoemMutation) Author() (r string, exists bool) {
+	v := m.author
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAuthor returns the old "author" field's value of the Poem entity.
+// If the Poem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemMutation) OldAuthor(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAuthor is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAuthor requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAuthor: %w", err)
+	}
+	return oldValue.Author, nil
+}
+
+// ClearAuthor clears the value of the "author" field.
+func (m *PoemMutation) ClearAuthor() {
+	m.author = nil
+	m.clearedFields[poem.FieldAuthor] = struct{}{}
+}
+
+// AuthorCleared returns if the "author" field was cleared in this mutation.
+func (m *PoemMutation) AuthorCleared() bool {
+	_, ok := m.clearedFields[poem.FieldAuthor]
+	return ok
+}
+
+// ResetAuthor resets all changes to the "author" field.
+func (m *PoemMutation) ResetAuthor() {
+	m.author = nil
+	delete(m.clearedFields, poem.FieldAuthor)
+}
+
+// SetDynasty sets the "dynasty" field.
+func (m *PoemMutation) SetDynasty(s string) {
+	m.dynasty = &s
+}
+
+// Dynasty returns the value of the "dynasty" field in the mutation.
+func (m *PoemMutation) Dynasty() (r string, exists bool) {
+	v := m.dynasty
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDynasty returns the old "dynasty" field's value of the Poem entity.
+// If the Poem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemMutation) OldDynasty(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDynasty is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDynasty requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDynasty: %w", err)
+	}
+	return oldValue.Dynasty, nil
+}
+
+// ClearDynasty clears the value of the "dynasty" field.
+func (m *PoemMutation) ClearDynasty() {
+	m.dynasty = nil
+	m.clearedFields[poem.FieldDynasty] = struct{}{}
+}
+
+// DynastyCleared returns if the "dynasty" field was cleared in this mutation.
+func (m *PoemMutation) DynastyCleared() bool {
+	_, ok := m.clearedFields[poem.FieldDynasty]
+	return ok
+}
+
+// ResetDynasty resets all changes to the "dynasty" field.
+func (m *PoemMutation) ResetDynasty() {
+	m.dynasty = nil
+	delete(m.clearedFields, poem.FieldDynasty)
+}
+
+// SetContent sets the "content" field.
+func (m *PoemMutation) SetContent(s string) {
+	m.content = &s
+}
+
+// Content returns the value of the "content" field in the mutation.
+func (m *PoemMutation) Content() (r string, exists bool) {
+	v := m.content
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContent returns the old "content" field's value of the Poem entity.
+// If the Poem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemMutation) OldContent(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContent: %w", err)
+	}
+	return oldValue.Content, nil
+}
+
+// ResetContent resets all changes to the "content" field.
+func (m *PoemMutation) ResetContent() {
+	m.content = nil
+}
+
+// SetPreface sets the "preface" field.
+func (m *PoemMutation) SetPreface(s string) {
+	m.preface = &s
+}
+
+// Preface returns the value of the "preface" field in the mutation.
+func (m *PoemMutation) Preface() (r string, exists bool) {
+	v := m.preface
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPreface returns the old "preface" field's value of the Poem entity.
+// If the Poem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemMutation) OldPreface(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPreface is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPreface requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPreface: %w", err)
+	}
+	return oldValue.Preface, nil
+}
+
+// ClearPreface clears the value of the "preface" field.
+func (m *PoemMutation) ClearPreface() {
+	m.preface = nil
+	m.clearedFields[poem.FieldPreface] = struct{}{}
+}
+
+// PrefaceCleared returns if the "preface" field was cleared in this mutation.
+func (m *PoemMutation) PrefaceCleared() bool {
+	_, ok := m.clearedFields[poem.FieldPreface]
+	return ok
+}
+
+// ResetPreface resets all changes to the "preface" field.
+func (m *PoemMutation) ResetPreface() {
+	m.preface = nil
+	delete(m.clearedFields, poem.FieldPreface)
+}
+
+// SetKeywords sets the "keywords" field.
+func (m *PoemMutation) SetKeywords(s []string) {
+	m.keywords = &s
+	m.appendkeywords = nil
+}
+
+// Keywords returns the value of the "keywords" field in the mutation.
+func (m *PoemMutation) Keywords() (r []string, exists bool) {
+	v := m.keywords
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKeywords returns the old "keywords" field's value of the Poem entity.
+// If the Poem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemMutation) OldKeywords(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKeywords is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKeywords requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKeywords: %w", err)
+	}
+	return oldValue.Keywords, nil
+}
+
+// AppendKeywords adds s to the "keywords" field.
+func (m *PoemMutation) AppendKeywords(s []string) {
+	m.appendkeywords = append(m.appendkeywords, s...)
+}
+
+// AppendedKeywords returns the list of values that were appended to the "keywords" field in this mutation.
+func (m *PoemMutation) AppendedKeywords() ([]string, bool) {
+	if len(m.appendkeywords) == 0 {
+		return nil, false
+	}
+	return m.appendkeywords, true
+}
+
+// ClearKeywords clears the value of the "keywords" field.
+func (m *PoemMutation) ClearKeywords() {
+	m.keywords = nil
+	m.appendkeywords = nil
+	m.clearedFields[poem.FieldKeywords] = struct{}{}
+}
+
+// KeywordsCleared returns if the "keywords" field was cleared in this mutation.
+func (m *PoemMutation) KeywordsCleared() bool {
+	_, ok := m.clearedFields[poem.FieldKeywords]
+	return ok
+}
+
+// ResetKeywords resets all changes to the "keywords" field.
+func (m *PoemMutation) ResetKeywords() {
+	m.keywords = nil
+	m.appendkeywords = nil
+	delete(m.clearedFields, poem.FieldKeywords)
+}
+
+// SetTags sets the "tags" field.
+func (m *PoemMutation) SetTags(s []string) {
+	m.tags = &s
+	m.appendtags = nil
+}
+
+// Tags returns the value of the "tags" field in the mutation.
+func (m *PoemMutation) Tags() (r []string, exists bool) {
+	v := m.tags
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTags returns the old "tags" field's value of the Poem entity.
+// If the Poem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemMutation) OldTags(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTags is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTags requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTags: %w", err)
+	}
+	return oldValue.Tags, nil
+}
+
+// AppendTags adds s to the "tags" field.
+func (m *PoemMutation) AppendTags(s []string) {
+	m.appendtags = append(m.appendtags, s...)
+}
+
+// AppendedTags returns the list of values that were appended to the "tags" field in this mutation.
+func (m *PoemMutation) AppendedTags() ([]string, bool) {
+	if len(m.appendtags) == 0 {
+		return nil, false
+	}
+	return m.appendtags, true
+}
+
+// ClearTags clears the value of the "tags" field.
+func (m *PoemMutation) ClearTags() {
+	m.tags = nil
+	m.appendtags = nil
+	m.clearedFields[poem.FieldTags] = struct{}{}
+}
+
+// TagsCleared returns if the "tags" field was cleared in this mutation.
+func (m *PoemMutation) TagsCleared() bool {
+	_, ok := m.clearedFields[poem.FieldTags]
+	return ok
+}
+
+// ResetTags resets all changes to the "tags" field.
+func (m *PoemMutation) ResetTags() {
+	m.tags = nil
+	m.appendtags = nil
+	delete(m.clearedFields, poem.FieldTags)
+}
+
+// SetType sets the "type" field.
+func (m *PoemMutation) SetType(po poem.Type) {
+	m._type = &po
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *PoemMutation) GetType() (r poem.Type, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the Poem entity.
+// If the Poem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemMutation) OldType(ctx context.Context) (v poem.Type, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *PoemMutation) ResetType() {
+	m._type = nil
+}
+
+// SetSource sets the "source" field.
+func (m *PoemMutation) SetSource(s string) {
+	m.source = &s
+}
+
+// Source returns the value of the "source" field in the mutation.
+func (m *PoemMutation) Source() (r string, exists bool) {
+	v := m.source
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSource returns the old "source" field's value of the Poem entity.
+// If the Poem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemMutation) OldSource(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSource is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSource requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSource: %w", err)
+	}
+	return oldValue.Source, nil
+}
+
+// ClearSource clears the value of the "source" field.
+func (m *PoemMutation) ClearSource() {
+	m.source = nil
+	m.clearedFields[poem.FieldSource] = struct{}{}
+}
+
+// SourceCleared returns if the "source" field was cleared in this mutation.
+func (m *PoemMutation) SourceCleared() bool {
+	_, ok := m.clearedFields[poem.FieldSource]
+	return ok
+}
+
+// ResetSource resets all changes to the "source" field.
+func (m *PoemMutation) ResetSource() {
+	m.source = nil
+	delete(m.clearedFields, poem.FieldSource)
+}
+
+// AddPoemCharIDs adds the "poem_chars" edge to the PoemChar entity by ids.
+func (m *PoemMutation) AddPoemCharIDs(ids ...int) {
+	if m.poem_chars == nil {
+		m.poem_chars = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.poem_chars[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPoemChars clears the "poem_chars" edge to the PoemChar entity.
+func (m *PoemMutation) ClearPoemChars() {
+	m.clearedpoem_chars = true
+}
+
+// PoemCharsCleared reports if the "poem_chars" edge to the PoemChar entity was cleared.
+func (m *PoemMutation) PoemCharsCleared() bool {
+	return m.clearedpoem_chars
+}
+
+// RemovePoemCharIDs removes the "poem_chars" edge to the PoemChar entity by IDs.
+func (m *PoemMutation) RemovePoemCharIDs(ids ...int) {
+	if m.removedpoem_chars == nil {
+		m.removedpoem_chars = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.poem_chars, ids[i])
+		m.removedpoem_chars[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPoemChars returns the removed IDs of the "poem_chars" edge to the PoemChar entity.
+func (m *PoemMutation) RemovedPoemCharsIDs() (ids []int) {
+	for id := range m.removedpoem_chars {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PoemCharsIDs returns the "poem_chars" edge IDs in the mutation.
+func (m *PoemMutation) PoemCharsIDs() (ids []int) {
+	for id := range m.poem_chars {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPoemChars resets all changes to the "poem_chars" edge.
+func (m *PoemMutation) ResetPoemChars() {
+	m.poem_chars = nil
+	m.clearedpoem_chars = false
+	m.removedpoem_chars = nil
+}
+
+// Where appends a list predicates to the PoemMutation builder.
+func (m *PoemMutation) Where(ps ...predicate.Poem) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the PoemMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *PoemMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Poem, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *PoemMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *PoemMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Poem).
+func (m *PoemMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *PoemMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.title != nil {
+		fields = append(fields, poem.FieldTitle)
+	}
+	if m.author != nil {
+		fields = append(fields, poem.FieldAuthor)
+	}
+	if m.dynasty != nil {
+		fields = append(fields, poem.FieldDynasty)
+	}
+	if m.content != nil {
+		fields = append(fields, poem.FieldContent)
+	}
+	if m.preface != nil {
+		fields = append(fields, poem.FieldPreface)
+	}
+	if m.keywords != nil {
+		fields = append(fields, poem.FieldKeywords)
+	}
+	if m.tags != nil {
+		fields = append(fields, poem.FieldTags)
+	}
+	if m._type != nil {
+		fields = append(fields, poem.FieldType)
+	}
+	if m.source != nil {
+		fields = append(fields, poem.FieldSource)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *PoemMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case poem.FieldTitle:
+		return m.Title()
+	case poem.FieldAuthor:
+		return m.Author()
+	case poem.FieldDynasty:
+		return m.Dynasty()
+	case poem.FieldContent:
+		return m.Content()
+	case poem.FieldPreface:
+		return m.Preface()
+	case poem.FieldKeywords:
+		return m.Keywords()
+	case poem.FieldTags:
+		return m.Tags()
+	case poem.FieldType:
+		return m.GetType()
+	case poem.FieldSource:
+		return m.Source()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *PoemMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case poem.FieldTitle:
+		return m.OldTitle(ctx)
+	case poem.FieldAuthor:
+		return m.OldAuthor(ctx)
+	case poem.FieldDynasty:
+		return m.OldDynasty(ctx)
+	case poem.FieldContent:
+		return m.OldContent(ctx)
+	case poem.FieldPreface:
+		return m.OldPreface(ctx)
+	case poem.FieldKeywords:
+		return m.OldKeywords(ctx)
+	case poem.FieldTags:
+		return m.OldTags(ctx)
+	case poem.FieldType:
+		return m.OldType(ctx)
+	case poem.FieldSource:
+		return m.OldSource(ctx)
+	}
+	return nil, fmt.Errorf("unknown Poem field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PoemMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case poem.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case poem.FieldAuthor:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAuthor(v)
+		return nil
+	case poem.FieldDynasty:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDynasty(v)
+		return nil
+	case poem.FieldContent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContent(v)
+		return nil
+	case poem.FieldPreface:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPreface(v)
+		return nil
+	case poem.FieldKeywords:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKeywords(v)
+		return nil
+	case poem.FieldTags:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTags(v)
+		return nil
+	case poem.FieldType:
+		v, ok := value.(poem.Type)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
+		return nil
+	case poem.FieldSource:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSource(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Poem field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *PoemMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *PoemMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PoemMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Poem numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *PoemMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(poem.FieldAuthor) {
+		fields = append(fields, poem.FieldAuthor)
+	}
+	if m.FieldCleared(poem.FieldDynasty) {
+		fields = append(fields, poem.FieldDynasty)
+	}
+	if m.FieldCleared(poem.FieldPreface) {
+		fields = append(fields, poem.FieldPreface)
+	}
+	if m.FieldCleared(poem.FieldKeywords) {
+		fields = append(fields, poem.FieldKeywords)
+	}
+	if m.FieldCleared(poem.FieldTags) {
+		fields = append(fields, poem.FieldTags)
+	}
+	if m.FieldCleared(poem.FieldSource) {
+		fields = append(fields, poem.FieldSource)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *PoemMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *PoemMutation) ClearField(name string) error {
+	switch name {
+	case poem.FieldAuthor:
+		m.ClearAuthor()
+		return nil
+	case poem.FieldDynasty:
+		m.ClearDynasty()
+		return nil
+	case poem.FieldPreface:
+		m.ClearPreface()
+		return nil
+	case poem.FieldKeywords:
+		m.ClearKeywords()
+		return nil
+	case poem.FieldTags:
+		m.ClearTags()
+		return nil
+	case poem.FieldSource:
+		m.ClearSource()
+		return nil
+	}
+	return fmt.Errorf("unknown Poem nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *PoemMutation) ResetField(name string) error {
+	switch name {
+	case poem.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case poem.FieldAuthor:
+		m.ResetAuthor()
+		return nil
+	case poem.FieldDynasty:
+		m.ResetDynasty()
+		return nil
+	case poem.FieldContent:
+		m.ResetContent()
+		return nil
+	case poem.FieldPreface:
+		m.ResetPreface()
+		return nil
+	case poem.FieldKeywords:
+		m.ResetKeywords()
+		return nil
+	case poem.FieldTags:
+		m.ResetTags()
+		return nil
+	case poem.FieldType:
+		m.ResetType()
+		return nil
+	case poem.FieldSource:
+		m.ResetSource()
+		return nil
+	}
+	return fmt.Errorf("unknown Poem field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *PoemMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.poem_chars != nil {
+		edges = append(edges, poem.EdgePoemChars)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *PoemMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case poem.EdgePoemChars:
+		ids := make([]ent.Value, 0, len(m.poem_chars))
+		for id := range m.poem_chars {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *PoemMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedpoem_chars != nil {
+		edges = append(edges, poem.EdgePoemChars)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *PoemMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case poem.EdgePoemChars:
+		ids := make([]ent.Value, 0, len(m.removedpoem_chars))
+		for id := range m.removedpoem_chars {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *PoemMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedpoem_chars {
+		edges = append(edges, poem.EdgePoemChars)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *PoemMutation) EdgeCleared(name string) bool {
+	switch name {
+	case poem.EdgePoemChars:
+		return m.clearedpoem_chars
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *PoemMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Poem unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *PoemMutation) ResetEdge(name string) error {
+	switch name {
+	case poem.EdgePoemChars:
+		m.ResetPoemChars()
+		return nil
+	}
+	return fmt.Errorf("unknown Poem edge %s", name)
+}
+
+// PoemCharMutation represents an operation that mutates the PoemChar nodes in the graph.
+type PoemCharMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	char          *string
+	position      *int
+	addposition   *int
+	sentence      *string
+	context       *string
+	clearedFields map[string]struct{}
+	poem          *int
+	clearedpoem   bool
+	done          bool
+	oldValue      func(context.Context) (*PoemChar, error)
+	predicates    []predicate.PoemChar
+}
+
+var _ ent.Mutation = (*PoemCharMutation)(nil)
+
+// poemcharOption allows management of the mutation configuration using functional options.
+type poemcharOption func(*PoemCharMutation)
+
+// newPoemCharMutation creates new mutation for the PoemChar entity.
+func newPoemCharMutation(c config, op Op, opts ...poemcharOption) *PoemCharMutation {
+	m := &PoemCharMutation{
+		config:        c,
+		op:            op,
+		typ:           TypePoemChar,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withPoemCharID sets the ID field of the mutation.
+func withPoemCharID(id int) poemcharOption {
+	return func(m *PoemCharMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *PoemChar
+		)
+		m.oldValue = func(ctx context.Context) (*PoemChar, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().PoemChar.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withPoemChar sets the old PoemChar of the mutation.
+func withPoemChar(node *PoemChar) poemcharOption {
+	return func(m *PoemCharMutation) {
+		m.oldValue = func(context.Context) (*PoemChar, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m PoemCharMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m PoemCharMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of PoemChar entities.
+func (m *PoemCharMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *PoemCharMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *PoemCharMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().PoemChar.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetPoemID sets the "poem_id" field.
+func (m *PoemCharMutation) SetPoemID(i int) {
+	m.poem = &i
+}
+
+// PoemID returns the value of the "poem_id" field in the mutation.
+func (m *PoemCharMutation) PoemID() (r int, exists bool) {
+	v := m.poem
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPoemID returns the old "poem_id" field's value of the PoemChar entity.
+// If the PoemChar object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemCharMutation) OldPoemID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPoemID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPoemID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPoemID: %w", err)
+	}
+	return oldValue.PoemID, nil
+}
+
+// ResetPoemID resets all changes to the "poem_id" field.
+func (m *PoemCharMutation) ResetPoemID() {
+	m.poem = nil
+}
+
+// SetChar sets the "char" field.
+func (m *PoemCharMutation) SetChar(s string) {
+	m.char = &s
+}
+
+// Char returns the value of the "char" field in the mutation.
+func (m *PoemCharMutation) Char() (r string, exists bool) {
+	v := m.char
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChar returns the old "char" field's value of the PoemChar entity.
+// If the PoemChar object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemCharMutation) OldChar(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChar is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChar requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChar: %w", err)
+	}
+	return oldValue.Char, nil
+}
+
+// ResetChar resets all changes to the "char" field.
+func (m *PoemCharMutation) ResetChar() {
+	m.char = nil
+}
+
+// SetPosition sets the "position" field.
+func (m *PoemCharMutation) SetPosition(i int) {
+	m.position = &i
+	m.addposition = nil
+}
+
+// Position returns the value of the "position" field in the mutation.
+func (m *PoemCharMutation) Position() (r int, exists bool) {
+	v := m.position
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPosition returns the old "position" field's value of the PoemChar entity.
+// If the PoemChar object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemCharMutation) OldPosition(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPosition is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPosition requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPosition: %w", err)
+	}
+	return oldValue.Position, nil
+}
+
+// AddPosition adds i to the "position" field.
+func (m *PoemCharMutation) AddPosition(i int) {
+	if m.addposition != nil {
+		*m.addposition += i
+	} else {
+		m.addposition = &i
+	}
+}
+
+// AddedPosition returns the value that was added to the "position" field in this mutation.
+func (m *PoemCharMutation) AddedPosition() (r int, exists bool) {
+	v := m.addposition
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPosition resets all changes to the "position" field.
+func (m *PoemCharMutation) ResetPosition() {
+	m.position = nil
+	m.addposition = nil
+}
+
+// SetSentence sets the "sentence" field.
+func (m *PoemCharMutation) SetSentence(s string) {
+	m.sentence = &s
+}
+
+// Sentence returns the value of the "sentence" field in the mutation.
+func (m *PoemCharMutation) Sentence() (r string, exists bool) {
+	v := m.sentence
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSentence returns the old "sentence" field's value of the PoemChar entity.
+// If the PoemChar object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemCharMutation) OldSentence(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSentence is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSentence requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSentence: %w", err)
+	}
+	return oldValue.Sentence, nil
+}
+
+// ClearSentence clears the value of the "sentence" field.
+func (m *PoemCharMutation) ClearSentence() {
+	m.sentence = nil
+	m.clearedFields[poemchar.FieldSentence] = struct{}{}
+}
+
+// SentenceCleared returns if the "sentence" field was cleared in this mutation.
+func (m *PoemCharMutation) SentenceCleared() bool {
+	_, ok := m.clearedFields[poemchar.FieldSentence]
+	return ok
+}
+
+// ResetSentence resets all changes to the "sentence" field.
+func (m *PoemCharMutation) ResetSentence() {
+	m.sentence = nil
+	delete(m.clearedFields, poemchar.FieldSentence)
+}
+
+// SetContext sets the "context" field.
+func (m *PoemCharMutation) SetContext(s string) {
+	m.context = &s
+}
+
+// Context returns the value of the "context" field in the mutation.
+func (m *PoemCharMutation) Context() (r string, exists bool) {
+	v := m.context
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContext returns the old "context" field's value of the PoemChar entity.
+// If the PoemChar object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PoemCharMutation) OldContext(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContext is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContext requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContext: %w", err)
+	}
+	return oldValue.Context, nil
+}
+
+// ClearContext clears the value of the "context" field.
+func (m *PoemCharMutation) ClearContext() {
+	m.context = nil
+	m.clearedFields[poemchar.FieldContext] = struct{}{}
+}
+
+// ContextCleared returns if the "context" field was cleared in this mutation.
+func (m *PoemCharMutation) ContextCleared() bool {
+	_, ok := m.clearedFields[poemchar.FieldContext]
+	return ok
+}
+
+// ResetContext resets all changes to the "context" field.
+func (m *PoemCharMutation) ResetContext() {
+	m.context = nil
+	delete(m.clearedFields, poemchar.FieldContext)
+}
+
+// ClearPoem clears the "poem" edge to the Poem entity.
+func (m *PoemCharMutation) ClearPoem() {
+	m.clearedpoem = true
+}
+
+// PoemCleared reports if the "poem" edge to the Poem entity was cleared.
+func (m *PoemCharMutation) PoemCleared() bool {
+	return m.clearedpoem
+}
+
+// PoemIDs returns the "poem" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PoemID instead. It exists only for internal usage by the builders.
+func (m *PoemCharMutation) PoemIDs() (ids []int) {
+	if id := m.poem; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPoem resets all changes to the "poem" edge.
+func (m *PoemCharMutation) ResetPoem() {
+	m.poem = nil
+	m.clearedpoem = false
+}
+
+// Where appends a list predicates to the PoemCharMutation builder.
+func (m *PoemCharMutation) Where(ps ...predicate.PoemChar) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the PoemCharMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *PoemCharMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.PoemChar, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *PoemCharMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *PoemCharMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (PoemChar).
+func (m *PoemCharMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *PoemCharMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.poem != nil {
+		fields = append(fields, poemchar.FieldPoemID)
+	}
+	if m.char != nil {
+		fields = append(fields, poemchar.FieldChar)
+	}
+	if m.position != nil {
+		fields = append(fields, poemchar.FieldPosition)
+	}
+	if m.sentence != nil {
+		fields = append(fields, poemchar.FieldSentence)
+	}
+	if m.context != nil {
+		fields = append(fields, poemchar.FieldContext)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *PoemCharMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case poemchar.FieldPoemID:
+		return m.PoemID()
+	case poemchar.FieldChar:
+		return m.Char()
+	case poemchar.FieldPosition:
+		return m.Position()
+	case poemchar.FieldSentence:
+		return m.Sentence()
+	case poemchar.FieldContext:
+		return m.Context()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *PoemCharMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case poemchar.FieldPoemID:
+		return m.OldPoemID(ctx)
+	case poemchar.FieldChar:
+		return m.OldChar(ctx)
+	case poemchar.FieldPosition:
+		return m.OldPosition(ctx)
+	case poemchar.FieldSentence:
+		return m.OldSentence(ctx)
+	case poemchar.FieldContext:
+		return m.OldContext(ctx)
+	}
+	return nil, fmt.Errorf("unknown PoemChar field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PoemCharMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case poemchar.FieldPoemID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPoemID(v)
+		return nil
+	case poemchar.FieldChar:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChar(v)
+		return nil
+	case poemchar.FieldPosition:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPosition(v)
+		return nil
+	case poemchar.FieldSentence:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSentence(v)
+		return nil
+	case poemchar.FieldContext:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContext(v)
+		return nil
+	}
+	return fmt.Errorf("unknown PoemChar field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *PoemCharMutation) AddedFields() []string {
+	var fields []string
+	if m.addposition != nil {
+		fields = append(fields, poemchar.FieldPosition)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *PoemCharMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case poemchar.FieldPosition:
+		return m.AddedPosition()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PoemCharMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case poemchar.FieldPosition:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPosition(v)
+		return nil
+	}
+	return fmt.Errorf("unknown PoemChar numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *PoemCharMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(poemchar.FieldSentence) {
+		fields = append(fields, poemchar.FieldSentence)
+	}
+	if m.FieldCleared(poemchar.FieldContext) {
+		fields = append(fields, poemchar.FieldContext)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *PoemCharMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *PoemCharMutation) ClearField(name string) error {
+	switch name {
+	case poemchar.FieldSentence:
+		m.ClearSentence()
+		return nil
+	case poemchar.FieldContext:
+		m.ClearContext()
+		return nil
+	}
+	return fmt.Errorf("unknown PoemChar nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *PoemCharMutation) ResetField(name string) error {
+	switch name {
+	case poemchar.FieldPoemID:
+		m.ResetPoemID()
+		return nil
+	case poemchar.FieldChar:
+		m.ResetChar()
+		return nil
+	case poemchar.FieldPosition:
+		m.ResetPosition()
+		return nil
+	case poemchar.FieldSentence:
+		m.ResetSentence()
+		return nil
+	case poemchar.FieldContext:
+		m.ResetContext()
+		return nil
+	}
+	return fmt.Errorf("unknown PoemChar field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *PoemCharMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.poem != nil {
+		edges = append(edges, poemchar.EdgePoem)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *PoemCharMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case poemchar.EdgePoem:
+		if id := m.poem; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *PoemCharMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *PoemCharMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *PoemCharMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedpoem {
+		edges = append(edges, poemchar.EdgePoem)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *PoemCharMutation) EdgeCleared(name string) bool {
+	switch name {
+	case poemchar.EdgePoem:
+		return m.clearedpoem
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *PoemCharMutation) ClearEdge(name string) error {
+	switch name {
+	case poemchar.EdgePoem:
+		m.ClearPoem()
+		return nil
+	}
+	return fmt.Errorf("unknown PoemChar unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *PoemCharMutation) ResetEdge(name string) error {
+	switch name {
+	case poemchar.EdgePoem:
+		m.ResetPoem()
+		return nil
+	}
+	return fmt.Errorf("unknown PoemChar edge %s", name)
 }
 
 // VersionMutation represents an operation that mutates the Version nodes in the graph.

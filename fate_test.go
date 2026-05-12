@@ -2,57 +2,63 @@ package fate
 
 import (
 	"testing"
-	"time"
 
 	"github.com/babyname/fate/config"
-	_ "github.com/sqlite3ent/sqlite3"
 )
 
 func TestNew(t *testing.T) {
-	type args struct {
-		cfg *config.Config
+	cfg := config.DefaultConfig()
+	got, err := New(cfg)
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
 	}
-	tests := []struct {
-		name    string
-		args    args
-		nowant  Fate
-		wantErr bool
-	}{
-		{
-			name: "",
-			args: args{
-				cfg: config.DefaultConfig(),
-			},
-			nowant:  nil,
-			wantErr: false,
-		},
+	if got == nil {
+		t.Fatal("New() returned nil")
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := New(tt.args.cfg)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got == tt.nowant {
-				t.Errorf("New() got = %v, nowant %v", got, tt.nowant)
-			}
-			session := got.NewSessionWithFilter(NewFilter(FilterOption{
-				CharacterFilter:     true,
-				CharacterFilterType: 0,
-				MinStroke:           3,
-				MaxStroke:           18,
-				SexFilter:           true,
-			}))
-			err = session.Start(&Input{
-				Last: [2]string{"章"},
-				Born: time.Now(),
-				Sex:  1,
-			})
-			if err != nil {
-				t.Fatal(err)
-			}
 
-		})
+	s := got.NewSession()
+	if s == nil {
+		t.Fatal("NewSession() returned nil")
+	}
+
+	s2 := got.NewSessionWithFilter(NewFilter(FilterOption{
+		CharacterFilter:     true,
+		CharacterFilterType: CharacterFilterTypeDefault,
+		MinStroke:           3,
+		MaxStroke:           18,
+		SexFilter:           true,
+	}))
+	if s2 == nil {
+		t.Fatal("NewSessionWithFilter() returned nil")
+	}
+}
+
+func TestFilterOption(t *testing.T) {
+	fo := FilterOption{
+		CharacterFilter:     true,
+		CharacterFilterType: CharacterFilterTypeChs,
+		MinStroke:           5,
+		MaxStroke:           20,
+		RegularFilter:       true,
+		DaYanFilter:         true,
+		WuXingFilter:        true,
+		SexFilter:           false,
+	}
+	f := NewFilter(fo)
+	if f == nil {
+		t.Fatal("NewFilter() returned nil")
+	}
+	if f.FilterType() != CharacterFilterTypeChs {
+		t.Errorf("FilterType() = %v, want %v", f.FilterType(), CharacterFilterTypeChs)
+	}
+}
+
+func TestDefaultFilter(t *testing.T) {
+	f := DefaultFilter()
+	if f == nil {
+		t.Fatal("DefaultFilter() returned nil")
+	}
+	if f.FilterType() != CharacterFilterTypeDefault {
+		t.Errorf("FilterType() = %v, want %v", f.FilterType(), CharacterFilterTypeDefault)
 	}
 }

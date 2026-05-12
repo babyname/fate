@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/tikafog/jsongs"
-
 	"github.com/babyname/fate/config"
 )
 
@@ -14,8 +12,8 @@ type DatabaseConfig struct {
 	Source    config.Config   `json:"-"`
 	TargetRaw json.RawMessage `json:"target"`
 	Target    config.Config   `json:"-"`
-	Tables    []string
-	Limit     int `json:"max"`
+	Tables    []string        `json:"tables"`
+	Limit     int             `json:"max"`
 }
 
 func ReadTransferConfig(p string) (*DatabaseConfig, error) {
@@ -24,15 +22,15 @@ func ReadTransferConfig(p string) (*DatabaseConfig, error) {
 		return nil, err
 	}
 	var db DatabaseConfig
-	err = jsongs.Unmarshal(bytes, &db)
+	err = json.Unmarshal(bytes, &db)
 	if err != nil {
 		return nil, err
 	}
-	err = db.Source.DecodeBytes(db.SourceRaw)
+	err = json.Unmarshal(db.SourceRaw, &db.Source)
 	if err != nil {
 		return nil, err
 	}
-	err = db.Target.DecodeBytes(db.TargetRaw)
+	err = json.Unmarshal(db.TargetRaw, &db.Target)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +38,7 @@ func ReadTransferConfig(p string) (*DatabaseConfig, error) {
 }
 
 func WriteTransferConfig(p string, db *DatabaseConfig) error {
-	marshal, err := jsongs.MarshalIndent(db, "", " ")
+	marshal, err := json.MarshalIndent(db, "", "  ")
 	if err != nil {
 		return err
 	}

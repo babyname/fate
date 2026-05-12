@@ -1,10 +1,9 @@
 package transfer
 
 import (
+	"encoding/json"
 	"reflect"
 	"testing"
-
-	"github.com/tikafog/jsongs"
 
 	"github.com/babyname/fate/config"
 )
@@ -24,8 +23,6 @@ func Test_writeConfig(t *testing.T) {
 			args: args{
 				p: "transfer.cfg",
 				db: DatabaseConfig{
-					Source: *config.DefaultMysqlConfig(),
-					Target: *config.DefaultConfig(),
 					Tables: []string{"Character", "WuGeLucky", "WuXing"},
 				},
 			},
@@ -42,42 +39,37 @@ func Test_writeConfig(t *testing.T) {
 }
 
 func TestReadTransferConfig(t *testing.T) {
-	type args struct {
-		p string
+	want := &DatabaseConfig{
+		Tables: []string{"Character", "WuGeLucky", "WuXing"},
 	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *DatabaseConfig
-		wantErr bool
-	}{
-		{
-			name: "",
-			args: args{
-				p: "transfer.cfg",
-			},
-			want: &DatabaseConfig{
-				Tables: nil,
-			},
-			wantErr: false,
-		},
+	err := WriteTransferConfig("transfer.cfg", want)
+	if err != nil {
+		t.Fatalf("WriteTransferConfig() error = %v", err)
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := ReadTransferConfig(tt.args.p)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ReadTransferConfig() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ReadTransferConfig() got = %v, want %v", got, tt.want)
-			}
-			marshal, err := jsongs.Marshal(got)
-			if err != nil {
-				t.Errorf("ReadTransferConfig() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			t.Log(string(marshal))
-		})
+	got, err := ReadTransferConfig("transfer.cfg")
+	if err != nil {
+		t.Fatalf("ReadTransferConfig() error = %v", err)
+	}
+	if !reflect.DeepEqual(got.Tables, want.Tables) {
+		marshal, _ := json.Marshal(got)
+		t.Errorf("ReadTransferConfig() got = %s, want Tables=%v", string(marshal), want.Tables)
+	}
+}
+
+func TestDatabaseConfigUnmarshal(t *testing.T) {
+	cfg := config.DefaultConfig()
+	raw, _ := json.Marshal(cfg)
+
+	var db DatabaseConfig
+	db.SourceRaw = raw
+	db.TargetRaw = raw
+	db.Tables = []string{"Character"}
+
+	err := json.Unmarshal(db.SourceRaw, &db.Source)
+	if err != nil {
+		t.Fatalf("unmarshal source: %v", err)
+	}
+	if db.Source.Database.Driver != "sqlite3" {
+		t.Errorf("Source.Database.Driver = %v, want sqlite3", db.Source.Database.Driver)
 	}
 }

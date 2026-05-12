@@ -5,11 +5,8 @@ import (
 
 	"github.com/babyname/fate"
 	"github.com/babyname/fate/config"
-	"github.com/babyname/fate/log"
-	"github.com/spf13/cobra"
-
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/sqlite3ent/sqlite3"
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -42,13 +39,13 @@ var rootCmd = &cobra.Command{
 		if flagConfigPath != "" {
 			fmt.Println("Loading config file from: ", flagConfigPath)
 		}
-		cfg = config.LoadConfig(flagConfigPath)
-		fmt.Printf("Config file: %+v\n", cfg)
-		err := log.LoadGlobalConfig(cfg.Log)
+		var err error
+		cfg, err = config.LoadConfig(flagConfigPath)
 		if err != nil {
+			fmt.Println("load config error:", err)
 			return
 		}
-		log.Info("logging config file", "path", cfg.Log.Path)
+		fmt.Printf("Config file: %+v\n", cfg)
 	},
 	DisableSuggestions: false,
 	CompletionOptions: cobra.CompletionOptions{
