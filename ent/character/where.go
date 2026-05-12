@@ -4,62 +4,88 @@ package character
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/babyname/fate/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id string) predicate.Character {
+func ID(id int) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id string) predicate.Character {
+func IDEQ(id int) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id string) predicate.Character {
+func IDNEQ(id int) predicate.Character {
 	return predicate.Character(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...string) predicate.Character {
+func IDIn(ids ...int) predicate.Character {
 	return predicate.Character(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...string) predicate.Character {
+func IDNotIn(ids ...int) predicate.Character {
 	return predicate.Character(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id string) predicate.Character {
+func IDGT(id int) predicate.Character {
 	return predicate.Character(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id string) predicate.Character {
+func IDGTE(id int) predicate.Character {
 	return predicate.Character(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id string) predicate.Character {
+func IDLT(id int) predicate.Character {
 	return predicate.Character(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id string) predicate.Character {
+func IDLTE(id int) predicate.Character {
 	return predicate.Character(sql.FieldLTE(FieldID, id))
 }
 
-// PinYin applies equality check predicate on the "pin_yin" field. It's identical to PinYinEQ.
-func PinYin(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldPinYin, v))
+// Char applies equality check predicate on the "char" field. It's identical to CharEQ.
+func Char(v string) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldChar, v))
 }
 
-// Ch applies equality check predicate on the "ch" field. It's identical to ChEQ.
-func Ch(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldCh, v))
+// Unicode applies equality check predicate on the "unicode" field. It's identical to UnicodeEQ.
+func Unicode(v string) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldUnicode, v))
+}
+
+// IsSimplified applies equality check predicate on the "is_simplified" field. It's identical to IsSimplifiedEQ.
+func IsSimplified(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldIsSimplified, v))
+}
+
+// IsTraditional applies equality check predicate on the "is_traditional" field. It's identical to IsTraditionalEQ.
+func IsTraditional(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldIsTraditional, v))
+}
+
+// IsKangxi applies equality check predicate on the "is_kangxi" field. It's identical to IsKangxiEQ.
+func IsKangxi(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldIsKangxi, v))
+}
+
+// IsVariant applies equality check predicate on the "is_variant" field. It's identical to IsVariantEQ.
+func IsVariant(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldIsVariant, v))
+}
+
+// IsAncient applies equality check predicate on the "is_ancient" field. It's identical to IsAncientEQ.
+func IsAncient(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldIsAncient, v))
 }
 
 // Radical applies equality check predicate on the "radical" field. It's identical to RadicalEQ.
@@ -72,89 +98,19 @@ func RadicalStroke(v int) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldRadicalStroke, v))
 }
 
-// Stroke applies equality check predicate on the "stroke" field. It's identical to StrokeEQ.
-func Stroke(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldStroke, v))
+// SimplifiedStroke applies equality check predicate on the "simplified_stroke" field. It's identical to SimplifiedStrokeEQ.
+func SimplifiedStroke(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldSimplifiedStroke, v))
 }
 
-// IsKangXi applies equality check predicate on the "is_kang_xi" field. It's identical to IsKangXiEQ.
-func IsKangXi(v bool) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldIsKangXi, v))
+// TraditionalStroke applies equality check predicate on the "traditional_stroke" field. It's identical to TraditionalStrokeEQ.
+func TraditionalStroke(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldTraditionalStroke, v))
 }
 
-// KangXi applies equality check predicate on the "kang_xi" field. It's identical to KangXiEQ.
-func KangXi(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldKangXi, v))
-}
-
-// KangXiStroke applies equality check predicate on the "kang_xi_stroke" field. It's identical to KangXiStrokeEQ.
-func KangXiStroke(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldKangXiStroke, v))
-}
-
-// SimpleRadical applies equality check predicate on the "simple_radical" field. It's identical to SimpleRadicalEQ.
-func SimpleRadical(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldSimpleRadical, v))
-}
-
-// SimpleRadicalStroke applies equality check predicate on the "simple_radical_stroke" field. It's identical to SimpleRadicalStrokeEQ.
-func SimpleRadicalStroke(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldSimpleRadicalStroke, v))
-}
-
-// SimpleTotalStroke applies equality check predicate on the "simple_total_stroke" field. It's identical to SimpleTotalStrokeEQ.
-func SimpleTotalStroke(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldSimpleTotalStroke, v))
-}
-
-// TraditionalRadical applies equality check predicate on the "traditional_radical" field. It's identical to TraditionalRadicalEQ.
-func TraditionalRadical(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldTraditionalRadical, v))
-}
-
-// TraditionalRadicalStroke applies equality check predicate on the "traditional_radical_stroke" field. It's identical to TraditionalRadicalStrokeEQ.
-func TraditionalRadicalStroke(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldTraditionalRadicalStroke, v))
-}
-
-// TraditionalTotalStroke applies equality check predicate on the "traditional_total_stroke" field. It's identical to TraditionalTotalStrokeEQ.
-func TraditionalTotalStroke(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldTraditionalTotalStroke, v))
-}
-
-// NameScience applies equality check predicate on the "name_science" field. It's identical to NameScienceEQ.
-func NameScience(v bool) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldNameScience, v))
-}
-
-// WuXing applies equality check predicate on the "wu_xing" field. It's identical to WuXingEQ.
-func WuXing(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldWuXing, v))
-}
-
-// Lucky applies equality check predicate on the "lucky" field. It's identical to LuckyEQ.
-func Lucky(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldLucky, v))
-}
-
-// Regular applies equality check predicate on the "regular" field. It's identical to RegularEQ.
-func Regular(v bool) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldRegular, v))
-}
-
-// TraditionalCharacter applies equality check predicate on the "traditional_character" field. It's identical to TraditionalCharacterEQ.
-func TraditionalCharacter(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldTraditionalCharacter, v))
-}
-
-// VariantCharacter applies equality check predicate on the "variant_character" field. It's identical to VariantCharacterEQ.
-func VariantCharacter(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldVariantCharacter, v))
-}
-
-// Comment applies equality check predicate on the "comment" field. It's identical to CommentEQ.
-func Comment(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldComment, v))
+// KangxiStroke applies equality check predicate on the "kangxi_stroke" field. It's identical to KangxiStrokeEQ.
+func KangxiStroke(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldKangxiStroke, v))
 }
 
 // ScienceStroke applies equality check predicate on the "science_stroke" field. It's identical to ScienceStrokeEQ.
@@ -162,134 +118,249 @@ func ScienceStroke(v int) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldScienceStroke, v))
 }
 
-// PinYinEQ applies the EQ predicate on the "pin_yin" field.
-func PinYinEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldPinYin, v))
+// WuXing applies equality check predicate on the "wu_xing" field. It's identical to WuXingEQ.
+func WuXing(v string) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldWuXing, v))
 }
 
-// PinYinNEQ applies the NEQ predicate on the "pin_yin" field.
-func PinYinNEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldPinYin, v))
+// Regular applies equality check predicate on the "regular" field. It's identical to RegularEQ.
+func Regular(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldRegular, v))
 }
 
-// PinYinIn applies the In predicate on the "pin_yin" field.
-func PinYinIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldPinYin, vs...))
+// CommonLevel applies equality check predicate on the "common_level" field. It's identical to CommonLevelEQ.
+func CommonLevel(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldCommonLevel, v))
 }
 
-// PinYinNotIn applies the NotIn predicate on the "pin_yin" field.
-func PinYinNotIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldPinYin, vs...))
+// GenderHint applies equality check predicate on the "gender_hint" field. It's identical to GenderHintEQ.
+func GenderHint(v string) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldGenderHint, v))
 }
 
-// PinYinGT applies the GT predicate on the "pin_yin" field.
-func PinYinGT(v string) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldPinYin, v))
+// Nameable applies equality check predicate on the "nameable" field. It's identical to NameableEQ.
+func Nameable(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldNameable, v))
 }
 
-// PinYinGTE applies the GTE predicate on the "pin_yin" field.
-func PinYinGTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldPinYin, v))
+// Meaning applies equality check predicate on the "meaning" field. It's identical to MeaningEQ.
+func Meaning(v string) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldMeaning, v))
 }
 
-// PinYinLT applies the LT predicate on the "pin_yin" field.
-func PinYinLT(v string) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldPinYin, v))
+// Source applies equality check predicate on the "source" field. It's identical to SourceEQ.
+func Source(v string) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldSource, v))
 }
 
-// PinYinLTE applies the LTE predicate on the "pin_yin" field.
-func PinYinLTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldPinYin, v))
+// SourceConfidence applies equality check predicate on the "source_confidence" field. It's identical to SourceConfidenceEQ.
+func SourceConfidence(v float64) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldSourceConfidence, v))
 }
 
-// PinYinContains applies the Contains predicate on the "pin_yin" field.
-func PinYinContains(v string) predicate.Character {
-	return predicate.Character(sql.FieldContains(FieldPinYin, v))
+// Comment applies equality check predicate on the "comment" field. It's identical to CommentEQ.
+func Comment(v string) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldComment, v))
 }
 
-// PinYinHasPrefix applies the HasPrefix predicate on the "pin_yin" field.
-func PinYinHasPrefix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasPrefix(FieldPinYin, v))
+// CharEQ applies the EQ predicate on the "char" field.
+func CharEQ(v string) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldChar, v))
 }
 
-// PinYinHasSuffix applies the HasSuffix predicate on the "pin_yin" field.
-func PinYinHasSuffix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasSuffix(FieldPinYin, v))
+// CharNEQ applies the NEQ predicate on the "char" field.
+func CharNEQ(v string) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldChar, v))
 }
 
-// PinYinEqualFold applies the EqualFold predicate on the "pin_yin" field.
-func PinYinEqualFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldEqualFold(FieldPinYin, v))
+// CharIn applies the In predicate on the "char" field.
+func CharIn(vs ...string) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldChar, vs...))
 }
 
-// PinYinContainsFold applies the ContainsFold predicate on the "pin_yin" field.
-func PinYinContainsFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldContainsFold(FieldPinYin, v))
+// CharNotIn applies the NotIn predicate on the "char" field.
+func CharNotIn(vs ...string) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldChar, vs...))
 }
 
-// ChEQ applies the EQ predicate on the "ch" field.
-func ChEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldCh, v))
+// CharGT applies the GT predicate on the "char" field.
+func CharGT(v string) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldChar, v))
 }
 
-// ChNEQ applies the NEQ predicate on the "ch" field.
-func ChNEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldCh, v))
+// CharGTE applies the GTE predicate on the "char" field.
+func CharGTE(v string) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldChar, v))
 }
 
-// ChIn applies the In predicate on the "ch" field.
-func ChIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldCh, vs...))
+// CharLT applies the LT predicate on the "char" field.
+func CharLT(v string) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldChar, v))
 }
 
-// ChNotIn applies the NotIn predicate on the "ch" field.
-func ChNotIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldCh, vs...))
+// CharLTE applies the LTE predicate on the "char" field.
+func CharLTE(v string) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldChar, v))
 }
 
-// ChGT applies the GT predicate on the "ch" field.
-func ChGT(v string) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldCh, v))
+// CharContains applies the Contains predicate on the "char" field.
+func CharContains(v string) predicate.Character {
+	return predicate.Character(sql.FieldContains(FieldChar, v))
 }
 
-// ChGTE applies the GTE predicate on the "ch" field.
-func ChGTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldCh, v))
+// CharHasPrefix applies the HasPrefix predicate on the "char" field.
+func CharHasPrefix(v string) predicate.Character {
+	return predicate.Character(sql.FieldHasPrefix(FieldChar, v))
 }
 
-// ChLT applies the LT predicate on the "ch" field.
-func ChLT(v string) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldCh, v))
+// CharHasSuffix applies the HasSuffix predicate on the "char" field.
+func CharHasSuffix(v string) predicate.Character {
+	return predicate.Character(sql.FieldHasSuffix(FieldChar, v))
 }
 
-// ChLTE applies the LTE predicate on the "ch" field.
-func ChLTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldCh, v))
+// CharEqualFold applies the EqualFold predicate on the "char" field.
+func CharEqualFold(v string) predicate.Character {
+	return predicate.Character(sql.FieldEqualFold(FieldChar, v))
 }
 
-// ChContains applies the Contains predicate on the "ch" field.
-func ChContains(v string) predicate.Character {
-	return predicate.Character(sql.FieldContains(FieldCh, v))
+// CharContainsFold applies the ContainsFold predicate on the "char" field.
+func CharContainsFold(v string) predicate.Character {
+	return predicate.Character(sql.FieldContainsFold(FieldChar, v))
 }
 
-// ChHasPrefix applies the HasPrefix predicate on the "ch" field.
-func ChHasPrefix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasPrefix(FieldCh, v))
+// UnicodeEQ applies the EQ predicate on the "unicode" field.
+func UnicodeEQ(v string) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldUnicode, v))
 }
 
-// ChHasSuffix applies the HasSuffix predicate on the "ch" field.
-func ChHasSuffix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasSuffix(FieldCh, v))
+// UnicodeNEQ applies the NEQ predicate on the "unicode" field.
+func UnicodeNEQ(v string) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldUnicode, v))
 }
 
-// ChEqualFold applies the EqualFold predicate on the "ch" field.
-func ChEqualFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldEqualFold(FieldCh, v))
+// UnicodeIn applies the In predicate on the "unicode" field.
+func UnicodeIn(vs ...string) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldUnicode, vs...))
 }
 
-// ChContainsFold applies the ContainsFold predicate on the "ch" field.
-func ChContainsFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldContainsFold(FieldCh, v))
+// UnicodeNotIn applies the NotIn predicate on the "unicode" field.
+func UnicodeNotIn(vs ...string) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldUnicode, vs...))
+}
+
+// UnicodeGT applies the GT predicate on the "unicode" field.
+func UnicodeGT(v string) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldUnicode, v))
+}
+
+// UnicodeGTE applies the GTE predicate on the "unicode" field.
+func UnicodeGTE(v string) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldUnicode, v))
+}
+
+// UnicodeLT applies the LT predicate on the "unicode" field.
+func UnicodeLT(v string) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldUnicode, v))
+}
+
+// UnicodeLTE applies the LTE predicate on the "unicode" field.
+func UnicodeLTE(v string) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldUnicode, v))
+}
+
+// UnicodeContains applies the Contains predicate on the "unicode" field.
+func UnicodeContains(v string) predicate.Character {
+	return predicate.Character(sql.FieldContains(FieldUnicode, v))
+}
+
+// UnicodeHasPrefix applies the HasPrefix predicate on the "unicode" field.
+func UnicodeHasPrefix(v string) predicate.Character {
+	return predicate.Character(sql.FieldHasPrefix(FieldUnicode, v))
+}
+
+// UnicodeHasSuffix applies the HasSuffix predicate on the "unicode" field.
+func UnicodeHasSuffix(v string) predicate.Character {
+	return predicate.Character(sql.FieldHasSuffix(FieldUnicode, v))
+}
+
+// UnicodeIsNil applies the IsNil predicate on the "unicode" field.
+func UnicodeIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldUnicode))
+}
+
+// UnicodeNotNil applies the NotNil predicate on the "unicode" field.
+func UnicodeNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldUnicode))
+}
+
+// UnicodeEqualFold applies the EqualFold predicate on the "unicode" field.
+func UnicodeEqualFold(v string) predicate.Character {
+	return predicate.Character(sql.FieldEqualFold(FieldUnicode, v))
+}
+
+// UnicodeContainsFold applies the ContainsFold predicate on the "unicode" field.
+func UnicodeContainsFold(v string) predicate.Character {
+	return predicate.Character(sql.FieldContainsFold(FieldUnicode, v))
+}
+
+// IsSimplifiedEQ applies the EQ predicate on the "is_simplified" field.
+func IsSimplifiedEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldIsSimplified, v))
+}
+
+// IsSimplifiedNEQ applies the NEQ predicate on the "is_simplified" field.
+func IsSimplifiedNEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldIsSimplified, v))
+}
+
+// IsTraditionalEQ applies the EQ predicate on the "is_traditional" field.
+func IsTraditionalEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldIsTraditional, v))
+}
+
+// IsTraditionalNEQ applies the NEQ predicate on the "is_traditional" field.
+func IsTraditionalNEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldIsTraditional, v))
+}
+
+// IsKangxiEQ applies the EQ predicate on the "is_kangxi" field.
+func IsKangxiEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldIsKangxi, v))
+}
+
+// IsKangxiNEQ applies the NEQ predicate on the "is_kangxi" field.
+func IsKangxiNEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldIsKangxi, v))
+}
+
+// IsVariantEQ applies the EQ predicate on the "is_variant" field.
+func IsVariantEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldIsVariant, v))
+}
+
+// IsVariantNEQ applies the NEQ predicate on the "is_variant" field.
+func IsVariantNEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldIsVariant, v))
+}
+
+// IsAncientEQ applies the EQ predicate on the "is_ancient" field.
+func IsAncientEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldIsAncient, v))
+}
+
+// IsAncientNEQ applies the NEQ predicate on the "is_ancient" field.
+func IsAncientNEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldIsAncient, v))
+}
+
+// PinyinIsNil applies the IsNil predicate on the "pinyin" field.
+func PinyinIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldPinyin))
+}
+
+// PinyinNotNil applies the NotNil predicate on the "pinyin" field.
+func PinyinNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldPinyin))
 }
 
 // RadicalEQ applies the EQ predicate on the "radical" field.
@@ -347,6 +418,16 @@ func RadicalHasSuffix(v string) predicate.Character {
 	return predicate.Character(sql.FieldHasSuffix(FieldRadical, v))
 }
 
+// RadicalIsNil applies the IsNil predicate on the "radical" field.
+func RadicalIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldRadical))
+}
+
+// RadicalNotNil applies the NotNil predicate on the "radical" field.
+func RadicalNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldRadical))
+}
+
 // RadicalEqualFold applies the EqualFold predicate on the "radical" field.
 func RadicalEqualFold(v string) predicate.Character {
 	return predicate.Character(sql.FieldEqualFold(FieldRadical, v))
@@ -397,459 +478,214 @@ func RadicalStrokeLTE(v int) predicate.Character {
 	return predicate.Character(sql.FieldLTE(FieldRadicalStroke, v))
 }
 
-// StrokeEQ applies the EQ predicate on the "stroke" field.
-func StrokeEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldStroke, v))
+// RadicalStrokeIsNil applies the IsNil predicate on the "radical_stroke" field.
+func RadicalStrokeIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldRadicalStroke))
 }
 
-// StrokeNEQ applies the NEQ predicate on the "stroke" field.
-func StrokeNEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldStroke, v))
+// RadicalStrokeNotNil applies the NotNil predicate on the "radical_stroke" field.
+func RadicalStrokeNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldRadicalStroke))
 }
 
-// StrokeIn applies the In predicate on the "stroke" field.
-func StrokeIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldStroke, vs...))
+// SimplifiedStrokeEQ applies the EQ predicate on the "simplified_stroke" field.
+func SimplifiedStrokeEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldSimplifiedStroke, v))
 }
 
-// StrokeNotIn applies the NotIn predicate on the "stroke" field.
-func StrokeNotIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldStroke, vs...))
+// SimplifiedStrokeNEQ applies the NEQ predicate on the "simplified_stroke" field.
+func SimplifiedStrokeNEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldSimplifiedStroke, v))
 }
 
-// StrokeGT applies the GT predicate on the "stroke" field.
-func StrokeGT(v int) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldStroke, v))
+// SimplifiedStrokeIn applies the In predicate on the "simplified_stroke" field.
+func SimplifiedStrokeIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldSimplifiedStroke, vs...))
 }
 
-// StrokeGTE applies the GTE predicate on the "stroke" field.
-func StrokeGTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldStroke, v))
+// SimplifiedStrokeNotIn applies the NotIn predicate on the "simplified_stroke" field.
+func SimplifiedStrokeNotIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldSimplifiedStroke, vs...))
 }
 
-// StrokeLT applies the LT predicate on the "stroke" field.
-func StrokeLT(v int) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldStroke, v))
+// SimplifiedStrokeGT applies the GT predicate on the "simplified_stroke" field.
+func SimplifiedStrokeGT(v int) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldSimplifiedStroke, v))
 }
 
-// StrokeLTE applies the LTE predicate on the "stroke" field.
-func StrokeLTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldStroke, v))
+// SimplifiedStrokeGTE applies the GTE predicate on the "simplified_stroke" field.
+func SimplifiedStrokeGTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldSimplifiedStroke, v))
 }
 
-// IsKangXiEQ applies the EQ predicate on the "is_kang_xi" field.
-func IsKangXiEQ(v bool) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldIsKangXi, v))
+// SimplifiedStrokeLT applies the LT predicate on the "simplified_stroke" field.
+func SimplifiedStrokeLT(v int) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldSimplifiedStroke, v))
 }
 
-// IsKangXiNEQ applies the NEQ predicate on the "is_kang_xi" field.
-func IsKangXiNEQ(v bool) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldIsKangXi, v))
+// SimplifiedStrokeLTE applies the LTE predicate on the "simplified_stroke" field.
+func SimplifiedStrokeLTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldSimplifiedStroke, v))
 }
 
-// KangXiEQ applies the EQ predicate on the "kang_xi" field.
-func KangXiEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldKangXi, v))
+// SimplifiedStrokeIsNil applies the IsNil predicate on the "simplified_stroke" field.
+func SimplifiedStrokeIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldSimplifiedStroke))
 }
 
-// KangXiNEQ applies the NEQ predicate on the "kang_xi" field.
-func KangXiNEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldKangXi, v))
+// SimplifiedStrokeNotNil applies the NotNil predicate on the "simplified_stroke" field.
+func SimplifiedStrokeNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldSimplifiedStroke))
 }
 
-// KangXiIn applies the In predicate on the "kang_xi" field.
-func KangXiIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldKangXi, vs...))
+// TraditionalStrokeEQ applies the EQ predicate on the "traditional_stroke" field.
+func TraditionalStrokeEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldTraditionalStroke, v))
 }
 
-// KangXiNotIn applies the NotIn predicate on the "kang_xi" field.
-func KangXiNotIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldKangXi, vs...))
+// TraditionalStrokeNEQ applies the NEQ predicate on the "traditional_stroke" field.
+func TraditionalStrokeNEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldTraditionalStroke, v))
 }
 
-// KangXiGT applies the GT predicate on the "kang_xi" field.
-func KangXiGT(v string) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldKangXi, v))
+// TraditionalStrokeIn applies the In predicate on the "traditional_stroke" field.
+func TraditionalStrokeIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldTraditionalStroke, vs...))
 }
 
-// KangXiGTE applies the GTE predicate on the "kang_xi" field.
-func KangXiGTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldKangXi, v))
+// TraditionalStrokeNotIn applies the NotIn predicate on the "traditional_stroke" field.
+func TraditionalStrokeNotIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldTraditionalStroke, vs...))
 }
 
-// KangXiLT applies the LT predicate on the "kang_xi" field.
-func KangXiLT(v string) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldKangXi, v))
+// TraditionalStrokeGT applies the GT predicate on the "traditional_stroke" field.
+func TraditionalStrokeGT(v int) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldTraditionalStroke, v))
 }
 
-// KangXiLTE applies the LTE predicate on the "kang_xi" field.
-func KangXiLTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldKangXi, v))
+// TraditionalStrokeGTE applies the GTE predicate on the "traditional_stroke" field.
+func TraditionalStrokeGTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldTraditionalStroke, v))
 }
 
-// KangXiContains applies the Contains predicate on the "kang_xi" field.
-func KangXiContains(v string) predicate.Character {
-	return predicate.Character(sql.FieldContains(FieldKangXi, v))
+// TraditionalStrokeLT applies the LT predicate on the "traditional_stroke" field.
+func TraditionalStrokeLT(v int) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldTraditionalStroke, v))
 }
 
-// KangXiHasPrefix applies the HasPrefix predicate on the "kang_xi" field.
-func KangXiHasPrefix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasPrefix(FieldKangXi, v))
+// TraditionalStrokeLTE applies the LTE predicate on the "traditional_stroke" field.
+func TraditionalStrokeLTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldTraditionalStroke, v))
 }
 
-// KangXiHasSuffix applies the HasSuffix predicate on the "kang_xi" field.
-func KangXiHasSuffix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasSuffix(FieldKangXi, v))
+// TraditionalStrokeIsNil applies the IsNil predicate on the "traditional_stroke" field.
+func TraditionalStrokeIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldTraditionalStroke))
 }
 
-// KangXiEqualFold applies the EqualFold predicate on the "kang_xi" field.
-func KangXiEqualFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldEqualFold(FieldKangXi, v))
+// TraditionalStrokeNotNil applies the NotNil predicate on the "traditional_stroke" field.
+func TraditionalStrokeNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldTraditionalStroke))
 }
 
-// KangXiContainsFold applies the ContainsFold predicate on the "kang_xi" field.
-func KangXiContainsFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldContainsFold(FieldKangXi, v))
+// KangxiStrokeEQ applies the EQ predicate on the "kangxi_stroke" field.
+func KangxiStrokeEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldKangxiStroke, v))
 }
 
-// KangXiStrokeEQ applies the EQ predicate on the "kang_xi_stroke" field.
-func KangXiStrokeEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldKangXiStroke, v))
+// KangxiStrokeNEQ applies the NEQ predicate on the "kangxi_stroke" field.
+func KangxiStrokeNEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldKangxiStroke, v))
 }
 
-// KangXiStrokeNEQ applies the NEQ predicate on the "kang_xi_stroke" field.
-func KangXiStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldKangXiStroke, v))
+// KangxiStrokeIn applies the In predicate on the "kangxi_stroke" field.
+func KangxiStrokeIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldKangxiStroke, vs...))
 }
 
-// KangXiStrokeIn applies the In predicate on the "kang_xi_stroke" field.
-func KangXiStrokeIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldKangXiStroke, vs...))
+// KangxiStrokeNotIn applies the NotIn predicate on the "kangxi_stroke" field.
+func KangxiStrokeNotIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldKangxiStroke, vs...))
 }
 
-// KangXiStrokeNotIn applies the NotIn predicate on the "kang_xi_stroke" field.
-func KangXiStrokeNotIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldKangXiStroke, vs...))
+// KangxiStrokeGT applies the GT predicate on the "kangxi_stroke" field.
+func KangxiStrokeGT(v int) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldKangxiStroke, v))
 }
 
-// KangXiStrokeGT applies the GT predicate on the "kang_xi_stroke" field.
-func KangXiStrokeGT(v int) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldKangXiStroke, v))
+// KangxiStrokeGTE applies the GTE predicate on the "kangxi_stroke" field.
+func KangxiStrokeGTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldKangxiStroke, v))
 }
 
-// KangXiStrokeGTE applies the GTE predicate on the "kang_xi_stroke" field.
-func KangXiStrokeGTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldKangXiStroke, v))
+// KangxiStrokeLT applies the LT predicate on the "kangxi_stroke" field.
+func KangxiStrokeLT(v int) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldKangxiStroke, v))
 }
 
-// KangXiStrokeLT applies the LT predicate on the "kang_xi_stroke" field.
-func KangXiStrokeLT(v int) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldKangXiStroke, v))
+// KangxiStrokeLTE applies the LTE predicate on the "kangxi_stroke" field.
+func KangxiStrokeLTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldKangxiStroke, v))
 }
 
-// KangXiStrokeLTE applies the LTE predicate on the "kang_xi_stroke" field.
-func KangXiStrokeLTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldKangXiStroke, v))
+// KangxiStrokeIsNil applies the IsNil predicate on the "kangxi_stroke" field.
+func KangxiStrokeIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldKangxiStroke))
 }
 
-// SimpleRadicalEQ applies the EQ predicate on the "simple_radical" field.
-func SimpleRadicalEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldSimpleRadical, v))
+// KangxiStrokeNotNil applies the NotNil predicate on the "kangxi_stroke" field.
+func KangxiStrokeNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldKangxiStroke))
 }
 
-// SimpleRadicalNEQ applies the NEQ predicate on the "simple_radical" field.
-func SimpleRadicalNEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldSimpleRadical, v))
+// ScienceStrokeEQ applies the EQ predicate on the "science_stroke" field.
+func ScienceStrokeEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldScienceStroke, v))
 }
 
-// SimpleRadicalIn applies the In predicate on the "simple_radical" field.
-func SimpleRadicalIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldSimpleRadical, vs...))
+// ScienceStrokeNEQ applies the NEQ predicate on the "science_stroke" field.
+func ScienceStrokeNEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldScienceStroke, v))
 }
 
-// SimpleRadicalNotIn applies the NotIn predicate on the "simple_radical" field.
-func SimpleRadicalNotIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldSimpleRadical, vs...))
+// ScienceStrokeIn applies the In predicate on the "science_stroke" field.
+func ScienceStrokeIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldScienceStroke, vs...))
 }
 
-// SimpleRadicalGT applies the GT predicate on the "simple_radical" field.
-func SimpleRadicalGT(v string) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldSimpleRadical, v))
+// ScienceStrokeNotIn applies the NotIn predicate on the "science_stroke" field.
+func ScienceStrokeNotIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldScienceStroke, vs...))
 }
 
-// SimpleRadicalGTE applies the GTE predicate on the "simple_radical" field.
-func SimpleRadicalGTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldSimpleRadical, v))
+// ScienceStrokeGT applies the GT predicate on the "science_stroke" field.
+func ScienceStrokeGT(v int) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldScienceStroke, v))
 }
 
-// SimpleRadicalLT applies the LT predicate on the "simple_radical" field.
-func SimpleRadicalLT(v string) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldSimpleRadical, v))
+// ScienceStrokeGTE applies the GTE predicate on the "science_stroke" field.
+func ScienceStrokeGTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldScienceStroke, v))
 }
 
-// SimpleRadicalLTE applies the LTE predicate on the "simple_radical" field.
-func SimpleRadicalLTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldSimpleRadical, v))
+// ScienceStrokeLT applies the LT predicate on the "science_stroke" field.
+func ScienceStrokeLT(v int) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldScienceStroke, v))
 }
 
-// SimpleRadicalContains applies the Contains predicate on the "simple_radical" field.
-func SimpleRadicalContains(v string) predicate.Character {
-	return predicate.Character(sql.FieldContains(FieldSimpleRadical, v))
+// ScienceStrokeLTE applies the LTE predicate on the "science_stroke" field.
+func ScienceStrokeLTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldScienceStroke, v))
 }
 
-// SimpleRadicalHasPrefix applies the HasPrefix predicate on the "simple_radical" field.
-func SimpleRadicalHasPrefix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasPrefix(FieldSimpleRadical, v))
+// ScienceStrokeIsNil applies the IsNil predicate on the "science_stroke" field.
+func ScienceStrokeIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldScienceStroke))
 }
 
-// SimpleRadicalHasSuffix applies the HasSuffix predicate on the "simple_radical" field.
-func SimpleRadicalHasSuffix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasSuffix(FieldSimpleRadical, v))
-}
-
-// SimpleRadicalEqualFold applies the EqualFold predicate on the "simple_radical" field.
-func SimpleRadicalEqualFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldEqualFold(FieldSimpleRadical, v))
-}
-
-// SimpleRadicalContainsFold applies the ContainsFold predicate on the "simple_radical" field.
-func SimpleRadicalContainsFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldContainsFold(FieldSimpleRadical, v))
-}
-
-// SimpleRadicalStrokeEQ applies the EQ predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldSimpleRadicalStroke, v))
-}
-
-// SimpleRadicalStrokeNEQ applies the NEQ predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldSimpleRadicalStroke, v))
-}
-
-// SimpleRadicalStrokeIn applies the In predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldSimpleRadicalStroke, vs...))
-}
-
-// SimpleRadicalStrokeNotIn applies the NotIn predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeNotIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldSimpleRadicalStroke, vs...))
-}
-
-// SimpleRadicalStrokeGT applies the GT predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeGT(v int) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldSimpleRadicalStroke, v))
-}
-
-// SimpleRadicalStrokeGTE applies the GTE predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeGTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldSimpleRadicalStroke, v))
-}
-
-// SimpleRadicalStrokeLT applies the LT predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeLT(v int) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldSimpleRadicalStroke, v))
-}
-
-// SimpleRadicalStrokeLTE applies the LTE predicate on the "simple_radical_stroke" field.
-func SimpleRadicalStrokeLTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldSimpleRadicalStroke, v))
-}
-
-// SimpleTotalStrokeEQ applies the EQ predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldSimpleTotalStroke, v))
-}
-
-// SimpleTotalStrokeNEQ applies the NEQ predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldSimpleTotalStroke, v))
-}
-
-// SimpleTotalStrokeIn applies the In predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldSimpleTotalStroke, vs...))
-}
-
-// SimpleTotalStrokeNotIn applies the NotIn predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeNotIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldSimpleTotalStroke, vs...))
-}
-
-// SimpleTotalStrokeGT applies the GT predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeGT(v int) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldSimpleTotalStroke, v))
-}
-
-// SimpleTotalStrokeGTE applies the GTE predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeGTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldSimpleTotalStroke, v))
-}
-
-// SimpleTotalStrokeLT applies the LT predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeLT(v int) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldSimpleTotalStroke, v))
-}
-
-// SimpleTotalStrokeLTE applies the LTE predicate on the "simple_total_stroke" field.
-func SimpleTotalStrokeLTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldSimpleTotalStroke, v))
-}
-
-// TraditionalRadicalEQ applies the EQ predicate on the "traditional_radical" field.
-func TraditionalRadicalEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldTraditionalRadical, v))
-}
-
-// TraditionalRadicalNEQ applies the NEQ predicate on the "traditional_radical" field.
-func TraditionalRadicalNEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldTraditionalRadical, v))
-}
-
-// TraditionalRadicalIn applies the In predicate on the "traditional_radical" field.
-func TraditionalRadicalIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldTraditionalRadical, vs...))
-}
-
-// TraditionalRadicalNotIn applies the NotIn predicate on the "traditional_radical" field.
-func TraditionalRadicalNotIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldTraditionalRadical, vs...))
-}
-
-// TraditionalRadicalGT applies the GT predicate on the "traditional_radical" field.
-func TraditionalRadicalGT(v string) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldTraditionalRadical, v))
-}
-
-// TraditionalRadicalGTE applies the GTE predicate on the "traditional_radical" field.
-func TraditionalRadicalGTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldTraditionalRadical, v))
-}
-
-// TraditionalRadicalLT applies the LT predicate on the "traditional_radical" field.
-func TraditionalRadicalLT(v string) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldTraditionalRadical, v))
-}
-
-// TraditionalRadicalLTE applies the LTE predicate on the "traditional_radical" field.
-func TraditionalRadicalLTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldTraditionalRadical, v))
-}
-
-// TraditionalRadicalContains applies the Contains predicate on the "traditional_radical" field.
-func TraditionalRadicalContains(v string) predicate.Character {
-	return predicate.Character(sql.FieldContains(FieldTraditionalRadical, v))
-}
-
-// TraditionalRadicalHasPrefix applies the HasPrefix predicate on the "traditional_radical" field.
-func TraditionalRadicalHasPrefix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasPrefix(FieldTraditionalRadical, v))
-}
-
-// TraditionalRadicalHasSuffix applies the HasSuffix predicate on the "traditional_radical" field.
-func TraditionalRadicalHasSuffix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasSuffix(FieldTraditionalRadical, v))
-}
-
-// TraditionalRadicalEqualFold applies the EqualFold predicate on the "traditional_radical" field.
-func TraditionalRadicalEqualFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldEqualFold(FieldTraditionalRadical, v))
-}
-
-// TraditionalRadicalContainsFold applies the ContainsFold predicate on the "traditional_radical" field.
-func TraditionalRadicalContainsFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldContainsFold(FieldTraditionalRadical, v))
-}
-
-// TraditionalRadicalStrokeEQ applies the EQ predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldTraditionalRadicalStroke, v))
-}
-
-// TraditionalRadicalStrokeNEQ applies the NEQ predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldTraditionalRadicalStroke, v))
-}
-
-// TraditionalRadicalStrokeIn applies the In predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldTraditionalRadicalStroke, vs...))
-}
-
-// TraditionalRadicalStrokeNotIn applies the NotIn predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeNotIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldTraditionalRadicalStroke, vs...))
-}
-
-// TraditionalRadicalStrokeGT applies the GT predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeGT(v int) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldTraditionalRadicalStroke, v))
-}
-
-// TraditionalRadicalStrokeGTE applies the GTE predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeGTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldTraditionalRadicalStroke, v))
-}
-
-// TraditionalRadicalStrokeLT applies the LT predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeLT(v int) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldTraditionalRadicalStroke, v))
-}
-
-// TraditionalRadicalStrokeLTE applies the LTE predicate on the "traditional_radical_stroke" field.
-func TraditionalRadicalStrokeLTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldTraditionalRadicalStroke, v))
-}
-
-// TraditionalTotalStrokeEQ applies the EQ predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldTraditionalTotalStroke, v))
-}
-
-// TraditionalTotalStrokeNEQ applies the NEQ predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldTraditionalTotalStroke, v))
-}
-
-// TraditionalTotalStrokeIn applies the In predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldTraditionalTotalStroke, vs...))
-}
-
-// TraditionalTotalStrokeNotIn applies the NotIn predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeNotIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldTraditionalTotalStroke, vs...))
-}
-
-// TraditionalTotalStrokeGT applies the GT predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeGT(v int) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldTraditionalTotalStroke, v))
-}
-
-// TraditionalTotalStrokeGTE applies the GTE predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeGTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldTraditionalTotalStroke, v))
-}
-
-// TraditionalTotalStrokeLT applies the LT predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeLT(v int) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldTraditionalTotalStroke, v))
-}
-
-// TraditionalTotalStrokeLTE applies the LTE predicate on the "traditional_total_stroke" field.
-func TraditionalTotalStrokeLTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldTraditionalTotalStroke, v))
-}
-
-// NameScienceEQ applies the EQ predicate on the "name_science" field.
-func NameScienceEQ(v bool) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldNameScience, v))
-}
-
-// NameScienceNEQ applies the NEQ predicate on the "name_science" field.
-func NameScienceNEQ(v bool) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldNameScience, v))
+// ScienceStrokeNotNil applies the NotNil predicate on the "science_stroke" field.
+func ScienceStrokeNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldScienceStroke))
 }
 
 // WuXingEQ applies the EQ predicate on the "wu_xing" field.
@@ -907,6 +743,16 @@ func WuXingHasSuffix(v string) predicate.Character {
 	return predicate.Character(sql.FieldHasSuffix(FieldWuXing, v))
 }
 
+// WuXingIsNil applies the IsNil predicate on the "wu_xing" field.
+func WuXingIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldWuXing))
+}
+
+// WuXingNotNil applies the NotNil predicate on the "wu_xing" field.
+func WuXingNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldWuXing))
+}
+
 // WuXingEqualFold applies the EqualFold predicate on the "wu_xing" field.
 func WuXingEqualFold(v string) predicate.Character {
 	return predicate.Character(sql.FieldEqualFold(FieldWuXing, v))
@@ -915,71 +761,6 @@ func WuXingEqualFold(v string) predicate.Character {
 // WuXingContainsFold applies the ContainsFold predicate on the "wu_xing" field.
 func WuXingContainsFold(v string) predicate.Character {
 	return predicate.Character(sql.FieldContainsFold(FieldWuXing, v))
-}
-
-// LuckyEQ applies the EQ predicate on the "lucky" field.
-func LuckyEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldLucky, v))
-}
-
-// LuckyNEQ applies the NEQ predicate on the "lucky" field.
-func LuckyNEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldLucky, v))
-}
-
-// LuckyIn applies the In predicate on the "lucky" field.
-func LuckyIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldLucky, vs...))
-}
-
-// LuckyNotIn applies the NotIn predicate on the "lucky" field.
-func LuckyNotIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldLucky, vs...))
-}
-
-// LuckyGT applies the GT predicate on the "lucky" field.
-func LuckyGT(v string) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldLucky, v))
-}
-
-// LuckyGTE applies the GTE predicate on the "lucky" field.
-func LuckyGTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldLucky, v))
-}
-
-// LuckyLT applies the LT predicate on the "lucky" field.
-func LuckyLT(v string) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldLucky, v))
-}
-
-// LuckyLTE applies the LTE predicate on the "lucky" field.
-func LuckyLTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldLucky, v))
-}
-
-// LuckyContains applies the Contains predicate on the "lucky" field.
-func LuckyContains(v string) predicate.Character {
-	return predicate.Character(sql.FieldContains(FieldLucky, v))
-}
-
-// LuckyHasPrefix applies the HasPrefix predicate on the "lucky" field.
-func LuckyHasPrefix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasPrefix(FieldLucky, v))
-}
-
-// LuckyHasSuffix applies the HasSuffix predicate on the "lucky" field.
-func LuckyHasSuffix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasSuffix(FieldLucky, v))
-}
-
-// LuckyEqualFold applies the EqualFold predicate on the "lucky" field.
-func LuckyEqualFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldEqualFold(FieldLucky, v))
-}
-
-// LuckyContainsFold applies the ContainsFold predicate on the "lucky" field.
-func LuckyContainsFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldContainsFold(FieldLucky, v))
 }
 
 // RegularEQ applies the EQ predicate on the "regular" field.
@@ -992,134 +773,339 @@ func RegularNEQ(v bool) predicate.Character {
 	return predicate.Character(sql.FieldNEQ(FieldRegular, v))
 }
 
-// TraditionalCharacterEQ applies the EQ predicate on the "traditional_character" field.
-func TraditionalCharacterEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldTraditionalCharacter, v))
+// CommonLevelEQ applies the EQ predicate on the "common_level" field.
+func CommonLevelEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldCommonLevel, v))
 }
 
-// TraditionalCharacterNEQ applies the NEQ predicate on the "traditional_character" field.
-func TraditionalCharacterNEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldTraditionalCharacter, v))
+// CommonLevelNEQ applies the NEQ predicate on the "common_level" field.
+func CommonLevelNEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldCommonLevel, v))
 }
 
-// TraditionalCharacterIn applies the In predicate on the "traditional_character" field.
-func TraditionalCharacterIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldTraditionalCharacter, vs...))
+// CommonLevelIn applies the In predicate on the "common_level" field.
+func CommonLevelIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldCommonLevel, vs...))
 }
 
-// TraditionalCharacterNotIn applies the NotIn predicate on the "traditional_character" field.
-func TraditionalCharacterNotIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldTraditionalCharacter, vs...))
+// CommonLevelNotIn applies the NotIn predicate on the "common_level" field.
+func CommonLevelNotIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldCommonLevel, vs...))
 }
 
-// TraditionalCharacterGT applies the GT predicate on the "traditional_character" field.
-func TraditionalCharacterGT(v string) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldTraditionalCharacter, v))
+// CommonLevelGT applies the GT predicate on the "common_level" field.
+func CommonLevelGT(v int) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldCommonLevel, v))
 }
 
-// TraditionalCharacterGTE applies the GTE predicate on the "traditional_character" field.
-func TraditionalCharacterGTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldTraditionalCharacter, v))
+// CommonLevelGTE applies the GTE predicate on the "common_level" field.
+func CommonLevelGTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldCommonLevel, v))
 }
 
-// TraditionalCharacterLT applies the LT predicate on the "traditional_character" field.
-func TraditionalCharacterLT(v string) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldTraditionalCharacter, v))
+// CommonLevelLT applies the LT predicate on the "common_level" field.
+func CommonLevelLT(v int) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldCommonLevel, v))
 }
 
-// TraditionalCharacterLTE applies the LTE predicate on the "traditional_character" field.
-func TraditionalCharacterLTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldTraditionalCharacter, v))
+// CommonLevelLTE applies the LTE predicate on the "common_level" field.
+func CommonLevelLTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldCommonLevel, v))
 }
 
-// TraditionalCharacterContains applies the Contains predicate on the "traditional_character" field.
-func TraditionalCharacterContains(v string) predicate.Character {
-	return predicate.Character(sql.FieldContains(FieldTraditionalCharacter, v))
+// CommonLevelIsNil applies the IsNil predicate on the "common_level" field.
+func CommonLevelIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldCommonLevel))
 }
 
-// TraditionalCharacterHasPrefix applies the HasPrefix predicate on the "traditional_character" field.
-func TraditionalCharacterHasPrefix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasPrefix(FieldTraditionalCharacter, v))
+// CommonLevelNotNil applies the NotNil predicate on the "common_level" field.
+func CommonLevelNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldCommonLevel))
 }
 
-// TraditionalCharacterHasSuffix applies the HasSuffix predicate on the "traditional_character" field.
-func TraditionalCharacterHasSuffix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasSuffix(FieldTraditionalCharacter, v))
+// GenderHintEQ applies the EQ predicate on the "gender_hint" field.
+func GenderHintEQ(v string) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldGenderHint, v))
 }
 
-// TraditionalCharacterEqualFold applies the EqualFold predicate on the "traditional_character" field.
-func TraditionalCharacterEqualFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldEqualFold(FieldTraditionalCharacter, v))
+// GenderHintNEQ applies the NEQ predicate on the "gender_hint" field.
+func GenderHintNEQ(v string) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldGenderHint, v))
 }
 
-// TraditionalCharacterContainsFold applies the ContainsFold predicate on the "traditional_character" field.
-func TraditionalCharacterContainsFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldContainsFold(FieldTraditionalCharacter, v))
+// GenderHintIn applies the In predicate on the "gender_hint" field.
+func GenderHintIn(vs ...string) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldGenderHint, vs...))
 }
 
-// VariantCharacterEQ applies the EQ predicate on the "variant_character" field.
-func VariantCharacterEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldVariantCharacter, v))
+// GenderHintNotIn applies the NotIn predicate on the "gender_hint" field.
+func GenderHintNotIn(vs ...string) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldGenderHint, vs...))
 }
 
-// VariantCharacterNEQ applies the NEQ predicate on the "variant_character" field.
-func VariantCharacterNEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldVariantCharacter, v))
+// GenderHintGT applies the GT predicate on the "gender_hint" field.
+func GenderHintGT(v string) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldGenderHint, v))
 }
 
-// VariantCharacterIn applies the In predicate on the "variant_character" field.
-func VariantCharacterIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldVariantCharacter, vs...))
+// GenderHintGTE applies the GTE predicate on the "gender_hint" field.
+func GenderHintGTE(v string) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldGenderHint, v))
 }
 
-// VariantCharacterNotIn applies the NotIn predicate on the "variant_character" field.
-func VariantCharacterNotIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldVariantCharacter, vs...))
+// GenderHintLT applies the LT predicate on the "gender_hint" field.
+func GenderHintLT(v string) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldGenderHint, v))
 }
 
-// VariantCharacterGT applies the GT predicate on the "variant_character" field.
-func VariantCharacterGT(v string) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldVariantCharacter, v))
+// GenderHintLTE applies the LTE predicate on the "gender_hint" field.
+func GenderHintLTE(v string) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldGenderHint, v))
 }
 
-// VariantCharacterGTE applies the GTE predicate on the "variant_character" field.
-func VariantCharacterGTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldVariantCharacter, v))
+// GenderHintContains applies the Contains predicate on the "gender_hint" field.
+func GenderHintContains(v string) predicate.Character {
+	return predicate.Character(sql.FieldContains(FieldGenderHint, v))
 }
 
-// VariantCharacterLT applies the LT predicate on the "variant_character" field.
-func VariantCharacterLT(v string) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldVariantCharacter, v))
+// GenderHintHasPrefix applies the HasPrefix predicate on the "gender_hint" field.
+func GenderHintHasPrefix(v string) predicate.Character {
+	return predicate.Character(sql.FieldHasPrefix(FieldGenderHint, v))
 }
 
-// VariantCharacterLTE applies the LTE predicate on the "variant_character" field.
-func VariantCharacterLTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldVariantCharacter, v))
+// GenderHintHasSuffix applies the HasSuffix predicate on the "gender_hint" field.
+func GenderHintHasSuffix(v string) predicate.Character {
+	return predicate.Character(sql.FieldHasSuffix(FieldGenderHint, v))
 }
 
-// VariantCharacterContains applies the Contains predicate on the "variant_character" field.
-func VariantCharacterContains(v string) predicate.Character {
-	return predicate.Character(sql.FieldContains(FieldVariantCharacter, v))
+// GenderHintIsNil applies the IsNil predicate on the "gender_hint" field.
+func GenderHintIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldGenderHint))
 }
 
-// VariantCharacterHasPrefix applies the HasPrefix predicate on the "variant_character" field.
-func VariantCharacterHasPrefix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasPrefix(FieldVariantCharacter, v))
+// GenderHintNotNil applies the NotNil predicate on the "gender_hint" field.
+func GenderHintNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldGenderHint))
 }
 
-// VariantCharacterHasSuffix applies the HasSuffix predicate on the "variant_character" field.
-func VariantCharacterHasSuffix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasSuffix(FieldVariantCharacter, v))
+// GenderHintEqualFold applies the EqualFold predicate on the "gender_hint" field.
+func GenderHintEqualFold(v string) predicate.Character {
+	return predicate.Character(sql.FieldEqualFold(FieldGenderHint, v))
 }
 
-// VariantCharacterEqualFold applies the EqualFold predicate on the "variant_character" field.
-func VariantCharacterEqualFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldEqualFold(FieldVariantCharacter, v))
+// GenderHintContainsFold applies the ContainsFold predicate on the "gender_hint" field.
+func GenderHintContainsFold(v string) predicate.Character {
+	return predicate.Character(sql.FieldContainsFold(FieldGenderHint, v))
 }
 
-// VariantCharacterContainsFold applies the ContainsFold predicate on the "variant_character" field.
-func VariantCharacterContainsFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldContainsFold(FieldVariantCharacter, v))
+// NameableEQ applies the EQ predicate on the "nameable" field.
+func NameableEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldNameable, v))
+}
+
+// NameableNEQ applies the NEQ predicate on the "nameable" field.
+func NameableNEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldNameable, v))
+}
+
+// MeaningEQ applies the EQ predicate on the "meaning" field.
+func MeaningEQ(v string) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldMeaning, v))
+}
+
+// MeaningNEQ applies the NEQ predicate on the "meaning" field.
+func MeaningNEQ(v string) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldMeaning, v))
+}
+
+// MeaningIn applies the In predicate on the "meaning" field.
+func MeaningIn(vs ...string) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldMeaning, vs...))
+}
+
+// MeaningNotIn applies the NotIn predicate on the "meaning" field.
+func MeaningNotIn(vs ...string) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldMeaning, vs...))
+}
+
+// MeaningGT applies the GT predicate on the "meaning" field.
+func MeaningGT(v string) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldMeaning, v))
+}
+
+// MeaningGTE applies the GTE predicate on the "meaning" field.
+func MeaningGTE(v string) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldMeaning, v))
+}
+
+// MeaningLT applies the LT predicate on the "meaning" field.
+func MeaningLT(v string) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldMeaning, v))
+}
+
+// MeaningLTE applies the LTE predicate on the "meaning" field.
+func MeaningLTE(v string) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldMeaning, v))
+}
+
+// MeaningContains applies the Contains predicate on the "meaning" field.
+func MeaningContains(v string) predicate.Character {
+	return predicate.Character(sql.FieldContains(FieldMeaning, v))
+}
+
+// MeaningHasPrefix applies the HasPrefix predicate on the "meaning" field.
+func MeaningHasPrefix(v string) predicate.Character {
+	return predicate.Character(sql.FieldHasPrefix(FieldMeaning, v))
+}
+
+// MeaningHasSuffix applies the HasSuffix predicate on the "meaning" field.
+func MeaningHasSuffix(v string) predicate.Character {
+	return predicate.Character(sql.FieldHasSuffix(FieldMeaning, v))
+}
+
+// MeaningIsNil applies the IsNil predicate on the "meaning" field.
+func MeaningIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldMeaning))
+}
+
+// MeaningNotNil applies the NotNil predicate on the "meaning" field.
+func MeaningNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldMeaning))
+}
+
+// MeaningEqualFold applies the EqualFold predicate on the "meaning" field.
+func MeaningEqualFold(v string) predicate.Character {
+	return predicate.Character(sql.FieldEqualFold(FieldMeaning, v))
+}
+
+// MeaningContainsFold applies the ContainsFold predicate on the "meaning" field.
+func MeaningContainsFold(v string) predicate.Character {
+	return predicate.Character(sql.FieldContainsFold(FieldMeaning, v))
+}
+
+// SourceEQ applies the EQ predicate on the "source" field.
+func SourceEQ(v string) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldSource, v))
+}
+
+// SourceNEQ applies the NEQ predicate on the "source" field.
+func SourceNEQ(v string) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldSource, v))
+}
+
+// SourceIn applies the In predicate on the "source" field.
+func SourceIn(vs ...string) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldSource, vs...))
+}
+
+// SourceNotIn applies the NotIn predicate on the "source" field.
+func SourceNotIn(vs ...string) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldSource, vs...))
+}
+
+// SourceGT applies the GT predicate on the "source" field.
+func SourceGT(v string) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldSource, v))
+}
+
+// SourceGTE applies the GTE predicate on the "source" field.
+func SourceGTE(v string) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldSource, v))
+}
+
+// SourceLT applies the LT predicate on the "source" field.
+func SourceLT(v string) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldSource, v))
+}
+
+// SourceLTE applies the LTE predicate on the "source" field.
+func SourceLTE(v string) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldSource, v))
+}
+
+// SourceContains applies the Contains predicate on the "source" field.
+func SourceContains(v string) predicate.Character {
+	return predicate.Character(sql.FieldContains(FieldSource, v))
+}
+
+// SourceHasPrefix applies the HasPrefix predicate on the "source" field.
+func SourceHasPrefix(v string) predicate.Character {
+	return predicate.Character(sql.FieldHasPrefix(FieldSource, v))
+}
+
+// SourceHasSuffix applies the HasSuffix predicate on the "source" field.
+func SourceHasSuffix(v string) predicate.Character {
+	return predicate.Character(sql.FieldHasSuffix(FieldSource, v))
+}
+
+// SourceIsNil applies the IsNil predicate on the "source" field.
+func SourceIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldSource))
+}
+
+// SourceNotNil applies the NotNil predicate on the "source" field.
+func SourceNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldSource))
+}
+
+// SourceEqualFold applies the EqualFold predicate on the "source" field.
+func SourceEqualFold(v string) predicate.Character {
+	return predicate.Character(sql.FieldEqualFold(FieldSource, v))
+}
+
+// SourceContainsFold applies the ContainsFold predicate on the "source" field.
+func SourceContainsFold(v string) predicate.Character {
+	return predicate.Character(sql.FieldContainsFold(FieldSource, v))
+}
+
+// SourceConfidenceEQ applies the EQ predicate on the "source_confidence" field.
+func SourceConfidenceEQ(v float64) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldSourceConfidence, v))
+}
+
+// SourceConfidenceNEQ applies the NEQ predicate on the "source_confidence" field.
+func SourceConfidenceNEQ(v float64) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldSourceConfidence, v))
+}
+
+// SourceConfidenceIn applies the In predicate on the "source_confidence" field.
+func SourceConfidenceIn(vs ...float64) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldSourceConfidence, vs...))
+}
+
+// SourceConfidenceNotIn applies the NotIn predicate on the "source_confidence" field.
+func SourceConfidenceNotIn(vs ...float64) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldSourceConfidence, vs...))
+}
+
+// SourceConfidenceGT applies the GT predicate on the "source_confidence" field.
+func SourceConfidenceGT(v float64) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldSourceConfidence, v))
+}
+
+// SourceConfidenceGTE applies the GTE predicate on the "source_confidence" field.
+func SourceConfidenceGTE(v float64) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldSourceConfidence, v))
+}
+
+// SourceConfidenceLT applies the LT predicate on the "source_confidence" field.
+func SourceConfidenceLT(v float64) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldSourceConfidence, v))
+}
+
+// SourceConfidenceLTE applies the LTE predicate on the "source_confidence" field.
+func SourceConfidenceLTE(v float64) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldSourceConfidence, v))
+}
+
+// SourceConfidenceIsNil applies the IsNil predicate on the "source_confidence" field.
+func SourceConfidenceIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldSourceConfidence))
+}
+
+// SourceConfidenceNotNil applies the NotNil predicate on the "source_confidence" field.
+func SourceConfidenceNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldSourceConfidence))
 }
 
 // CommentEQ applies the EQ predicate on the "comment" field.
@@ -1177,6 +1163,16 @@ func CommentHasSuffix(v string) predicate.Character {
 	return predicate.Character(sql.FieldHasSuffix(FieldComment, v))
 }
 
+// CommentIsNil applies the IsNil predicate on the "comment" field.
+func CommentIsNil() predicate.Character {
+	return predicate.Character(sql.FieldIsNull(FieldComment))
+}
+
+// CommentNotNil applies the NotNil predicate on the "comment" field.
+func CommentNotNil() predicate.Character {
+	return predicate.Character(sql.FieldNotNull(FieldComment))
+}
+
 // CommentEqualFold applies the EqualFold predicate on the "comment" field.
 func CommentEqualFold(v string) predicate.Character {
 	return predicate.Character(sql.FieldEqualFold(FieldComment, v))
@@ -1187,44 +1183,112 @@ func CommentContainsFold(v string) predicate.Character {
 	return predicate.Character(sql.FieldContainsFold(FieldComment, v))
 }
 
-// ScienceStrokeEQ applies the EQ predicate on the "science_stroke" field.
-func ScienceStrokeEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldScienceStroke, v))
+// HasSimplifiedOf applies the HasEdge predicate on the "simplified_of" edge.
+func HasSimplifiedOf() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, SimplifiedOfTable, SimplifiedOfColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// ScienceStrokeNEQ applies the NEQ predicate on the "science_stroke" field.
-func ScienceStrokeNEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldScienceStroke, v))
+// HasSimplifiedOfWith applies the HasEdge predicate on the "simplified_of" edge with a given conditions (other predicates).
+func HasSimplifiedOfWith(preds ...predicate.Character) predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, SimplifiedOfTable, SimplifiedOfColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
-// ScienceStrokeIn applies the In predicate on the "science_stroke" field.
-func ScienceStrokeIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldScienceStroke, vs...))
+// HasTraditionalToSimplified applies the HasEdge predicate on the "traditional_to_simplified" edge.
+func HasTraditionalToSimplified() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, TraditionalToSimplifiedTable, TraditionalToSimplifiedColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// ScienceStrokeNotIn applies the NotIn predicate on the "science_stroke" field.
-func ScienceStrokeNotIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldScienceStroke, vs...))
+// HasTraditionalToSimplifiedWith applies the HasEdge predicate on the "traditional_to_simplified" edge with a given conditions (other predicates).
+func HasTraditionalToSimplifiedWith(preds ...predicate.Character) predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, TraditionalToSimplifiedTable, TraditionalToSimplifiedColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
-// ScienceStrokeGT applies the GT predicate on the "science_stroke" field.
-func ScienceStrokeGT(v int) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldScienceStroke, v))
+// HasVariantOf applies the HasEdge predicate on the "variant_of" edge.
+func HasVariantOf() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, VariantOfTable, VariantOfColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// ScienceStrokeGTE applies the GTE predicate on the "science_stroke" field.
-func ScienceStrokeGTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldScienceStroke, v))
+// HasVariantOfWith applies the HasEdge predicate on the "variant_of" edge with a given conditions (other predicates).
+func HasVariantOfWith(preds ...predicate.Character) predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, VariantOfTable, VariantOfColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
-// ScienceStrokeLT applies the LT predicate on the "science_stroke" field.
-func ScienceStrokeLT(v int) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldScienceStroke, v))
+// HasStandardToVariant applies the HasEdge predicate on the "standard_to_variant" edge.
+func HasStandardToVariant() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, StandardToVariantTable, StandardToVariantColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
 }
 
-// ScienceStrokeLTE applies the LTE predicate on the "science_stroke" field.
-func ScienceStrokeLTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldScienceStroke, v))
+// HasStandardToVariantWith applies the HasEdge predicate on the "standard_to_variant" edge with a given conditions (other predicates).
+func HasStandardToVariantWith(preds ...predicate.Character) predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, StandardToVariantTable, StandardToVariantColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

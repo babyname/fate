@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/babyname/fate/ent/character"
 	"github.com/babyname/fate/ent/predicate"
@@ -27,21 +28,137 @@ func (cu *CharacterUpdate) Where(ps ...predicate.Character) *CharacterUpdate {
 	return cu
 }
 
-// SetPinYin sets the "pin_yin" field.
-func (cu *CharacterUpdate) SetPinYin(s string) *CharacterUpdate {
-	cu.mutation.SetPinYin(s)
+// SetChar sets the "char" field.
+func (cu *CharacterUpdate) SetChar(s string) *CharacterUpdate {
+	cu.mutation.SetChar(s)
 	return cu
 }
 
-// SetCh sets the "ch" field.
-func (cu *CharacterUpdate) SetCh(s string) *CharacterUpdate {
-	cu.mutation.SetCh(s)
+// SetUnicode sets the "unicode" field.
+func (cu *CharacterUpdate) SetUnicode(s string) *CharacterUpdate {
+	cu.mutation.SetUnicode(s)
+	return cu
+}
+
+// SetNillableUnicode sets the "unicode" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableUnicode(s *string) *CharacterUpdate {
+	if s != nil {
+		cu.SetUnicode(*s)
+	}
+	return cu
+}
+
+// ClearUnicode clears the value of the "unicode" field.
+func (cu *CharacterUpdate) ClearUnicode() *CharacterUpdate {
+	cu.mutation.ClearUnicode()
+	return cu
+}
+
+// SetIsSimplified sets the "is_simplified" field.
+func (cu *CharacterUpdate) SetIsSimplified(b bool) *CharacterUpdate {
+	cu.mutation.SetIsSimplified(b)
+	return cu
+}
+
+// SetNillableIsSimplified sets the "is_simplified" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableIsSimplified(b *bool) *CharacterUpdate {
+	if b != nil {
+		cu.SetIsSimplified(*b)
+	}
+	return cu
+}
+
+// SetIsTraditional sets the "is_traditional" field.
+func (cu *CharacterUpdate) SetIsTraditional(b bool) *CharacterUpdate {
+	cu.mutation.SetIsTraditional(b)
+	return cu
+}
+
+// SetNillableIsTraditional sets the "is_traditional" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableIsTraditional(b *bool) *CharacterUpdate {
+	if b != nil {
+		cu.SetIsTraditional(*b)
+	}
+	return cu
+}
+
+// SetIsKangxi sets the "is_kangxi" field.
+func (cu *CharacterUpdate) SetIsKangxi(b bool) *CharacterUpdate {
+	cu.mutation.SetIsKangxi(b)
+	return cu
+}
+
+// SetNillableIsKangxi sets the "is_kangxi" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableIsKangxi(b *bool) *CharacterUpdate {
+	if b != nil {
+		cu.SetIsKangxi(*b)
+	}
+	return cu
+}
+
+// SetIsVariant sets the "is_variant" field.
+func (cu *CharacterUpdate) SetIsVariant(b bool) *CharacterUpdate {
+	cu.mutation.SetIsVariant(b)
+	return cu
+}
+
+// SetNillableIsVariant sets the "is_variant" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableIsVariant(b *bool) *CharacterUpdate {
+	if b != nil {
+		cu.SetIsVariant(*b)
+	}
+	return cu
+}
+
+// SetIsAncient sets the "is_ancient" field.
+func (cu *CharacterUpdate) SetIsAncient(b bool) *CharacterUpdate {
+	cu.mutation.SetIsAncient(b)
+	return cu
+}
+
+// SetNillableIsAncient sets the "is_ancient" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableIsAncient(b *bool) *CharacterUpdate {
+	if b != nil {
+		cu.SetIsAncient(*b)
+	}
+	return cu
+}
+
+// SetPinyin sets the "pinyin" field.
+func (cu *CharacterUpdate) SetPinyin(s []string) *CharacterUpdate {
+	cu.mutation.SetPinyin(s)
+	return cu
+}
+
+// AppendPinyin appends s to the "pinyin" field.
+func (cu *CharacterUpdate) AppendPinyin(s []string) *CharacterUpdate {
+	cu.mutation.AppendPinyin(s)
+	return cu
+}
+
+// ClearPinyin clears the value of the "pinyin" field.
+func (cu *CharacterUpdate) ClearPinyin() *CharacterUpdate {
+	cu.mutation.ClearPinyin()
 	return cu
 }
 
 // SetRadical sets the "radical" field.
 func (cu *CharacterUpdate) SetRadical(s string) *CharacterUpdate {
 	cu.mutation.SetRadical(s)
+	return cu
+}
+
+// SetNillableRadical sets the "radical" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableRadical(s *string) *CharacterUpdate {
+	if s != nil {
+		cu.SetRadical(*s)
+	}
+	return cu
+}
+
+// ClearRadical clears the value of the "radical" field.
+func (cu *CharacterUpdate) ClearRadical() *CharacterUpdate {
+	cu.mutation.ClearRadical()
 	return cu
 }
 
@@ -52,153 +169,104 @@ func (cu *CharacterUpdate) SetRadicalStroke(i int) *CharacterUpdate {
 	return cu
 }
 
+// SetNillableRadicalStroke sets the "radical_stroke" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableRadicalStroke(i *int) *CharacterUpdate {
+	if i != nil {
+		cu.SetRadicalStroke(*i)
+	}
+	return cu
+}
+
 // AddRadicalStroke adds i to the "radical_stroke" field.
 func (cu *CharacterUpdate) AddRadicalStroke(i int) *CharacterUpdate {
 	cu.mutation.AddRadicalStroke(i)
 	return cu
 }
 
-// SetStroke sets the "stroke" field.
-func (cu *CharacterUpdate) SetStroke(i int) *CharacterUpdate {
-	cu.mutation.ResetStroke()
-	cu.mutation.SetStroke(i)
+// ClearRadicalStroke clears the value of the "radical_stroke" field.
+func (cu *CharacterUpdate) ClearRadicalStroke() *CharacterUpdate {
+	cu.mutation.ClearRadicalStroke()
 	return cu
 }
 
-// AddStroke adds i to the "stroke" field.
-func (cu *CharacterUpdate) AddStroke(i int) *CharacterUpdate {
-	cu.mutation.AddStroke(i)
+// SetSimplifiedStroke sets the "simplified_stroke" field.
+func (cu *CharacterUpdate) SetSimplifiedStroke(i int) *CharacterUpdate {
+	cu.mutation.ResetSimplifiedStroke()
+	cu.mutation.SetSimplifiedStroke(i)
 	return cu
 }
 
-// SetIsKangXi sets the "is_kang_xi" field.
-func (cu *CharacterUpdate) SetIsKangXi(b bool) *CharacterUpdate {
-	cu.mutation.SetIsKangXi(b)
+// SetNillableSimplifiedStroke sets the "simplified_stroke" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableSimplifiedStroke(i *int) *CharacterUpdate {
+	if i != nil {
+		cu.SetSimplifiedStroke(*i)
+	}
 	return cu
 }
 
-// SetKangXi sets the "kang_xi" field.
-func (cu *CharacterUpdate) SetKangXi(s string) *CharacterUpdate {
-	cu.mutation.SetKangXi(s)
+// AddSimplifiedStroke adds i to the "simplified_stroke" field.
+func (cu *CharacterUpdate) AddSimplifiedStroke(i int) *CharacterUpdate {
+	cu.mutation.AddSimplifiedStroke(i)
 	return cu
 }
 
-// SetKangXiStroke sets the "kang_xi_stroke" field.
-func (cu *CharacterUpdate) SetKangXiStroke(i int) *CharacterUpdate {
-	cu.mutation.ResetKangXiStroke()
-	cu.mutation.SetKangXiStroke(i)
+// ClearSimplifiedStroke clears the value of the "simplified_stroke" field.
+func (cu *CharacterUpdate) ClearSimplifiedStroke() *CharacterUpdate {
+	cu.mutation.ClearSimplifiedStroke()
 	return cu
 }
 
-// AddKangXiStroke adds i to the "kang_xi_stroke" field.
-func (cu *CharacterUpdate) AddKangXiStroke(i int) *CharacterUpdate {
-	cu.mutation.AddKangXiStroke(i)
+// SetTraditionalStroke sets the "traditional_stroke" field.
+func (cu *CharacterUpdate) SetTraditionalStroke(i int) *CharacterUpdate {
+	cu.mutation.ResetTraditionalStroke()
+	cu.mutation.SetTraditionalStroke(i)
 	return cu
 }
 
-// SetSimpleRadical sets the "simple_radical" field.
-func (cu *CharacterUpdate) SetSimpleRadical(s string) *CharacterUpdate {
-	cu.mutation.SetSimpleRadical(s)
+// SetNillableTraditionalStroke sets the "traditional_stroke" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableTraditionalStroke(i *int) *CharacterUpdate {
+	if i != nil {
+		cu.SetTraditionalStroke(*i)
+	}
 	return cu
 }
 
-// SetSimpleRadicalStroke sets the "simple_radical_stroke" field.
-func (cu *CharacterUpdate) SetSimpleRadicalStroke(i int) *CharacterUpdate {
-	cu.mutation.ResetSimpleRadicalStroke()
-	cu.mutation.SetSimpleRadicalStroke(i)
+// AddTraditionalStroke adds i to the "traditional_stroke" field.
+func (cu *CharacterUpdate) AddTraditionalStroke(i int) *CharacterUpdate {
+	cu.mutation.AddTraditionalStroke(i)
 	return cu
 }
 
-// AddSimpleRadicalStroke adds i to the "simple_radical_stroke" field.
-func (cu *CharacterUpdate) AddSimpleRadicalStroke(i int) *CharacterUpdate {
-	cu.mutation.AddSimpleRadicalStroke(i)
+// ClearTraditionalStroke clears the value of the "traditional_stroke" field.
+func (cu *CharacterUpdate) ClearTraditionalStroke() *CharacterUpdate {
+	cu.mutation.ClearTraditionalStroke()
 	return cu
 }
 
-// SetSimpleTotalStroke sets the "simple_total_stroke" field.
-func (cu *CharacterUpdate) SetSimpleTotalStroke(i int) *CharacterUpdate {
-	cu.mutation.ResetSimpleTotalStroke()
-	cu.mutation.SetSimpleTotalStroke(i)
+// SetKangxiStroke sets the "kangxi_stroke" field.
+func (cu *CharacterUpdate) SetKangxiStroke(i int) *CharacterUpdate {
+	cu.mutation.ResetKangxiStroke()
+	cu.mutation.SetKangxiStroke(i)
 	return cu
 }
 
-// AddSimpleTotalStroke adds i to the "simple_total_stroke" field.
-func (cu *CharacterUpdate) AddSimpleTotalStroke(i int) *CharacterUpdate {
-	cu.mutation.AddSimpleTotalStroke(i)
+// SetNillableKangxiStroke sets the "kangxi_stroke" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableKangxiStroke(i *int) *CharacterUpdate {
+	if i != nil {
+		cu.SetKangxiStroke(*i)
+	}
 	return cu
 }
 
-// SetTraditionalRadical sets the "traditional_radical" field.
-func (cu *CharacterUpdate) SetTraditionalRadical(s string) *CharacterUpdate {
-	cu.mutation.SetTraditionalRadical(s)
+// AddKangxiStroke adds i to the "kangxi_stroke" field.
+func (cu *CharacterUpdate) AddKangxiStroke(i int) *CharacterUpdate {
+	cu.mutation.AddKangxiStroke(i)
 	return cu
 }
 
-// SetTraditionalRadicalStroke sets the "traditional_radical_stroke" field.
-func (cu *CharacterUpdate) SetTraditionalRadicalStroke(i int) *CharacterUpdate {
-	cu.mutation.ResetTraditionalRadicalStroke()
-	cu.mutation.SetTraditionalRadicalStroke(i)
-	return cu
-}
-
-// AddTraditionalRadicalStroke adds i to the "traditional_radical_stroke" field.
-func (cu *CharacterUpdate) AddTraditionalRadicalStroke(i int) *CharacterUpdate {
-	cu.mutation.AddTraditionalRadicalStroke(i)
-	return cu
-}
-
-// SetTraditionalTotalStroke sets the "traditional_total_stroke" field.
-func (cu *CharacterUpdate) SetTraditionalTotalStroke(i int) *CharacterUpdate {
-	cu.mutation.ResetTraditionalTotalStroke()
-	cu.mutation.SetTraditionalTotalStroke(i)
-	return cu
-}
-
-// AddTraditionalTotalStroke adds i to the "traditional_total_stroke" field.
-func (cu *CharacterUpdate) AddTraditionalTotalStroke(i int) *CharacterUpdate {
-	cu.mutation.AddTraditionalTotalStroke(i)
-	return cu
-}
-
-// SetNameScience sets the "name_science" field.
-func (cu *CharacterUpdate) SetNameScience(b bool) *CharacterUpdate {
-	cu.mutation.SetNameScience(b)
-	return cu
-}
-
-// SetWuXing sets the "wu_xing" field.
-func (cu *CharacterUpdate) SetWuXing(s string) *CharacterUpdate {
-	cu.mutation.SetWuXing(s)
-	return cu
-}
-
-// SetLucky sets the "lucky" field.
-func (cu *CharacterUpdate) SetLucky(s string) *CharacterUpdate {
-	cu.mutation.SetLucky(s)
-	return cu
-}
-
-// SetRegular sets the "regular" field.
-func (cu *CharacterUpdate) SetRegular(b bool) *CharacterUpdate {
-	cu.mutation.SetRegular(b)
-	return cu
-}
-
-// SetTraditionalCharacter sets the "traditional_character" field.
-func (cu *CharacterUpdate) SetTraditionalCharacter(s string) *CharacterUpdate {
-	cu.mutation.SetTraditionalCharacter(s)
-	return cu
-}
-
-// SetVariantCharacter sets the "variant_character" field.
-func (cu *CharacterUpdate) SetVariantCharacter(s string) *CharacterUpdate {
-	cu.mutation.SetVariantCharacter(s)
-	return cu
-}
-
-// SetComment sets the "comment" field.
-func (cu *CharacterUpdate) SetComment(s string) *CharacterUpdate {
-	cu.mutation.SetComment(s)
+// ClearKangxiStroke clears the value of the "kangxi_stroke" field.
+func (cu *CharacterUpdate) ClearKangxiStroke() *CharacterUpdate {
+	cu.mutation.ClearKangxiStroke()
 	return cu
 }
 
@@ -209,15 +277,322 @@ func (cu *CharacterUpdate) SetScienceStroke(i int) *CharacterUpdate {
 	return cu
 }
 
+// SetNillableScienceStroke sets the "science_stroke" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableScienceStroke(i *int) *CharacterUpdate {
+	if i != nil {
+		cu.SetScienceStroke(*i)
+	}
+	return cu
+}
+
 // AddScienceStroke adds i to the "science_stroke" field.
 func (cu *CharacterUpdate) AddScienceStroke(i int) *CharacterUpdate {
 	cu.mutation.AddScienceStroke(i)
 	return cu
 }
 
+// ClearScienceStroke clears the value of the "science_stroke" field.
+func (cu *CharacterUpdate) ClearScienceStroke() *CharacterUpdate {
+	cu.mutation.ClearScienceStroke()
+	return cu
+}
+
+// SetWuXing sets the "wu_xing" field.
+func (cu *CharacterUpdate) SetWuXing(s string) *CharacterUpdate {
+	cu.mutation.SetWuXing(s)
+	return cu
+}
+
+// SetNillableWuXing sets the "wu_xing" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableWuXing(s *string) *CharacterUpdate {
+	if s != nil {
+		cu.SetWuXing(*s)
+	}
+	return cu
+}
+
+// ClearWuXing clears the value of the "wu_xing" field.
+func (cu *CharacterUpdate) ClearWuXing() *CharacterUpdate {
+	cu.mutation.ClearWuXing()
+	return cu
+}
+
+// SetRegular sets the "regular" field.
+func (cu *CharacterUpdate) SetRegular(b bool) *CharacterUpdate {
+	cu.mutation.SetRegular(b)
+	return cu
+}
+
+// SetNillableRegular sets the "regular" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableRegular(b *bool) *CharacterUpdate {
+	if b != nil {
+		cu.SetRegular(*b)
+	}
+	return cu
+}
+
+// SetCommonLevel sets the "common_level" field.
+func (cu *CharacterUpdate) SetCommonLevel(i int) *CharacterUpdate {
+	cu.mutation.ResetCommonLevel()
+	cu.mutation.SetCommonLevel(i)
+	return cu
+}
+
+// SetNillableCommonLevel sets the "common_level" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableCommonLevel(i *int) *CharacterUpdate {
+	if i != nil {
+		cu.SetCommonLevel(*i)
+	}
+	return cu
+}
+
+// AddCommonLevel adds i to the "common_level" field.
+func (cu *CharacterUpdate) AddCommonLevel(i int) *CharacterUpdate {
+	cu.mutation.AddCommonLevel(i)
+	return cu
+}
+
+// ClearCommonLevel clears the value of the "common_level" field.
+func (cu *CharacterUpdate) ClearCommonLevel() *CharacterUpdate {
+	cu.mutation.ClearCommonLevel()
+	return cu
+}
+
+// SetGenderHint sets the "gender_hint" field.
+func (cu *CharacterUpdate) SetGenderHint(s string) *CharacterUpdate {
+	cu.mutation.SetGenderHint(s)
+	return cu
+}
+
+// SetNillableGenderHint sets the "gender_hint" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableGenderHint(s *string) *CharacterUpdate {
+	if s != nil {
+		cu.SetGenderHint(*s)
+	}
+	return cu
+}
+
+// ClearGenderHint clears the value of the "gender_hint" field.
+func (cu *CharacterUpdate) ClearGenderHint() *CharacterUpdate {
+	cu.mutation.ClearGenderHint()
+	return cu
+}
+
+// SetNameable sets the "nameable" field.
+func (cu *CharacterUpdate) SetNameable(b bool) *CharacterUpdate {
+	cu.mutation.SetNameable(b)
+	return cu
+}
+
+// SetNillableNameable sets the "nameable" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableNameable(b *bool) *CharacterUpdate {
+	if b != nil {
+		cu.SetNameable(*b)
+	}
+	return cu
+}
+
+// SetMeaning sets the "meaning" field.
+func (cu *CharacterUpdate) SetMeaning(s string) *CharacterUpdate {
+	cu.mutation.SetMeaning(s)
+	return cu
+}
+
+// SetNillableMeaning sets the "meaning" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableMeaning(s *string) *CharacterUpdate {
+	if s != nil {
+		cu.SetMeaning(*s)
+	}
+	return cu
+}
+
+// ClearMeaning clears the value of the "meaning" field.
+func (cu *CharacterUpdate) ClearMeaning() *CharacterUpdate {
+	cu.mutation.ClearMeaning()
+	return cu
+}
+
+// SetSource sets the "source" field.
+func (cu *CharacterUpdate) SetSource(s string) *CharacterUpdate {
+	cu.mutation.SetSource(s)
+	return cu
+}
+
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableSource(s *string) *CharacterUpdate {
+	if s != nil {
+		cu.SetSource(*s)
+	}
+	return cu
+}
+
+// ClearSource clears the value of the "source" field.
+func (cu *CharacterUpdate) ClearSource() *CharacterUpdate {
+	cu.mutation.ClearSource()
+	return cu
+}
+
+// SetSourceConfidence sets the "source_confidence" field.
+func (cu *CharacterUpdate) SetSourceConfidence(f float64) *CharacterUpdate {
+	cu.mutation.ResetSourceConfidence()
+	cu.mutation.SetSourceConfidence(f)
+	return cu
+}
+
+// SetNillableSourceConfidence sets the "source_confidence" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableSourceConfidence(f *float64) *CharacterUpdate {
+	if f != nil {
+		cu.SetSourceConfidence(*f)
+	}
+	return cu
+}
+
+// AddSourceConfidence adds f to the "source_confidence" field.
+func (cu *CharacterUpdate) AddSourceConfidence(f float64) *CharacterUpdate {
+	cu.mutation.AddSourceConfidence(f)
+	return cu
+}
+
+// ClearSourceConfidence clears the value of the "source_confidence" field.
+func (cu *CharacterUpdate) ClearSourceConfidence() *CharacterUpdate {
+	cu.mutation.ClearSourceConfidence()
+	return cu
+}
+
+// SetComment sets the "comment" field.
+func (cu *CharacterUpdate) SetComment(s string) *CharacterUpdate {
+	cu.mutation.SetComment(s)
+	return cu
+}
+
+// SetNillableComment sets the "comment" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableComment(s *string) *CharacterUpdate {
+	if s != nil {
+		cu.SetComment(*s)
+	}
+	return cu
+}
+
+// ClearComment clears the value of the "comment" field.
+func (cu *CharacterUpdate) ClearComment() *CharacterUpdate {
+	cu.mutation.ClearComment()
+	return cu
+}
+
+// SetSimplifiedOfID sets the "simplified_of" edge to the Character entity by ID.
+func (cu *CharacterUpdate) SetSimplifiedOfID(id int) *CharacterUpdate {
+	cu.mutation.SetSimplifiedOfID(id)
+	return cu
+}
+
+// SetNillableSimplifiedOfID sets the "simplified_of" edge to the Character entity by ID if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableSimplifiedOfID(id *int) *CharacterUpdate {
+	if id != nil {
+		cu = cu.SetSimplifiedOfID(*id)
+	}
+	return cu
+}
+
+// SetSimplifiedOf sets the "simplified_of" edge to the Character entity.
+func (cu *CharacterUpdate) SetSimplifiedOf(c *Character) *CharacterUpdate {
+	return cu.SetSimplifiedOfID(c.ID)
+}
+
+// SetTraditionalToSimplifiedID sets the "traditional_to_simplified" edge to the Character entity by ID.
+func (cu *CharacterUpdate) SetTraditionalToSimplifiedID(id int) *CharacterUpdate {
+	cu.mutation.SetTraditionalToSimplifiedID(id)
+	return cu
+}
+
+// SetNillableTraditionalToSimplifiedID sets the "traditional_to_simplified" edge to the Character entity by ID if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableTraditionalToSimplifiedID(id *int) *CharacterUpdate {
+	if id != nil {
+		cu = cu.SetTraditionalToSimplifiedID(*id)
+	}
+	return cu
+}
+
+// SetTraditionalToSimplified sets the "traditional_to_simplified" edge to the Character entity.
+func (cu *CharacterUpdate) SetTraditionalToSimplified(c *Character) *CharacterUpdate {
+	return cu.SetTraditionalToSimplifiedID(c.ID)
+}
+
+// SetVariantOfID sets the "variant_of" edge to the Character entity by ID.
+func (cu *CharacterUpdate) SetVariantOfID(id int) *CharacterUpdate {
+	cu.mutation.SetVariantOfID(id)
+	return cu
+}
+
+// SetNillableVariantOfID sets the "variant_of" edge to the Character entity by ID if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableVariantOfID(id *int) *CharacterUpdate {
+	if id != nil {
+		cu = cu.SetVariantOfID(*id)
+	}
+	return cu
+}
+
+// SetVariantOf sets the "variant_of" edge to the Character entity.
+func (cu *CharacterUpdate) SetVariantOf(c *Character) *CharacterUpdate {
+	return cu.SetVariantOfID(c.ID)
+}
+
+// AddStandardToVariantIDs adds the "standard_to_variant" edge to the Character entity by IDs.
+func (cu *CharacterUpdate) AddStandardToVariantIDs(ids ...int) *CharacterUpdate {
+	cu.mutation.AddStandardToVariantIDs(ids...)
+	return cu
+}
+
+// AddStandardToVariant adds the "standard_to_variant" edges to the Character entity.
+func (cu *CharacterUpdate) AddStandardToVariant(c ...*Character) *CharacterUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.AddStandardToVariantIDs(ids...)
+}
+
 // Mutation returns the CharacterMutation object of the builder.
 func (cu *CharacterUpdate) Mutation() *CharacterMutation {
 	return cu.mutation
+}
+
+// ClearSimplifiedOf clears the "simplified_of" edge to the Character entity.
+func (cu *CharacterUpdate) ClearSimplifiedOf() *CharacterUpdate {
+	cu.mutation.ClearSimplifiedOf()
+	return cu
+}
+
+// ClearTraditionalToSimplified clears the "traditional_to_simplified" edge to the Character entity.
+func (cu *CharacterUpdate) ClearTraditionalToSimplified() *CharacterUpdate {
+	cu.mutation.ClearTraditionalToSimplified()
+	return cu
+}
+
+// ClearVariantOf clears the "variant_of" edge to the Character entity.
+func (cu *CharacterUpdate) ClearVariantOf() *CharacterUpdate {
+	cu.mutation.ClearVariantOf()
+	return cu
+}
+
+// ClearStandardToVariant clears all "standard_to_variant" edges to the Character entity.
+func (cu *CharacterUpdate) ClearStandardToVariant() *CharacterUpdate {
+	cu.mutation.ClearStandardToVariant()
+	return cu
+}
+
+// RemoveStandardToVariantIDs removes the "standard_to_variant" edge to Character entities by IDs.
+func (cu *CharacterUpdate) RemoveStandardToVariantIDs(ids ...int) *CharacterUpdate {
+	cu.mutation.RemoveStandardToVariantIDs(ids...)
+	return cu
+}
+
+// RemoveStandardToVariant removes "standard_to_variant" edges to Character entities.
+func (cu *CharacterUpdate) RemoveStandardToVariant(c ...*Character) *CharacterUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.RemoveStandardToVariantIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -247,8 +622,51 @@ func (cu *CharacterUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cu *CharacterUpdate) check() error {
+	if v, ok := cu.mutation.Char(); ok {
+		if err := character.CharValidator(v); err != nil {
+			return &ValidationError{Name: "char", err: fmt.Errorf(`ent: validator failed for field "Character.char": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.RadicalStroke(); ok {
+		if err := character.RadicalStrokeValidator(v); err != nil {
+			return &ValidationError{Name: "radical_stroke", err: fmt.Errorf(`ent: validator failed for field "Character.radical_stroke": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.SimplifiedStroke(); ok {
+		if err := character.SimplifiedStrokeValidator(v); err != nil {
+			return &ValidationError{Name: "simplified_stroke", err: fmt.Errorf(`ent: validator failed for field "Character.simplified_stroke": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.TraditionalStroke(); ok {
+		if err := character.TraditionalStrokeValidator(v); err != nil {
+			return &ValidationError{Name: "traditional_stroke", err: fmt.Errorf(`ent: validator failed for field "Character.traditional_stroke": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.KangxiStroke(); ok {
+		if err := character.KangxiStrokeValidator(v); err != nil {
+			return &ValidationError{Name: "kangxi_stroke", err: fmt.Errorf(`ent: validator failed for field "Character.kangxi_stroke": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.ScienceStroke(); ok {
+		if err := character.ScienceStrokeValidator(v); err != nil {
+			return &ValidationError{Name: "science_stroke", err: fmt.Errorf(`ent: validator failed for field "Character.science_stroke": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.CommonLevel(); ok {
+		if err := character.CommonLevelValidator(v); err != nil {
+			return &ValidationError{Name: "common_level", err: fmt.Errorf(`ent: validator failed for field "Character.common_level": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(character.Table, character.Columns, sqlgraph.NewFieldSpec(character.FieldID, field.TypeString))
+	if err := cu.check(); err != nil {
+		return n, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(character.Table, character.Columns, sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt))
 	if ps := cu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -256,14 +674,46 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := cu.mutation.PinYin(); ok {
-		_spec.SetField(character.FieldPinYin, field.TypeString, value)
+	if value, ok := cu.mutation.Char(); ok {
+		_spec.SetField(character.FieldChar, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.Ch(); ok {
-		_spec.SetField(character.FieldCh, field.TypeString, value)
+	if value, ok := cu.mutation.Unicode(); ok {
+		_spec.SetField(character.FieldUnicode, field.TypeString, value)
+	}
+	if cu.mutation.UnicodeCleared() {
+		_spec.ClearField(character.FieldUnicode, field.TypeString)
+	}
+	if value, ok := cu.mutation.IsSimplified(); ok {
+		_spec.SetField(character.FieldIsSimplified, field.TypeBool, value)
+	}
+	if value, ok := cu.mutation.IsTraditional(); ok {
+		_spec.SetField(character.FieldIsTraditional, field.TypeBool, value)
+	}
+	if value, ok := cu.mutation.IsKangxi(); ok {
+		_spec.SetField(character.FieldIsKangxi, field.TypeBool, value)
+	}
+	if value, ok := cu.mutation.IsVariant(); ok {
+		_spec.SetField(character.FieldIsVariant, field.TypeBool, value)
+	}
+	if value, ok := cu.mutation.IsAncient(); ok {
+		_spec.SetField(character.FieldIsAncient, field.TypeBool, value)
+	}
+	if value, ok := cu.mutation.Pinyin(); ok {
+		_spec.SetField(character.FieldPinyin, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.AppendedPinyin(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, character.FieldPinyin, value)
+		})
+	}
+	if cu.mutation.PinyinCleared() {
+		_spec.ClearField(character.FieldPinyin, field.TypeJSON)
 	}
 	if value, ok := cu.mutation.Radical(); ok {
 		_spec.SetField(character.FieldRadical, field.TypeString, value)
+	}
+	if cu.mutation.RadicalCleared() {
+		_spec.ClearField(character.FieldRadical, field.TypeString)
 	}
 	if value, ok := cu.mutation.RadicalStroke(); ok {
 		_spec.SetField(character.FieldRadicalStroke, field.TypeInt, value)
@@ -271,80 +721,257 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.AddedRadicalStroke(); ok {
 		_spec.AddField(character.FieldRadicalStroke, field.TypeInt, value)
 	}
-	if value, ok := cu.mutation.Stroke(); ok {
-		_spec.SetField(character.FieldStroke, field.TypeInt, value)
+	if cu.mutation.RadicalStrokeCleared() {
+		_spec.ClearField(character.FieldRadicalStroke, field.TypeInt)
 	}
-	if value, ok := cu.mutation.AddedStroke(); ok {
-		_spec.AddField(character.FieldStroke, field.TypeInt, value)
+	if value, ok := cu.mutation.SimplifiedStroke(); ok {
+		_spec.SetField(character.FieldSimplifiedStroke, field.TypeInt, value)
 	}
-	if value, ok := cu.mutation.IsKangXi(); ok {
-		_spec.SetField(character.FieldIsKangXi, field.TypeBool, value)
+	if value, ok := cu.mutation.AddedSimplifiedStroke(); ok {
+		_spec.AddField(character.FieldSimplifiedStroke, field.TypeInt, value)
 	}
-	if value, ok := cu.mutation.KangXi(); ok {
-		_spec.SetField(character.FieldKangXi, field.TypeString, value)
+	if cu.mutation.SimplifiedStrokeCleared() {
+		_spec.ClearField(character.FieldSimplifiedStroke, field.TypeInt)
 	}
-	if value, ok := cu.mutation.KangXiStroke(); ok {
-		_spec.SetField(character.FieldKangXiStroke, field.TypeInt, value)
+	if value, ok := cu.mutation.TraditionalStroke(); ok {
+		_spec.SetField(character.FieldTraditionalStroke, field.TypeInt, value)
 	}
-	if value, ok := cu.mutation.AddedKangXiStroke(); ok {
-		_spec.AddField(character.FieldKangXiStroke, field.TypeInt, value)
+	if value, ok := cu.mutation.AddedTraditionalStroke(); ok {
+		_spec.AddField(character.FieldTraditionalStroke, field.TypeInt, value)
 	}
-	if value, ok := cu.mutation.SimpleRadical(); ok {
-		_spec.SetField(character.FieldSimpleRadical, field.TypeString, value)
+	if cu.mutation.TraditionalStrokeCleared() {
+		_spec.ClearField(character.FieldTraditionalStroke, field.TypeInt)
 	}
-	if value, ok := cu.mutation.SimpleRadicalStroke(); ok {
-		_spec.SetField(character.FieldSimpleRadicalStroke, field.TypeInt, value)
+	if value, ok := cu.mutation.KangxiStroke(); ok {
+		_spec.SetField(character.FieldKangxiStroke, field.TypeInt, value)
 	}
-	if value, ok := cu.mutation.AddedSimpleRadicalStroke(); ok {
-		_spec.AddField(character.FieldSimpleRadicalStroke, field.TypeInt, value)
+	if value, ok := cu.mutation.AddedKangxiStroke(); ok {
+		_spec.AddField(character.FieldKangxiStroke, field.TypeInt, value)
 	}
-	if value, ok := cu.mutation.SimpleTotalStroke(); ok {
-		_spec.SetField(character.FieldSimpleTotalStroke, field.TypeInt, value)
-	}
-	if value, ok := cu.mutation.AddedSimpleTotalStroke(); ok {
-		_spec.AddField(character.FieldSimpleTotalStroke, field.TypeInt, value)
-	}
-	if value, ok := cu.mutation.TraditionalRadical(); ok {
-		_spec.SetField(character.FieldTraditionalRadical, field.TypeString, value)
-	}
-	if value, ok := cu.mutation.TraditionalRadicalStroke(); ok {
-		_spec.SetField(character.FieldTraditionalRadicalStroke, field.TypeInt, value)
-	}
-	if value, ok := cu.mutation.AddedTraditionalRadicalStroke(); ok {
-		_spec.AddField(character.FieldTraditionalRadicalStroke, field.TypeInt, value)
-	}
-	if value, ok := cu.mutation.TraditionalTotalStroke(); ok {
-		_spec.SetField(character.FieldTraditionalTotalStroke, field.TypeInt, value)
-	}
-	if value, ok := cu.mutation.AddedTraditionalTotalStroke(); ok {
-		_spec.AddField(character.FieldTraditionalTotalStroke, field.TypeInt, value)
-	}
-	if value, ok := cu.mutation.NameScience(); ok {
-		_spec.SetField(character.FieldNameScience, field.TypeBool, value)
-	}
-	if value, ok := cu.mutation.WuXing(); ok {
-		_spec.SetField(character.FieldWuXing, field.TypeString, value)
-	}
-	if value, ok := cu.mutation.Lucky(); ok {
-		_spec.SetField(character.FieldLucky, field.TypeString, value)
-	}
-	if value, ok := cu.mutation.Regular(); ok {
-		_spec.SetField(character.FieldRegular, field.TypeBool, value)
-	}
-	if value, ok := cu.mutation.TraditionalCharacter(); ok {
-		_spec.SetField(character.FieldTraditionalCharacter, field.TypeString, value)
-	}
-	if value, ok := cu.mutation.VariantCharacter(); ok {
-		_spec.SetField(character.FieldVariantCharacter, field.TypeString, value)
-	}
-	if value, ok := cu.mutation.Comment(); ok {
-		_spec.SetField(character.FieldComment, field.TypeString, value)
+	if cu.mutation.KangxiStrokeCleared() {
+		_spec.ClearField(character.FieldKangxiStroke, field.TypeInt)
 	}
 	if value, ok := cu.mutation.ScienceStroke(); ok {
 		_spec.SetField(character.FieldScienceStroke, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedScienceStroke(); ok {
 		_spec.AddField(character.FieldScienceStroke, field.TypeInt, value)
+	}
+	if cu.mutation.ScienceStrokeCleared() {
+		_spec.ClearField(character.FieldScienceStroke, field.TypeInt)
+	}
+	if value, ok := cu.mutation.WuXing(); ok {
+		_spec.SetField(character.FieldWuXing, field.TypeString, value)
+	}
+	if cu.mutation.WuXingCleared() {
+		_spec.ClearField(character.FieldWuXing, field.TypeString)
+	}
+	if value, ok := cu.mutation.Regular(); ok {
+		_spec.SetField(character.FieldRegular, field.TypeBool, value)
+	}
+	if value, ok := cu.mutation.CommonLevel(); ok {
+		_spec.SetField(character.FieldCommonLevel, field.TypeInt, value)
+	}
+	if value, ok := cu.mutation.AddedCommonLevel(); ok {
+		_spec.AddField(character.FieldCommonLevel, field.TypeInt, value)
+	}
+	if cu.mutation.CommonLevelCleared() {
+		_spec.ClearField(character.FieldCommonLevel, field.TypeInt)
+	}
+	if value, ok := cu.mutation.GenderHint(); ok {
+		_spec.SetField(character.FieldGenderHint, field.TypeString, value)
+	}
+	if cu.mutation.GenderHintCleared() {
+		_spec.ClearField(character.FieldGenderHint, field.TypeString)
+	}
+	if value, ok := cu.mutation.Nameable(); ok {
+		_spec.SetField(character.FieldNameable, field.TypeBool, value)
+	}
+	if value, ok := cu.mutation.Meaning(); ok {
+		_spec.SetField(character.FieldMeaning, field.TypeString, value)
+	}
+	if cu.mutation.MeaningCleared() {
+		_spec.ClearField(character.FieldMeaning, field.TypeString)
+	}
+	if value, ok := cu.mutation.Source(); ok {
+		_spec.SetField(character.FieldSource, field.TypeString, value)
+	}
+	if cu.mutation.SourceCleared() {
+		_spec.ClearField(character.FieldSource, field.TypeString)
+	}
+	if value, ok := cu.mutation.SourceConfidence(); ok {
+		_spec.SetField(character.FieldSourceConfidence, field.TypeFloat64, value)
+	}
+	if value, ok := cu.mutation.AddedSourceConfidence(); ok {
+		_spec.AddField(character.FieldSourceConfidence, field.TypeFloat64, value)
+	}
+	if cu.mutation.SourceConfidenceCleared() {
+		_spec.ClearField(character.FieldSourceConfidence, field.TypeFloat64)
+	}
+	if value, ok := cu.mutation.Comment(); ok {
+		_spec.SetField(character.FieldComment, field.TypeString, value)
+	}
+	if cu.mutation.CommentCleared() {
+		_spec.ClearField(character.FieldComment, field.TypeString)
+	}
+	if cu.mutation.SimplifiedOfCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   character.SimplifiedOfTable,
+			Columns: []string{character.SimplifiedOfColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.SimplifiedOfIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   character.SimplifiedOfTable,
+			Columns: []string{character.SimplifiedOfColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.TraditionalToSimplifiedCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   character.TraditionalToSimplifiedTable,
+			Columns: []string{character.TraditionalToSimplifiedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.TraditionalToSimplifiedIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   character.TraditionalToSimplifiedTable,
+			Columns: []string{character.TraditionalToSimplifiedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.VariantOfCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   character.VariantOfTable,
+			Columns: []string{character.VariantOfColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.VariantOfIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   character.VariantOfTable,
+			Columns: []string{character.VariantOfColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.StandardToVariantCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.StandardToVariantTable,
+			Columns: []string{character.StandardToVariantColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedStandardToVariantIDs(); len(nodes) > 0 && !cu.mutation.StandardToVariantCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.StandardToVariantTable,
+			Columns: []string{character.StandardToVariantColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.StandardToVariantIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.StandardToVariantTable,
+			Columns: []string{character.StandardToVariantColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -366,21 +993,137 @@ type CharacterUpdateOne struct {
 	mutation *CharacterMutation
 }
 
-// SetPinYin sets the "pin_yin" field.
-func (cuo *CharacterUpdateOne) SetPinYin(s string) *CharacterUpdateOne {
-	cuo.mutation.SetPinYin(s)
+// SetChar sets the "char" field.
+func (cuo *CharacterUpdateOne) SetChar(s string) *CharacterUpdateOne {
+	cuo.mutation.SetChar(s)
 	return cuo
 }
 
-// SetCh sets the "ch" field.
-func (cuo *CharacterUpdateOne) SetCh(s string) *CharacterUpdateOne {
-	cuo.mutation.SetCh(s)
+// SetUnicode sets the "unicode" field.
+func (cuo *CharacterUpdateOne) SetUnicode(s string) *CharacterUpdateOne {
+	cuo.mutation.SetUnicode(s)
+	return cuo
+}
+
+// SetNillableUnicode sets the "unicode" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableUnicode(s *string) *CharacterUpdateOne {
+	if s != nil {
+		cuo.SetUnicode(*s)
+	}
+	return cuo
+}
+
+// ClearUnicode clears the value of the "unicode" field.
+func (cuo *CharacterUpdateOne) ClearUnicode() *CharacterUpdateOne {
+	cuo.mutation.ClearUnicode()
+	return cuo
+}
+
+// SetIsSimplified sets the "is_simplified" field.
+func (cuo *CharacterUpdateOne) SetIsSimplified(b bool) *CharacterUpdateOne {
+	cuo.mutation.SetIsSimplified(b)
+	return cuo
+}
+
+// SetNillableIsSimplified sets the "is_simplified" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableIsSimplified(b *bool) *CharacterUpdateOne {
+	if b != nil {
+		cuo.SetIsSimplified(*b)
+	}
+	return cuo
+}
+
+// SetIsTraditional sets the "is_traditional" field.
+func (cuo *CharacterUpdateOne) SetIsTraditional(b bool) *CharacterUpdateOne {
+	cuo.mutation.SetIsTraditional(b)
+	return cuo
+}
+
+// SetNillableIsTraditional sets the "is_traditional" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableIsTraditional(b *bool) *CharacterUpdateOne {
+	if b != nil {
+		cuo.SetIsTraditional(*b)
+	}
+	return cuo
+}
+
+// SetIsKangxi sets the "is_kangxi" field.
+func (cuo *CharacterUpdateOne) SetIsKangxi(b bool) *CharacterUpdateOne {
+	cuo.mutation.SetIsKangxi(b)
+	return cuo
+}
+
+// SetNillableIsKangxi sets the "is_kangxi" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableIsKangxi(b *bool) *CharacterUpdateOne {
+	if b != nil {
+		cuo.SetIsKangxi(*b)
+	}
+	return cuo
+}
+
+// SetIsVariant sets the "is_variant" field.
+func (cuo *CharacterUpdateOne) SetIsVariant(b bool) *CharacterUpdateOne {
+	cuo.mutation.SetIsVariant(b)
+	return cuo
+}
+
+// SetNillableIsVariant sets the "is_variant" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableIsVariant(b *bool) *CharacterUpdateOne {
+	if b != nil {
+		cuo.SetIsVariant(*b)
+	}
+	return cuo
+}
+
+// SetIsAncient sets the "is_ancient" field.
+func (cuo *CharacterUpdateOne) SetIsAncient(b bool) *CharacterUpdateOne {
+	cuo.mutation.SetIsAncient(b)
+	return cuo
+}
+
+// SetNillableIsAncient sets the "is_ancient" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableIsAncient(b *bool) *CharacterUpdateOne {
+	if b != nil {
+		cuo.SetIsAncient(*b)
+	}
+	return cuo
+}
+
+// SetPinyin sets the "pinyin" field.
+func (cuo *CharacterUpdateOne) SetPinyin(s []string) *CharacterUpdateOne {
+	cuo.mutation.SetPinyin(s)
+	return cuo
+}
+
+// AppendPinyin appends s to the "pinyin" field.
+func (cuo *CharacterUpdateOne) AppendPinyin(s []string) *CharacterUpdateOne {
+	cuo.mutation.AppendPinyin(s)
+	return cuo
+}
+
+// ClearPinyin clears the value of the "pinyin" field.
+func (cuo *CharacterUpdateOne) ClearPinyin() *CharacterUpdateOne {
+	cuo.mutation.ClearPinyin()
 	return cuo
 }
 
 // SetRadical sets the "radical" field.
 func (cuo *CharacterUpdateOne) SetRadical(s string) *CharacterUpdateOne {
 	cuo.mutation.SetRadical(s)
+	return cuo
+}
+
+// SetNillableRadical sets the "radical" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableRadical(s *string) *CharacterUpdateOne {
+	if s != nil {
+		cuo.SetRadical(*s)
+	}
+	return cuo
+}
+
+// ClearRadical clears the value of the "radical" field.
+func (cuo *CharacterUpdateOne) ClearRadical() *CharacterUpdateOne {
+	cuo.mutation.ClearRadical()
 	return cuo
 }
 
@@ -391,153 +1134,104 @@ func (cuo *CharacterUpdateOne) SetRadicalStroke(i int) *CharacterUpdateOne {
 	return cuo
 }
 
+// SetNillableRadicalStroke sets the "radical_stroke" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableRadicalStroke(i *int) *CharacterUpdateOne {
+	if i != nil {
+		cuo.SetRadicalStroke(*i)
+	}
+	return cuo
+}
+
 // AddRadicalStroke adds i to the "radical_stroke" field.
 func (cuo *CharacterUpdateOne) AddRadicalStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.AddRadicalStroke(i)
 	return cuo
 }
 
-// SetStroke sets the "stroke" field.
-func (cuo *CharacterUpdateOne) SetStroke(i int) *CharacterUpdateOne {
-	cuo.mutation.ResetStroke()
-	cuo.mutation.SetStroke(i)
+// ClearRadicalStroke clears the value of the "radical_stroke" field.
+func (cuo *CharacterUpdateOne) ClearRadicalStroke() *CharacterUpdateOne {
+	cuo.mutation.ClearRadicalStroke()
 	return cuo
 }
 
-// AddStroke adds i to the "stroke" field.
-func (cuo *CharacterUpdateOne) AddStroke(i int) *CharacterUpdateOne {
-	cuo.mutation.AddStroke(i)
+// SetSimplifiedStroke sets the "simplified_stroke" field.
+func (cuo *CharacterUpdateOne) SetSimplifiedStroke(i int) *CharacterUpdateOne {
+	cuo.mutation.ResetSimplifiedStroke()
+	cuo.mutation.SetSimplifiedStroke(i)
 	return cuo
 }
 
-// SetIsKangXi sets the "is_kang_xi" field.
-func (cuo *CharacterUpdateOne) SetIsKangXi(b bool) *CharacterUpdateOne {
-	cuo.mutation.SetIsKangXi(b)
+// SetNillableSimplifiedStroke sets the "simplified_stroke" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableSimplifiedStroke(i *int) *CharacterUpdateOne {
+	if i != nil {
+		cuo.SetSimplifiedStroke(*i)
+	}
 	return cuo
 }
 
-// SetKangXi sets the "kang_xi" field.
-func (cuo *CharacterUpdateOne) SetKangXi(s string) *CharacterUpdateOne {
-	cuo.mutation.SetKangXi(s)
+// AddSimplifiedStroke adds i to the "simplified_stroke" field.
+func (cuo *CharacterUpdateOne) AddSimplifiedStroke(i int) *CharacterUpdateOne {
+	cuo.mutation.AddSimplifiedStroke(i)
 	return cuo
 }
 
-// SetKangXiStroke sets the "kang_xi_stroke" field.
-func (cuo *CharacterUpdateOne) SetKangXiStroke(i int) *CharacterUpdateOne {
-	cuo.mutation.ResetKangXiStroke()
-	cuo.mutation.SetKangXiStroke(i)
+// ClearSimplifiedStroke clears the value of the "simplified_stroke" field.
+func (cuo *CharacterUpdateOne) ClearSimplifiedStroke() *CharacterUpdateOne {
+	cuo.mutation.ClearSimplifiedStroke()
 	return cuo
 }
 
-// AddKangXiStroke adds i to the "kang_xi_stroke" field.
-func (cuo *CharacterUpdateOne) AddKangXiStroke(i int) *CharacterUpdateOne {
-	cuo.mutation.AddKangXiStroke(i)
+// SetTraditionalStroke sets the "traditional_stroke" field.
+func (cuo *CharacterUpdateOne) SetTraditionalStroke(i int) *CharacterUpdateOne {
+	cuo.mutation.ResetTraditionalStroke()
+	cuo.mutation.SetTraditionalStroke(i)
 	return cuo
 }
 
-// SetSimpleRadical sets the "simple_radical" field.
-func (cuo *CharacterUpdateOne) SetSimpleRadical(s string) *CharacterUpdateOne {
-	cuo.mutation.SetSimpleRadical(s)
+// SetNillableTraditionalStroke sets the "traditional_stroke" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableTraditionalStroke(i *int) *CharacterUpdateOne {
+	if i != nil {
+		cuo.SetTraditionalStroke(*i)
+	}
 	return cuo
 }
 
-// SetSimpleRadicalStroke sets the "simple_radical_stroke" field.
-func (cuo *CharacterUpdateOne) SetSimpleRadicalStroke(i int) *CharacterUpdateOne {
-	cuo.mutation.ResetSimpleRadicalStroke()
-	cuo.mutation.SetSimpleRadicalStroke(i)
+// AddTraditionalStroke adds i to the "traditional_stroke" field.
+func (cuo *CharacterUpdateOne) AddTraditionalStroke(i int) *CharacterUpdateOne {
+	cuo.mutation.AddTraditionalStroke(i)
 	return cuo
 }
 
-// AddSimpleRadicalStroke adds i to the "simple_radical_stroke" field.
-func (cuo *CharacterUpdateOne) AddSimpleRadicalStroke(i int) *CharacterUpdateOne {
-	cuo.mutation.AddSimpleRadicalStroke(i)
+// ClearTraditionalStroke clears the value of the "traditional_stroke" field.
+func (cuo *CharacterUpdateOne) ClearTraditionalStroke() *CharacterUpdateOne {
+	cuo.mutation.ClearTraditionalStroke()
 	return cuo
 }
 
-// SetSimpleTotalStroke sets the "simple_total_stroke" field.
-func (cuo *CharacterUpdateOne) SetSimpleTotalStroke(i int) *CharacterUpdateOne {
-	cuo.mutation.ResetSimpleTotalStroke()
-	cuo.mutation.SetSimpleTotalStroke(i)
+// SetKangxiStroke sets the "kangxi_stroke" field.
+func (cuo *CharacterUpdateOne) SetKangxiStroke(i int) *CharacterUpdateOne {
+	cuo.mutation.ResetKangxiStroke()
+	cuo.mutation.SetKangxiStroke(i)
 	return cuo
 }
 
-// AddSimpleTotalStroke adds i to the "simple_total_stroke" field.
-func (cuo *CharacterUpdateOne) AddSimpleTotalStroke(i int) *CharacterUpdateOne {
-	cuo.mutation.AddSimpleTotalStroke(i)
+// SetNillableKangxiStroke sets the "kangxi_stroke" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableKangxiStroke(i *int) *CharacterUpdateOne {
+	if i != nil {
+		cuo.SetKangxiStroke(*i)
+	}
 	return cuo
 }
 
-// SetTraditionalRadical sets the "traditional_radical" field.
-func (cuo *CharacterUpdateOne) SetTraditionalRadical(s string) *CharacterUpdateOne {
-	cuo.mutation.SetTraditionalRadical(s)
+// AddKangxiStroke adds i to the "kangxi_stroke" field.
+func (cuo *CharacterUpdateOne) AddKangxiStroke(i int) *CharacterUpdateOne {
+	cuo.mutation.AddKangxiStroke(i)
 	return cuo
 }
 
-// SetTraditionalRadicalStroke sets the "traditional_radical_stroke" field.
-func (cuo *CharacterUpdateOne) SetTraditionalRadicalStroke(i int) *CharacterUpdateOne {
-	cuo.mutation.ResetTraditionalRadicalStroke()
-	cuo.mutation.SetTraditionalRadicalStroke(i)
-	return cuo
-}
-
-// AddTraditionalRadicalStroke adds i to the "traditional_radical_stroke" field.
-func (cuo *CharacterUpdateOne) AddTraditionalRadicalStroke(i int) *CharacterUpdateOne {
-	cuo.mutation.AddTraditionalRadicalStroke(i)
-	return cuo
-}
-
-// SetTraditionalTotalStroke sets the "traditional_total_stroke" field.
-func (cuo *CharacterUpdateOne) SetTraditionalTotalStroke(i int) *CharacterUpdateOne {
-	cuo.mutation.ResetTraditionalTotalStroke()
-	cuo.mutation.SetTraditionalTotalStroke(i)
-	return cuo
-}
-
-// AddTraditionalTotalStroke adds i to the "traditional_total_stroke" field.
-func (cuo *CharacterUpdateOne) AddTraditionalTotalStroke(i int) *CharacterUpdateOne {
-	cuo.mutation.AddTraditionalTotalStroke(i)
-	return cuo
-}
-
-// SetNameScience sets the "name_science" field.
-func (cuo *CharacterUpdateOne) SetNameScience(b bool) *CharacterUpdateOne {
-	cuo.mutation.SetNameScience(b)
-	return cuo
-}
-
-// SetWuXing sets the "wu_xing" field.
-func (cuo *CharacterUpdateOne) SetWuXing(s string) *CharacterUpdateOne {
-	cuo.mutation.SetWuXing(s)
-	return cuo
-}
-
-// SetLucky sets the "lucky" field.
-func (cuo *CharacterUpdateOne) SetLucky(s string) *CharacterUpdateOne {
-	cuo.mutation.SetLucky(s)
-	return cuo
-}
-
-// SetRegular sets the "regular" field.
-func (cuo *CharacterUpdateOne) SetRegular(b bool) *CharacterUpdateOne {
-	cuo.mutation.SetRegular(b)
-	return cuo
-}
-
-// SetTraditionalCharacter sets the "traditional_character" field.
-func (cuo *CharacterUpdateOne) SetTraditionalCharacter(s string) *CharacterUpdateOne {
-	cuo.mutation.SetTraditionalCharacter(s)
-	return cuo
-}
-
-// SetVariantCharacter sets the "variant_character" field.
-func (cuo *CharacterUpdateOne) SetVariantCharacter(s string) *CharacterUpdateOne {
-	cuo.mutation.SetVariantCharacter(s)
-	return cuo
-}
-
-// SetComment sets the "comment" field.
-func (cuo *CharacterUpdateOne) SetComment(s string) *CharacterUpdateOne {
-	cuo.mutation.SetComment(s)
+// ClearKangxiStroke clears the value of the "kangxi_stroke" field.
+func (cuo *CharacterUpdateOne) ClearKangxiStroke() *CharacterUpdateOne {
+	cuo.mutation.ClearKangxiStroke()
 	return cuo
 }
 
@@ -548,15 +1242,322 @@ func (cuo *CharacterUpdateOne) SetScienceStroke(i int) *CharacterUpdateOne {
 	return cuo
 }
 
+// SetNillableScienceStroke sets the "science_stroke" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableScienceStroke(i *int) *CharacterUpdateOne {
+	if i != nil {
+		cuo.SetScienceStroke(*i)
+	}
+	return cuo
+}
+
 // AddScienceStroke adds i to the "science_stroke" field.
 func (cuo *CharacterUpdateOne) AddScienceStroke(i int) *CharacterUpdateOne {
 	cuo.mutation.AddScienceStroke(i)
 	return cuo
 }
 
+// ClearScienceStroke clears the value of the "science_stroke" field.
+func (cuo *CharacterUpdateOne) ClearScienceStroke() *CharacterUpdateOne {
+	cuo.mutation.ClearScienceStroke()
+	return cuo
+}
+
+// SetWuXing sets the "wu_xing" field.
+func (cuo *CharacterUpdateOne) SetWuXing(s string) *CharacterUpdateOne {
+	cuo.mutation.SetWuXing(s)
+	return cuo
+}
+
+// SetNillableWuXing sets the "wu_xing" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableWuXing(s *string) *CharacterUpdateOne {
+	if s != nil {
+		cuo.SetWuXing(*s)
+	}
+	return cuo
+}
+
+// ClearWuXing clears the value of the "wu_xing" field.
+func (cuo *CharacterUpdateOne) ClearWuXing() *CharacterUpdateOne {
+	cuo.mutation.ClearWuXing()
+	return cuo
+}
+
+// SetRegular sets the "regular" field.
+func (cuo *CharacterUpdateOne) SetRegular(b bool) *CharacterUpdateOne {
+	cuo.mutation.SetRegular(b)
+	return cuo
+}
+
+// SetNillableRegular sets the "regular" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableRegular(b *bool) *CharacterUpdateOne {
+	if b != nil {
+		cuo.SetRegular(*b)
+	}
+	return cuo
+}
+
+// SetCommonLevel sets the "common_level" field.
+func (cuo *CharacterUpdateOne) SetCommonLevel(i int) *CharacterUpdateOne {
+	cuo.mutation.ResetCommonLevel()
+	cuo.mutation.SetCommonLevel(i)
+	return cuo
+}
+
+// SetNillableCommonLevel sets the "common_level" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableCommonLevel(i *int) *CharacterUpdateOne {
+	if i != nil {
+		cuo.SetCommonLevel(*i)
+	}
+	return cuo
+}
+
+// AddCommonLevel adds i to the "common_level" field.
+func (cuo *CharacterUpdateOne) AddCommonLevel(i int) *CharacterUpdateOne {
+	cuo.mutation.AddCommonLevel(i)
+	return cuo
+}
+
+// ClearCommonLevel clears the value of the "common_level" field.
+func (cuo *CharacterUpdateOne) ClearCommonLevel() *CharacterUpdateOne {
+	cuo.mutation.ClearCommonLevel()
+	return cuo
+}
+
+// SetGenderHint sets the "gender_hint" field.
+func (cuo *CharacterUpdateOne) SetGenderHint(s string) *CharacterUpdateOne {
+	cuo.mutation.SetGenderHint(s)
+	return cuo
+}
+
+// SetNillableGenderHint sets the "gender_hint" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableGenderHint(s *string) *CharacterUpdateOne {
+	if s != nil {
+		cuo.SetGenderHint(*s)
+	}
+	return cuo
+}
+
+// ClearGenderHint clears the value of the "gender_hint" field.
+func (cuo *CharacterUpdateOne) ClearGenderHint() *CharacterUpdateOne {
+	cuo.mutation.ClearGenderHint()
+	return cuo
+}
+
+// SetNameable sets the "nameable" field.
+func (cuo *CharacterUpdateOne) SetNameable(b bool) *CharacterUpdateOne {
+	cuo.mutation.SetNameable(b)
+	return cuo
+}
+
+// SetNillableNameable sets the "nameable" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableNameable(b *bool) *CharacterUpdateOne {
+	if b != nil {
+		cuo.SetNameable(*b)
+	}
+	return cuo
+}
+
+// SetMeaning sets the "meaning" field.
+func (cuo *CharacterUpdateOne) SetMeaning(s string) *CharacterUpdateOne {
+	cuo.mutation.SetMeaning(s)
+	return cuo
+}
+
+// SetNillableMeaning sets the "meaning" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableMeaning(s *string) *CharacterUpdateOne {
+	if s != nil {
+		cuo.SetMeaning(*s)
+	}
+	return cuo
+}
+
+// ClearMeaning clears the value of the "meaning" field.
+func (cuo *CharacterUpdateOne) ClearMeaning() *CharacterUpdateOne {
+	cuo.mutation.ClearMeaning()
+	return cuo
+}
+
+// SetSource sets the "source" field.
+func (cuo *CharacterUpdateOne) SetSource(s string) *CharacterUpdateOne {
+	cuo.mutation.SetSource(s)
+	return cuo
+}
+
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableSource(s *string) *CharacterUpdateOne {
+	if s != nil {
+		cuo.SetSource(*s)
+	}
+	return cuo
+}
+
+// ClearSource clears the value of the "source" field.
+func (cuo *CharacterUpdateOne) ClearSource() *CharacterUpdateOne {
+	cuo.mutation.ClearSource()
+	return cuo
+}
+
+// SetSourceConfidence sets the "source_confidence" field.
+func (cuo *CharacterUpdateOne) SetSourceConfidence(f float64) *CharacterUpdateOne {
+	cuo.mutation.ResetSourceConfidence()
+	cuo.mutation.SetSourceConfidence(f)
+	return cuo
+}
+
+// SetNillableSourceConfidence sets the "source_confidence" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableSourceConfidence(f *float64) *CharacterUpdateOne {
+	if f != nil {
+		cuo.SetSourceConfidence(*f)
+	}
+	return cuo
+}
+
+// AddSourceConfidence adds f to the "source_confidence" field.
+func (cuo *CharacterUpdateOne) AddSourceConfidence(f float64) *CharacterUpdateOne {
+	cuo.mutation.AddSourceConfidence(f)
+	return cuo
+}
+
+// ClearSourceConfidence clears the value of the "source_confidence" field.
+func (cuo *CharacterUpdateOne) ClearSourceConfidence() *CharacterUpdateOne {
+	cuo.mutation.ClearSourceConfidence()
+	return cuo
+}
+
+// SetComment sets the "comment" field.
+func (cuo *CharacterUpdateOne) SetComment(s string) *CharacterUpdateOne {
+	cuo.mutation.SetComment(s)
+	return cuo
+}
+
+// SetNillableComment sets the "comment" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableComment(s *string) *CharacterUpdateOne {
+	if s != nil {
+		cuo.SetComment(*s)
+	}
+	return cuo
+}
+
+// ClearComment clears the value of the "comment" field.
+func (cuo *CharacterUpdateOne) ClearComment() *CharacterUpdateOne {
+	cuo.mutation.ClearComment()
+	return cuo
+}
+
+// SetSimplifiedOfID sets the "simplified_of" edge to the Character entity by ID.
+func (cuo *CharacterUpdateOne) SetSimplifiedOfID(id int) *CharacterUpdateOne {
+	cuo.mutation.SetSimplifiedOfID(id)
+	return cuo
+}
+
+// SetNillableSimplifiedOfID sets the "simplified_of" edge to the Character entity by ID if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableSimplifiedOfID(id *int) *CharacterUpdateOne {
+	if id != nil {
+		cuo = cuo.SetSimplifiedOfID(*id)
+	}
+	return cuo
+}
+
+// SetSimplifiedOf sets the "simplified_of" edge to the Character entity.
+func (cuo *CharacterUpdateOne) SetSimplifiedOf(c *Character) *CharacterUpdateOne {
+	return cuo.SetSimplifiedOfID(c.ID)
+}
+
+// SetTraditionalToSimplifiedID sets the "traditional_to_simplified" edge to the Character entity by ID.
+func (cuo *CharacterUpdateOne) SetTraditionalToSimplifiedID(id int) *CharacterUpdateOne {
+	cuo.mutation.SetTraditionalToSimplifiedID(id)
+	return cuo
+}
+
+// SetNillableTraditionalToSimplifiedID sets the "traditional_to_simplified" edge to the Character entity by ID if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableTraditionalToSimplifiedID(id *int) *CharacterUpdateOne {
+	if id != nil {
+		cuo = cuo.SetTraditionalToSimplifiedID(*id)
+	}
+	return cuo
+}
+
+// SetTraditionalToSimplified sets the "traditional_to_simplified" edge to the Character entity.
+func (cuo *CharacterUpdateOne) SetTraditionalToSimplified(c *Character) *CharacterUpdateOne {
+	return cuo.SetTraditionalToSimplifiedID(c.ID)
+}
+
+// SetVariantOfID sets the "variant_of" edge to the Character entity by ID.
+func (cuo *CharacterUpdateOne) SetVariantOfID(id int) *CharacterUpdateOne {
+	cuo.mutation.SetVariantOfID(id)
+	return cuo
+}
+
+// SetNillableVariantOfID sets the "variant_of" edge to the Character entity by ID if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableVariantOfID(id *int) *CharacterUpdateOne {
+	if id != nil {
+		cuo = cuo.SetVariantOfID(*id)
+	}
+	return cuo
+}
+
+// SetVariantOf sets the "variant_of" edge to the Character entity.
+func (cuo *CharacterUpdateOne) SetVariantOf(c *Character) *CharacterUpdateOne {
+	return cuo.SetVariantOfID(c.ID)
+}
+
+// AddStandardToVariantIDs adds the "standard_to_variant" edge to the Character entity by IDs.
+func (cuo *CharacterUpdateOne) AddStandardToVariantIDs(ids ...int) *CharacterUpdateOne {
+	cuo.mutation.AddStandardToVariantIDs(ids...)
+	return cuo
+}
+
+// AddStandardToVariant adds the "standard_to_variant" edges to the Character entity.
+func (cuo *CharacterUpdateOne) AddStandardToVariant(c ...*Character) *CharacterUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.AddStandardToVariantIDs(ids...)
+}
+
 // Mutation returns the CharacterMutation object of the builder.
 func (cuo *CharacterUpdateOne) Mutation() *CharacterMutation {
 	return cuo.mutation
+}
+
+// ClearSimplifiedOf clears the "simplified_of" edge to the Character entity.
+func (cuo *CharacterUpdateOne) ClearSimplifiedOf() *CharacterUpdateOne {
+	cuo.mutation.ClearSimplifiedOf()
+	return cuo
+}
+
+// ClearTraditionalToSimplified clears the "traditional_to_simplified" edge to the Character entity.
+func (cuo *CharacterUpdateOne) ClearTraditionalToSimplified() *CharacterUpdateOne {
+	cuo.mutation.ClearTraditionalToSimplified()
+	return cuo
+}
+
+// ClearVariantOf clears the "variant_of" edge to the Character entity.
+func (cuo *CharacterUpdateOne) ClearVariantOf() *CharacterUpdateOne {
+	cuo.mutation.ClearVariantOf()
+	return cuo
+}
+
+// ClearStandardToVariant clears all "standard_to_variant" edges to the Character entity.
+func (cuo *CharacterUpdateOne) ClearStandardToVariant() *CharacterUpdateOne {
+	cuo.mutation.ClearStandardToVariant()
+	return cuo
+}
+
+// RemoveStandardToVariantIDs removes the "standard_to_variant" edge to Character entities by IDs.
+func (cuo *CharacterUpdateOne) RemoveStandardToVariantIDs(ids ...int) *CharacterUpdateOne {
+	cuo.mutation.RemoveStandardToVariantIDs(ids...)
+	return cuo
+}
+
+// RemoveStandardToVariant removes "standard_to_variant" edges to Character entities.
+func (cuo *CharacterUpdateOne) RemoveStandardToVariant(c ...*Character) *CharacterUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.RemoveStandardToVariantIDs(ids...)
 }
 
 // Where appends a list predicates to the CharacterUpdate builder.
@@ -599,8 +1600,51 @@ func (cuo *CharacterUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cuo *CharacterUpdateOne) check() error {
+	if v, ok := cuo.mutation.Char(); ok {
+		if err := character.CharValidator(v); err != nil {
+			return &ValidationError{Name: "char", err: fmt.Errorf(`ent: validator failed for field "Character.char": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.RadicalStroke(); ok {
+		if err := character.RadicalStrokeValidator(v); err != nil {
+			return &ValidationError{Name: "radical_stroke", err: fmt.Errorf(`ent: validator failed for field "Character.radical_stroke": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.SimplifiedStroke(); ok {
+		if err := character.SimplifiedStrokeValidator(v); err != nil {
+			return &ValidationError{Name: "simplified_stroke", err: fmt.Errorf(`ent: validator failed for field "Character.simplified_stroke": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.TraditionalStroke(); ok {
+		if err := character.TraditionalStrokeValidator(v); err != nil {
+			return &ValidationError{Name: "traditional_stroke", err: fmt.Errorf(`ent: validator failed for field "Character.traditional_stroke": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.KangxiStroke(); ok {
+		if err := character.KangxiStrokeValidator(v); err != nil {
+			return &ValidationError{Name: "kangxi_stroke", err: fmt.Errorf(`ent: validator failed for field "Character.kangxi_stroke": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.ScienceStroke(); ok {
+		if err := character.ScienceStrokeValidator(v); err != nil {
+			return &ValidationError{Name: "science_stroke", err: fmt.Errorf(`ent: validator failed for field "Character.science_stroke": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.CommonLevel(); ok {
+		if err := character.CommonLevelValidator(v); err != nil {
+			return &ValidationError{Name: "common_level", err: fmt.Errorf(`ent: validator failed for field "Character.common_level": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, err error) {
-	_spec := sqlgraph.NewUpdateSpec(character.Table, character.Columns, sqlgraph.NewFieldSpec(character.FieldID, field.TypeString))
+	if err := cuo.check(); err != nil {
+		return _node, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(character.Table, character.Columns, sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt))
 	id, ok := cuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Character.id" for update`)}
@@ -625,14 +1669,46 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 			}
 		}
 	}
-	if value, ok := cuo.mutation.PinYin(); ok {
-		_spec.SetField(character.FieldPinYin, field.TypeString, value)
+	if value, ok := cuo.mutation.Char(); ok {
+		_spec.SetField(character.FieldChar, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.Ch(); ok {
-		_spec.SetField(character.FieldCh, field.TypeString, value)
+	if value, ok := cuo.mutation.Unicode(); ok {
+		_spec.SetField(character.FieldUnicode, field.TypeString, value)
+	}
+	if cuo.mutation.UnicodeCleared() {
+		_spec.ClearField(character.FieldUnicode, field.TypeString)
+	}
+	if value, ok := cuo.mutation.IsSimplified(); ok {
+		_spec.SetField(character.FieldIsSimplified, field.TypeBool, value)
+	}
+	if value, ok := cuo.mutation.IsTraditional(); ok {
+		_spec.SetField(character.FieldIsTraditional, field.TypeBool, value)
+	}
+	if value, ok := cuo.mutation.IsKangxi(); ok {
+		_spec.SetField(character.FieldIsKangxi, field.TypeBool, value)
+	}
+	if value, ok := cuo.mutation.IsVariant(); ok {
+		_spec.SetField(character.FieldIsVariant, field.TypeBool, value)
+	}
+	if value, ok := cuo.mutation.IsAncient(); ok {
+		_spec.SetField(character.FieldIsAncient, field.TypeBool, value)
+	}
+	if value, ok := cuo.mutation.Pinyin(); ok {
+		_spec.SetField(character.FieldPinyin, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.AppendedPinyin(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, character.FieldPinyin, value)
+		})
+	}
+	if cuo.mutation.PinyinCleared() {
+		_spec.ClearField(character.FieldPinyin, field.TypeJSON)
 	}
 	if value, ok := cuo.mutation.Radical(); ok {
 		_spec.SetField(character.FieldRadical, field.TypeString, value)
+	}
+	if cuo.mutation.RadicalCleared() {
+		_spec.ClearField(character.FieldRadical, field.TypeString)
 	}
 	if value, ok := cuo.mutation.RadicalStroke(); ok {
 		_spec.SetField(character.FieldRadicalStroke, field.TypeInt, value)
@@ -640,80 +1716,257 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 	if value, ok := cuo.mutation.AddedRadicalStroke(); ok {
 		_spec.AddField(character.FieldRadicalStroke, field.TypeInt, value)
 	}
-	if value, ok := cuo.mutation.Stroke(); ok {
-		_spec.SetField(character.FieldStroke, field.TypeInt, value)
+	if cuo.mutation.RadicalStrokeCleared() {
+		_spec.ClearField(character.FieldRadicalStroke, field.TypeInt)
 	}
-	if value, ok := cuo.mutation.AddedStroke(); ok {
-		_spec.AddField(character.FieldStroke, field.TypeInt, value)
+	if value, ok := cuo.mutation.SimplifiedStroke(); ok {
+		_spec.SetField(character.FieldSimplifiedStroke, field.TypeInt, value)
 	}
-	if value, ok := cuo.mutation.IsKangXi(); ok {
-		_spec.SetField(character.FieldIsKangXi, field.TypeBool, value)
+	if value, ok := cuo.mutation.AddedSimplifiedStroke(); ok {
+		_spec.AddField(character.FieldSimplifiedStroke, field.TypeInt, value)
 	}
-	if value, ok := cuo.mutation.KangXi(); ok {
-		_spec.SetField(character.FieldKangXi, field.TypeString, value)
+	if cuo.mutation.SimplifiedStrokeCleared() {
+		_spec.ClearField(character.FieldSimplifiedStroke, field.TypeInt)
 	}
-	if value, ok := cuo.mutation.KangXiStroke(); ok {
-		_spec.SetField(character.FieldKangXiStroke, field.TypeInt, value)
+	if value, ok := cuo.mutation.TraditionalStroke(); ok {
+		_spec.SetField(character.FieldTraditionalStroke, field.TypeInt, value)
 	}
-	if value, ok := cuo.mutation.AddedKangXiStroke(); ok {
-		_spec.AddField(character.FieldKangXiStroke, field.TypeInt, value)
+	if value, ok := cuo.mutation.AddedTraditionalStroke(); ok {
+		_spec.AddField(character.FieldTraditionalStroke, field.TypeInt, value)
 	}
-	if value, ok := cuo.mutation.SimpleRadical(); ok {
-		_spec.SetField(character.FieldSimpleRadical, field.TypeString, value)
+	if cuo.mutation.TraditionalStrokeCleared() {
+		_spec.ClearField(character.FieldTraditionalStroke, field.TypeInt)
 	}
-	if value, ok := cuo.mutation.SimpleRadicalStroke(); ok {
-		_spec.SetField(character.FieldSimpleRadicalStroke, field.TypeInt, value)
+	if value, ok := cuo.mutation.KangxiStroke(); ok {
+		_spec.SetField(character.FieldKangxiStroke, field.TypeInt, value)
 	}
-	if value, ok := cuo.mutation.AddedSimpleRadicalStroke(); ok {
-		_spec.AddField(character.FieldSimpleRadicalStroke, field.TypeInt, value)
+	if value, ok := cuo.mutation.AddedKangxiStroke(); ok {
+		_spec.AddField(character.FieldKangxiStroke, field.TypeInt, value)
 	}
-	if value, ok := cuo.mutation.SimpleTotalStroke(); ok {
-		_spec.SetField(character.FieldSimpleTotalStroke, field.TypeInt, value)
-	}
-	if value, ok := cuo.mutation.AddedSimpleTotalStroke(); ok {
-		_spec.AddField(character.FieldSimpleTotalStroke, field.TypeInt, value)
-	}
-	if value, ok := cuo.mutation.TraditionalRadical(); ok {
-		_spec.SetField(character.FieldTraditionalRadical, field.TypeString, value)
-	}
-	if value, ok := cuo.mutation.TraditionalRadicalStroke(); ok {
-		_spec.SetField(character.FieldTraditionalRadicalStroke, field.TypeInt, value)
-	}
-	if value, ok := cuo.mutation.AddedTraditionalRadicalStroke(); ok {
-		_spec.AddField(character.FieldTraditionalRadicalStroke, field.TypeInt, value)
-	}
-	if value, ok := cuo.mutation.TraditionalTotalStroke(); ok {
-		_spec.SetField(character.FieldTraditionalTotalStroke, field.TypeInt, value)
-	}
-	if value, ok := cuo.mutation.AddedTraditionalTotalStroke(); ok {
-		_spec.AddField(character.FieldTraditionalTotalStroke, field.TypeInt, value)
-	}
-	if value, ok := cuo.mutation.NameScience(); ok {
-		_spec.SetField(character.FieldNameScience, field.TypeBool, value)
-	}
-	if value, ok := cuo.mutation.WuXing(); ok {
-		_spec.SetField(character.FieldWuXing, field.TypeString, value)
-	}
-	if value, ok := cuo.mutation.Lucky(); ok {
-		_spec.SetField(character.FieldLucky, field.TypeString, value)
-	}
-	if value, ok := cuo.mutation.Regular(); ok {
-		_spec.SetField(character.FieldRegular, field.TypeBool, value)
-	}
-	if value, ok := cuo.mutation.TraditionalCharacter(); ok {
-		_spec.SetField(character.FieldTraditionalCharacter, field.TypeString, value)
-	}
-	if value, ok := cuo.mutation.VariantCharacter(); ok {
-		_spec.SetField(character.FieldVariantCharacter, field.TypeString, value)
-	}
-	if value, ok := cuo.mutation.Comment(); ok {
-		_spec.SetField(character.FieldComment, field.TypeString, value)
+	if cuo.mutation.KangxiStrokeCleared() {
+		_spec.ClearField(character.FieldKangxiStroke, field.TypeInt)
 	}
 	if value, ok := cuo.mutation.ScienceStroke(); ok {
 		_spec.SetField(character.FieldScienceStroke, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedScienceStroke(); ok {
 		_spec.AddField(character.FieldScienceStroke, field.TypeInt, value)
+	}
+	if cuo.mutation.ScienceStrokeCleared() {
+		_spec.ClearField(character.FieldScienceStroke, field.TypeInt)
+	}
+	if value, ok := cuo.mutation.WuXing(); ok {
+		_spec.SetField(character.FieldWuXing, field.TypeString, value)
+	}
+	if cuo.mutation.WuXingCleared() {
+		_spec.ClearField(character.FieldWuXing, field.TypeString)
+	}
+	if value, ok := cuo.mutation.Regular(); ok {
+		_spec.SetField(character.FieldRegular, field.TypeBool, value)
+	}
+	if value, ok := cuo.mutation.CommonLevel(); ok {
+		_spec.SetField(character.FieldCommonLevel, field.TypeInt, value)
+	}
+	if value, ok := cuo.mutation.AddedCommonLevel(); ok {
+		_spec.AddField(character.FieldCommonLevel, field.TypeInt, value)
+	}
+	if cuo.mutation.CommonLevelCleared() {
+		_spec.ClearField(character.FieldCommonLevel, field.TypeInt)
+	}
+	if value, ok := cuo.mutation.GenderHint(); ok {
+		_spec.SetField(character.FieldGenderHint, field.TypeString, value)
+	}
+	if cuo.mutation.GenderHintCleared() {
+		_spec.ClearField(character.FieldGenderHint, field.TypeString)
+	}
+	if value, ok := cuo.mutation.Nameable(); ok {
+		_spec.SetField(character.FieldNameable, field.TypeBool, value)
+	}
+	if value, ok := cuo.mutation.Meaning(); ok {
+		_spec.SetField(character.FieldMeaning, field.TypeString, value)
+	}
+	if cuo.mutation.MeaningCleared() {
+		_spec.ClearField(character.FieldMeaning, field.TypeString)
+	}
+	if value, ok := cuo.mutation.Source(); ok {
+		_spec.SetField(character.FieldSource, field.TypeString, value)
+	}
+	if cuo.mutation.SourceCleared() {
+		_spec.ClearField(character.FieldSource, field.TypeString)
+	}
+	if value, ok := cuo.mutation.SourceConfidence(); ok {
+		_spec.SetField(character.FieldSourceConfidence, field.TypeFloat64, value)
+	}
+	if value, ok := cuo.mutation.AddedSourceConfidence(); ok {
+		_spec.AddField(character.FieldSourceConfidence, field.TypeFloat64, value)
+	}
+	if cuo.mutation.SourceConfidenceCleared() {
+		_spec.ClearField(character.FieldSourceConfidence, field.TypeFloat64)
+	}
+	if value, ok := cuo.mutation.Comment(); ok {
+		_spec.SetField(character.FieldComment, field.TypeString, value)
+	}
+	if cuo.mutation.CommentCleared() {
+		_spec.ClearField(character.FieldComment, field.TypeString)
+	}
+	if cuo.mutation.SimplifiedOfCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   character.SimplifiedOfTable,
+			Columns: []string{character.SimplifiedOfColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.SimplifiedOfIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   character.SimplifiedOfTable,
+			Columns: []string{character.SimplifiedOfColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.TraditionalToSimplifiedCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   character.TraditionalToSimplifiedTable,
+			Columns: []string{character.TraditionalToSimplifiedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.TraditionalToSimplifiedIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   character.TraditionalToSimplifiedTable,
+			Columns: []string{character.TraditionalToSimplifiedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.VariantOfCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   character.VariantOfTable,
+			Columns: []string{character.VariantOfColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.VariantOfIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   character.VariantOfTable,
+			Columns: []string{character.VariantOfColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.StandardToVariantCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.StandardToVariantTable,
+			Columns: []string{character.StandardToVariantColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedStandardToVariantIDs(); len(nodes) > 0 && !cuo.mutation.StandardToVariantCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.StandardToVariantTable,
+			Columns: []string{character.StandardToVariantColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.StandardToVariantIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.StandardToVariantTable,
+			Columns: []string{character.StandardToVariantColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Character{config: cuo.config}
 	_spec.Assign = _node.assignValues

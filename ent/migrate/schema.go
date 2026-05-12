@@ -11,35 +11,220 @@ import (
 var (
 	// CharacterColumns holds the columns for the "character" table.
 	CharacterColumns = []*schema.Column{
-		{Name: "hash", Type: field.TypeString},
-		{Name: "pin_yin", Type: field.TypeString},
-		{Name: "ch", Type: field.TypeString},
-		{Name: "radical", Type: field.TypeString},
-		{Name: "radical_stroke", Type: field.TypeInt},
-		{Name: "stroke", Type: field.TypeInt},
-		{Name: "is_kang_xi", Type: field.TypeBool},
-		{Name: "kang_xi", Type: field.TypeString},
-		{Name: "kang_xi_stroke", Type: field.TypeInt},
-		{Name: "simple_radical", Type: field.TypeString},
-		{Name: "simple_radical_stroke", Type: field.TypeInt},
-		{Name: "simple_total_stroke", Type: field.TypeInt},
-		{Name: "traditional_radical", Type: field.TypeString},
-		{Name: "traditional_radical_stroke", Type: field.TypeInt},
-		{Name: "traditional_total_stroke", Type: field.TypeInt},
-		{Name: "name_science", Type: field.TypeBool},
-		{Name: "wu_xing", Type: field.TypeString},
-		{Name: "lucky", Type: field.TypeString},
-		{Name: "regular", Type: field.TypeBool},
-		{Name: "traditional_character", Type: field.TypeString},
-		{Name: "variant_character", Type: field.TypeString},
-		{Name: "comment", Type: field.TypeString},
-		{Name: "science_stroke", Type: field.TypeInt},
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "char", Type: field.TypeString},
+		{Name: "unicode", Type: field.TypeString, Nullable: true},
+		{Name: "is_simplified", Type: field.TypeBool, Default: false},
+		{Name: "is_traditional", Type: field.TypeBool, Default: false},
+		{Name: "is_kangxi", Type: field.TypeBool, Default: false},
+		{Name: "is_variant", Type: field.TypeBool, Default: false},
+		{Name: "is_ancient", Type: field.TypeBool, Default: false},
+		{Name: "pinyin", Type: field.TypeJSON, Nullable: true},
+		{Name: "radical", Type: field.TypeString, Nullable: true},
+		{Name: "radical_stroke", Type: field.TypeInt, Nullable: true},
+		{Name: "simplified_stroke", Type: field.TypeInt, Nullable: true},
+		{Name: "traditional_stroke", Type: field.TypeInt, Nullable: true},
+		{Name: "kangxi_stroke", Type: field.TypeInt, Nullable: true},
+		{Name: "science_stroke", Type: field.TypeInt, Nullable: true},
+		{Name: "wu_xing", Type: field.TypeString, Nullable: true},
+		{Name: "regular", Type: field.TypeBool, Default: false},
+		{Name: "common_level", Type: field.TypeInt, Nullable: true},
+		{Name: "gender_hint", Type: field.TypeString, Nullable: true},
+		{Name: "nameable", Type: field.TypeBool, Default: true},
+		{Name: "meaning", Type: field.TypeString, Nullable: true},
+		{Name: "source", Type: field.TypeString, Nullable: true},
+		{Name: "source_confidence", Type: field.TypeFloat64, Nullable: true},
+		{Name: "comment", Type: field.TypeString, Nullable: true},
+		{Name: "character_traditional_to_simplified", Type: field.TypeInt, Unique: true, Nullable: true},
+		{Name: "character_standard_to_variant", Type: field.TypeInt, Nullable: true},
 	}
 	// CharacterTable holds the schema information for the "character" table.
 	CharacterTable = &schema.Table{
 		Name:       "character",
 		Columns:    CharacterColumns,
 		PrimaryKey: []*schema.Column{CharacterColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "character_character_traditional_to_simplified",
+				Columns:    []*schema.Column{CharacterColumns[24]},
+				RefColumns: []*schema.Column{CharacterColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "character_character_standard_to_variant",
+				Columns:    []*schema.Column{CharacterColumns[25]},
+				RefColumns: []*schema.Column{CharacterColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "character_char",
+				Unique:  true,
+				Columns: []*schema.Column{CharacterColumns[1]},
+			},
+			{
+				Name:    "character_unicode",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[2]},
+			},
+			{
+				Name:    "character_is_simplified",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[3]},
+			},
+			{
+				Name:    "character_is_traditional",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[4]},
+			},
+			{
+				Name:    "character_is_kangxi",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[5]},
+			},
+			{
+				Name:    "character_is_variant",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[6]},
+			},
+			{
+				Name:    "character_wu_xing",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[15]},
+			},
+			{
+				Name:    "character_simplified_stroke",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[11]},
+			},
+			{
+				Name:    "character_traditional_stroke",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[12]},
+			},
+			{
+				Name:    "character_kangxi_stroke",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[13]},
+			},
+			{
+				Name:    "character_science_stroke",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[14]},
+			},
+			{
+				Name:    "character_regular",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[16]},
+			},
+			{
+				Name:    "character_common_level",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[17]},
+			},
+			{
+				Name:    "character_nameable",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[19]},
+			},
+			{
+				Name:    "character_wu_xing_science_stroke",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[15], CharacterColumns[14]},
+			},
+			{
+				Name:    "character_wu_xing_kangxi_stroke",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[15], CharacterColumns[13]},
+			},
+			{
+				Name:    "character_regular_nameable",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[16], CharacterColumns[19]},
+			},
+			{
+				Name:    "character_is_simplified_is_traditional_is_kangxi",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[3], CharacterColumns[4], CharacterColumns[5]},
+			},
+		},
+	}
+	// PoemColumns holds the columns for the "poem" table.
+	PoemColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "author", Type: field.TypeString, Nullable: true},
+		{Name: "dynasty", Type: field.TypeString, Nullable: true},
+		{Name: "content", Type: field.TypeString, Size: 2147483647},
+		{Name: "preface", Type: field.TypeString, Nullable: true},
+		{Name: "keywords", Type: field.TypeJSON, Nullable: true},
+		{Name: "tags", Type: field.TypeJSON, Nullable: true},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"shi", "ci", "fu", "jing", "other"}, Default: "shi"},
+		{Name: "source", Type: field.TypeString, Nullable: true},
+	}
+	// PoemTable holds the schema information for the "poem" table.
+	PoemTable = &schema.Table{
+		Name:       "poem",
+		Columns:    PoemColumns,
+		PrimaryKey: []*schema.Column{PoemColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "poem_title_author",
+				Unique:  false,
+				Columns: []*schema.Column{PoemColumns[1], PoemColumns[2]},
+			},
+			{
+				Name:    "poem_dynasty",
+				Unique:  false,
+				Columns: []*schema.Column{PoemColumns[3]},
+			},
+			{
+				Name:    "poem_type",
+				Unique:  false,
+				Columns: []*schema.Column{PoemColumns[8]},
+			},
+		},
+	}
+	// PoemCharColumns holds the columns for the "poem_char" table.
+	PoemCharColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "char", Type: field.TypeString},
+		{Name: "position", Type: field.TypeInt},
+		{Name: "sentence", Type: field.TypeString, Nullable: true},
+		{Name: "context", Type: field.TypeString, Nullable: true},
+		{Name: "poem_id", Type: field.TypeInt},
+	}
+	// PoemCharTable holds the schema information for the "poem_char" table.
+	PoemCharTable = &schema.Table{
+		Name:       "poem_char",
+		Columns:    PoemCharColumns,
+		PrimaryKey: []*schema.Column{PoemCharColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "poem_char_poem_poem_chars",
+				Columns:    []*schema.Column{PoemCharColumns[5]},
+				RefColumns: []*schema.Column{PoemColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "poemchar_char",
+				Unique:  false,
+				Columns: []*schema.Column{PoemCharColumns[1]},
+			},
+			{
+				Name:    "poemchar_poem_id",
+				Unique:  false,
+				Columns: []*schema.Column{PoemCharColumns[5]},
+			},
+			{
+				Name:    "poemchar_char_poem_id",
+				Unique:  false,
+				Columns: []*schema.Column{PoemCharColumns[1], PoemCharColumns[5]},
+			},
+		},
 	}
 	// VersionsColumns holds the columns for the "versions" table.
 	VersionsColumns = []*schema.Column{
@@ -113,6 +298,8 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CharacterTable,
+		PoemTable,
+		PoemCharTable,
 		VersionsTable,
 		WuGeLuckyTable,
 		WuXingTable,
@@ -120,8 +307,17 @@ var (
 )
 
 func init() {
+	CharacterTable.ForeignKeys[0].RefTable = CharacterTable
+	CharacterTable.ForeignKeys[1].RefTable = CharacterTable
 	CharacterTable.Annotation = &entsql.Annotation{
 		Table: "character",
+	}
+	PoemTable.Annotation = &entsql.Annotation{
+		Table: "poem",
+	}
+	PoemCharTable.ForeignKeys[0].RefTable = PoemTable
+	PoemCharTable.Annotation = &entsql.Annotation{
+		Table: "poem_char",
 	}
 	WuGeLuckyTable.Annotation = &entsql.Annotation{
 		Table: "wu_ge_lucky",

@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -14,51 +15,121 @@ import (
 type Character struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
-	// PinYin holds the value of the "pin_yin" field.
-	PinYin string `json:"pin_yin,omitempty"`
-	// Ch holds the value of the "ch" field.
-	Ch string `json:"ch,omitempty"`
-	// Radical holds the value of the "radical" field.
+	ID int `json:"id,omitempty"`
+	// 汉字本身（Unicode标准形式）
+	Char string `json:"char,omitempty"`
+	// Unicode码点，如U+4E00
+	Unicode string `json:"unicode,omitempty"`
+	// 是否为简体字形
+	IsSimplified bool `json:"is_simplified,omitempty"`
+	// 是否为繁体字形
+	IsTraditional bool `json:"is_traditional,omitempty"`
+	// 是否为康熙字典字形
+	IsKangxi bool `json:"is_kangxi,omitempty"`
+	// 是否为异体字
+	IsVariant bool `json:"is_variant,omitempty"`
+	// 是否为古字/旧字形
+	IsAncient bool `json:"is_ancient,omitempty"`
+	// 拼音列表（多音字支持），如[zhōng,zhòng]
+	Pinyin []string `json:"pinyin,omitempty"`
+	// 部首
 	Radical string `json:"radical,omitempty"`
-	// RadicalStroke holds the value of the "radical_stroke" field.
+	// 部首笔画数
 	RadicalStroke int `json:"radical_stroke,omitempty"`
-	// Stroke holds the value of the "stroke" field.
-	Stroke int `json:"stroke,omitempty"`
-	// IsKangXi holds the value of the "is_kang_xi" field.
-	IsKangXi bool `json:"is_kang_xi,omitempty"`
-	// KangXi holds the value of the "kang_xi" field.
-	KangXi string `json:"kang_xi,omitempty"`
-	// KangXiStroke holds the value of the "kang_xi_stroke" field.
-	KangXiStroke int `json:"kang_xi_stroke,omitempty"`
-	// SimpleRadical holds the value of the "simple_radical" field.
-	SimpleRadical string `json:"simple_radical,omitempty"`
-	// SimpleRadicalStroke holds the value of the "simple_radical_stroke" field.
-	SimpleRadicalStroke int `json:"simple_radical_stroke,omitempty"`
-	// SimpleTotalStroke holds the value of the "simple_total_stroke" field.
-	SimpleTotalStroke int `json:"simple_total_stroke,omitempty"`
-	// TraditionalRadical holds the value of the "traditional_radical" field.
-	TraditionalRadical string `json:"traditional_radical,omitempty"`
-	// TraditionalRadicalStroke holds the value of the "traditional_radical_stroke" field.
-	TraditionalRadicalStroke int `json:"traditional_radical_stroke,omitempty"`
-	// TraditionalTotalStroke holds the value of the "traditional_total_stroke" field.
-	TraditionalTotalStroke int `json:"traditional_total_stroke,omitempty"`
-	// NameScience holds the value of the "name_science" field.
-	NameScience bool `json:"name_science,omitempty"`
-	// WuXing holds the value of the "wu_xing" field.
-	WuXing string `json:"wu_xing,omitempty"`
-	// Lucky holds the value of the "lucky" field.
-	Lucky string `json:"lucky,omitempty"`
-	// Regular holds the value of the "regular" field.
-	Regular bool `json:"regular,omitempty"`
-	// TraditionalCharacter holds the value of the "traditional_character" field.
-	TraditionalCharacter string `json:"traditional_character,omitempty"`
-	// VariantCharacter holds the value of the "variant_character" field.
-	VariantCharacter string `json:"variant_character,omitempty"`
-	// Comment holds the value of the "comment" field.
-	Comment string `json:"comment,omitempty"`
-	// ScienceStroke holds the value of the "science_stroke" field.
+	// 简体笔画数（GB13000/通用规范汉字表）
+	SimplifiedStroke int `json:"simplified_stroke,omitempty"`
+	// 繁体笔画数
+	TraditionalStroke int `json:"traditional_stroke,omitempty"`
+	// 康熙字典笔画数（起名用）
+	KangxiStroke int `json:"kangxi_stroke,omitempty"`
+	// 姓名学笔画数（基于康熙字典，含部首变形修正）
 	ScienceStroke int `json:"science_stroke,omitempty"`
+	// 五行属性：木/火/土/金/水
+	WuXing string `json:"wu_xing,omitempty"`
+	// 是否常用字（通用规范汉字表内）
+	Regular bool `json:"regular,omitempty"`
+	// 常用字等级 1-5（1最常用）
+	CommonLevel int `json:"common_level,omitempty"`
+	// 性别倾向：male/female/neutral
+	GenderHint string `json:"gender_hint,omitempty"`
+	// 是否可用于起名
+	Nameable bool `json:"nameable,omitempty"`
+	// 字义简释
+	Meaning string `json:"meaning,omitempty"`
+	// 数据来源标识，如unihan/kangxi/custom
+	Source string `json:"source,omitempty"`
+	// 数据来源可信度 0-1
+	SourceConfidence float64 `json:"source_confidence,omitempty"`
+	// 备注
+	Comment string `json:"comment,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the CharacterQuery when eager-loading is set.
+	Edges                               CharacterEdges `json:"edges"`
+	character_traditional_to_simplified *int
+	character_standard_to_variant       *int
+}
+
+// CharacterEdges holds the relations/edges for other nodes in the graph.
+type CharacterEdges struct {
+	// 简体字对应的繁体字
+	SimplifiedOf *Character `json:"simplified_of,omitempty"`
+	// 繁体字对应的简体字
+	TraditionalToSimplified *Character `json:"traditional_to_simplified,omitempty"`
+	// 异体字对应的标准字
+	VariantOf *Character `json:"variant_of,omitempty"`
+	// 标准字对应的异体字
+	StandardToVariant []*Character `json:"standard_to_variant,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [4]bool
+}
+
+// SimplifiedOfOrErr returns the SimplifiedOf value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CharacterEdges) SimplifiedOfOrErr() (*Character, error) {
+	if e.loadedTypes[0] {
+		if e.SimplifiedOf == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: character.Label}
+		}
+		return e.SimplifiedOf, nil
+	}
+	return nil, &NotLoadedError{edge: "simplified_of"}
+}
+
+// TraditionalToSimplifiedOrErr returns the TraditionalToSimplified value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CharacterEdges) TraditionalToSimplifiedOrErr() (*Character, error) {
+	if e.loadedTypes[1] {
+		if e.TraditionalToSimplified == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: character.Label}
+		}
+		return e.TraditionalToSimplified, nil
+	}
+	return nil, &NotLoadedError{edge: "traditional_to_simplified"}
+}
+
+// VariantOfOrErr returns the VariantOf value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CharacterEdges) VariantOfOrErr() (*Character, error) {
+	if e.loadedTypes[2] {
+		if e.VariantOf == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: character.Label}
+		}
+		return e.VariantOf, nil
+	}
+	return nil, &NotLoadedError{edge: "variant_of"}
+}
+
+// StandardToVariantOrErr returns the StandardToVariant value or an error if the edge
+// was not loaded in eager-loading.
+func (e CharacterEdges) StandardToVariantOrErr() ([]*Character, error) {
+	if e.loadedTypes[3] {
+		return e.StandardToVariant, nil
+	}
+	return nil, &NotLoadedError{edge: "standard_to_variant"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -66,12 +137,20 @@ func (*Character) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case character.FieldIsKangXi, character.FieldNameScience, character.FieldRegular:
+		case character.FieldPinyin:
+			values[i] = new([]byte)
+		case character.FieldIsSimplified, character.FieldIsTraditional, character.FieldIsKangxi, character.FieldIsVariant, character.FieldIsAncient, character.FieldRegular, character.FieldNameable:
 			values[i] = new(sql.NullBool)
-		case character.FieldRadicalStroke, character.FieldStroke, character.FieldKangXiStroke, character.FieldSimpleRadicalStroke, character.FieldSimpleTotalStroke, character.FieldTraditionalRadicalStroke, character.FieldTraditionalTotalStroke, character.FieldScienceStroke:
+		case character.FieldSourceConfidence:
+			values[i] = new(sql.NullFloat64)
+		case character.FieldID, character.FieldRadicalStroke, character.FieldSimplifiedStroke, character.FieldTraditionalStroke, character.FieldKangxiStroke, character.FieldScienceStroke, character.FieldCommonLevel:
 			values[i] = new(sql.NullInt64)
-		case character.FieldID, character.FieldPinYin, character.FieldCh, character.FieldRadical, character.FieldKangXi, character.FieldSimpleRadical, character.FieldTraditionalRadical, character.FieldWuXing, character.FieldLucky, character.FieldTraditionalCharacter, character.FieldVariantCharacter, character.FieldComment:
+		case character.FieldChar, character.FieldUnicode, character.FieldRadical, character.FieldWuXing, character.FieldGenderHint, character.FieldMeaning, character.FieldSource, character.FieldComment:
 			values[i] = new(sql.NullString)
+		case character.ForeignKeys[0]: // character_traditional_to_simplified
+			values[i] = new(sql.NullInt64)
+		case character.ForeignKeys[1]: // character_standard_to_variant
+			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Character", columns[i])
 		}
@@ -88,22 +167,60 @@ func (c *Character) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case character.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				c.ID = value.String
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-		case character.FieldPinYin:
+			c.ID = int(value.Int64)
+		case character.FieldChar:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field pin_yin", values[i])
+				return fmt.Errorf("unexpected type %T for field char", values[i])
 			} else if value.Valid {
-				c.PinYin = value.String
+				c.Char = value.String
 			}
-		case character.FieldCh:
+		case character.FieldUnicode:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field ch", values[i])
+				return fmt.Errorf("unexpected type %T for field unicode", values[i])
 			} else if value.Valid {
-				c.Ch = value.String
+				c.Unicode = value.String
+			}
+		case character.FieldIsSimplified:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_simplified", values[i])
+			} else if value.Valid {
+				c.IsSimplified = value.Bool
+			}
+		case character.FieldIsTraditional:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_traditional", values[i])
+			} else if value.Valid {
+				c.IsTraditional = value.Bool
+			}
+		case character.FieldIsKangxi:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_kangxi", values[i])
+			} else if value.Valid {
+				c.IsKangxi = value.Bool
+			}
+		case character.FieldIsVariant:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_variant", values[i])
+			} else if value.Valid {
+				c.IsVariant = value.Bool
+			}
+		case character.FieldIsAncient:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_ancient", values[i])
+			} else if value.Valid {
+				c.IsAncient = value.Bool
+			}
+		case character.FieldPinyin:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field pinyin", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.Pinyin); err != nil {
+					return fmt.Errorf("unmarshal field pinyin: %w", err)
+				}
 			}
 		case character.FieldRadical:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -117,107 +234,23 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.RadicalStroke = int(value.Int64)
 			}
-		case character.FieldStroke:
+		case character.FieldSimplifiedStroke:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field stroke", values[i])
+				return fmt.Errorf("unexpected type %T for field simplified_stroke", values[i])
 			} else if value.Valid {
-				c.Stroke = int(value.Int64)
+				c.SimplifiedStroke = int(value.Int64)
 			}
-		case character.FieldIsKangXi:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_kang_xi", values[i])
-			} else if value.Valid {
-				c.IsKangXi = value.Bool
-			}
-		case character.FieldKangXi:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field kang_xi", values[i])
-			} else if value.Valid {
-				c.KangXi = value.String
-			}
-		case character.FieldKangXiStroke:
+		case character.FieldTraditionalStroke:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field kang_xi_stroke", values[i])
+				return fmt.Errorf("unexpected type %T for field traditional_stroke", values[i])
 			} else if value.Valid {
-				c.KangXiStroke = int(value.Int64)
+				c.TraditionalStroke = int(value.Int64)
 			}
-		case character.FieldSimpleRadical:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field simple_radical", values[i])
-			} else if value.Valid {
-				c.SimpleRadical = value.String
-			}
-		case character.FieldSimpleRadicalStroke:
+		case character.FieldKangxiStroke:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field simple_radical_stroke", values[i])
+				return fmt.Errorf("unexpected type %T for field kangxi_stroke", values[i])
 			} else if value.Valid {
-				c.SimpleRadicalStroke = int(value.Int64)
-			}
-		case character.FieldSimpleTotalStroke:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field simple_total_stroke", values[i])
-			} else if value.Valid {
-				c.SimpleTotalStroke = int(value.Int64)
-			}
-		case character.FieldTraditionalRadical:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field traditional_radical", values[i])
-			} else if value.Valid {
-				c.TraditionalRadical = value.String
-			}
-		case character.FieldTraditionalRadicalStroke:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field traditional_radical_stroke", values[i])
-			} else if value.Valid {
-				c.TraditionalRadicalStroke = int(value.Int64)
-			}
-		case character.FieldTraditionalTotalStroke:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field traditional_total_stroke", values[i])
-			} else if value.Valid {
-				c.TraditionalTotalStroke = int(value.Int64)
-			}
-		case character.FieldNameScience:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field name_science", values[i])
-			} else if value.Valid {
-				c.NameScience = value.Bool
-			}
-		case character.FieldWuXing:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field wu_xing", values[i])
-			} else if value.Valid {
-				c.WuXing = value.String
-			}
-		case character.FieldLucky:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field lucky", values[i])
-			} else if value.Valid {
-				c.Lucky = value.String
-			}
-		case character.FieldRegular:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field regular", values[i])
-			} else if value.Valid {
-				c.Regular = value.Bool
-			}
-		case character.FieldTraditionalCharacter:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field traditional_character", values[i])
-			} else if value.Valid {
-				c.TraditionalCharacter = value.String
-			}
-		case character.FieldVariantCharacter:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field variant_character", values[i])
-			} else if value.Valid {
-				c.VariantCharacter = value.String
-			}
-		case character.FieldComment:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field comment", values[i])
-			} else if value.Valid {
-				c.Comment = value.String
+				c.KangxiStroke = int(value.Int64)
 			}
 		case character.FieldScienceStroke:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -225,9 +258,97 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.ScienceStroke = int(value.Int64)
 			}
+		case character.FieldWuXing:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field wu_xing", values[i])
+			} else if value.Valid {
+				c.WuXing = value.String
+			}
+		case character.FieldRegular:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field regular", values[i])
+			} else if value.Valid {
+				c.Regular = value.Bool
+			}
+		case character.FieldCommonLevel:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field common_level", values[i])
+			} else if value.Valid {
+				c.CommonLevel = int(value.Int64)
+			}
+		case character.FieldGenderHint:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field gender_hint", values[i])
+			} else if value.Valid {
+				c.GenderHint = value.String
+			}
+		case character.FieldNameable:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field nameable", values[i])
+			} else if value.Valid {
+				c.Nameable = value.Bool
+			}
+		case character.FieldMeaning:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field meaning", values[i])
+			} else if value.Valid {
+				c.Meaning = value.String
+			}
+		case character.FieldSource:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field source", values[i])
+			} else if value.Valid {
+				c.Source = value.String
+			}
+		case character.FieldSourceConfidence:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field source_confidence", values[i])
+			} else if value.Valid {
+				c.SourceConfidence = value.Float64
+			}
+		case character.FieldComment:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field comment", values[i])
+			} else if value.Valid {
+				c.Comment = value.String
+			}
+		case character.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field character_traditional_to_simplified", value)
+			} else if value.Valid {
+				c.character_traditional_to_simplified = new(int)
+				*c.character_traditional_to_simplified = int(value.Int64)
+			}
+		case character.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field character_standard_to_variant", value)
+			} else if value.Valid {
+				c.character_standard_to_variant = new(int)
+				*c.character_standard_to_variant = int(value.Int64)
+			}
 		}
 	}
 	return nil
+}
+
+// QuerySimplifiedOf queries the "simplified_of" edge of the Character entity.
+func (c *Character) QuerySimplifiedOf() *CharacterQuery {
+	return NewCharacterClient(c.config).QuerySimplifiedOf(c)
+}
+
+// QueryTraditionalToSimplified queries the "traditional_to_simplified" edge of the Character entity.
+func (c *Character) QueryTraditionalToSimplified() *CharacterQuery {
+	return NewCharacterClient(c.config).QueryTraditionalToSimplified(c)
+}
+
+// QueryVariantOf queries the "variant_of" edge of the Character entity.
+func (c *Character) QueryVariantOf() *CharacterQuery {
+	return NewCharacterClient(c.config).QueryVariantOf(c)
+}
+
+// QueryStandardToVariant queries the "standard_to_variant" edge of the Character entity.
+func (c *Character) QueryStandardToVariant() *CharacterQuery {
+	return NewCharacterClient(c.config).QueryStandardToVariant(c)
 }
 
 // Update returns a builder for updating this Character.
@@ -253,11 +374,29 @@ func (c *Character) String() string {
 	var builder strings.Builder
 	builder.WriteString("Character(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
-	builder.WriteString("pin_yin=")
-	builder.WriteString(c.PinYin)
+	builder.WriteString("char=")
+	builder.WriteString(c.Char)
 	builder.WriteString(", ")
-	builder.WriteString("ch=")
-	builder.WriteString(c.Ch)
+	builder.WriteString("unicode=")
+	builder.WriteString(c.Unicode)
+	builder.WriteString(", ")
+	builder.WriteString("is_simplified=")
+	builder.WriteString(fmt.Sprintf("%v", c.IsSimplified))
+	builder.WriteString(", ")
+	builder.WriteString("is_traditional=")
+	builder.WriteString(fmt.Sprintf("%v", c.IsTraditional))
+	builder.WriteString(", ")
+	builder.WriteString("is_kangxi=")
+	builder.WriteString(fmt.Sprintf("%v", c.IsKangxi))
+	builder.WriteString(", ")
+	builder.WriteString("is_variant=")
+	builder.WriteString(fmt.Sprintf("%v", c.IsVariant))
+	builder.WriteString(", ")
+	builder.WriteString("is_ancient=")
+	builder.WriteString(fmt.Sprintf("%v", c.IsAncient))
+	builder.WriteString(", ")
+	builder.WriteString("pinyin=")
+	builder.WriteString(fmt.Sprintf("%v", c.Pinyin))
 	builder.WriteString(", ")
 	builder.WriteString("radical=")
 	builder.WriteString(c.Radical)
@@ -265,59 +404,44 @@ func (c *Character) String() string {
 	builder.WriteString("radical_stroke=")
 	builder.WriteString(fmt.Sprintf("%v", c.RadicalStroke))
 	builder.WriteString(", ")
-	builder.WriteString("stroke=")
-	builder.WriteString(fmt.Sprintf("%v", c.Stroke))
+	builder.WriteString("simplified_stroke=")
+	builder.WriteString(fmt.Sprintf("%v", c.SimplifiedStroke))
 	builder.WriteString(", ")
-	builder.WriteString("is_kang_xi=")
-	builder.WriteString(fmt.Sprintf("%v", c.IsKangXi))
+	builder.WriteString("traditional_stroke=")
+	builder.WriteString(fmt.Sprintf("%v", c.TraditionalStroke))
 	builder.WriteString(", ")
-	builder.WriteString("kang_xi=")
-	builder.WriteString(c.KangXi)
+	builder.WriteString("kangxi_stroke=")
+	builder.WriteString(fmt.Sprintf("%v", c.KangxiStroke))
 	builder.WriteString(", ")
-	builder.WriteString("kang_xi_stroke=")
-	builder.WriteString(fmt.Sprintf("%v", c.KangXiStroke))
-	builder.WriteString(", ")
-	builder.WriteString("simple_radical=")
-	builder.WriteString(c.SimpleRadical)
-	builder.WriteString(", ")
-	builder.WriteString("simple_radical_stroke=")
-	builder.WriteString(fmt.Sprintf("%v", c.SimpleRadicalStroke))
-	builder.WriteString(", ")
-	builder.WriteString("simple_total_stroke=")
-	builder.WriteString(fmt.Sprintf("%v", c.SimpleTotalStroke))
-	builder.WriteString(", ")
-	builder.WriteString("traditional_radical=")
-	builder.WriteString(c.TraditionalRadical)
-	builder.WriteString(", ")
-	builder.WriteString("traditional_radical_stroke=")
-	builder.WriteString(fmt.Sprintf("%v", c.TraditionalRadicalStroke))
-	builder.WriteString(", ")
-	builder.WriteString("traditional_total_stroke=")
-	builder.WriteString(fmt.Sprintf("%v", c.TraditionalTotalStroke))
-	builder.WriteString(", ")
-	builder.WriteString("name_science=")
-	builder.WriteString(fmt.Sprintf("%v", c.NameScience))
+	builder.WriteString("science_stroke=")
+	builder.WriteString(fmt.Sprintf("%v", c.ScienceStroke))
 	builder.WriteString(", ")
 	builder.WriteString("wu_xing=")
 	builder.WriteString(c.WuXing)
 	builder.WriteString(", ")
-	builder.WriteString("lucky=")
-	builder.WriteString(c.Lucky)
-	builder.WriteString(", ")
 	builder.WriteString("regular=")
 	builder.WriteString(fmt.Sprintf("%v", c.Regular))
 	builder.WriteString(", ")
-	builder.WriteString("traditional_character=")
-	builder.WriteString(c.TraditionalCharacter)
+	builder.WriteString("common_level=")
+	builder.WriteString(fmt.Sprintf("%v", c.CommonLevel))
 	builder.WriteString(", ")
-	builder.WriteString("variant_character=")
-	builder.WriteString(c.VariantCharacter)
+	builder.WriteString("gender_hint=")
+	builder.WriteString(c.GenderHint)
+	builder.WriteString(", ")
+	builder.WriteString("nameable=")
+	builder.WriteString(fmt.Sprintf("%v", c.Nameable))
+	builder.WriteString(", ")
+	builder.WriteString("meaning=")
+	builder.WriteString(c.Meaning)
+	builder.WriteString(", ")
+	builder.WriteString("source=")
+	builder.WriteString(c.Source)
+	builder.WriteString(", ")
+	builder.WriteString("source_confidence=")
+	builder.WriteString(fmt.Sprintf("%v", c.SourceConfidence))
 	builder.WriteString(", ")
 	builder.WriteString("comment=")
 	builder.WriteString(c.Comment)
-	builder.WriteString(", ")
-	builder.WriteString("science_stroke=")
-	builder.WriteString(fmt.Sprintf("%v", c.ScienceStroke))
 	builder.WriteByte(')')
 	return builder.String()
 }
