@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	_ "modernc.org/sqlite"
+	_ "github.com/sqlite3ent/sqlite3"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 		dbPath = os.Args[1]
 	}
 
-	db, err := sql.Open("sqlite", dbPath+"?mode=ro")
+	db, err := sql.Open("sqlite3", dbPath+"?mode=ro")
 	if err != nil {
 		fmt.Println("open error:", err)
 		return
