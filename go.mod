@@ -7,11 +7,11 @@ require (
 	github.com/godcong/yi v1.0.2
 	github.com/google/uuid v1.3.0
 	github.com/spf13/cobra v1.6.1
+	github.com/sqlite3ent/sqlite3 v1.0.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/net v0.54.0
 	golang.org/x/sync v0.20.0
 	gopkg.in/yaml.v3 v3.0.1
-	modernc.org/sqlite v1.21.0
 )
 
 replace github.com/godcong/chronos/v2 => ../chronos
@@ -44,6 +44,7 @@ require (
 	modernc.org/mathutil v1.5.0 // indirect
 	modernc.org/memory v1.5.0 // indirect
 	modernc.org/opt v0.1.3 // indirect
+	modernc.org/sqlite v1.21.0 // indirect
 	modernc.org/strutil v1.1.3 // indirect
 	modernc.org/token v1.0.1 // indirect
 )

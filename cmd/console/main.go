@@ -6,6 +6,7 @@ import (
 	"github.com/babyname/fate"
 	"github.com/babyname/fate/config"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/sqlite3ent/sqlite3"
 	"github.com/spf13/cobra"
 )
 
