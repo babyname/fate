@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -17,10 +18,15 @@ import (
 // CharacterQuery is the builder for querying Character entities.
 type CharacterQuery struct {
 	config
-	ctx        *QueryContext
-	order      []OrderFunc
-	inters     []Interceptor
-	predicates []predicate.Character
+	ctx                         *QueryContext
+	order                       []OrderFunc
+	inters                      []Interceptor
+	predicates                  []predicate.Character
+	withSimplifiedOf            *CharacterQuery
+	withTraditionalToSimplified *CharacterQuery
+	withVariantOf               *CharacterQuery
+	withStandardToVariant       *CharacterQuery
+	withFKs                     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -57,6 +63,94 @@ func (cq *CharacterQuery) Order(o ...OrderFunc) *CharacterQuery {
 	return cq
 }
 
+// QuerySimplifiedOf chains the current query on the "simplified_of" edge.
+func (cq *CharacterQuery) QuerySimplifiedOf() *CharacterQuery {
+	query := (&CharacterClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, selector),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, character.SimplifiedOfTable, character.SimplifiedOfColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTraditionalToSimplified chains the current query on the "traditional_to_simplified" edge.
+func (cq *CharacterQuery) QueryTraditionalToSimplified() *CharacterQuery {
+	query := (&CharacterClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, selector),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, character.TraditionalToSimplifiedTable, character.TraditionalToSimplifiedColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryVariantOf chains the current query on the "variant_of" edge.
+func (cq *CharacterQuery) QueryVariantOf() *CharacterQuery {
+	query := (&CharacterClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, selector),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, character.VariantOfTable, character.VariantOfColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryStandardToVariant chains the current query on the "standard_to_variant" edge.
+func (cq *CharacterQuery) QueryStandardToVariant() *CharacterQuery {
+	query := (&CharacterClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, selector),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, character.StandardToVariantTable, character.StandardToVariantColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Character entity from the query.
 // Returns a *NotFoundError when no Character was found.
 func (cq *CharacterQuery) First(ctx context.Context) (*Character, error) {
@@ -81,8 +175,8 @@ func (cq *CharacterQuery) FirstX(ctx context.Context) *Character {
 
 // FirstID returns the first Character ID from the query.
 // Returns a *NotFoundError when no Character ID was found.
-func (cq *CharacterQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (cq *CharacterQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -94,7 +188,7 @@ func (cq *CharacterQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cq *CharacterQuery) FirstIDX(ctx context.Context) string {
+func (cq *CharacterQuery) FirstIDX(ctx context.Context) int {
 	id, err := cq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -132,8 +226,8 @@ func (cq *CharacterQuery) OnlyX(ctx context.Context) *Character {
 // OnlyID is like Only, but returns the only Character ID in the query.
 // Returns a *NotSingularError when more than one Character ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cq *CharacterQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (cq *CharacterQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -149,7 +243,7 @@ func (cq *CharacterQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cq *CharacterQuery) OnlyIDX(ctx context.Context) string {
+func (cq *CharacterQuery) OnlyIDX(ctx context.Context) int {
 	id, err := cq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -177,7 +271,7 @@ func (cq *CharacterQuery) AllX(ctx context.Context) []*Character {
 }
 
 // IDs executes the query and returns a list of Character IDs.
-func (cq *CharacterQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (cq *CharacterQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if cq.ctx.Unique == nil && cq.path != nil {
 		cq.Unique(true)
 	}
@@ -189,7 +283,7 @@ func (cq *CharacterQuery) IDs(ctx context.Context) (ids []string, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cq *CharacterQuery) IDsX(ctx context.Context) []string {
+func (cq *CharacterQuery) IDsX(ctx context.Context) []int {
 	ids, err := cq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -244,15 +338,63 @@ func (cq *CharacterQuery) Clone() *CharacterQuery {
 		return nil
 	}
 	return &CharacterQuery{
-		config:     cq.config,
-		ctx:        cq.ctx.Clone(),
-		order:      append([]OrderFunc{}, cq.order...),
-		inters:     append([]Interceptor{}, cq.inters...),
-		predicates: append([]predicate.Character{}, cq.predicates...),
+		config:                      cq.config,
+		ctx:                         cq.ctx.Clone(),
+		order:                       append([]OrderFunc{}, cq.order...),
+		inters:                      append([]Interceptor{}, cq.inters...),
+		predicates:                  append([]predicate.Character{}, cq.predicates...),
+		withSimplifiedOf:            cq.withSimplifiedOf.Clone(),
+		withTraditionalToSimplified: cq.withTraditionalToSimplified.Clone(),
+		withVariantOf:               cq.withVariantOf.Clone(),
+		withStandardToVariant:       cq.withStandardToVariant.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
+}
+
+// WithSimplifiedOf tells the query-builder to eager-load the nodes that are connected to
+// the "simplified_of" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CharacterQuery) WithSimplifiedOf(opts ...func(*CharacterQuery)) *CharacterQuery {
+	query := (&CharacterClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withSimplifiedOf = query
+	return cq
+}
+
+// WithTraditionalToSimplified tells the query-builder to eager-load the nodes that are connected to
+// the "traditional_to_simplified" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CharacterQuery) WithTraditionalToSimplified(opts ...func(*CharacterQuery)) *CharacterQuery {
+	query := (&CharacterClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withTraditionalToSimplified = query
+	return cq
+}
+
+// WithVariantOf tells the query-builder to eager-load the nodes that are connected to
+// the "variant_of" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CharacterQuery) WithVariantOf(opts ...func(*CharacterQuery)) *CharacterQuery {
+	query := (&CharacterClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withVariantOf = query
+	return cq
+}
+
+// WithStandardToVariant tells the query-builder to eager-load the nodes that are connected to
+// the "standard_to_variant" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CharacterQuery) WithStandardToVariant(opts ...func(*CharacterQuery)) *CharacterQuery {
+	query := (&CharacterClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withStandardToVariant = query
+	return cq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -261,12 +403,12 @@ func (cq *CharacterQuery) Clone() *CharacterQuery {
 // Example:
 //
 //	var v []struct {
-//		PinYin string `json:"pin_yin,omitempty"`
+//		Char string `json:"char,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Character.Query().
-//		GroupBy(character.FieldPinYin).
+//		GroupBy(character.FieldChar).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (cq *CharacterQuery) GroupBy(field string, fields ...string) *CharacterGroupBy {
@@ -284,11 +426,11 @@ func (cq *CharacterQuery) GroupBy(field string, fields ...string) *CharacterGrou
 // Example:
 //
 //	var v []struct {
-//		PinYin string `json:"pin_yin,omitempty"`
+//		Char string `json:"char,omitempty"`
 //	}
 //
 //	client.Character.Query().
-//		Select(character.FieldPinYin).
+//		Select(character.FieldChar).
 //		Scan(ctx, &v)
 func (cq *CharacterQuery) Select(fields ...string) *CharacterSelect {
 	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
@@ -331,15 +473,29 @@ func (cq *CharacterQuery) prepareQuery(ctx context.Context) error {
 
 func (cq *CharacterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Character, error) {
 	var (
-		nodes = []*Character{}
-		_spec = cq.querySpec()
+		nodes       = []*Character{}
+		withFKs     = cq.withFKs
+		_spec       = cq.querySpec()
+		loadedTypes = [4]bool{
+			cq.withSimplifiedOf != nil,
+			cq.withTraditionalToSimplified != nil,
+			cq.withVariantOf != nil,
+			cq.withStandardToVariant != nil,
+		}
 	)
+	if cq.withSimplifiedOf != nil || cq.withVariantOf != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, character.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Character).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Character{config: cq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,7 +507,156 @@ func (cq *CharacterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := cq.withSimplifiedOf; query != nil {
+		if err := cq.loadSimplifiedOf(ctx, query, nodes, nil,
+			func(n *Character, e *Character) { n.Edges.SimplifiedOf = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withTraditionalToSimplified; query != nil {
+		if err := cq.loadTraditionalToSimplified(ctx, query, nodes, nil,
+			func(n *Character, e *Character) { n.Edges.TraditionalToSimplified = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withVariantOf; query != nil {
+		if err := cq.loadVariantOf(ctx, query, nodes, nil,
+			func(n *Character, e *Character) { n.Edges.VariantOf = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withStandardToVariant; query != nil {
+		if err := cq.loadStandardToVariant(ctx, query, nodes,
+			func(n *Character) { n.Edges.StandardToVariant = []*Character{} },
+			func(n *Character, e *Character) { n.Edges.StandardToVariant = append(n.Edges.StandardToVariant, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (cq *CharacterQuery) loadSimplifiedOf(ctx context.Context, query *CharacterQuery, nodes []*Character, init func(*Character), assign func(*Character, *Character)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Character)
+	for i := range nodes {
+		if nodes[i].character_traditional_to_simplified == nil {
+			continue
+		}
+		fk := *nodes[i].character_traditional_to_simplified
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(character.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "character_traditional_to_simplified" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (cq *CharacterQuery) loadTraditionalToSimplified(ctx context.Context, query *CharacterQuery, nodes []*Character, init func(*Character), assign func(*Character, *Character)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Character)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.Character(func(s *sql.Selector) {
+		s.Where(sql.InValues(character.TraditionalToSimplifiedColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.character_traditional_to_simplified
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "character_traditional_to_simplified" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "character_traditional_to_simplified" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (cq *CharacterQuery) loadVariantOf(ctx context.Context, query *CharacterQuery, nodes []*Character, init func(*Character), assign func(*Character, *Character)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Character)
+	for i := range nodes {
+		if nodes[i].character_standard_to_variant == nil {
+			continue
+		}
+		fk := *nodes[i].character_standard_to_variant
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(character.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "character_standard_to_variant" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (cq *CharacterQuery) loadStandardToVariant(ctx context.Context, query *CharacterQuery, nodes []*Character, init func(*Character), assign func(*Character, *Character)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Character)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Character(func(s *sql.Selector) {
+		s.Where(sql.InValues(character.StandardToVariantColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.character_standard_to_variant
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "character_standard_to_variant" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "character_standard_to_variant" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (cq *CharacterQuery) sqlCount(ctx context.Context) (int, error) {
@@ -364,7 +669,7 @@ func (cq *CharacterQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (cq *CharacterQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(character.Table, character.Columns, sqlgraph.NewFieldSpec(character.FieldID, field.TypeString))
+	_spec := sqlgraph.NewQuerySpec(character.Table, character.Columns, sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt))
 	_spec.From = cq.sql
 	if unique := cq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

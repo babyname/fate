@@ -6,80 +6,114 @@ const (
 	// Label holds the string label denoting the character type in the database.
 	Label = "character"
 	// FieldID holds the string denoting the id field in the database.
-	FieldID = "hash"
-	// FieldPinYin holds the string denoting the pin_yin field in the database.
-	FieldPinYin = "pin_yin"
-	// FieldCh holds the string denoting the ch field in the database.
-	FieldCh = "ch"
+	FieldID = "id"
+	// FieldChar holds the string denoting the char field in the database.
+	FieldChar = "char"
+	// FieldUnicode holds the string denoting the unicode field in the database.
+	FieldUnicode = "unicode"
+	// FieldIsSimplified holds the string denoting the is_simplified field in the database.
+	FieldIsSimplified = "is_simplified"
+	// FieldIsTraditional holds the string denoting the is_traditional field in the database.
+	FieldIsTraditional = "is_traditional"
+	// FieldIsKangxi holds the string denoting the is_kangxi field in the database.
+	FieldIsKangxi = "is_kangxi"
+	// FieldIsVariant holds the string denoting the is_variant field in the database.
+	FieldIsVariant = "is_variant"
+	// FieldIsAncient holds the string denoting the is_ancient field in the database.
+	FieldIsAncient = "is_ancient"
+	// FieldPinyin holds the string denoting the pinyin field in the database.
+	FieldPinyin = "pinyin"
 	// FieldRadical holds the string denoting the radical field in the database.
 	FieldRadical = "radical"
 	// FieldRadicalStroke holds the string denoting the radical_stroke field in the database.
 	FieldRadicalStroke = "radical_stroke"
-	// FieldStroke holds the string denoting the stroke field in the database.
-	FieldStroke = "stroke"
-	// FieldIsKangXi holds the string denoting the is_kang_xi field in the database.
-	FieldIsKangXi = "is_kang_xi"
-	// FieldKangXi holds the string denoting the kang_xi field in the database.
-	FieldKangXi = "kang_xi"
-	// FieldKangXiStroke holds the string denoting the kang_xi_stroke field in the database.
-	FieldKangXiStroke = "kang_xi_stroke"
-	// FieldSimpleRadical holds the string denoting the simple_radical field in the database.
-	FieldSimpleRadical = "simple_radical"
-	// FieldSimpleRadicalStroke holds the string denoting the simple_radical_stroke field in the database.
-	FieldSimpleRadicalStroke = "simple_radical_stroke"
-	// FieldSimpleTotalStroke holds the string denoting the simple_total_stroke field in the database.
-	FieldSimpleTotalStroke = "simple_total_stroke"
-	// FieldTraditionalRadical holds the string denoting the traditional_radical field in the database.
-	FieldTraditionalRadical = "traditional_radical"
-	// FieldTraditionalRadicalStroke holds the string denoting the traditional_radical_stroke field in the database.
-	FieldTraditionalRadicalStroke = "traditional_radical_stroke"
-	// FieldTraditionalTotalStroke holds the string denoting the traditional_total_stroke field in the database.
-	FieldTraditionalTotalStroke = "traditional_total_stroke"
-	// FieldNameScience holds the string denoting the name_science field in the database.
-	FieldNameScience = "name_science"
-	// FieldWuXing holds the string denoting the wu_xing field in the database.
-	FieldWuXing = "wu_xing"
-	// FieldLucky holds the string denoting the lucky field in the database.
-	FieldLucky = "lucky"
-	// FieldRegular holds the string denoting the regular field in the database.
-	FieldRegular = "regular"
-	// FieldTraditionalCharacter holds the string denoting the traditional_character field in the database.
-	FieldTraditionalCharacter = "traditional_character"
-	// FieldVariantCharacter holds the string denoting the variant_character field in the database.
-	FieldVariantCharacter = "variant_character"
-	// FieldComment holds the string denoting the comment field in the database.
-	FieldComment = "comment"
+	// FieldSimplifiedStroke holds the string denoting the simplified_stroke field in the database.
+	FieldSimplifiedStroke = "simplified_stroke"
+	// FieldTraditionalStroke holds the string denoting the traditional_stroke field in the database.
+	FieldTraditionalStroke = "traditional_stroke"
+	// FieldKangxiStroke holds the string denoting the kangxi_stroke field in the database.
+	FieldKangxiStroke = "kangxi_stroke"
 	// FieldScienceStroke holds the string denoting the science_stroke field in the database.
 	FieldScienceStroke = "science_stroke"
+	// FieldWuXing holds the string denoting the wu_xing field in the database.
+	FieldWuXing = "wu_xing"
+	// FieldRegular holds the string denoting the regular field in the database.
+	FieldRegular = "regular"
+	// FieldCommonLevel holds the string denoting the common_level field in the database.
+	FieldCommonLevel = "common_level"
+	// FieldGenderHint holds the string denoting the gender_hint field in the database.
+	FieldGenderHint = "gender_hint"
+	// FieldNameable holds the string denoting the nameable field in the database.
+	FieldNameable = "nameable"
+	// FieldMeaning holds the string denoting the meaning field in the database.
+	FieldMeaning = "meaning"
+	// FieldSource holds the string denoting the source field in the database.
+	FieldSource = "source"
+	// FieldSourceConfidence holds the string denoting the source_confidence field in the database.
+	FieldSourceConfidence = "source_confidence"
+	// FieldComment holds the string denoting the comment field in the database.
+	FieldComment = "comment"
+	// EdgeSimplifiedOf holds the string denoting the simplified_of edge name in mutations.
+	EdgeSimplifiedOf = "simplified_of"
+	// EdgeTraditionalToSimplified holds the string denoting the traditional_to_simplified edge name in mutations.
+	EdgeTraditionalToSimplified = "traditional_to_simplified"
+	// EdgeVariantOf holds the string denoting the variant_of edge name in mutations.
+	EdgeVariantOf = "variant_of"
+	// EdgeStandardToVariant holds the string denoting the standard_to_variant edge name in mutations.
+	EdgeStandardToVariant = "standard_to_variant"
 	// Table holds the table name of the character in the database.
 	Table = "character"
+	// SimplifiedOfTable is the table that holds the simplified_of relation/edge.
+	SimplifiedOfTable = "character"
+	// SimplifiedOfColumn is the table column denoting the simplified_of relation/edge.
+	SimplifiedOfColumn = "character_traditional_to_simplified"
+	// TraditionalToSimplifiedTable is the table that holds the traditional_to_simplified relation/edge.
+	TraditionalToSimplifiedTable = "character"
+	// TraditionalToSimplifiedColumn is the table column denoting the traditional_to_simplified relation/edge.
+	TraditionalToSimplifiedColumn = "character_traditional_to_simplified"
+	// VariantOfTable is the table that holds the variant_of relation/edge.
+	VariantOfTable = "character"
+	// VariantOfColumn is the table column denoting the variant_of relation/edge.
+	VariantOfColumn = "character_standard_to_variant"
+	// StandardToVariantTable is the table that holds the standard_to_variant relation/edge.
+	StandardToVariantTable = "character"
+	// StandardToVariantColumn is the table column denoting the standard_to_variant relation/edge.
+	StandardToVariantColumn = "character_standard_to_variant"
 )
 
 // Columns holds all SQL columns for character fields.
 var Columns = []string{
 	FieldID,
-	FieldPinYin,
-	FieldCh,
+	FieldChar,
+	FieldUnicode,
+	FieldIsSimplified,
+	FieldIsTraditional,
+	FieldIsKangxi,
+	FieldIsVariant,
+	FieldIsAncient,
+	FieldPinyin,
 	FieldRadical,
 	FieldRadicalStroke,
-	FieldStroke,
-	FieldIsKangXi,
-	FieldKangXi,
-	FieldKangXiStroke,
-	FieldSimpleRadical,
-	FieldSimpleRadicalStroke,
-	FieldSimpleTotalStroke,
-	FieldTraditionalRadical,
-	FieldTraditionalRadicalStroke,
-	FieldTraditionalTotalStroke,
-	FieldNameScience,
-	FieldWuXing,
-	FieldLucky,
-	FieldRegular,
-	FieldTraditionalCharacter,
-	FieldVariantCharacter,
-	FieldComment,
+	FieldSimplifiedStroke,
+	FieldTraditionalStroke,
+	FieldKangxiStroke,
 	FieldScienceStroke,
+	FieldWuXing,
+	FieldRegular,
+	FieldCommonLevel,
+	FieldGenderHint,
+	FieldNameable,
+	FieldMeaning,
+	FieldSource,
+	FieldSourceConfidence,
+	FieldComment,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "character"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"character_traditional_to_simplified",
+	"character_standard_to_variant",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -89,5 +123,41 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
+
+var (
+	// CharValidator is a validator for the "char" field. It is called by the builders before save.
+	CharValidator func(string) error
+	// DefaultIsSimplified holds the default value on creation for the "is_simplified" field.
+	DefaultIsSimplified bool
+	// DefaultIsTraditional holds the default value on creation for the "is_traditional" field.
+	DefaultIsTraditional bool
+	// DefaultIsKangxi holds the default value on creation for the "is_kangxi" field.
+	DefaultIsKangxi bool
+	// DefaultIsVariant holds the default value on creation for the "is_variant" field.
+	DefaultIsVariant bool
+	// DefaultIsAncient holds the default value on creation for the "is_ancient" field.
+	DefaultIsAncient bool
+	// RadicalStrokeValidator is a validator for the "radical_stroke" field. It is called by the builders before save.
+	RadicalStrokeValidator func(int) error
+	// SimplifiedStrokeValidator is a validator for the "simplified_stroke" field. It is called by the builders before save.
+	SimplifiedStrokeValidator func(int) error
+	// TraditionalStrokeValidator is a validator for the "traditional_stroke" field. It is called by the builders before save.
+	TraditionalStrokeValidator func(int) error
+	// KangxiStrokeValidator is a validator for the "kangxi_stroke" field. It is called by the builders before save.
+	KangxiStrokeValidator func(int) error
+	// ScienceStrokeValidator is a validator for the "science_stroke" field. It is called by the builders before save.
+	ScienceStrokeValidator func(int) error
+	// DefaultRegular holds the default value on creation for the "regular" field.
+	DefaultRegular bool
+	// CommonLevelValidator is a validator for the "common_level" field. It is called by the builders before save.
+	CommonLevelValidator func(int) error
+	// DefaultNameable holds the default value on creation for the "nameable" field.
+	DefaultNameable bool
+)

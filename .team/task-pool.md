@@ -1,0 +1,6 @@
+- F001: Refactor project based on: 1. Project structure 2. Content maintenance (chronos, yi) 3. Performance improvement. 4. UI interface. 5. Ent (Status: Done, Phase: Phase 1, Sub-Agent: tech-lead-architect)
+- F002: Improve name generation performance - optimize session generate loop, character caching, and concurrent name production (Status: Done, Phase: Phase 1, Sub-Agent: tech-lead-architect)
+- F003: Integrate chronos calendar module - replace direct lunar-go/chronos v2 calls with internal chronos bridge layer, add wuxing xiji algorithm (Status: Done, Phase: Phase 1, Sub-Agent: tech-lead-architect)
+- F004: Fill in missing dictionary content - complete zodiac Xi data, character stroke data, wuxing tables (Status: Done, Phase: Phase 2, Sub-Agent: tech-lead-architect)
+- F005: Optimize output document format - implement analysis module for formatted bazi/wuxing/name output (Status: Done, Phase: Phase 3, Sub-Agent: tech-lead-architect)
+- F006: Add name analysis and scoring system - implement RateNames with wuxing/bihua/yinyun scoring, name interpretation like meimingteng (Status: Done, Phase: Phase 3, Sub-Agent: tech-lead-architect)

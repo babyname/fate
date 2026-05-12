@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "code-review-graph": {
+      "command": "C:\\Python311\\python.exe",
+      "args": ["-m", "code_review_graph", "serve"],
+      "env": {}
+    },
+    "beads": {
+      "command": "C:\\Users\\godcong\\AppData\\Local\\Programs\\bd\\bd.exe",
+      "args": ["mcp"],
+      "env": {}
+    }
+  }
+}
