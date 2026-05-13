@@ -1,12 +1,15 @@
 package seeddb
 
 import (
+	"bufio"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	_ "github.com/sqlite3ent/sqlite3"
 )
@@ -80,6 +83,13 @@ type oldWuXing struct {
 }
 
 func (e *Exporter) Export() error {
+	log.Println("Loading external reference data...")
+	if err := e.loadUnihanPinyin(); err != nil {
+		log.Printf("Warning: failed to load Unihan pinyin: %v", err)
+	} else {
+		log.Printf("  → %d pinyin entries", len(e.pinyinMap))
+	}
+
 	db, err := sql.Open("sqlite3", e.dbPath+"?mode=ro")
 	if err != nil {
 		return fmt.Errorf("open database: %w", err)
@@ -434,4 +444,69 @@ func resolveIDs(ids []int, lookup map[int]string) []string {
 		}
 	}
 	return result
+}
+
+func (e *Exporter) loadUnihanPinyin() error {
+	unihanDir := filepath.Join(e.rawDataDir, "unihan")
+	readingsPath := filepath.Join(unihanDir, "Unihan_Readings.txt")
+
+	file, err := os.Open(readingsPath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "#") || strings.TrimSpace(line) == "" {
+			continue
+		}
+
+		parts := strings.Fields(line)
+		if len(parts) < 3 {
+			continue
+		}
+
+		codePoint := parts[0]
+		field := parts[1]
+		value := strings.Join(parts[2:], " ")
+
+		if !strings.HasPrefix(codePoint, "U+") {
+			continue
+		}
+
+		r, err := strconv.ParseUint(codePoint[2:], 16, 32)
+		if err != nil {
+			continue
+		}
+		char := string(rune(r))
+
+		if field == "kMandarin" || field == "kHanyuPinyin" {
+			var pinyins []string
+			if field == "kMandarin" {
+				pinyins = strings.Split(value, " ")
+			} else {
+				for _, part := range strings.Split(value, " ") {
+					if idx := strings.Index(part, ":"); idx != -1 {
+						pinyinStr := part[idx+1:]
+						pinyins = append(pinyins, strings.Split(pinyinStr, ",")...)
+					}
+				}
+			}
+
+			var cleaned []string
+			for _, p := range pinyins {
+				p = strings.TrimSpace(p)
+				if p != "" {
+					cleaned = append(cleaned, p)
+				}
+			}
+			if len(cleaned) > 0 {
+				e.pinyinMap[char] = cleaned
+			}
+		}
+	}
+
+	return scanner.Err()
 }
