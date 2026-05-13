@@ -86,6 +86,13 @@ func (e *Exporter) Export() error {
 	}
 	defer db.Close()
 
+	log.Println("Building ID→Char lookup from n_character...")
+	idToChar, err := e.buildIDLookup(db)
+	if err != nil {
+		return err
+	}
+	log.Printf("  → %d ID mappings", len(idToChar))
+
 	var allChars []SeedCharacter
 
 	log.Println("Exporting n_character table (primary)...")
@@ -93,7 +100,7 @@ func (e *Exporter) Export() error {
 	if err != nil {
 		return err
 	}
-	nSeeds := transformNCharacters(nChars)
+	nSeeds := e.transformNCharacters(nChars, idToChar)
 	log.Printf("  → %d from n_character", len(nSeeds))
 	allChars = append(allChars, nSeeds...)
 
@@ -102,10 +109,10 @@ func (e *Exporter) Export() error {
 	if err != nil {
 		return err
 	}
-	cSeeds := transformCharacters(oldChars)
+	cSeeds := e.transformCharacters(oldChars)
 	log.Printf("  → %d from character", len(cSeeds))
 
-	allChars = mergeCharacters(allChars, cSeeds)
+	allChars = e.mergeCharacters(allChars, cSeeds)
 	log.Printf("  → %d after merge (dedup by char)", len(allChars))
 
 	log.Println("Exporting wu_ge_lucky table...")
@@ -140,8 +147,35 @@ func (e *Exporter) Export() error {
 	}
 	log.Printf("  → %d wu_xing → %s", len(seedWuXings), wuxingPath)
 
+	if len(e.changes) > 0 {
+		changelogPath := filepath.Join(e.seedDir, "changelog.json")
+		if err := writeJSON(changelogPath, e.changes); err != nil {
+			return err
+		}
+		log.Printf("  → %d field changes → %s", len(e.changes), changelogPath)
+	}
+
 	log.Println("Export completed!")
 	return nil
+}
+
+func (e *Exporter) buildIDLookup(db *sql.DB) (map[int]string, error) {
+	rows, err := db.Query("SELECT id, char FROM n_character")
+	if err != nil {
+		return nil, fmt.Errorf("query n_character for lookup: %w", err)
+	}
+	defer rows.Close()
+
+	lookup := make(map[int]string)
+	for rows.Next() {
+		var id int
+		var ch string
+		if err := rows.Scan(&id, &ch); err != nil {
+			return nil, fmt.Errorf("scan lookup row: %w", err)
+		}
+		lookup[id] = ch
+	}
+	return lookup, nil
 }
 
 func (e *Exporter) queryNCharacters(db *sql.DB) ([]oldNCharacter, error) {
@@ -247,7 +281,7 @@ func (e *Exporter) queryWuXing(db *sql.DB) ([]oldWuXing, error) {
 	return results, nil
 }
 
-func mergeCharacters(primary []SeedCharacter, supplement []SeedCharacter) []SeedCharacter {
+func (e *Exporter) mergeCharacters(primary []SeedCharacter, supplement []SeedCharacter) []SeedCharacter {
 	existing := make(map[string]*SeedCharacter, len(primary))
 	for i := range primary {
 		existing[primary[i].Char] = &primary[i]
@@ -257,7 +291,7 @@ func mergeCharacters(primary []SeedCharacter, supplement []SeedCharacter) []Seed
 	enriched := 0
 	for _, sup := range supplement {
 		if ex, ok := existing[sup.Char]; ok {
-			if enrichCharacter(ex, sup) {
+			if e.enrichCharacter(ex, sup) {
 				enriched++
 			}
 		} else {
@@ -271,34 +305,41 @@ func mergeCharacters(primary []SeedCharacter, supplement []SeedCharacter) []Seed
 	return primary
 }
 
-func enrichCharacter(dst *SeedCharacter, src SeedCharacter) bool {
+func (e *Exporter) enrichCharacter(dst *SeedCharacter, src SeedCharacter) bool {
 	changed := false
 
 	if dst.WuXing == "" && src.WuXing != "" {
+		e.recordChange(dst.Char, "wu_xing", "", src.WuXing, "enrich_from_character", "character")
 		dst.WuXing = src.WuXing
 		changed = true
 	}
 	if len(dst.Pinyin) == 0 && len(src.Pinyin) > 0 {
+		e.recordChange(dst.Char, "pinyin", "", fmt.Sprintf("%v", src.Pinyin), "enrich_from_character", "character")
 		dst.Pinyin = src.Pinyin
 		changed = true
 	}
 	if dst.SimplifiedStroke == 0 && src.SimplifiedStroke > 0 {
+		e.recordChange(dst.Char, "simplified_stroke", "0", fmt.Sprintf("%d", src.SimplifiedStroke), "enrich_from_character", "character")
 		dst.SimplifiedStroke = src.SimplifiedStroke
 		changed = true
 	}
 	if dst.TraditionalStroke == 0 && src.TraditionalStroke > 0 {
+		e.recordChange(dst.Char, "traditional_stroke", "0", fmt.Sprintf("%d", src.TraditionalStroke), "enrich_from_character", "character")
 		dst.TraditionalStroke = src.TraditionalStroke
 		changed = true
 	}
 	if dst.KangxiStroke == 0 && src.KangxiStroke > 0 {
+		e.recordChange(dst.Char, "kangxi_stroke", "0", fmt.Sprintf("%d", src.KangxiStroke), "enrich_from_character", "character")
 		dst.KangxiStroke = src.KangxiStroke
 		changed = true
 	}
 	if dst.ScienceStroke == 0 && src.ScienceStroke > 0 {
+		e.recordChange(dst.Char, "science_stroke", "0", fmt.Sprintf("%d", src.ScienceStroke), "enrich_from_character", "character")
 		dst.ScienceStroke = src.ScienceStroke
 		changed = true
 	}
 	if dst.Radical == "" && src.Radical != "" {
+		e.recordChange(dst.Char, "radical", "", src.Radical, "enrich_from_character", "character")
 		dst.Radical = src.Radical
 		dst.RadicalStroke = src.RadicalStroke
 		changed = true
@@ -312,6 +353,7 @@ func enrichCharacter(dst *SeedCharacter, src SeedCharacter) bool {
 		changed = true
 	}
 	if !dst.IsSimplified && src.IsSimplified {
+		e.recordChange(dst.Char, "is_simplified", "false", "true", "enrich_from_character", "character")
 		dst.IsSimplified = src.IsSimplified
 		if dst.SimplifiedOfChar == "" {
 			dst.SimplifiedOfChar = src.SimplifiedOfChar
@@ -319,10 +361,12 @@ func enrichCharacter(dst *SeedCharacter, src SeedCharacter) bool {
 		changed = true
 	}
 	if !dst.IsTraditional && src.IsTraditional {
+		e.recordChange(dst.Char, "is_traditional", "false", "true", "enrich_from_character", "character")
 		dst.IsTraditional = src.IsTraditional
 		changed = true
 	}
 	if !dst.IsVariant && src.IsVariant {
+		e.recordChange(dst.Char, "is_variant", "false", "true", "enrich_from_character", "character")
 		dst.IsVariant = src.IsVariant
 		if dst.VariantOfChar == "" {
 			dst.VariantOfChar = src.VariantOfChar
@@ -376,6 +420,18 @@ func parseJSONInts(s string) []int {
 	var result []int
 	if err := json.Unmarshal([]byte(s), &result); err != nil {
 		return nil
+	}
+	return result
+}
+
+func resolveIDs(ids []int, lookup map[int]string) []string {
+	var result []string
+	for _, id := range ids {
+		if ch, ok := lookup[id]; ok {
+			result = append(result, ch)
+		} else {
+			result = append(result, fmt.Sprintf("id:%d", id))
+		}
 	}
 	return result
 }
