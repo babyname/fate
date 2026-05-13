@@ -6,6 +6,90 @@ import (
 	"github.com/babyname/fate/internal/wuge"
 )
 
+func transformNCharacters(oldList []oldNCharacter) []SeedCharacter {
+	result := make([]SeedCharacter, 0, len(oldList))
+	for _, old := range oldList {
+		result = append(result, transformNCharacter(old))
+	}
+	return result
+}
+
+func transformNCharacter(old oldNCharacter) SeedCharacter {
+	wx := old.WuXing
+	if wx == "岁" {
+		wx = ""
+	}
+	if wx == "" {
+		wx = inferWuXing(old.Radical)
+	}
+
+	sc := SeedCharacter{
+		Char:          old.Char,
+		IsSimplified:  old.IsSimplified,
+		IsTraditional: old.IsTraditional,
+		IsKangxi:      old.IsKangXi,
+		IsVariant:     old.IsVariant,
+		Regular:       old.IsRegular,
+		Nameable:      determineNameable(old.IsScience, old.ScienceStroke, old.CharStroke, old.NeedFix),
+		WuXing:        wx,
+		Source:        "n_character",
+	}
+
+	sc.Pinyin = parseJSONString(old.PinYin)
+
+	if old.Radical != "" {
+		sc.Radical = old.Radical
+		sc.RadicalStroke = old.RadicalStroke
+	}
+
+	sc.ScienceStroke = old.ScienceStroke
+	sc.KangxiStroke = old.KangXiStroke
+
+	if old.CharStroke > 0 && old.ScienceStroke == 0 {
+		sc.ScienceStroke = old.CharStroke
+	}
+
+	simplifiedIDs := parseJSONInts(old.SimplifiedID)
+	if len(simplifiedIDs) > 0 {
+		sc.SimplifiedOfChar = fmt.Sprintf("id:%d", simplifiedIDs[0])
+	}
+
+	if old.Explanation != "" {
+		sc.Meaning = old.Explanation
+	}
+
+	commentParts := parseJSONString(old.Comment)
+	if len(commentParts) > 0 {
+		if len(commentParts) == 1 {
+			if len(commentParts[0]) > 200 {
+				sc.Comment = commentParts[0][:200] + "..."
+			} else {
+				sc.Comment = commentParts[0]
+			}
+		} else {
+			sc.Comment = fmt.Sprintf("%v", commentParts)
+		}
+	}
+
+	if old.Lucky != "" {
+		if sc.Comment != "" {
+			sc.Comment = fmt.Sprintf("lucky=%s; %s", old.Lucky, sc.Comment)
+		} else {
+			sc.Comment = fmt.Sprintf("lucky=%s", old.Lucky)
+		}
+	}
+
+	if old.NeedFix {
+		if sc.Comment != "" {
+			sc.Comment += "; [need_fix]"
+		} else {
+			sc.Comment = "[need_fix]"
+		}
+	}
+
+	return sc
+}
+
 func transformCharacters(oldList []oldCharacter) []SeedCharacter {
 	result := make([]SeedCharacter, 0, len(oldList))
 	for _, old := range oldList {
@@ -15,13 +99,21 @@ func transformCharacters(oldList []oldCharacter) []SeedCharacter {
 }
 
 func transformCharacter(old oldCharacter) SeedCharacter {
+	wx := old.WuXing
+	if wx == "岁" {
+		wx = ""
+	}
+	if wx == "" {
+		wx = inferWuXing(old.Radical)
+	}
+
 	sc := SeedCharacter{
 		Char:      old.Ch,
 		IsKangxi:  old.IsKangXi,
 		Regular:   old.Regular,
-		Nameable:  old.NameScience,
-		WuXing:    old.WuXing,
-		Source:    "legacy",
+		Nameable:  determineNameable(old.NameScience, old.ScienceStroke, old.Stroke, false),
+		WuXing:    wx,
+		Source:    "character",
 	}
 
 	sc.Pinyin = parseJSONString(old.PinYin)
@@ -126,18 +218,46 @@ func transformWuXing(oldList []oldWuXing) []SeedWuXing {
 	for _, old := range oldList {
 		result = append(result, SeedWuXing{
 			ID:      old.ID,
-			First:   old.SanCai,
-			Second:  old.SanCai,
-			Third:   old.SanCai,
-			Fortune: formatWuXingFortune(old.Lucky, old.Comment),
+			First:   old.First,
+			Second:  old.Second,
+			Third:   old.Third,
+			Fortune: old.Fortune,
 		})
 	}
 	return result
 }
 
-func formatWuXingFortune(lucky bool, comment string) string {
-	if lucky {
-		return "吉|" + comment
+func determineNameable(isScience bool, scienceStroke int, fallbackStroke int, needFix bool) bool {
+	if isScience {
+		return true
 	}
-	return "凶|" + comment
+	stroke := scienceStroke
+	if stroke <= 0 {
+		stroke = fallbackStroke
+	}
+	if stroke <= 0 {
+		return false
+	}
+	if needFix {
+		return false
+	}
+	return stroke >= 1 && stroke <= 30
+}
+
+var radicalWuXing = map[string]string{
+	"木": "木", "禾": "木", "竹": "木", "艹": "木", "草": "木", "耒": "木",
+	"火": "火", "灬": "火", "日": "火", "光": "火", "炎": "火",
+	"土": "土", "山": "土", "石": "土", "田": "土", "邑": "土", "阝": "土",
+	"金": "金", "钅": "金", "刀": "金", "刂": "金", "力": "金", "戈": "金",
+	"水": "水", "氵": "水", "雨": "水", "冫": "水", "鱼": "水", "酉": "水",
+}
+
+func inferWuXing(radical string) string {
+	if radical == "" {
+		return ""
+	}
+	if wx, ok := radicalWuXing[radical]; ok {
+		return wx
+	}
+	return ""
 }
