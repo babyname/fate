@@ -12,43 +12,41 @@ import (
 )
 
 type OldCharacter struct {
-	ID                     int    `json:"id"`
-	Ch                     string `json:"ch"`
-	PinYin                string `json:"pin_yin"`
-	WuXing                 string `json:"wu_xing"`
-	Stroke                 int    `json:"stroke"`
-	KangXiStroke           int    `json:"kang_xi_stroke"`
-	ScienceStroke          int    `json:"science_stroke"`
-	IsKangXi               bool   `json:"is_kang_xi"`
-	SimpleTotalStroke      int    `json:"simple_total_stroke"`
-	TraditionalTotalStroke int    `json:"traditional_total_stroke"`
-	Regular                bool   `json:"regular"`
-	NameScience            bool   `json:"name_science"`
-	Lucky                  string `json:"lucky"`
-	TraditionalCharacter   string `json:"traditional_character"`
-	VariantCharacter       string `json:"variant_character"`
-	KangXi                 string `json:"kang_xi"`
+	Hash                    string `json:"hash"`
+	PinYin                  string `json:"pin_yin"`
+	Ch                      string `json:"ch"`
+	Radical                 string `json:"radical"`
+	RadicalStroke           int    `json:"radical_stroke"`
+	Stroke                  int    `json:"stroke"`
+	IsKangXi                bool   `json:"is_kang_xi"`
+	KangXi                  string `json:"kang_xi"`
+	KangXiStroke            int    `json:"kang_xi_stroke"`
+	SimpleRadical           string `json:"simple_radical"`
+	SimpleRadicalStroke     int    `json:"simple_radical_stroke"`
+	SimpleTotalStroke       int    `json:"simple_total_stroke"`
+	TraditionalRadical      string `json:"traditional_radical"`
+	TraditionalRadicalStroke int   `json:"traditional_radical_stroke"`
+	TraditionalTotalStroke  int    `json:"traditional_total_stroke"`
+	NameScience             bool   `json:"name_science"`
+	WuXing                  string `json:"wu_xing"`
+	Lucky                   string `json:"lucky"`
+	Regular                 bool   `json:"regular"`
+	TraditionalCharacter    string `json:"traditional_character"`
+	VariantCharacter        string `json:"variant_character"`
+	Comment                 string `json:"comment"`
+	ScienceStroke           int    `json:"science_stroke"`
 }
 
 type OldWuGeLucky struct {
-	ID           int  `json:"id"`
-	LastStroke1  int  `json:"last_stroke_1"`
-	LastStroke2  int  `json:"last_stroke_2"`
-	FirstStroke1 int  `json:"first_stroke_1"`
-	FirstStroke2 int  `json:"first_stroke_2"`
-	TianGeLucky  bool `json:"tian_ge_lucky"`
-	RenGeLucky   bool `json:"ren_ge_lucky"`
-	DiGeLucky    bool `json:"di_ge_lucky"`
-	WaiGeLucky   bool `json:"wai_ge_lucky"`
-	ZongGeLucky  bool `json:"zong_ge_lucky"`
-	ZongLucky    bool `json:"zong_lucky"`
+	LastStroke1  int    `json:"last_stroke_1"`
+	LastStroke2  int    `json:"last_stroke_2"`
+	FirstStroke1 int    `json:"first_stroke_1"`
+	FirstStroke2 int    `json:"first_stroke_2"`
+	ZongLucky    bool   `json:"zong_lucky"`
 }
 
 type OldWuXing struct {
 	ID      string `json:"id"`
-	TianGe  int    `json:"tian_ge"`
-	RenGe   int    `json:"ren_ge"`
-	DiGe    int    `json:"di_ge"`
 	SanCai  string `json:"san_cai"`
 	Lucky   bool   `json:"lucky"`
 	Comment string `json:"comment"`
@@ -71,19 +69,19 @@ func (e *Exporter) Export() error {
 	defer db.Close()
 
 	log.Println("Exporting character table...")
-	oldChars, err := e.queryTable(db, "character", e.scanCharacters)
+	oldChars, err := e.queryCharacters(db)
 	if err != nil {
 		return err
 	}
 
 	log.Println("Exporting wu_ge_lucky table...")
-	oldWuGes, err := e.queryTable(db, "wu_ge_lucky", e.scanWuGeLucky)
+	oldWuGes, err := e.queryWuGeLucky(db)
 	if err != nil {
 		return err
 	}
 
 	log.Println("Exporting wu_xing table...")
-	oldWuXings, err := e.queryTable(db, "wu_xing", e.scanWuXing)
+	oldWuXings, err := e.queryWuXing(db)
 	if err != nil {
 		return err
 	}
@@ -115,6 +113,41 @@ func (e *Exporter) Export() error {
 	return nil
 }
 
+func (e *Exporter) queryCharacters(db *sql.DB) ([]OldCharacter, error) {
+	rows, err := db.Query("SELECT hash, pin_yin, ch, radical, radical_stroke, stroke, is_kang_xi, kang_xi, kang_xi_stroke, simple_radical, simple_radical_stroke, simple_total_stroke, traditional_radical, traditional_radical_stroke, traditional_total_stroke, name_science, wu_xing, lucky, regular, traditional_character, variant_character, comment, science_stroke FROM character")
+	if err != nil {
+		return nil, fmt.Errorf("query character: %w", err)
+	}
+	defer rows.Close()
+
+	var results []OldCharacter
+	for rows.Next() {
+		var c OldCharacter
+		err := rows.Scan(
+			&c.Hash, &c.PinYin, &c.Ch, &c.Radical, &c.RadicalStroke,
+			&c.Stroke, &c.IsKangXi, &c.KangXi, &c.KangXiStroke,
+			&c.SimpleRadical, &c.SimpleRadicalStroke, &c.SimpleTotalStroke,
+			&c.TraditionalRadical, &c.TraditionalRadicalStroke, &c.TraditionalTotalStroke,
+			&c.NameScience, &c.WuXing, &c.Lucky, &c.Regular,
+			&c.TraditionalCharacter, &c.VariantCharacter, &c.Comment, &c.ScienceStroke,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("scan character row: %w", err)
+		}
+		results = append(results, c)
+	}
+	log.Printf("  Read %d rows from character", len(results))
+	return results, nil
+}
+
+func (e *Exporter) queryWuGeLucky(db *sql.DB) ([]interface{}, error) {
+	return e.queryTable(db, "wu_ge_lucky", e.scanWuGeLucky)
+}
+
+func (e *Exporter) queryWuXing(db *sql.DB) ([]interface{}, error) {
+	return e.queryTable(db, "wu_xing", e.scanWuXing)
+}
+
 type scanFunc func(*sql.Rows) (interface{}, error)
 
 func (e *Exporter) queryTable(db *sql.DB, table string, scan scanFunc) ([]interface{}, error) {
@@ -136,32 +169,38 @@ func (e *Exporter) queryTable(db *sql.DB, table string, scan scanFunc) ([]interf
 	return results, nil
 }
 
-func (e *Exporter) scanCharacters(rows *sql.Rows) (interface{}, error) {
-	var c OldCharacter
-	err := rows.Scan(
-		&c.ID, &c.Ch, &c.PinYin, &c.WuXing, &c.Stroke, &c.KangXiStroke,
-		&c.ScienceStroke, &c.IsKangXi, &c.SimpleTotalStroke,
-		&c.TraditionalTotalStroke, &c.Regular, &c.NameScience,
-		&c.Lucky, &c.TraditionalCharacter, &c.VariantCharacter, &c.KangXi,
-	)
-	return c, err
-}
-
 func (e *Exporter) scanWuGeLucky(rows *sql.Rows) (interface{}, error) {
 	var w OldWuGeLucky
+	var discardID string
+	var discardTianGe, discardRenGe, discardDiGe, discardWaiGe, discardZongGe int
+	var discardTianDaYan, discardRenDaYan, discardDiDaYan, discardWaiDaYan, discardZongDaYan string
+	var discardZongSex, discardZongMax bool
 	err := rows.Scan(
-		&w.ID, &w.LastStroke1, &w.LastStroke2, &w.FirstStroke1, &w.FirstStroke2,
-		&w.TianGeLucky, &w.RenGeLucky, &w.DiGeLucky, &w.WaiGeLucky,
-		&w.ZongGeLucky, &w.ZongLucky,
+		&discardID, &w.LastStroke1, &w.LastStroke2, &w.FirstStroke1, &w.FirstStroke2,
+		&discardTianGe, &discardTianDaYan, &discardRenGe, &discardRenDaYan,
+		&discardDiGe, &discardDiDaYan, &discardWaiGe, &discardWaiDaYan,
+		&discardZongGe, &discardZongDaYan, &w.ZongLucky, &discardZongSex, &discardZongMax,
 	)
+	_ = discardID
 	return w, err
 }
 
 func (e *Exporter) scanWuXing(rows *sql.Rows) (interface{}, error) {
 	var w OldWuXing
+	var discardCreated, discardUpdated, discardDeleted string
+	var discardVersion int
+	var first, second, third, fortune string
 	err := rows.Scan(
-		&w.ID, &w.TianGe, &w.RenGe, &w.DiGe, &w.SanCai, &w.Lucky, &w.Comment,
+		&w.ID, &discardCreated, &discardUpdated, &discardDeleted, &discardVersion,
+		&first, &second, &third, &fortune,
 	)
+	_ = discardCreated
+	_ = discardUpdated
+	_ = discardDeleted
+	_ = discardVersion
+	w.SanCai = first + second + third
+	w.Comment = fortune
+	w.Lucky = fortune == "大吉" || fortune == "吉"
 	return w, err
 }
 
@@ -175,4 +214,15 @@ func writeJSON(filename string, data interface{}) error {
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", "  ")
 	return enc.Encode(data)
+}
+
+func parseJSONString(s string) []string {
+	if s == "" || s == "null" {
+		return nil
+	}
+	var result []string
+	if err := json.Unmarshal([]byte(s), &result); err != nil {
+		return []string{s}
+	}
+	return result
 }
