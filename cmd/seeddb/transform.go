@@ -8,7 +8,6 @@ import (
 )
 
 type SeedCharacter struct {
-	ID                 int      `json:"id"`
 	Char               string   `json:"char"`
 	Unicode            string   `json:"unicode,omitempty"`
 	IsSimplified       bool     `json:"is_simplified"`
@@ -33,7 +32,6 @@ type SeedCharacter struct {
 	SourceConfidence   float64  `json:"source_confidence,omitempty"`
 	Comment            string   `json:"comment,omitempty"`
 	SimplifiedOfChar   string   `json:"simplified_of_char,omitempty"`
-	TraditionalOfChar  string   `json:"traditional_of_char,omitempty"`
 	VariantOfChar      string   `json:"variant_of_char,omitempty"`
 }
 
@@ -65,10 +63,9 @@ type SeedWuXing struct {
 	Fortune string `json:"fortune"`
 }
 
-func TransformCharacters(oldList []interface{}) []SeedCharacter {
+func TransformCharacters(oldList []OldCharacter) []SeedCharacter {
 	result := make([]SeedCharacter, 0, len(oldList))
-	for _, item := range oldList {
-		old := item.(OldCharacter)
+	for _, old := range oldList {
 		sc := transformCharacter(old)
 		result = append(result, sc)
 	}
@@ -77,7 +74,6 @@ func TransformCharacters(oldList []interface{}) []SeedCharacter {
 
 func transformCharacter(old OldCharacter) SeedCharacter {
 	sc := SeedCharacter{
-		ID:        old.ID,
 		Char:      old.Ch,
 		IsKangxi:  old.IsKangXi,
 		Regular:   old.Regular,
@@ -86,54 +82,59 @@ func transformCharacter(old OldCharacter) SeedCharacter {
 		Source:    "legacy",
 	}
 
-	sc.Pinyin = parsePinyin(old.PinYin)
+	sc.Pinyin = parseJSONString(old.PinYin)
+
+	if old.Radical != "" {
+		sc.Radical = old.Radical
+		sc.RadicalStroke = old.RadicalStroke
+	}
 
 	sc.SimplifiedStroke = old.SimpleTotalStroke
 	sc.TraditionalStroke = old.TraditionalTotalStroke
 	sc.KangxiStroke = old.KangXiStroke
 	sc.ScienceStroke = old.ScienceStroke
 
-	if old.TraditionalCharacter != "" && old.TraditionalCharacter != old.Ch {
+	tradChars := parseJSONString(old.TraditionalCharacter)
+	if len(tradChars) > 0 {
 		sc.IsSimplified = true
-		sc.SimplifiedOfChar = old.TraditionalCharacter
+		sc.SimplifiedOfChar = tradChars[0]
 	}
-	if old.TraditionalCharacter == "" && old.SimpleTotalStroke != old.TraditionalTotalStroke && old.TraditionalTotalStroke > 0 {
+
+	if old.TraditionalTotalStroke > 0 && old.SimpleTotalStroke != old.TraditionalTotalStroke && len(tradChars) == 0 {
 		sc.IsTraditional = true
 	}
+
 	if old.KangXi != "" && old.KangXi != old.Ch {
 		sc.IsVariant = true
 		sc.VariantOfChar = old.KangXi
 	}
-	if old.VariantCharacter != "" && old.VariantCharacter != old.Ch {
+
+	variantChars := parseJSONString(old.VariantCharacter)
+	if len(variantChars) > 0 {
 		sc.IsVariant = true
 		if sc.VariantOfChar == "" {
-			sc.VariantOfChar = old.VariantCharacter
+			sc.VariantOfChar = variantChars[0]
 		}
 	}
 
+	commentParts := parseJSONString(old.Comment)
 	if old.Lucky != "" {
 		sc.Comment = fmt.Sprintf("lucky=%s", old.Lucky)
 	}
-
-	return sc
-}
-
-func parsePinyin(pinyin string) []string {
-	if pinyin == "" {
-		return nil
-	}
-	parts := strings.Split(pinyin, ",")
-	result := make([]string, 0, len(parts))
-	for _, p := range parts {
-		p = strings.TrimSpace(p)
-		if p != "" {
-			result = append(result, p)
+	if len(commentParts) > 0 {
+		if sc.Comment != "" {
+			sc.Comment += "; "
+		}
+		if len(commentParts) == 1 {
+			if len(commentParts[0]) > 200 {
+				sc.Comment += commentParts[0][:200] + "..."
+			} else {
+				sc.Comment += commentParts[0]
+			}
 		}
 	}
-	if len(result) == 0 {
-		return nil
-	}
-	return result
+
+	return sc
 }
 
 func TransformWuGeLucky(oldList []interface{}) []SeedWuGeLucky {
@@ -205,4 +206,22 @@ func formatWuXingFortune(lucky bool, comment string) string {
 		return "吉|" + comment
 	}
 	return "凶|" + comment
+}
+
+func parsePinyin(pinyin string) []string {
+	if pinyin == "" {
+		return nil
+	}
+	parts := strings.Split(pinyin, ",")
+	result := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			result = append(result, p)
+		}
+	}
+	if len(result) == 0 {
+		return nil
+	}
+	return result
 }
