@@ -1,4 +1,4 @@
-package main
+package seeddb
 
 import (
 	"fmt"
@@ -7,59 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 )
-
-type Reporter struct {
-	seedDir string
-}
-
-func NewReporter(seedDir string) *Reporter {
-	return &Reporter{seedDir: seedDir}
-}
-
-type DataReport struct {
-	Characters CharacterReport `json:"characters"`
-	WuGeLucky  WuGeLuckyReport `json:"wu_ge_lucky"`
-	WuXing     WuXingReport    `json:"wu_xing"`
-}
-
-type CharacterReport struct {
-	Total           int              `json:"total"`
-	WithWuXing      int              `json:"with_wu_xing"`
-	WithoutWuXing   int              `json:"without_wu_xing"`
-	WuXingCoverage  float64          `json:"wu_xing_coverage"`
-	WithPinyin      int              `json:"with_pinyin"`
-	PinyinCoverage  float64          `json:"pinyin_coverage"`
-	RegularCount    int              `json:"regular_count"`
-	NameableCount   int              `json:"nameable_count"`
-	SimplifiedCount int              `json:"simplified_count"`
-	TraditionalCount int             `json:"traditional_count"`
-	KangxiCount     int              `json:"kangxi_count"`
-	VariantCount    int              `json:"variant_count"`
-	WuXingDist      map[string]int   `json:"wu_xing_distribution"`
-	StrokeIssues    []StrokeIssue    `json:"stroke_issues,omitempty"`
-}
-
-type StrokeIssue struct {
-	Char    string `json:"char"`
-	Field   string `json:"field"`
-	Value   int    `json:"value"`
-	Message string `json:"message"`
-}
-
-type WuGeLuckyReport struct {
-	Total       int     `json:"total"`
-	LuckyCount  int     `json:"lucky_count"`
-	LuckyRate   float64 `json:"lucky_rate"`
-	MaxCount    int     `json:"max_count"`
-	SexCount    int     `json:"sex_count"`
-}
-
-type WuXingReport struct {
-	Total       int              `json:"total"`
-	LuckyCount  int              `json:"lucky_count"`
-	UnluckyCount int             `json:"unlucky_count"`
-	FortuneDist map[string]int   `json:"fortune_distribution"`
-}
 
 func (r *Reporter) Generate() error {
 	report := DataReport{}

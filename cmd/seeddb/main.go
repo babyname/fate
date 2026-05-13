@@ -6,12 +6,13 @@ import (
 	"os"
 
 	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/internal/seeddb"
 	"github.com/spf13/cobra"
 )
 
 var (
-	seedDir   string
-	dbConfig  config.DBConfig
+	seedDir    string
+	dbConfig   config.DBConfig
 	configPath string
 )
 
@@ -80,22 +81,38 @@ func init() {
 	rootCmd.AddCommand(exportCmd, initCmd, reportCmd)
 }
 
-func resolveDBConfig() config.DBConfig {
+func resolveDBConfig() seeddb.DBConfig {
 	if configPath != "" {
 		cfg, err := config.LoadConfig(configPath)
 		if err != nil {
 			log.Fatalf("Failed to load config: %v", err)
 		}
-		return cfg.Database
+		return seeddb.DBConfig{
+			Driver: cfg.Database.Driver,
+			DSN:    cfg.Database.DSN,
+			Host:   cfg.Database.Host,
+			Port:   cfg.Database.Port,
+			User:   cfg.Database.User,
+			Pwd:    cfg.Database.Pwd,
+			Name:   cfg.Database.Name,
+		}
 	}
-	return dbConfig
+	return seeddb.DBConfig{
+		Driver: dbConfig.Driver,
+		DSN:    dbConfig.DSN,
+		Host:   dbConfig.Host,
+		Port:   dbConfig.Port,
+		User:   dbConfig.User,
+		Pwd:    dbConfig.Pwd,
+		Name:   dbConfig.Name,
+	}
 }
 
 func runExport() error {
 	if err := os.MkdirAll(seedDir, 0755); err != nil {
 		return fmt.Errorf("create seed dir: %w", err)
 	}
-	exporter := NewExporter(dbConfig.Name, seedDir)
+	exporter := seeddb.NewExporter(dbConfig.Name, seedDir)
 	return exporter.Export()
 }
 
@@ -104,12 +121,12 @@ func runInit() error {
 	if err := os.MkdirAll(seedDir, 0755); err != nil {
 		return fmt.Errorf("create seed dir: %w", err)
 	}
-	importer := NewImporter(seedDir, cfg)
+	importer := seeddb.NewImporter(seedDir, cfg)
 	return importer.Import()
 }
 
 func runReport() error {
-	reporter := NewReporter(seedDir)
+	reporter := seeddb.NewReporter(seedDir)
 	return reporter.Generate()
 }
 
