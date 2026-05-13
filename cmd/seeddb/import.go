@@ -185,12 +185,6 @@ func (imp *Importer) linkCharacterEdges(ctx context.Context, client *ent.Client,
 				hasUpdate = true
 			}
 		}
-		if sc.TraditionalOfChar != "" {
-			if simpID, ok := charIDMap[sc.TraditionalOfChar]; ok {
-				updates.SetTraditionalToSimplifiedID(simpID)
-				hasUpdate = true
-			}
-		}
 		if sc.VariantOfChar != "" {
 			if stdID, ok := charIDMap[sc.VariantOfChar]; ok {
 				updates.SetVariantOfID(stdID)
