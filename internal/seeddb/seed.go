@@ -56,6 +56,15 @@ type SeedWuXing struct {
 	Fortune string `json:"fortune"`
 }
 
+type FieldChange struct {
+	Char      string `json:"char"`
+	Field     string `json:"field"`
+	OldValue  string `json:"old_value"`
+	NewValue  string `json:"new_value"`
+	Reason    string `json:"reason"`
+	Source    string `json:"source"`
+}
+
 type DataReport struct {
 	Characters CharacterReport `json:"characters"`
 	WuGeLucky  WuGeLuckyReport `json:"wu_ge_lucky"`
@@ -104,6 +113,7 @@ type WuXingReport struct {
 type Exporter struct {
 	dbPath  string
 	seedDir string
+	changes []FieldChange
 }
 
 type Importer struct {
@@ -135,4 +145,15 @@ func NewImporter(seedDir string, cfg DBConfig) *Importer {
 
 func NewReporter(seedDir string) *Reporter {
 	return &Reporter{seedDir: seedDir}
+}
+
+func (e *Exporter) recordChange(char, field, oldVal, newVal, reason, source string) {
+	e.changes = append(e.changes, FieldChange{
+		Char:     char,
+		Field:    field,
+		OldValue: oldVal,
+		NewValue: newVal,
+		Reason:   reason,
+		Source:   source,
+	})
 }
