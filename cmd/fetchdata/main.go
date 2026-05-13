@@ -1,6 +1,7 @@
 package main
 
 import (
+	"archive/zip"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -16,21 +17,19 @@ var sources = map[string]struct {
 	URL         string
 	Description string
 	Format      string
+	Extract     bool
 }{
-	"unihan-irgs": {
-		URL:         "https://www.unicode.org/Public/UCD/latest/ucd/Unihan_IRGSources.txt",
-		Description: "Unicode Unihan IRG Sources (简繁映射、部首、笔画)",
-		Format:      "tsv",
+	"unihan": {
+		URL:         "https://www.unicode.org/Public/UCD/latest/ucd/Unihan.zip",
+		Description: "Unicode Unihan Database (all data, zip archive)",
+		Format:      "zip",
+		Extract:     true,
 	},
-	"unihan-readings": {
-		URL:         "https://www.unicode.org/Public/UCD/latest/ucd/Unihan_Readings.txt",
-		Description: "Unicode Unihan Readings (拼音、释义)",
-		Format:      "tsv",
-	},
-	"unihan-other-mappings": {
-		URL:         "https://www.unicode.org/Public/UCD/latest/ucd/Unihan_OtherMappings.txt",
-		Description: "Unicode Unihan Other Mappings",
-		Format:      "tsv",
+	"hanzi-wuxing": {
+		URL:         "https://raw.githubusercontent.com/mozillazg/hanzi-wuxing/master/data.json",
+		Description: "mozillazg/hanzi-wuxing (汉字五行数据)",
+		Format:      "json",
+		Extract:     false,
 	},
 }
 
@@ -89,11 +88,14 @@ func fetchSource(name string) {
 		os.Exit(1)
 	}
 
-	ext := ".txt"
-	if src.Format == "json" {
-		ext = ".json"
+	var outputPath string
+	if src.Format == "zip" {
+		outputPath = filepath.Join(dataDir, name+".zip")
+	} else if src.Format == "json" {
+		outputPath = filepath.Join(dataDir, name+".json")
+	} else {
+		outputPath = filepath.Join(dataDir, name+".txt")
 	}
-	outputPath := filepath.Join(dataDir, name+ext)
 
 	fmt.Printf("Fetching %s...\n", name)
 	fmt.Printf("  URL: %s\n", src.URL)
@@ -124,6 +126,20 @@ func fetchSource(name string) {
 	}
 
 	fmt.Printf("  Saved: %s (%d bytes)\n", outputPath, written)
+
+	if src.Extract && src.Format == "zip" {
+		fmt.Printf("  Extracting zip...\n")
+		extractDir := filepath.Join(dataDir, name)
+		if err := os.MkdirAll(extractDir, 0755); err != nil {
+			fmt.Printf("  Error creating extract dir: %v\n", err)
+			return
+		}
+		if err := unzip(outputPath, extractDir); err != nil {
+			fmt.Printf("  Error extracting: %v\n", err)
+		} else {
+			fmt.Printf("  Extracted to: %s\n", extractDir)
+		}
+	}
 }
 
 func fetchAll() {
@@ -131,6 +147,50 @@ func fetchAll() {
 		fetchSource(name)
 		fmt.Println()
 	}
+}
+
+func unzip(src, dest string) error {
+	r, err := zip.OpenReader(src)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+
+	for _, f := range r.File {
+		fpath := filepath.Join(dest, f.Name)
+
+		if f.FileInfo().IsDir() {
+			if err := os.MkdirAll(fpath, 0755); err != nil {
+				return err
+			}
+			continue
+		}
+
+		if err := os.MkdirAll(filepath.Dir(fpath), 0755); err != nil {
+			return err
+		}
+
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+
+		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+		if err != nil {
+			rc.Close()
+			return err
+		}
+
+		_, err = io.Copy(outFile, rc)
+
+		outFile.Close()
+		rc.Close()
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func showStatus() {
@@ -143,11 +203,14 @@ func showStatus() {
 	fmt.Println()
 
 	for name, src := range sources {
-		ext := ".txt"
-		if src.Format == "json" {
-			ext = ".json"
+		var outputPath string
+		if src.Format == "zip" {
+			outputPath = filepath.Join(dataDir, name+".zip")
+		} else if src.Format == "json" {
+			outputPath = filepath.Join(dataDir, name+".json")
+		} else {
+			outputPath = filepath.Join(dataDir, name+".txt")
 		}
-		outputPath := filepath.Join(dataDir, name+ext)
 
 		info, err := os.Stat(outputPath)
 		if err != nil {

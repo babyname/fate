@@ -47,3 +47,4 @@ fate-wal
 
 # Seed data (too large for git, managed by seeddb tool)
 data/seed/
+data/raw/

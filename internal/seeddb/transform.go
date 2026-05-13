@@ -49,6 +49,12 @@ func (e *Exporter) transformNCharacter(old oldNCharacter, idLookup map[int]strin
 	}
 
 	sc.Pinyin = parseJSONString(old.PinYin)
+	if len(sc.Pinyin) == 0 {
+		if pinyins, ok := e.pinyinMap[old.Char]; ok && len(pinyins) > 0 {
+			e.recordChange(old.Char, "pinyin", "", fmt.Sprintf("%v", pinyins), "unihan_pinyin", "Unihan")
+			sc.Pinyin = pinyins
+		}
+	}
 
 	if old.Radical != "" {
 		sc.Radical = old.Radical
@@ -150,6 +156,12 @@ func (e *Exporter) transformCharacter(old oldCharacter) SeedCharacter {
 	}
 
 	sc.Pinyin = parseJSONString(old.PinYin)
+	if len(sc.Pinyin) == 0 {
+		if pinyins, ok := e.pinyinMap[old.Ch]; ok && len(pinyins) > 0 {
+			e.recordChange(old.Ch, "pinyin", "", fmt.Sprintf("%v", pinyins), "unihan_pinyin", "Unihan")
+			sc.Pinyin = pinyins
+		}
+	}
 
 	if old.Radical != "" {
 		sc.Radical = old.Radical
