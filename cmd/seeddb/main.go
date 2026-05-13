@@ -12,6 +12,7 @@ import (
 
 var (
 	seedDir    string
+	rawDataDir string
 	dbConfig   config.DBConfig
 	configPath string
 )
@@ -66,6 +67,7 @@ var reportCmd = &cobra.Command{
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&seedDir, "dir", "d", "data/seed", "Directory for JSON seed files")
+	rootCmd.PersistentFlags().StringVarP(&rawDataDir, "raw", "r", "data/raw", "Directory for external reference data (Unihan, etc.)")
 
 	exportCmd.Flags().StringVarP(&dbConfig.Name, "input", "i", "fate_old.db", "Path to old SQLite3 database file")
 
@@ -112,7 +114,7 @@ func runExport() error {
 	if err := os.MkdirAll(seedDir, 0755); err != nil {
 		return fmt.Errorf("create seed dir: %w", err)
 	}
-	exporter := seeddb.NewExporter(dbConfig.Name, seedDir)
+	exporter := seeddb.NewExporter(dbConfig.Name, seedDir, rawDataDir)
 	return exporter.Export()
 }
 
