@@ -1,0 +1,138 @@
+package seeddb
+
+type SeedCharacter struct {
+	Char              string   `json:"char"`
+	Unicode           string   `json:"unicode,omitempty"`
+	IsSimplified      bool     `json:"is_simplified"`
+	IsTraditional     bool     `json:"is_traditional"`
+	IsKangxi          bool     `json:"is_kangxi"`
+	IsVariant         bool     `json:"is_variant"`
+	IsAncient         bool     `json:"is_ancient"`
+	Pinyin            []string `json:"pinyin,omitempty"`
+	Radical           string   `json:"radical,omitempty"`
+	RadicalStroke     int      `json:"radical_stroke,omitempty"`
+	SimplifiedStroke  int      `json:"simplified_stroke,omitempty"`
+	TraditionalStroke int      `json:"traditional_stroke,omitempty"`
+	KangxiStroke      int      `json:"kangxi_stroke,omitempty"`
+	ScienceStroke     int      `json:"science_stroke,omitempty"`
+	WuXing            string   `json:"wu_xing,omitempty"`
+	Regular           bool     `json:"regular"`
+	CommonLevel       int      `json:"common_level,omitempty"`
+	GenderHint        string   `json:"gender_hint,omitempty"`
+	Nameable          bool     `json:"nameable"`
+	Meaning           string   `json:"meaning,omitempty"`
+	Source            string   `json:"source,omitempty"`
+	SourceConfidence  float64  `json:"source_confidence,omitempty"`
+	Comment           string   `json:"comment,omitempty"`
+	SimplifiedOfChar  string   `json:"simplified_of_char,omitempty"`
+	VariantOfChar     string   `json:"variant_of_char,omitempty"`
+}
+
+type SeedWuGeLucky struct {
+	LastStroke1  int    `json:"last_stroke_1"`
+	LastStroke2  int    `json:"last_stroke_2"`
+	FirstStroke1 int    `json:"first_stroke_1"`
+	FirstStroke2 int    `json:"first_stroke_2"`
+	TianGe       int    `json:"tian_ge"`
+	TianDaYan    string `json:"tian_da_yan"`
+	RenGe        int    `json:"ren_ge"`
+	RenDaYan     string `json:"ren_da_yan"`
+	DiGe         int    `json:"di_ge"`
+	DiDaYan      string `json:"di_da_yan"`
+	WaiGe        int    `json:"wai_ge"`
+	WaiDaYan     string `json:"wai_da_yan"`
+	ZongGe       int    `json:"zong_ge"`
+	ZongDaYan    string `json:"zong_da_yan"`
+	ZongLucky    bool   `json:"zong_lucky"`
+	ZongSex      bool   `json:"zong_sex"`
+	ZongMax      bool   `json:"zong_max"`
+}
+
+type SeedWuXing struct {
+	ID      string `json:"id"`
+	First   string `json:"first"`
+	Second  string `json:"second"`
+	Third   string `json:"third"`
+	Fortune string `json:"fortune"`
+}
+
+type DataReport struct {
+	Characters CharacterReport `json:"characters"`
+	WuGeLucky  WuGeLuckyReport `json:"wu_ge_lucky"`
+	WuXing     WuXingReport    `json:"wu_xing"`
+}
+
+type CharacterReport struct {
+	Total            int            `json:"total"`
+	WithWuXing       int            `json:"with_wu_xing"`
+	WithoutWuXing    int            `json:"without_wu_xing"`
+	WuXingCoverage   float64        `json:"wu_xing_coverage"`
+	WithPinyin       int            `json:"with_pinyin"`
+	PinyinCoverage   float64        `json:"pinyin_coverage"`
+	RegularCount     int            `json:"regular_count"`
+	NameableCount    int            `json:"nameable_count"`
+	SimplifiedCount  int            `json:"simplified_count"`
+	TraditionalCount int            `json:"traditional_count"`
+	KangxiCount      int            `json:"kangxi_count"`
+	VariantCount     int            `json:"variant_count"`
+	WuXingDist       map[string]int `json:"wu_xing_distribution"`
+	StrokeIssues     []StrokeIssue  `json:"stroke_issues,omitempty"`
+}
+
+type StrokeIssue struct {
+	Char    string `json:"char"`
+	Field   string `json:"field"`
+	Value   int    `json:"value"`
+	Message string `json:"message"`
+}
+
+type WuGeLuckyReport struct {
+	Total      int     `json:"total"`
+	LuckyCount int     `json:"lucky_count"`
+	LuckyRate  float64 `json:"lucky_rate"`
+	MaxCount   int     `json:"max_count"`
+	SexCount   int     `json:"sex_count"`
+}
+
+type WuXingReport struct {
+	Total        int            `json:"total"`
+	LuckyCount   int            `json:"lucky_count"`
+	UnluckyCount int            `json:"unlucky_count"`
+	FortuneDist  map[string]int `json:"fortune_distribution"`
+}
+
+type Exporter struct {
+	dbPath  string
+	seedDir string
+}
+
+type Importer struct {
+	seedDir string
+	cfg     DBConfig
+}
+
+type Reporter struct {
+	seedDir string
+}
+
+type DBConfig struct {
+	Driver string
+	DSN    string
+	Host   string
+	Port   string
+	User   string
+	Pwd    string
+	Name   string
+}
+
+func NewExporter(dbPath, seedDir string) *Exporter {
+	return &Exporter{dbPath: dbPath, seedDir: seedDir}
+}
+
+func NewImporter(seedDir string, cfg DBConfig) *Importer {
+	return &Importer{seedDir: seedDir, cfg: cfg}
+}
+
+func NewReporter(seedDir string) *Reporter {
+	return &Reporter{seedDir: seedDir}
+}
