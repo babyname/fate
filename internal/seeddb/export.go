@@ -37,6 +37,32 @@ type oldCharacter struct {
 	ScienceStroke            int
 }
 
+type oldNCharacter struct {
+	ID             int
+	PinYin         string
+	Char           string
+	CharStroke     int
+	Radical        string
+	RadicalStroke  int
+	IsRegular      bool
+	IsSimplified   bool
+	SimplifiedID   string
+	IsTraditional  bool
+	TraditionalID  string
+	IsKangXi       bool
+	KangXiID       string
+	KangXiStroke   int
+	IsVariant      bool
+	VariantID      string
+	IsScience      bool
+	ScienceStroke  int
+	WuXing         string
+	Lucky          string
+	Explanation    string
+	Comment        string
+	NeedFix        bool
+}
+
 type oldWuGeLucky struct {
 	LastStroke1  int
 	LastStroke2  int
@@ -47,9 +73,10 @@ type oldWuGeLucky struct {
 
 type oldWuXing struct {
 	ID      string
-	SanCai  string
-	Lucky   bool
-	Comment string
+	First   string
+	Second  string
+	Third   string
+	Fortune string
 }
 
 func (e *Exporter) Export() error {
@@ -59,34 +86,47 @@ func (e *Exporter) Export() error {
 	}
 	defer db.Close()
 
-	log.Println("Exporting character table...")
+	var allChars []SeedCharacter
+
+	log.Println("Exporting n_character table (primary)...")
+	nChars, err := e.queryNCharacters(db)
+	if err != nil {
+		return err
+	}
+	nSeeds := transformNCharacters(nChars)
+	log.Printf("  → %d from n_character", len(nSeeds))
+	allChars = append(allChars, nSeeds...)
+
+	log.Println("Exporting character table (supplement)...")
 	oldChars, err := e.queryCharacters(db)
 	if err != nil {
 		return err
 	}
+	cSeeds := transformCharacters(oldChars)
+	log.Printf("  → %d from character", len(cSeeds))
+
+	allChars = mergeCharacters(allChars, cSeeds)
+	log.Printf("  → %d after merge (dedup by char)", len(allChars))
 
 	log.Println("Exporting wu_ge_lucky table...")
 	oldWuGes, err := e.queryWuGeLucky(db)
 	if err != nil {
 		return err
 	}
+	seedWuGes := transformWuGeLucky(oldWuGes)
 
 	log.Println("Exporting wu_xing table...")
 	oldWuXings, err := e.queryWuXing(db)
 	if err != nil {
 		return err
 	}
-
-	log.Println("Transforming data to seed format...")
-	seedChars := transformCharacters(oldChars)
-	seedWuGes := transformWuGeLucky(oldWuGes)
 	seedWuXings := transformWuXing(oldWuXings)
 
 	charPath := filepath.Join(e.seedDir, "character.json")
-	if err := writeJSON(charPath, seedChars); err != nil {
+	if err := writeJSON(charPath, allChars); err != nil {
 		return err
 	}
-	log.Printf("  → %d characters → %s", len(seedChars), charPath)
+	log.Printf("  → %d characters → %s", len(allChars), charPath)
 
 	wugePath := filepath.Join(e.seedDir, "wu_ge_lucky.json")
 	if err := writeJSON(wugePath, seedWuGes); err != nil {
@@ -102,6 +142,34 @@ func (e *Exporter) Export() error {
 
 	log.Println("Export completed!")
 	return nil
+}
+
+func (e *Exporter) queryNCharacters(db *sql.DB) ([]oldNCharacter, error) {
+	rows, err := db.Query("SELECT id, pin_yin, char, char_stroke, radical, radical_stroke, is_regular, is_simplified, simplified_id, is_traditional, traditional_id, is_kang_xi, kang_xi_id, kang_xi_stroke, is_variant, variant_id, is_science, science_stroke, wu_xing, lucky, explanation, comment, need_fix FROM n_character")
+	if err != nil {
+		return nil, fmt.Errorf("query n_character: %w", err)
+	}
+	defer rows.Close()
+
+	var results []oldNCharacter
+	for rows.Next() {
+		var c oldNCharacter
+		err := rows.Scan(
+			&c.ID, &c.PinYin, &c.Char, &c.CharStroke, &c.Radical, &c.RadicalStroke,
+			&c.IsRegular, &c.IsSimplified, &c.SimplifiedID,
+			&c.IsTraditional, &c.TraditionalID,
+			&c.IsKangXi, &c.KangXiID, &c.KangXiStroke,
+			&c.IsVariant, &c.VariantID,
+			&c.IsScience, &c.ScienceStroke,
+			&c.WuXing, &c.Lucky, &c.Explanation, &c.Comment, &c.NeedFix,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("scan n_character row: %w", err)
+		}
+		results = append(results, c)
+	}
+	log.Printf("  Read %d rows from n_character", len(results))
+	return results, nil
 }
 
 func (e *Exporter) queryCharacters(db *sql.DB) ([]oldCharacter, error) {
@@ -169,20 +237,100 @@ func (e *Exporter) queryWuXing(db *sql.DB) ([]oldWuXing, error) {
 	var results []oldWuXing
 	for rows.Next() {
 		var w oldWuXing
-		var first, second, third, fortune string
-		err := rows.Scan(
-			&w.ID, &first, &second, &third, &fortune,
-		)
+		err := rows.Scan(&w.ID, &w.First, &w.Second, &w.Third, &w.Fortune)
 		if err != nil {
 			return nil, fmt.Errorf("scan wu_xing row: %w", err)
 		}
-		w.SanCai = first + second + third
-		w.Comment = fortune
-		w.Lucky = fortune == "大吉" || fortune == "吉"
 		results = append(results, w)
 	}
 	log.Printf("  Read %d rows from wu_xing", len(results))
 	return results, nil
+}
+
+func mergeCharacters(primary []SeedCharacter, supplement []SeedCharacter) []SeedCharacter {
+	existing := make(map[string]*SeedCharacter, len(primary))
+	for i := range primary {
+		existing[primary[i].Char] = &primary[i]
+	}
+
+	added := 0
+	enriched := 0
+	for _, sup := range supplement {
+		if ex, ok := existing[sup.Char]; ok {
+			if enrichCharacter(ex, sup) {
+				enriched++
+			}
+		} else {
+			primary = append(primary, sup)
+			existing[sup.Char] = &primary[len(primary)-1]
+			added++
+		}
+	}
+
+	log.Printf("  Merge: %d added, %d enriched from supplement", added, enriched)
+	return primary
+}
+
+func enrichCharacter(dst *SeedCharacter, src SeedCharacter) bool {
+	changed := false
+
+	if dst.WuXing == "" && src.WuXing != "" {
+		dst.WuXing = src.WuXing
+		changed = true
+	}
+	if len(dst.Pinyin) == 0 && len(src.Pinyin) > 0 {
+		dst.Pinyin = src.Pinyin
+		changed = true
+	}
+	if dst.SimplifiedStroke == 0 && src.SimplifiedStroke > 0 {
+		dst.SimplifiedStroke = src.SimplifiedStroke
+		changed = true
+	}
+	if dst.TraditionalStroke == 0 && src.TraditionalStroke > 0 {
+		dst.TraditionalStroke = src.TraditionalStroke
+		changed = true
+	}
+	if dst.KangxiStroke == 0 && src.KangxiStroke > 0 {
+		dst.KangxiStroke = src.KangxiStroke
+		changed = true
+	}
+	if dst.ScienceStroke == 0 && src.ScienceStroke > 0 {
+		dst.ScienceStroke = src.ScienceStroke
+		changed = true
+	}
+	if dst.Radical == "" && src.Radical != "" {
+		dst.Radical = src.Radical
+		dst.RadicalStroke = src.RadicalStroke
+		changed = true
+	}
+	if dst.Meaning == "" && src.Meaning != "" {
+		dst.Meaning = src.Meaning
+		changed = true
+	}
+	if dst.Comment == "" && src.Comment != "" {
+		dst.Comment = src.Comment
+		changed = true
+	}
+	if !dst.IsSimplified && src.IsSimplified {
+		dst.IsSimplified = src.IsSimplified
+		if dst.SimplifiedOfChar == "" {
+			dst.SimplifiedOfChar = src.SimplifiedOfChar
+		}
+		changed = true
+	}
+	if !dst.IsTraditional && src.IsTraditional {
+		dst.IsTraditional = src.IsTraditional
+		changed = true
+	}
+	if !dst.IsVariant && src.IsVariant {
+		dst.IsVariant = src.IsVariant
+		if dst.VariantOfChar == "" {
+			dst.VariantOfChar = src.VariantOfChar
+		}
+		changed = true
+	}
+
+	return changed
 }
 
 func writeJSON(filename string, data interface{}) error {
@@ -217,6 +365,17 @@ func parseJSONString(s string) []string {
 	var result []string
 	if err := json.Unmarshal([]byte(s), &result); err != nil {
 		return []string{s}
+	}
+	return result
+}
+
+func parseJSONInts(s string) []int {
+	if s == "" || s == "null" || s == "[]" {
+		return nil
+	}
+	var result []int
+	if err := json.Unmarshal([]byte(s), &result); err != nil {
+		return nil
 	}
 	return result
 }
