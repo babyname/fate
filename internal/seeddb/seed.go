@@ -111,9 +111,13 @@ type WuXingReport struct {
 }
 
 type Exporter struct {
-	dbPath  string
-	seedDir string
-	changes []FieldChange
+	dbPath     string
+	seedDir    string
+	rawDataDir string
+	changes    []FieldChange
+
+	pinyinMap  map[string][]string // char -> []pinyin
+	wuxingMap  map[string]string   // char -> wuxing
 }
 
 type Importer struct {
@@ -135,8 +139,18 @@ type DBConfig struct {
 	Name   string
 }
 
-func NewExporter(dbPath, seedDir string) *Exporter {
-	return &Exporter{dbPath: dbPath, seedDir: seedDir}
+func NewExporter(dbPath, seedDir string, rawDataDirs ...string) *Exporter {
+	rawDataDir := "data/raw"
+	if len(rawDataDirs) > 0 {
+		rawDataDir = rawDataDirs[0]
+	}
+	return &Exporter{
+		dbPath:     dbPath,
+		seedDir:    seedDir,
+		rawDataDir: rawDataDir,
+		pinyinMap:  make(map[string][]string),
+		wuxingMap:  make(map[string]string),
+	}
 }
 
 func NewImporter(seedDir string, cfg DBConfig) *Importer {
