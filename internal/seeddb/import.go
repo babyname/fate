@@ -1,7 +1,6 @@
-package main
+package seeddb
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -18,19 +17,20 @@ import (
 
 const batchSize = 500
 
-type Importer struct {
-	seedDir string
-	cfg     config.DBConfig
-}
-
-func NewImporter(seedDir string, cfg config.DBConfig) *Importer {
-	return &Importer{seedDir: seedDir, cfg: cfg}
-}
-
 func (imp *Importer) Import() error {
 	ctx := context.Background()
 
-	builder := database.New(imp.cfg)
+	cfg := config.DBConfig{
+		Driver: imp.cfg.Driver,
+		DSN:    imp.cfg.DSN,
+		Host:   imp.cfg.Host,
+		Port:   imp.cfg.Port,
+		User:   imp.cfg.User,
+		Pwd:    imp.cfg.Pwd,
+		Name:   imp.cfg.Name,
+	}
+
+	builder := database.New(cfg)
 	client, err := builder.Client()
 	if err != nil {
 		return fmt.Errorf("connect database: %w", err)
@@ -80,7 +80,6 @@ func (imp *Importer) importCharacters(ctx context.Context, client *ent.Client, f
 	}
 
 	charIDMap := make(map[string]int)
-
 	total := len(seeds)
 	imported := 0
 
@@ -176,7 +175,6 @@ func (imp *Importer) linkCharacterEdges(ctx context.Context, client *ent.Client,
 	linked := 0
 	for _, sc := range seeds {
 		updates := client.Character.UpdateOneID(charIDMap[sc.Char])
-
 		hasUpdate := false
 
 		if sc.SimplifiedOfChar != "" {
@@ -300,18 +298,5 @@ func (imp *Importer) importWuXing(ctx context.Context, client *ent.Client, filen
 		log.Printf("  WuXing: %d/%d", imported, total)
 	}
 
-	return nil
-}
-
-func readJSON(filename string, v interface{}) error {
-	f, err := os.Open(filename)
-	if err != nil {
-		return fmt.Errorf("open %s: %w", filename, err)
-	}
-	defer f.Close()
-
-	if err := json.NewDecoder(f).Decode(v); err != nil {
-		return fmt.Errorf("decode %s: %w", filename, err)
-	}
 	return nil
 }
