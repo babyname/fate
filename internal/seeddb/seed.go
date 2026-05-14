@@ -116,8 +116,9 @@ type Exporter struct {
 	rawDataDir string
 	changes    []FieldChange
 
-	pinyinMap  map[string][]string // char -> []pinyin
-	wuxingMap  map[string]string   // char -> wuxing
+	pinyinMap    map[string][]string // char -> []pinyin
+	totalStrokes map[string]int     // char -> stroke count
+	definitions  map[string]string   // char -> definition
 }
 
 type Importer struct {
@@ -145,11 +146,12 @@ func NewExporter(dbPath, seedDir string, rawDataDirs ...string) *Exporter {
 		rawDataDir = rawDataDirs[0]
 	}
 	return &Exporter{
-		dbPath:     dbPath,
-		seedDir:    seedDir,
-		rawDataDir: rawDataDir,
-		pinyinMap:  make(map[string][]string),
-		wuxingMap:  make(map[string]string),
+		dbPath:        dbPath,
+		seedDir:       seedDir,
+		rawDataDir:    rawDataDir,
+		pinyinMap:     make(map[string][]string),
+		totalStrokes:  make(map[string]int),
+		definitions:   make(map[string]string),
 	}
 }
 
