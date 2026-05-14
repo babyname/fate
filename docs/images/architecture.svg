@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#d4a574"/>
+      <stop offset="100%" style="stop-color:#e8d5b7"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)" rx="16"/>
+  <text x="400" y="60" text-anchor="middle" fill="url(#accent)" font-family="serif" font-size="42" letter-spacing="12">命 运 起 名</text>
+  <text x="400" y="90" text-anchor="middle" fill="#8b7e6a" font-family="sans-serif" font-size="14" letter-spacing="4">FATE — 现代科学取名工具</text>
+  <line x1="200" y1="108" x2="600" y2="108" stroke="#30363d" stroke-width="1"/>
+  <g transform="translate(40,130)">
+    <g transform="translate(0,0)">
+      <rect width="220" height="90" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(232,213,183,0.15)" stroke-width="1"/>
+      <text x="110" y="30" text-anchor="middle" font-size="22">🎂</text>
+      <text x="110" y="52" text-anchor="middle" fill="#e8d5b7" font-family="sans-serif" font-size="14" font-weight="600">八字计算</text>
+      <text x="110" y="72" text-anchor="middle" fill="#8b7e6a" font-family="sans-serif" font-size="11">四柱八字 · 五行强弱 · 调候用神</text>
+    </g>
+    <g transform="translate(250,0)">
+      <rect width="220" height="90" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(232,213,183,0.15)" stroke-width="1"/>
+      <text x="110" y="30" text-anchor="middle" font-size="22">☯️</text>
+      <text x="110" y="52" text-anchor="middle" fill="#e8d5b7" font-family="sans-serif" font-size="14" font-weight="600">喜用神</text>
+      <text x="110" y="72" text-anchor="middle" fill="#8b7e6a" font-family="sans-serif" font-size="11">平衡用神法 · 格局用神法</text>
+    </g>
+    <g transform="translate(500,0)">
+      <rect width="220" height="90" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(232,213,183,0.15)" stroke-width="1"/>
+      <text x="110" y="30" text-anchor="middle" font-size="22">📐</text>
+      <text x="110" y="52" text-anchor="middle" fill="#e8d5b7" font-family="sans-serif" font-size="14" font-weight="600">三才五格</text>
+      <text x="110" y="72" text-anchor="middle" fill="#8b7e6a" font-family="sans-serif" font-size="11">81数大衍 · O(1)预计算查找</text>
+    </g>
+    <g transform="translate(0,110)">
+      <rect width="220" height="90" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(232,213,183,0.15)" stroke-width="1"/>
+      <text x="110" y="30" text-anchor="middle" font-size="22">🔮</text>
+      <text x="110" y="52" text-anchor="middle" fill="#e8d5b7" font-family="sans-serif" font-size="14" font-weight="600">周易卦象</text>
+      <text x="110" y="72" text-anchor="middle" fill="#8b7e6a" font-family="sans-serif" font-size="11">64卦解读 · 事业婚恋决策</text>
+    </g>
+    <g transform="translate(250,110)">
+      <rect width="220" height="90" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(232,213,183,0.15)" stroke-width="1"/>
+      <text x="110" y="30" text-anchor="middle" font-size="22">📊</text>
+      <text x="110" y="52" text-anchor="middle" fill="#e8d5b7" font-family="sans-serif" font-size="14" font-weight="600">评分系统</text>
+      <text x="110" y="72" text-anchor="middle" fill="#8b7e6a" font-family="sans-serif" font-size="11">文化印象 · 五行八字 · 生肖 · 五格</text>
+    </g>
+    <g transform="translate(500,110)">
+      <rect width="220" height="90" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(232,213,183,0.15)" stroke-width="1"/>
+      <text x="110" y="30" text-anchor="middle" font-size="22">📝</text>
+      <text x="110" y="52" text-anchor="middle" fill="#e8d5b7" font-family="sans-serif" font-size="14" font-weight="600">报告输出</text>
+      <text x="110" y="72" text-anchor="middle" fill="#8b7e6a" font-family="sans-serif" font-size="11">Text · Markdown · JSON</text>
+    </g>
+  </g>
+  <g transform="translate(50,390)">
+    <rect x="0" y="0" width="90" height="30" rx="6" fill="rgba(232,213,183,0.1)" stroke="rgba(232,213,183,0.2)" stroke-width="1"/>
+    <text x="45" y="20" text-anchor="middle" fill="#e8d5b7" font-family="sans-serif" font-size="11">生辰八字</text>
+    <text x="105" y="20" text-anchor="middle" fill="#8b7e6a" font-size="16">→</text>
+    <rect x="120" y="0" width="90" height="30" rx="6" fill="rgba(232,213,183,0.1)" stroke="rgba(232,213,183,0.2)" stroke-width="1"/>
+    <text x="165" y="20" text-anchor="middle" fill="#e8d5b7" font-family="sans-serif" font-size="11">喜用神</text>
+    <text x="225" y="20" text-anchor="middle" fill="#8b7e6a" font-size="16">→</text>
+    <rect x="240" y="0" width="90" height="30" rx="6" fill="rgba(232,213,183,0.1)" stroke="rgba(232,213,183,0.2)" stroke-width="1"/>
+    <text x="285" y="20" text-anchor="middle" fill="#e8d5b7" font-family="sans-serif" font-size="11">候选字</text>
+    <text x="345" y="20" text-anchor="middle" fill="#8b7e6a" font-size="16">→</text>
+    <rect x="360" y="0" width="90" height="30" rx="6" fill="rgba(232,213,183,0.1)" stroke="rgba(232,213,183,0.2)" stroke-width="1"/>
+    <text x="405" y="20" text-anchor="middle" fill="#e8d5b7" font-family="sans-serif" font-size="11">五格评分</text>
+    <text x="465" y="20" text-anchor="middle" fill="#8b7e6a" font-size="16">→</text>
+    <rect x="480" y="0" width="90" height="30" rx="6" fill="rgba(232,213,183,0.1)" stroke="rgba(232,213,183,0.2)" stroke-width="1"/>
+    <text x="525" y="20" text-anchor="middle" fill="#e8d5b7" font-family="sans-serif" font-size="11">卦象分析</text>
+    <text x="585" y="20" text-anchor="middle" fill="#8b7e6a" font-size="16">→</text>
+    <rect x="600" y="0" width="90" height="30" rx="6" fill="rgba(232,213,183,0.1)" stroke="rgba(232,213,183,0.2)" stroke-width="1"/>
+    <text x="645" y="20" text-anchor="middle" fill="#e8d5b7" font-family="sans-serif" font-size="11">报告输出</text>
+  </g>
+  <text x="400" y="470" text-anchor="middle" fill="#5a5040" font-family="sans-serif" font-size="11" letter-spacing="2">Go 1.22+ · Ent ORM · SQLite3 · chronos/v2 · yi</text>
+</svg>
