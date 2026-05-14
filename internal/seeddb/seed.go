@@ -120,6 +120,7 @@ type Exporter struct {
 	totalStrokes map[string]int     // char -> stroke count
 	definitions  map[string]string   // char -> definition
 	wuxingMap    map[string]string   // char -> wuxing (from yw11.com)
+	rsUnicode    map[string]int      // char -> kangxi radical number (from kRSUnicode)
 }
 
 type Importer struct {
@@ -154,6 +155,7 @@ func NewExporter(dbPath, seedDir string, rawDataDirs ...string) *Exporter {
 		totalStrokes:  make(map[string]int),
 		definitions:   make(map[string]string),
 		wuxingMap:     make(map[string]string),
+		rsUnicode:     make(map[string]int),
 	}
 }
 
