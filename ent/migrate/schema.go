@@ -238,45 +238,6 @@ var (
 		Columns:    VersionsColumns,
 		PrimaryKey: []*schema.Column{VersionsColumns[0]},
 	}
-	// WuGeLuckyColumns holds the columns for the "wu_ge_lucky" table.
-	WuGeLuckyColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID},
-		{Name: "last_stroke_1", Type: field.TypeInt},
-		{Name: "last_stroke_2", Type: field.TypeInt},
-		{Name: "first_stroke_1", Type: field.TypeInt},
-		{Name: "first_stroke_2", Type: field.TypeInt},
-		{Name: "tian_ge", Type: field.TypeInt},
-		{Name: "tian_da_yan", Type: field.TypeString},
-		{Name: "ren_ge", Type: field.TypeInt},
-		{Name: "ren_da_yan", Type: field.TypeString},
-		{Name: "di_ge", Type: field.TypeInt},
-		{Name: "di_da_yan", Type: field.TypeString},
-		{Name: "wai_ge", Type: field.TypeInt},
-		{Name: "wai_da_yan", Type: field.TypeString},
-		{Name: "zong_ge", Type: field.TypeInt},
-		{Name: "zong_da_yan", Type: field.TypeString},
-		{Name: "zong_lucky", Type: field.TypeBool},
-		{Name: "zong_sex", Type: field.TypeBool},
-		{Name: "zong_max", Type: field.TypeBool},
-	}
-	// WuGeLuckyTable holds the schema information for the "wu_ge_lucky" table.
-	WuGeLuckyTable = &schema.Table{
-		Name:       "wu_ge_lucky",
-		Columns:    WuGeLuckyColumns,
-		PrimaryKey: []*schema.Column{WuGeLuckyColumns[0]},
-		Indexes: []*schema.Index{
-			{
-				Name:    "wugelucky_last_stroke_1",
-				Unique:  false,
-				Columns: []*schema.Column{WuGeLuckyColumns[1]},
-			},
-			{
-				Name:    "wugelucky_last_stroke_2",
-				Unique:  false,
-				Columns: []*schema.Column{WuGeLuckyColumns[2]},
-			},
-		},
-	}
 	// WuXingColumns holds the columns for the "wu_xing" table.
 	WuXingColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
@@ -301,7 +262,6 @@ var (
 		PoemTable,
 		PoemCharTable,
 		VersionsTable,
-		WuGeLuckyTable,
 		WuXingTable,
 	}
 )
@@ -318,9 +278,6 @@ func init() {
 	PoemCharTable.ForeignKeys[0].RefTable = PoemTable
 	PoemCharTable.Annotation = &entsql.Annotation{
 		Table: "poem_char",
-	}
-	WuGeLuckyTable.Annotation = &entsql.Annotation{
-		Table: "wu_ge_lucky",
 	}
 	WuXingTable.Annotation = &entsql.Annotation{
 		Table: "wu_xing",
