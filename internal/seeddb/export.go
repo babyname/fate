@@ -89,8 +89,8 @@ func (e *Exporter) Export() error {
 	if err := e.loadUnihanData(); err != nil {
 		log.Printf("Warning: failed to load Unihan data: %v", err)
 	} else {
-		log.Printf("  → %d pinyin entries, %d strokes, %d definitions",
-			len(e.pinyinMap), len(e.totalStrokes), len(e.definitions))
+		log.Printf("  → %d pinyin entries, %d strokes, %d definitions, %d radicals",
+			len(e.pinyinMap), len(e.totalStrokes), len(e.definitions), len(e.rsUnicode))
 	}
 
 	db, err := sql.Open("sqlite3", e.dbPath+"?mode=ro")
@@ -579,6 +579,20 @@ func (e *Exporter) loadUnihanIRG(path string) error {
 		if field == "kTotalStrokes" {
 			if strokes, err := strconv.Atoi(value); err == nil && e.totalStrokes[char] == 0 {
 				e.totalStrokes[char] = strokes
+			}
+		} else if field == "kRSUnicode" {
+			rsValues := strings.Split(value, " ")
+			if len(rsValues) > 0 {
+				firstRS := rsValues[0]
+				if idx := strings.Index(firstRS, "'"); idx != -1 {
+					firstRS = firstRS[:idx]
+				}
+				if idx := strings.Index(firstRS, "."); idx != -1 {
+					radicalNumStr := firstRS[:idx]
+					if num, err := strconv.Atoi(radicalNumStr); err == nil && e.rsUnicode[char] == 0 {
+						e.rsUnicode[char] = num
+					}
+				}
 			}
 		}
 	}
