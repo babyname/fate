@@ -57,18 +57,6 @@ func (f VersionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.VersionMutation", m)
 }
 
-// The WuGeLuckyFunc type is an adapter to allow the use of ordinary
-// function as WuGeLucky mutator.
-type WuGeLuckyFunc func(context.Context, *ent.WuGeLuckyMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f WuGeLuckyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.WuGeLuckyMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WuGeLuckyMutation", m)
-}
-
 // The WuXingFunc type is an adapter to allow the use of ordinary
 // function as WuXing mutator.
 type WuXingFunc func(context.Context, *ent.WuXingMutation) (ent.Value, error)

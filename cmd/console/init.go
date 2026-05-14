@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 
-	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/database"
 	"github.com/babyname/fate/internal/repository"
 	"github.com/spf13/cobra"
@@ -21,10 +20,8 @@ func cmdInit() *cobra.Command {
 				fmt.Println("building database error:", err)
 			}
 			m := repository.New(cli)
-			wuge := make(chan *ent.WuGeLucky, 1)
-			//go fate.InitWuGe(wuge)
 			fmt.Println("database initializing...")
-			err = m.Initialize(cmd.Context(), wuge)
+			err = m.Initialize(cmd.Context())
 			if err != nil {
 				fmt.Println("initialize database error:", err)
 			}

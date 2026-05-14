@@ -5,7 +5,6 @@ import (
 
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/character"
-	"github.com/babyname/fate/ent/wugelucky"
 	"golang.org/x/net/context"
 )
 
@@ -15,25 +14,13 @@ type CharCache struct {
 	all      []*ent.Character
 }
 
-type LuckyCache struct {
-	mu        sync.RWMutex
-	byStrokes map[[2]int][]*ent.WuGeLucky
-}
-
 type ModelCache struct {
 	chars *CharCache
-	lucky *LuckyCache
 }
 
 func newCharCache() *CharCache {
 	return &CharCache{
 		byStroke: make(map[int][]*ent.Character, 128),
-	}
-}
-
-func newLuckyCache() *LuckyCache {
-	return &LuckyCache{
-		byStrokes: make(map[[2]int][]*ent.WuGeLucky, 64),
 	}
 }
 
@@ -60,19 +47,6 @@ func (c *CharCache) SetAll(chars []*ent.Character) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.all = chars
-}
-
-func (c *LuckyCache) Get(strokes [2]int) ([]*ent.WuGeLucky, bool) {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	luckies, ok := c.byStrokes[strokes]
-	return luckies, ok
-}
-
-func (c *LuckyCache) Set(strokes [2]int, luckies []*ent.WuGeLucky) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.byStrokes[strokes] = luckies
 }
 
 func (m *Repository) PreloadCharacters(ctx context.Context) error {
@@ -131,25 +105,8 @@ func (m *Repository) GetCharactersCached(ctx context.Context, stroke int, stroke
 	return chars, nil
 }
 
-func (m *Repository) GetWuGeLuckyCached(ctx context.Context, strokes [2]int) ([]*ent.WuGeLucky, error) {
-	if cached, ok := m.cache.lucky.Get(strokes); ok {
-		return cached, nil
-	}
-	query := m.WuGeLucky.Query().
-		Where(wugelucky.LastStroke1EQ(strokes[0])).
-		Where(wugelucky.And(wugelucky.LastStroke2EQ(strokes[1]))).
-		Where(wugelucky.And(wugelucky.ZongLuckyEQ(true)))
-	luckies, err := query.All(ctx)
-	if err != nil {
-		return nil, err
-	}
-	m.cache.lucky.Set(strokes, luckies)
-	return luckies, nil
-}
-
 func NewModelCache() *ModelCache {
 	return &ModelCache{
 		chars: newCharCache(),
-		lucky: newLuckyCache(),
 	}
 }

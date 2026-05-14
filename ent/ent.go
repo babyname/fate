@@ -15,7 +15,6 @@ import (
 	"github.com/babyname/fate/ent/poem"
 	"github.com/babyname/fate/ent/poemchar"
 	"github.com/babyname/fate/ent/version"
-	"github.com/babyname/fate/ent/wugelucky"
 	"github.com/babyname/fate/ent/wuxing"
 )
 
@@ -74,7 +73,6 @@ func columnChecker(table string) func(string) error {
 		poem.Table:      poem.ValidColumn,
 		poemchar.Table:  poemchar.ValidColumn,
 		version.Table:   version.ValidColumn,
-		wugelucky.Table: wugelucky.ValidColumn,
 		wuxing.Table:    wuxing.ValidColumn,
 	}
 	check, ok := checks[table]

@@ -23,7 +23,7 @@ func Test_writeConfig(t *testing.T) {
 			args: args{
 				p: "transfer.cfg",
 				db: DatabaseConfig{
-					Tables: []string{"Character", "WuGeLucky", "WuXing"},
+					Tables: []string{"Character", "WuXing"},
 				},
 			},
 			wantErr: false,
@@ -40,7 +40,7 @@ func Test_writeConfig(t *testing.T) {
 
 func TestReadTransferConfig(t *testing.T) {
 	want := &DatabaseConfig{
-		Tables: []string{"Character", "WuGeLucky", "WuXing"},
+		Tables: []string{"Character", "WuXing"},
 	}
 	err := WriteTransferConfig("transfer.cfg", want)
 	if err != nil {

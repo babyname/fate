@@ -9,7 +9,6 @@ import (
 	"log"
 
 	"github.com/babyname/fate/ent/migrate"
-	"github.com/google/uuid"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -19,7 +18,6 @@ import (
 	"github.com/babyname/fate/ent/poem"
 	"github.com/babyname/fate/ent/poemchar"
 	"github.com/babyname/fate/ent/version"
-	"github.com/babyname/fate/ent/wugelucky"
 	"github.com/babyname/fate/ent/wuxing"
 )
 
@@ -36,8 +34,6 @@ type Client struct {
 	PoemChar *PoemCharClient
 	// Version is the client for interacting with the Version builders.
 	Version *VersionClient
-	// WuGeLucky is the client for interacting with the WuGeLucky builders.
-	WuGeLucky *WuGeLuckyClient
 	// WuXing is the client for interacting with the WuXing builders.
 	WuXing *WuXingClient
 }
@@ -57,7 +53,6 @@ func (c *Client) init() {
 	c.Poem = NewPoemClient(c.config)
 	c.PoemChar = NewPoemCharClient(c.config)
 	c.Version = NewVersionClient(c.config)
-	c.WuGeLucky = NewWuGeLuckyClient(c.config)
 	c.WuXing = NewWuXingClient(c.config)
 }
 
@@ -145,7 +140,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Poem:      NewPoemClient(cfg),
 		PoemChar:  NewPoemCharClient(cfg),
 		Version:   NewVersionClient(cfg),
-		WuGeLucky: NewWuGeLuckyClient(cfg),
 		WuXing:    NewWuXingClient(cfg),
 	}, nil
 }
@@ -170,7 +164,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Poem:      NewPoemClient(cfg),
 		PoemChar:  NewPoemCharClient(cfg),
 		Version:   NewVersionClient(cfg),
-		WuGeLucky: NewWuGeLuckyClient(cfg),
 		WuXing:    NewWuXingClient(cfg),
 	}, nil
 }
@@ -200,21 +193,21 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	for _, n := range []interface{ Use(...Hook) }{
-		c.Character, c.Poem, c.PoemChar, c.Version, c.WuGeLucky, c.WuXing,
-	} {
-		n.Use(hooks...)
-	}
+	c.Character.Use(hooks...)
+	c.Poem.Use(hooks...)
+	c.PoemChar.Use(hooks...)
+	c.Version.Use(hooks...)
+	c.WuXing.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Character, c.Poem, c.PoemChar, c.Version, c.WuGeLucky, c.WuXing,
-	} {
-		n.Intercept(interceptors...)
-	}
+	c.Character.Intercept(interceptors...)
+	c.Poem.Intercept(interceptors...)
+	c.PoemChar.Intercept(interceptors...)
+	c.Version.Intercept(interceptors...)
+	c.WuXing.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -228,8 +221,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.PoemChar.mutate(ctx, m)
 	case *VersionMutation:
 		return c.Version.mutate(ctx, m)
-	case *WuGeLuckyMutation:
-		return c.WuGeLucky.mutate(ctx, m)
 	case *WuXingMutation:
 		return c.WuXing.mutate(ctx, m)
 	default:
@@ -805,124 +796,6 @@ func (c *VersionClient) mutate(ctx context.Context, m *VersionMutation) (Value, 
 	}
 }
 
-// WuGeLuckyClient is a client for the WuGeLucky schema.
-type WuGeLuckyClient struct {
-	config
-}
-
-// NewWuGeLuckyClient returns a client for the WuGeLucky from the given config.
-func NewWuGeLuckyClient(c config) *WuGeLuckyClient {
-	return &WuGeLuckyClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `wugelucky.Hooks(f(g(h())))`.
-func (c *WuGeLuckyClient) Use(hooks ...Hook) {
-	c.hooks.WuGeLucky = append(c.hooks.WuGeLucky, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `wugelucky.Intercept(f(g(h())))`.
-func (c *WuGeLuckyClient) Intercept(interceptors ...Interceptor) {
-	c.inters.WuGeLucky = append(c.inters.WuGeLucky, interceptors...)
-}
-
-// Create returns a builder for creating a WuGeLucky entity.
-func (c *WuGeLuckyClient) Create() *WuGeLuckyCreate {
-	mutation := newWuGeLuckyMutation(c.config, OpCreate)
-	return &WuGeLuckyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of WuGeLucky entities.
-func (c *WuGeLuckyClient) CreateBulk(builders ...*WuGeLuckyCreate) *WuGeLuckyCreateBulk {
-	return &WuGeLuckyCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for WuGeLucky.
-func (c *WuGeLuckyClient) Update() *WuGeLuckyUpdate {
-	mutation := newWuGeLuckyMutation(c.config, OpUpdate)
-	return &WuGeLuckyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *WuGeLuckyClient) UpdateOne(wgl *WuGeLucky) *WuGeLuckyUpdateOne {
-	mutation := newWuGeLuckyMutation(c.config, OpUpdateOne, withWuGeLucky(wgl))
-	return &WuGeLuckyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *WuGeLuckyClient) UpdateOneID(id uuid.UUID) *WuGeLuckyUpdateOne {
-	mutation := newWuGeLuckyMutation(c.config, OpUpdateOne, withWuGeLuckyID(id))
-	return &WuGeLuckyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for WuGeLucky.
-func (c *WuGeLuckyClient) Delete() *WuGeLuckyDelete {
-	mutation := newWuGeLuckyMutation(c.config, OpDelete)
-	return &WuGeLuckyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *WuGeLuckyClient) DeleteOne(wgl *WuGeLucky) *WuGeLuckyDeleteOne {
-	return c.DeleteOneID(wgl.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *WuGeLuckyClient) DeleteOneID(id uuid.UUID) *WuGeLuckyDeleteOne {
-	builder := c.Delete().Where(wugelucky.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &WuGeLuckyDeleteOne{builder}
-}
-
-// Query returns a query builder for WuGeLucky.
-func (c *WuGeLuckyClient) Query() *WuGeLuckyQuery {
-	return &WuGeLuckyQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeWuGeLucky},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a WuGeLucky entity by its id.
-func (c *WuGeLuckyClient) Get(ctx context.Context, id uuid.UUID) (*WuGeLucky, error) {
-	return c.Query().Where(wugelucky.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *WuGeLuckyClient) GetX(ctx context.Context, id uuid.UUID) *WuGeLucky {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *WuGeLuckyClient) Hooks() []Hook {
-	return c.hooks.WuGeLucky
-}
-
-// Interceptors returns the client interceptors.
-func (c *WuGeLuckyClient) Interceptors() []Interceptor {
-	return c.inters.WuGeLucky
-}
-
-func (c *WuGeLuckyClient) mutate(ctx context.Context, m *WuGeLuckyMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&WuGeLuckyCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&WuGeLuckyUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&WuGeLuckyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&WuGeLuckyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown WuGeLucky mutation op: %q", m.Op())
-	}
-}
-
 // WuXingClient is a client for the WuXing schema.
 type WuXingClient struct {
 	config
@@ -1044,9 +917,9 @@ func (c *WuXingClient) mutate(ctx context.Context, m *WuXingMutation) (Value, er
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Character, Poem, PoemChar, Version, WuGeLucky, WuXing []ent.Hook
+		Character, Poem, PoemChar, Version, WuXing []ent.Hook
 	}
 	inters struct {
-		Character, Poem, PoemChar, Version, WuGeLucky, WuXing []ent.Interceptor
+		Character, Poem, PoemChar, Version, WuXing []ent.Interceptor
 	}
 )
