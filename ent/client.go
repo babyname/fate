@@ -338,7 +338,7 @@ func (c *CharacterClient) QuerySimplifiedOf(ch *Character) *CharacterQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(character.Table, character.FieldID, id),
 			sqlgraph.To(character.Table, character.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, character.SimplifiedOfTable, character.SimplifiedOfColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, character.SimplifiedOfTable, character.SimplifiedOfColumn),
 		)
 		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
 		return fromV, nil
@@ -354,7 +354,7 @@ func (c *CharacterClient) QueryTraditionalToSimplified(ch *Character) *Character
 		step := sqlgraph.NewStep(
 			sqlgraph.From(character.Table, character.FieldID, id),
 			sqlgraph.To(character.Table, character.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, character.TraditionalToSimplifiedTable, character.TraditionalToSimplifiedColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, character.TraditionalToSimplifiedTable, character.TraditionalToSimplifiedColumn),
 		)
 		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
 		return fromV, nil

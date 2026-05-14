@@ -1188,7 +1188,7 @@ func HasSimplifiedOf() predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, SimplifiedOfTable, SimplifiedOfColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, SimplifiedOfTable, SimplifiedOfColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -1200,7 +1200,7 @@ func HasSimplifiedOfWith(preds ...predicate.Character) predicate.Character {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, SimplifiedOfTable, SimplifiedOfColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, SimplifiedOfTable, SimplifiedOfColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -1215,7 +1215,7 @@ func HasTraditionalToSimplified() predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, TraditionalToSimplifiedTable, TraditionalToSimplifiedColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, TraditionalToSimplifiedTable, TraditionalToSimplifiedColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -1227,7 +1227,7 @@ func HasTraditionalToSimplifiedWith(preds ...predicate.Character) predicate.Char
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, TraditionalToSimplifiedTable, TraditionalToSimplifiedColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, TraditionalToSimplifiedTable, TraditionalToSimplifiedColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
