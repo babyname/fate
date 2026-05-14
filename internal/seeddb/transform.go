@@ -131,6 +131,11 @@ func (e *Exporter) transformNCharacter(old oldNCharacter, idLookup map[int]strin
 		}
 	}
 
+	if sc.Nameable && len(sc.Pinyin) == 0 {
+		e.recordChange(old.Char, "nameable", "true", "false", "no_pinyin_not_nameable", "n_character")
+		sc.Nameable = false
+	}
+
 	return sc
 }
 
@@ -227,6 +232,11 @@ func (e *Exporter) transformCharacter(old oldCharacter) SeedCharacter {
 				sc.Comment += commentParts[0]
 			}
 		}
+	}
+
+	if sc.Nameable && len(sc.Pinyin) == 0 {
+		e.recordChange(old.Ch, "nameable", "true", "false", "no_pinyin_not_nameable", "character")
+		sc.Nameable = false
 	}
 
 	return sc

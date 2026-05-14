@@ -331,23 +331,19 @@ func (cc *CharacterCreate) SetID(i int) *CharacterCreate {
 	return cc
 }
 
-// SetSimplifiedOfID sets the "simplified_of" edge to the Character entity by ID.
-func (cc *CharacterCreate) SetSimplifiedOfID(id int) *CharacterCreate {
-	cc.mutation.SetSimplifiedOfID(id)
+// AddSimplifiedOfIDs adds the "simplified_of" edge to the Character entity by IDs.
+func (cc *CharacterCreate) AddSimplifiedOfIDs(ids ...int) *CharacterCreate {
+	cc.mutation.AddSimplifiedOfIDs(ids...)
 	return cc
 }
 
-// SetNillableSimplifiedOfID sets the "simplified_of" edge to the Character entity by ID if the given value is not nil.
-func (cc *CharacterCreate) SetNillableSimplifiedOfID(id *int) *CharacterCreate {
-	if id != nil {
-		cc = cc.SetSimplifiedOfID(*id)
+// AddSimplifiedOf adds the "simplified_of" edges to the Character entity.
+func (cc *CharacterCreate) AddSimplifiedOf(c ...*Character) *CharacterCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return cc
-}
-
-// SetSimplifiedOf sets the "simplified_of" edge to the Character entity.
-func (cc *CharacterCreate) SetSimplifiedOf(c *Character) *CharacterCreate {
-	return cc.SetSimplifiedOfID(c.ID)
+	return cc.AddSimplifiedOfIDs(ids...)
 }
 
 // SetTraditionalToSimplifiedID sets the "traditional_to_simplified" edge to the Character entity by ID.
@@ -655,7 +651,7 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 	}
 	if nodes := cc.mutation.SimplifiedOfIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   character.SimplifiedOfTable,
 			Columns: []string{character.SimplifiedOfColumn},
@@ -670,12 +666,11 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.character_traditional_to_simplified = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.TraditionalToSimplifiedIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   character.TraditionalToSimplifiedTable,
 			Columns: []string{character.TraditionalToSimplifiedColumn},
@@ -690,6 +685,7 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.character_traditional_to_simplified = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.VariantOfIDs(); len(nodes) > 0 {

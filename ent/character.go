@@ -72,7 +72,7 @@ type Character struct {
 // CharacterEdges holds the relations/edges for other nodes in the graph.
 type CharacterEdges struct {
 	// 简体字对应的繁体字
-	SimplifiedOf *Character `json:"simplified_of,omitempty"`
+	SimplifiedOf []*Character `json:"simplified_of,omitempty"`
 	// 繁体字对应的简体字
 	TraditionalToSimplified *Character `json:"traditional_to_simplified,omitempty"`
 	// 异体字对应的标准字
@@ -85,13 +85,9 @@ type CharacterEdges struct {
 }
 
 // SimplifiedOfOrErr returns the SimplifiedOf value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e CharacterEdges) SimplifiedOfOrErr() (*Character, error) {
+// was not loaded in eager-loading.
+func (e CharacterEdges) SimplifiedOfOrErr() ([]*Character, error) {
 	if e.loadedTypes[0] {
-		if e.SimplifiedOf == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: character.Label}
-		}
 		return e.SimplifiedOf, nil
 	}
 	return nil, &NotLoadedError{edge: "simplified_of"}

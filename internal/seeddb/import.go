@@ -9,6 +9,7 @@ import (
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/database"
+	"github.com/google/uuid"
 	"golang.org/x/net/context"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -172,33 +173,48 @@ func (imp *Importer) importCharacters(ctx context.Context, client *ent.Client, f
 }
 
 func (imp *Importer) linkCharacterEdges(ctx context.Context, client *ent.Client, seeds []SeedCharacter, charIDMap map[string]int) error {
-	linked := 0
-	for _, sc := range seeds {
-		updates := client.Character.UpdateOneID(charIDMap[sc.Char])
-		hasUpdate := false
+	traditionalToSimplified := make(map[int]int)
+	variantOf := make(map[int]int)
 
+	for _, sc := range seeds {
 		if sc.SimplifiedOfChar != "" {
-			if tradID, ok := charIDMap[sc.SimplifiedOfChar]; ok {
-				updates.SetSimplifiedOfID(tradID)
-				hasUpdate = true
+			if simplifiedID, ok := charIDMap[sc.SimplifiedOfChar]; ok {
+				currentID := charIDMap[sc.Char]
+				traditionalToSimplified[currentID] = simplifiedID
 			}
 		}
 		if sc.VariantOfChar != "" {
-			if stdID, ok := charIDMap[sc.VariantOfChar]; ok {
-				updates.SetVariantOfID(stdID)
-				hasUpdate = true
+			if standardID, ok := charIDMap[sc.VariantOfChar]; ok {
+				currentID := charIDMap[sc.Char]
+				variantOf[currentID] = standardID
 			}
-		}
-
-		if hasUpdate {
-			if err := updates.Exec(ctx); err != nil {
-				log.Printf("  Warning: failed to link %s: %v", sc.Char, err)
-				continue
-			}
-			linked++
 		}
 	}
-	log.Printf("  Linked %d character edges", linked)
+
+	linked := 0
+	for tradID, simpID := range traditionalToSimplified {
+		err := client.Character.UpdateOneID(tradID).
+			SetTraditionalToSimplifiedID(simpID).
+			Exec(ctx)
+		if err != nil {
+			log.Printf("  Warning: failed to link traditional_to_simplified %d→%d: %v", tradID, simpID, err)
+			continue
+		}
+		linked++
+	}
+
+	for variantID, standardID := range variantOf {
+		err := client.Character.UpdateOneID(variantID).
+			SetVariantOfID(standardID).
+			Exec(ctx)
+		if err != nil {
+			log.Printf("  Warning: failed to link variant_of %d→%d: %v", variantID, standardID, err)
+			continue
+		}
+		linked++
+	}
+
+	log.Printf("  Linked %d character edges (trad→simp: %d, variant→std: %d)", linked, len(traditionalToSimplified), len(variantOf))
 	return nil
 }
 
@@ -220,7 +236,9 @@ func (imp *Importer) importWuGeLucky(ctx context.Context, client *ent.Client, fi
 
 		builders := make([]*ent.WuGeLuckyCreate, 0, len(batch))
 		for _, sw := range batch {
+			uid := uuid.New()
 			builder := client.WuGeLucky.Create().
+				SetID(uid).
 				SetLastStroke1(sw.LastStroke1).
 				SetLastStroke2(sw.LastStroke2).
 				SetFirstStroke1(sw.FirstStroke1).

@@ -227,7 +227,7 @@ func strokeFilterKX(s int) func(*ent.CharacterQuery) *ent.CharacterQuery {
 }
 
 func regularFilter(query *ent.CharacterQuery) *ent.CharacterQuery {
-	return query.Where(character.RegularEQ(true))
+	return query.Where(character.RegularEQ(true), character.NameableEQ(true))
 }
 
 func wuXingFilter(ge int, ge2 int, ge3 int) bool {
@@ -236,10 +236,10 @@ func wuXingFilter(ge int, ge2 int, ge3 int) bool {
 }
 
 func daYanFilter(lucky *ent.WuGeLucky) bool {
-	return isLucky(wuge.Find(lucky.DiGe).Lucky) &&
+	return !(isLucky(wuge.Find(lucky.DiGe).Lucky) &&
 		isLucky(wuge.Find(lucky.RenGe).Lucky) &&
 		isLucky(wuge.Find(lucky.WaiGe).Lucky) &&
-		isLucky(wuge.Find(lucky.ZongGe).Lucky)
+		isLucky(wuge.Find(lucky.ZongGe).Lucky))
 }
 
 func isLucky(s string) bool {

@@ -77,7 +77,7 @@ func (cq *CharacterQuery) QuerySimplifiedOf() *CharacterQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(character.Table, character.FieldID, selector),
 			sqlgraph.To(character.Table, character.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, character.SimplifiedOfTable, character.SimplifiedOfColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, character.SimplifiedOfTable, character.SimplifiedOfColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -99,7 +99,7 @@ func (cq *CharacterQuery) QueryTraditionalToSimplified() *CharacterQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(character.Table, character.FieldID, selector),
 			sqlgraph.To(character.Table, character.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, character.TraditionalToSimplifiedTable, character.TraditionalToSimplifiedColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, character.TraditionalToSimplifiedTable, character.TraditionalToSimplifiedColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -483,7 +483,7 @@ func (cq *CharacterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 			cq.withStandardToVariant != nil,
 		}
 	)
-	if cq.withSimplifiedOf != nil || cq.withVariantOf != nil {
+	if cq.withTraditionalToSimplified != nil || cq.withVariantOf != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -508,8 +508,9 @@ func (cq *CharacterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 		return nodes, nil
 	}
 	if query := cq.withSimplifiedOf; query != nil {
-		if err := cq.loadSimplifiedOf(ctx, query, nodes, nil,
-			func(n *Character, e *Character) { n.Edges.SimplifiedOf = e }); err != nil {
+		if err := cq.loadSimplifiedOf(ctx, query, nodes,
+			func(n *Character) { n.Edges.SimplifiedOf = []*Character{} },
+			func(n *Character, e *Character) { n.Edges.SimplifiedOf = append(n.Edges.SimplifiedOf, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -536,6 +537,37 @@ func (cq *CharacterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 }
 
 func (cq *CharacterQuery) loadSimplifiedOf(ctx context.Context, query *CharacterQuery, nodes []*Character, init func(*Character), assign func(*Character, *Character)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Character)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Character(func(s *sql.Selector) {
+		s.Where(sql.InValues(character.SimplifiedOfColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.character_traditional_to_simplified
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "character_traditional_to_simplified" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "character_traditional_to_simplified" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (cq *CharacterQuery) loadTraditionalToSimplified(ctx context.Context, query *CharacterQuery, nodes []*Character, init func(*Character), assign func(*Character, *Character)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Character)
 	for i := range nodes {
@@ -564,34 +596,6 @@ func (cq *CharacterQuery) loadSimplifiedOf(ctx context.Context, query *Character
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
-	}
-	return nil
-}
-func (cq *CharacterQuery) loadTraditionalToSimplified(ctx context.Context, query *CharacterQuery, nodes []*Character, init func(*Character), assign func(*Character, *Character)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Character)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-	}
-	query.withFKs = true
-	query.Where(predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.InValues(character.TraditionalToSimplifiedColumn, fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.character_traditional_to_simplified
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "character_traditional_to_simplified" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "character_traditional_to_simplified" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
 	}
 	return nil
 }
