@@ -1,193 +1,247 @@
-# 命运起名 (Fate)
+# 命运起名 Fate
 
-![FATE](docs/fate.png)
+<p align="center">
+  <strong>现代科学取名工具 — 基于八字五行·三才五格·周易卦象的智能起名系统</strong>
+</p>
 
-![Go Version](https://img.shields.io/badge/go%20version-%3E=1.22.1-blue.svg?style=flat-square)
-[![GoDoc](https://godoc.org/github.com/babyname/fate?status.svg)](http://godoc.org/github.com/babyname/fate)
-[![license](https://img.shields.io/github/license/babyname/fate.svg)](https://github.com/babyname/fate/blob/master/LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/babyname/fate)](https://goreportcard.com/report/github.com/babyname/fate)
+<p align="center">
+  <img src="docs/images/architecture.svg" alt="Architecture" width="800"/>
+</p>
 
-[[ENGLISH](README_EN.md)][[中文](README.md)]
+<p align="center">
+  <a href="README_EN.md">English</a> | 中文
+</p>
 
-## 现代科学取名工具 (A modern science Chinese name create tool)
+---
 
-Github 上第一个开源的中文取名项目 (The first Chinese name create tool on `github`)
+## ✨ 特性
 
-## 目录
+- 🎂 **八字计算** — 四柱八字、五行强弱、调候用神
+- ☯️ **双算法喜用神** — 平衡用神法 + 格局用神法（正官格/七杀格/食神格等10种格局）
+- 📐 **三才五格** — 81数大衍、阴阳五行、预计算O(1)查找（3.89ns/op）
+- 🔮 **周易卦象** — 64卦完整解读（大象/事业/经商/求名/婚恋/决策）
+- 📊 **四维评分** — 文化印象 / 五行八字 / 生肖 / 五格数理
+- 📝 **多格式输出** — Text / Markdown / JSON（美名腾风格）
+- 🏛️ **简繁对照** — 400+常用汉字简繁体映射
 
-[TOR]
+## 📸 报告预览
 
-### 简介
+<p align="center">
+  <img src="docs/images/report_preview.svg" alt="Report Preview" width="800"/>
+</p>
 
-本程序适用于单个姓或双个姓，起 2 个名的情况。（如：独孤**, 李张**, 张**, 王**）
-一个好名字伴随人的一生，FATE 让你取一个好名字。
+## 🚀 快速开始
 
-### 关于版本
+### 环境要求
 
-特定版本会单独出 release，以后每次提交都会生成二进制文件的 pre_release 提供下载。
-最新版使用 Sqlite3 数据库，不再需要导入数据库文件了。直接下载下面的 Sqlite3 数据库到本地就能使用。
+- Go 1.22+
+- GCC（SQLite3 CGO 依赖）
+- SQLite3
 
-- **[v3.5.5 下载](https://github.com/babyname/fate/releases/tag/v3.5.5)**
-- **[Sqlite3 数据库](https://github.com/babyname/fate/releases/download/v3.5.4/fate_sqlite3_database.zip)**
-- **[最新自编译版本](https://github.com/babyname/fate/releases/tag/auto_build)**
-- **[旧版 SQL 数据库文件:20200331](https://github.com/babyname/fate/releases/download/v3.5.1/fate_db_200331.7z)**
+### 安装
 
-### 使用方法
+```bash
+git clone https://github.com/babyname/fate.git
+cd fate
+go mod download
+```
 
-#### 编写运行 Go 代码，接口调用生成姓名
+### 生成姓名分析报告
+
+```bash
+# 使用内置工具生成示例报告
+go run github.com/babyname/fate/cmd/gen_report
+
+# 输出文件在 output/ 目录
+ls output/
+# 张_姓名分析报告_平衡用神法.txt
+# 张_姓名分析报告_平衡用神法.md
+# 张_姓名分析报告_平衡用神法.json
+# 张_姓名分析报告_格局用神法.txt
+# 张_姓名分析报告_格局用神法.md
+# 张_姓名分析报告_格局用神法.json
+```
+
+### 代码中使用
 
 ```go
-// 使用前请导入 database 的数据（测试字库已基本完善，保险起见生成姓名后可以去一些测名网站验证下）
-// 加载配置（具体参数参考 example/create_a_name）
-cfg := config.Default()
-// 生日
-born := chronos.New("2020/01/23 11:31")
-// 姓氏 lastName := "张"
-// 第一参数：姓氏
-// 第二参数：生日
-f := fate.NewFate(lastName, born.Solar().Time(), fate.ConfigOption(cfg))
-e := f.MakeName(context.Background())
-if e != nil {
-t.Fatal(e)
+package main
+
+import (
+    "fmt"
+    "time"
+
+    "github.com/babyname/fate/internal/analysis"
+    v2 "github.com/godcong/chronos/v2"
+)
+
+func main() {
+    // 1. 计算八字和喜用神
+    born, _ := time.Parse("2006/01/02 15:04", "2024/06/15 10:30")
+
+    // 平衡用神法
+    fateData, _ := v2.GetFateData(&v2.FateInput{
+        BirthDate: born,
+        Gender:    1,       // 1=男, 2=女
+        Surname:   "张",
+        Method:    v2.XiYongMethodBalance, // 平衡用神法
+    })
+
+    // 格局用神法
+    fateData2, _ := v2.GetFateData(&v2.FateInput{
+        BirthDate: born,
+        Gender:    1,
+        Surname:   "张",
+        Method:    v2.XiYongMethodGeJu,   // 格局用神法
+    })
+
+    // 2. 构建名字分析结果
+    c1 := &ent.Character{Char: "驰", WuXing: "火", ScienceStroke: 13, ...}
+    c2 := &ent.Character{Char: "筎", WuXing: "木", ScienceStroke: 12, ...}
+    result := analysis.BuildNameResult(1, "张", c1, c2, 11, 0, fateData)
+
+    // 3. 生成报告
+    report := analysis.NewReport("张", "2024年06月15日", "男", fateData, 1000)
+    report.TopNames = append(report.TopNames, result)
+
+    // 输出 Markdown
+    f := &analysis.MarkdownFormatter{}
+    f.Format(os.Stdout, report)
 }
 ```
 
-#### 使用预编译二进制文件生成姓名
+## 🏗️ 项目结构
 
-```shell
-# 生成配置文件，可修改数据库，及一些基本参数
-fate.exe init
-# 输出姓名
-fate.exe name -l 张 -b "2020/02/06 15:04"
+```
+fate/
+├── cmd/
+│   └── gen_report/          # 报告生成工具
+├── ent/                     # Ent ORM 实体定义
+│   └── character.go         # 字符实体（简/繁笔画、五行、偏旁等）
+├── internal/
+│   ├── analysis/            # 核心分析模块
+│   │   ├── analysis.go      # 数据结构 + 格式化器
+│   │   ├── sancai_data.go   # 三才/基础运/成功运/人际关系数据
+│   │   ├── zhouyi.go        # 周易卦象计算
+│   │   ├── zhouyi_data.go   # 64卦解读数据
+│   │   └── simplified_traditional.go  # 简繁对照表
+│   ├── wuge/                # 三才五格
+│   │   ├── wuge.go          # 五格计算
+│   │   ├── dayan.go         # 81数大衍
+│   │   └── result.go        # O(1)预计算查找表
+│   ├── wuxing/              # 五行分析
+│   │   ├── san_cai.go       # 三才五行
+│   │   └── wu_xing.go       # 125种三才组合吉凶
+│   ├── rating/              # 评分系统
+│   ├── zhouyi/              # 周易辅助
+│   ├── filter/              # 名字筛选
+│   ├── naming/              # 起名逻辑
+│   └── session/             # 会话管理
+├── chronos/                 # 八字计算子模块
+│   ├── fate.go              # FateData 主入口
+│   ├── xiyong_balance.go    # 平衡用神法
+│   ├── xiyong_geju.go       # 格局用神法
+│   └── fate_helpers.go      # 五行计算辅助函数
+└── yi/                      # 周易卦象子模块
 ```
 
-### 常见问题
+## ☯️ 两种喜用神算法
 
-#### 报错: count total error: The system cannot find the path specified
+### 平衡用神法
 
-- zoneinfo 缺失导致的时间转换失败问题（一般发生在 Windows 环境下）， 下载上面的 zoneinfo 文件并放到执行文件相同的目录下即可解决。
-- 最新版已不需要 zoneinfo 文件。
+基于日主强弱判断，通过同党/异党力量对比取用神：
 
-#### 如何导入数据 (MySQL)
+| 日主 | 用神 | 喜神 | 忌神 | 仇神 |
+|------|------|------|------|------|
+| 强 | 克我者（官杀） | 我克者+生我者 | 同我者（比劫） | 生忌神者 |
+| 弱 | 生我者（印星） | 同我者（比劫） | 克我者+我生者 | 生忌神者 |
 
-1. 链接到 MySQL 数据库 mysql -u 用户名 -p 密码
-2. 创建数据库 CREATE SCHEMA fate DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-3. 使用 fate 数据库 USE fate;
-4. 导入数据库文件 SOURCE /path/to/sql/file;
-5. 建议使用 Navicat 等工具导入，导入速度较快
+### 格局用神法
 
-#### 数据库配置，替换 config.json 中相关部分
+先定格局（10种），再根据格局+强弱取用神：
 
-**MYSQL 配置:**
+| 格局 | 强日主用神 | 弱日主用神 |
+|------|-----------|-----------|
+| 正官格 | 官星 | 印星 |
+| 七杀格 | 食神制杀 | 印星化杀 |
+| 食神格 | 食神生财 | 比劫帮身 |
+| 伤官格 | 印星制伤 | 印星 |
+| 正财/偏财格 | 财星 | 印星 |
+| 建禄/阳刃格 | 官星 | 印星 |
 
+## 📊 评分体系
+
+| 维度 | 权重 | 说明 |
+|------|------|------|
+| 文化印象 | — | 常用字、正体字、字义丰富度 |
+| 五行八字 | — | 名字五行与喜用神匹配度 |
+| 生肖 | — | 生肖五行与名字五行生克关系 |
+| 五格数理 | — | 天/人/地/外/总格吉凶 |
+
+## 🔧 性能
+
+| 指标 | 数值 |
+|------|------|
+| WuGeLucky 查找 | 3.89 ns/op, 0 B alloc |
+| 张姓全量起名 | ~50ms / 61730名 |
+| 李姓全量起名 | ~127ms / 165852名 |
+
+## 📄 输出格式
+
+### Text 格式
+```
+════════════════════════════════════════════════════════════
+                      姓名分析报告
+════════════════════════════════════════════════════════════
+  姓氏: 张    性别: 男    出生: 2024年06月15日 10:30
+
+【五行喜忌分析】
+  算法: 格局用神法  格局: 正官格
+  日主: 庚（金）    强弱: 强
+  用  神: 火
+  喜  神: 木、金
+  忌  神: 土
+  仇  神: 火
+  闲  神: 水
+```
+
+### Markdown 格式
+```markdown
+## 五行喜忌分析
+
+| 项目 | 内容 |
+|------|------|
+| 算法 | 格局用神法 |
+| 格局 | 正官格 |
+| 用神 | 火 |
+| 喜神 | 木、金 |
+| 忌神 | 土 |
+```
+
+### JSON 格式
 ```json
-"database": {
-  "host": "127.0.0.1",
-  "port": "3306",
-  "user": "root",
-  "pwd": "111111",
-  "name": "fate",
-  "max_idle_con": 0,
-  "max_open_con": 0,
-  "driver": "mysql",
-  "file": "",
-  "dsn": "",
-  "show_sql": false,
-  "show_exec_time": false
+{
+  "wuxing_xiji": {
+    "day_gan": "庚",
+    "yong_wuxing": "火",
+    "xi_wuxing": ["木", "金"],
+    "ji_wuxing": ["土"],
+    "chou_wuxing": ["火"],
+    "xian_wuxing": ["水"],
+    "method_name": "格局用神法",
+    "geju_name": "正官格"
+  }
 }
 ```
 
-**SQLITE3 配置:**
+## 🛠️ 技术栈
 
-```json
-"database": { "name": "fate", "driver": "sqlite3" }
-```
+- **Go 1.22+** — 主语言
+- **Ent ORM** — 数据库 ORM
+- **SQLite3** — 数据存储（`github.com/sqlite3ent/sqlite3` 驱动）
+- **chronos/v2** — 八字计算子模块（本地 `replace`）
+- **yi** — 周易卦象计算（`github.com/godcong/yi`）
 
-## 版本计划
+## 📜 License
 
-### 第一版
-
-大部分是手动工作，现已废弃
-
-### 第二版
-
-可自动生成名字字符 + 手工筛选
-
-### 第三版 (开发中)
-
-1. 添加 API 接口查询（后期可能需要一些 WEB 方面的工作，如果有兴趣的可以报名）。
-2. 完善精简字典库，并迁移到 EntORM。
-3. 更完善的查询规则定义。
-
-### 第四版 (计划中)
-
-优化算法，调整接口，数据库，完善文档以及修复一些 bug。
-
-### 第七版 (计划中)
-
-通过 AI，大数据匹配算法，取出更好更佳的名字。
-
-### 关于 FATE
-
-FATE 使用了以下算法，查询字典库自动生成匹配规则的名字。
-按照每种算法的准确度，使用程度也有高有低，不会一概而否，也不会偏向单独某种算法。
-不会按照个人喜好做出选择。
-
-- 周易卦象
-- 大衍之数
-- 三才五格
-- 喜用神（平衡用神）
-- 生肖用字
-- 八字吉凶
-
-目前 Fate 以六大派为基准综合计算生成名字:
-
-- 笔划派: 认为笔划全吉，人生就大吉。准确度 12.5 %
-- 三才派: 完全不管笔划吉凶，只认为天地人三才五行相生，人生就大吉。准确度 56.6 %。
-- 补八字: 完全不管笔划吉凶，只认为名字补到先天八字命盘欠缺，人生就大吉。其实准确度非常低。
-- 卦象派: 完全不管笔划吉凶，只认为名字求出卦象漂亮，人生就大吉。准确度 40.26 %。
-- 天运派: 完全不管笔划吉凶，只认为名字不要被出生年天运五行所剋，人生就大吉。准确度 25.32 %。
-- 生肖派: 完全不管笔划吉凶，只认为生肖用对字形，人生就大吉。准确度 27.55 %。
-
-目前使用到的一些库:
-
-- 八字计算（用于计算生辰）:
-  <https://github.com/godcong/chronos>
-- 字典数据（一个爬虫工具填充字典数据库）:
-  <https://github.com/godcong/excavator>
-  如果谁有更好用的可以告诉我。
-
-### 资料查询
-
-1. 全国及各省重名查询网址汇总
-
-网友提供：`https://zhuanlan.zhihu.com/p/89654568` (**请谨慎访问非本站点地址**)
-[本仓库地址](./docs/chinese_name_query.md)
-
-### 贡献者
-
-<table>
-<tr>
-    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
-        <a href=https://github.com/godcong>
-            <img src=https://avatars.githubusercontent.com/u/2727298?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=godcong/>
-            <br />
-            <sub style="font-size:14px"><b>godcong</b></sub>
-        </a>
-    </td>
-    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
-        <a href=https://github.com/Z-fly>
-            <img src=https://avatars.githubusercontent.com/u/10470892?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Z-fly/>
-            <br />
-            <sub style="font-size:14px"><b>Z-fly</b></sub>
-        </a>
-    </td>
-    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
-        <a href=https://github.com/fesiong>
-            <img src=https://avatars.githubusercontent.com/u/9912496?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Sinclair/>
-            <br />
-            <sub style="font-size:14px"><b>Sinclair</b></sub>
-        </a>
-    </td>
-</tr>
-</table>
+MIT License
