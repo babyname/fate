@@ -160,7 +160,7 @@ func TestNameGenerationE2E(t *testing.T) {
 		t.Fatalf("Start() error = %v", err)
 	}
 
-	<-s.Context().Done()
+	s.Wait()
 
 	output := input.Output()
 	total := output.Total()

@@ -18,8 +18,5 @@ type PoemChar func(*sql.Selector)
 // Version is the predicate function for version builders.
 type Version func(*sql.Selector)
 
-// WuGeLucky is the predicate function for wugelucky builders.
-type WuGeLucky func(*sql.Selector)
-
 // WuXing is the predicate function for wuxing builders.
 type WuXing func(*sql.Selector)
