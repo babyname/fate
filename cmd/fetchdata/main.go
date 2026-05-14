@@ -2,13 +2,17 @@ package main
 
 import (
 	"archive/zip"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/cookiejar"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
+	"time"
 )
 
 const dataDir = "data/raw"
@@ -58,6 +62,8 @@ func main() {
 		fetchAll()
 	case "status":
 		showStatus()
+	case "scrape-wuxing":
+		scrapeWuxing()
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 		os.Exit(1)
@@ -278,4 +284,140 @@ func init() {
 	_ = generateKangxiStarterJSON
 	_ = generateWuxingStarterJSON
 	_ = generatePinyinStarterJSON
+}
+
+func scrapeWuxing() {
+	elements := []struct {
+		pinyin string
+		label  string
+	}{
+		{"jin", "金"}, {"mu", "木"}, {"shui", "水"}, {"huo", "火"}, {"tu", "土"},
+	}
+
+	wuxingData := make(map[string]string)
+	charInSpan := regexp.MustCompile(`<span>([一-龥])</span>`)
+	jar, _ := cookiejar.New(nil)
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{MinVersion: tls.VersionTLS12},
+	}
+	client := &http.Client{
+		Timeout:   30 * time.Second,
+		Jar:       jar,
+		Transport: transport,
+	}
+
+	visitReq, _ := http.NewRequest("GET", "https://www.yw11.com/zidian/", nil)
+	visitReq.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	visitResp, err := client.Do(visitReq)
+	if err != nil {
+		fmt.Printf("Warning: failed to visit homepage for cookies: %v\n", err)
+	} else {
+		visitResp.Body.Close()
+		fmt.Printf("Homepage visited, cookies acquired\n")
+	}
+
+	for _, elem := range elements {
+		fmt.Printf("Scraping %s (%s)...\n", elem.label, elem.pinyin)
+		for page := 1; page <= 50; page++ {
+			url := fmt.Sprintf("https://www.yw11.com/zidian/wuxing/%s/", elem.pinyin)
+			if page > 1 {
+				url = fmt.Sprintf("https://www.yw11.com/zidian/wuxing/%s/%d/", elem.pinyin, page)
+			}
+
+			req, err := http.NewRequest("GET", url, nil)
+			if err != nil {
+				fmt.Printf("  Page %d: error creating request: %v\n", page, err)
+				continue
+			}
+			req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+			req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+			req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+			req.Header.Set("Referer", "https://www.yw11.com/zidian/")
+			req.Header.Set("Connection", "keep-alive")
+
+			resp, err := client.Do(req)
+			if err != nil {
+				fmt.Printf("  Page %d: error: %v\n", page, err)
+				continue
+			}
+
+			body, err := io.ReadAll(resp.Body)
+			resp.Body.Close()
+			if err != nil {
+				fmt.Printf("  Page %d: read error: %v\n", page, err)
+				continue
+			}
+
+			if resp.StatusCode == http.StatusForbidden {
+				fmt.Printf("  Page %d: HTTP 403, retrying after delay...\n", page)
+				time.Sleep(3 * time.Second)
+				req2, _ := http.NewRequest("GET", url, nil)
+				req2.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+				req2.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+				req2.Header.Set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+				req2.Header.Set("Referer", "https://www.yw11.com/zidian/")
+				req2.Header.Set("Connection", "keep-alive")
+				resp2, err := client.Do(req2)
+				if err != nil || resp2.StatusCode != http.StatusOK {
+					if resp2 != nil {
+						resp2.Body.Close()
+					}
+					fmt.Printf("  Page %d: retry failed, stopping\n", page)
+					break
+				}
+				resp = resp2
+				body, err = io.ReadAll(resp.Body)
+				resp.Body.Close()
+				if err != nil {
+					fmt.Printf("  Page %d: read error: %v\n", page, err)
+					break
+				}
+			} else if resp.StatusCode != http.StatusOK {
+				fmt.Printf("  Page %d: HTTP %d, stopping\n", page, resp.StatusCode)
+				break
+			}
+
+			content := string(body)
+
+			count := 0
+			matches := charInSpan.FindAllStringSubmatch(content, -1)
+			for _, m := range matches {
+				char := strings.TrimSpace(m[1])
+				if _, exists := wuxingData[char]; !exists {
+					wuxingData[char] = elem.label
+					count++
+				}
+			}
+
+			fmt.Printf("  Page %d: %d new chars\n", page, count)
+			if count == 0 {
+				break
+			}
+			time.Sleep(1 * time.Second)
+		}
+	}
+
+	fmt.Printf("\nTotal: %d characters with WuXing data\n", len(wuxingData))
+
+	result := make(map[string]interface{})
+	result["source"] = "yw11.com"
+	result["count"] = len(wuxingData)
+	result["data"] = wuxingData
+
+	data, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		fmt.Printf("Error marshaling: %v\n", err)
+		os.Exit(1)
+	}
+
+	outputPath := filepath.Join(dataDir, "wuxing.json")
+	if err := os.MkdirAll(dataDir, 0755); err != nil {
+		fmt.Printf("Error creating dir: %v\n", err)
+		os.Exit(1)
+	}
+	if err := os.WriteFile(outputPath, data, 0644); err != nil {
+		fmt.Printf("Error writing: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("Saved to: %s\n", outputPath)
 }
