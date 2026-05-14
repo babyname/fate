@@ -82,12 +82,15 @@ type oldWuXing struct {
 	Fortune string
 }
 
+
+
 func (e *Exporter) Export() error {
 	log.Println("Loading external reference data...")
-	if err := e.loadUnihanPinyin(); err != nil {
-		log.Printf("Warning: failed to load Unihan pinyin: %v", err)
+	if err := e.loadUnihanData(); err != nil {
+		log.Printf("Warning: failed to load Unihan data: %v", err)
 	} else {
-		log.Printf("  → %d pinyin entries", len(e.pinyinMap))
+		log.Printf("  → %d pinyin entries, %d strokes, %d definitions",
+			len(e.pinyinMap), len(e.totalStrokes), len(e.definitions))
 	}
 
 	db, err := sql.Open("sqlite3", e.dbPath+"?mode=ro")
@@ -446,11 +449,22 @@ func resolveIDs(ids []int, lookup map[int]string) []string {
 	return result
 }
 
-func (e *Exporter) loadUnihanPinyin() error {
+func (e *Exporter) loadUnihanData() error {
 	unihanDir := filepath.Join(e.rawDataDir, "unihan")
-	readingsPath := filepath.Join(unihanDir, "Unihan_Readings.txt")
 
-	file, err := os.Open(readingsPath)
+	if err := e.loadUnihanReadings(filepath.Join(unihanDir, "Unihan_Readings.txt")); err != nil {
+		log.Printf("Warning: failed to load Unihan_Readings: %v", err)
+	}
+
+	if err := e.loadUnihanIRG(filepath.Join(unihanDir, "Unihan_IRGSources.txt")); err != nil {
+		log.Printf("Warning: failed to load Unihan_IRGSources: %v", err)
+	}
+
+	return nil
+}
+
+func (e *Exporter) loadUnihanReadings(path string) error {
+	file, err := os.Open(path)
 	if err != nil {
 		return err
 	}
@@ -482,19 +496,9 @@ func (e *Exporter) loadUnihanPinyin() error {
 		}
 		char := string(rune(r))
 
-		if field == "kMandarin" || field == "kHanyuPinyin" {
-			var pinyins []string
-			if field == "kMandarin" {
-				pinyins = strings.Split(value, " ")
-			} else {
-				for _, part := range strings.Split(value, " ") {
-					if idx := strings.Index(part, ":"); idx != -1 {
-						pinyinStr := part[idx+1:]
-						pinyins = append(pinyins, strings.Split(pinyinStr, ",")...)
-					}
-				}
-			}
-
+		switch field {
+		case "kMandarin":
+			pinyins := strings.Split(value, " ")
 			var cleaned []string
 			for _, p := range pinyins {
 				p = strings.TrimSpace(p)
@@ -502,8 +506,73 @@ func (e *Exporter) loadUnihanPinyin() error {
 					cleaned = append(cleaned, p)
 				}
 			}
-			if len(cleaned) > 0 {
+			if len(cleaned) > 0 && e.pinyinMap[char] == nil {
 				e.pinyinMap[char] = cleaned
+			}
+		case "kHanyuPinyin":
+			for _, part := range strings.Split(value, " ") {
+				if idx := strings.Index(part, ":"); idx != -1 {
+					pinyinStr := part[idx+1:]
+					pinyins := strings.Split(pinyinStr, ",")
+					var cleaned []string
+					for _, p := range pinyins {
+						p = strings.TrimSpace(p)
+						if p != "" {
+							cleaned = append(cleaned, p)
+						}
+					}
+					if len(cleaned) > 0 && e.pinyinMap[char] == nil {
+						e.pinyinMap[char] = cleaned
+						break
+					}
+				}
+			}
+		case "kDefinition":
+			if e.definitions[char] == "" {
+				e.definitions[char] = value
+			}
+		}
+	}
+
+	return scanner.Err()
+}
+
+func (e *Exporter) loadUnihanIRG(path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "#") || strings.TrimSpace(line) == "" {
+			continue
+		}
+
+		parts := strings.Fields(line)
+		if len(parts) < 3 {
+			continue
+		}
+
+		codePoint := parts[0]
+		field := parts[1]
+		value := parts[2]
+
+		if !strings.HasPrefix(codePoint, "U+") {
+			continue
+		}
+
+		r, err := strconv.ParseUint(codePoint[2:], 16, 32)
+		if err != nil {
+			continue
+		}
+		char := string(rune(r))
+
+		if field == "kTotalStrokes" {
+			if strokes, err := strconv.Atoi(value); err == nil && e.totalStrokes[char] == 0 {
+				e.totalStrokes[char] = strokes
 			}
 		}
 	}
