@@ -18,16 +18,16 @@ type Filter interface {
 	QueryCharacterFilter(query *ent.CharacterQuery) *ent.CharacterQuery
 	QueryRegularFilter(query *ent.CharacterQuery) *ent.CharacterQuery
 	QueryStrokeFilter(stroke int) func(query *ent.CharacterQuery) *ent.CharacterQuery
-	CheckSkipSexFilter(lucky *ent.WuGeLucky) bool
-	CheckSkipDaYanFilter(lucky *ent.WuGeLucky) bool
+	CheckSkipSexFilter(lucky *wuge.WuGeResult) bool
+	CheckSkipDaYanFilter(lucky *wuge.WuGeResult) bool
 	CheckSkipWuXingFilter(ge int, ge2 int, ge3 int) bool
 	CheckSkipStrokeNumberScope(stroke ...int) bool
 }
 
 type filter struct {
 	characterFilterType        CharacterFilterType
-	checkSkipSexFilter         func(lucky *ent.WuGeLucky) bool
-	checkSkipDaYanFilter       func(lucky *ent.WuGeLucky) bool
+	checkSkipSexFilter         func(lucky *wuge.WuGeResult) bool
+	checkSkipDaYanFilter       func(lucky *wuge.WuGeResult) bool
 	checkSkipWuXingFilter      func(ge int, ge2 int, ge3 int) bool
 	checkSkipStrokeNumberScope func(stroke []int) bool
 	queryCharacterFilter       func(query *ent.CharacterQuery) *ent.CharacterQuery
@@ -80,11 +80,11 @@ func (f *filter) CheckSkipWuXingFilter(ge int, ge2 int, ge3 int) bool {
 	return f.checkSkipWuXingFilter(ge, ge2, ge3)
 }
 
-func (f *filter) CheckSkipDaYanFilter(lucky *ent.WuGeLucky) bool {
+func (f *filter) CheckSkipDaYanFilter(lucky *wuge.WuGeResult) bool {
 	return f.checkSkipDaYanFilter(lucky)
 }
 
-func (f *filter) CheckSkipSexFilter(lucky *ent.WuGeLucky) bool {
+func (f *filter) CheckSkipSexFilter(lucky *wuge.WuGeResult) bool {
 	return f.checkSkipSexFilter(lucky)
 }
 
@@ -99,10 +99,10 @@ func DefaultFilter() Filter {
 func newFilter() *filter {
 	return &filter{
 		characterFilterType: CharacterFilterTypeDefault,
-		checkSkipSexFilter: func(lucky *ent.WuGeLucky) bool {
+		checkSkipSexFilter: func(lucky *wuge.WuGeResult) bool {
 			return false
 		},
-		checkSkipDaYanFilter: func(lucky *ent.WuGeLucky) bool {
+		checkSkipDaYanFilter: func(lucky *wuge.WuGeResult) bool {
 			return false
 		},
 		checkSkipWuXingFilter: func(ge int, ge2 int, ge3 int) bool {
@@ -128,7 +128,7 @@ func newFilter() *filter {
 func NewFilter(fo FilterOption) Filter {
 	f := newFilter()
 	if fo.SexFilter {
-		f.checkSkipSexFilter = func(lucky *ent.WuGeLucky) bool {
+		f.checkSkipSexFilter = func(lucky *wuge.WuGeResult) bool {
 			return lucky.ZongLucky == false
 		}
 	}
@@ -235,7 +235,7 @@ func wuXingFilter(ge int, ge2 int, ge3 int) bool {
 	return sc.Check(5) == false
 }
 
-func daYanFilter(lucky *ent.WuGeLucky) bool {
+func daYanFilter(lucky *wuge.WuGeResult) bool {
 	return !(isLucky(wuge.Find(lucky.DiGe).Lucky) &&
 		isLucky(wuge.Find(lucky.RenGe).Lucky) &&
 		isLucky(wuge.Find(lucky.WaiGe).Lucky) &&

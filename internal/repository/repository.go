@@ -8,7 +8,6 @@ import (
 
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/character"
-	"github.com/google/uuid"
 )
 
 type Repository struct {
@@ -16,40 +15,8 @@ type Repository struct {
 	cache *ModelCache
 }
 
-func (m *Repository) Initialize(ctx context.Context, luckies <-chan *ent.WuGeLucky) error {
-	err := m.Schema.Create(ctx)
-	if err != nil {
-		return err
-	}
-	var tmp []*ent.WuGeLuckyCreate
-	var count int
-	for lucky := range luckies {
-		_ = WuGeLuckyID(lucky.LastStroke1, lucky.LastStroke2, lucky.FirstStroke1, lucky.FirstStroke2)
-		uid := uuid.Must(uuid.NewUUID())
-		tmp = append(tmp, m.WuGeLucky.Create().SetWuGeLuckyWithOptional(lucky).SetID(uid))
-		count++
-		if len(tmp) >= PerInitStep {
-			log.Info("insert into wugelucky", "count", count)
-			_, err := m.insertWuGeLucky(ctx, tmp)
-			if err != nil {
-				return err
-			}
-			tmp = nil
-		}
-	}
-	if len(tmp) != 0 {
-		log.Info("insert into wugelucky", "count", count)
-		_, err := m.insertWuGeLucky(ctx, tmp)
-		if err != nil {
-			return err
-		}
-		tmp = nil
-	}
-	return nil
-}
-
-func (m *Repository) insertWuGeLucky(ctx context.Context, tmp []*ent.WuGeLuckyCreate) ([]*ent.WuGeLucky, error) {
-	return m.WuGeLucky.CreateBulk(tmp...).Save(ctx)
+func (m *Repository) Initialize(ctx context.Context) error {
+	return m.Schema.Create(ctx)
 }
 
 func (m *Repository) QueryLastName(ctx context.Context, last [2]string) (lastName [2]*ent.Character, err error) {

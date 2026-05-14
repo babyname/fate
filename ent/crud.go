@@ -120,60 +120,6 @@ func (vu *VersionUpdate) SetVersionWithOptional(input *Version) *VersionUpdate {
 	return vu
 }
 
-func (wglc *WuGeLuckyCreate) SetWuGeLucky(input *WuGeLucky) *WuGeLuckyCreate {
-	return wglc
-}
-
-func (wglc *WuGeLuckyCreate) SetWuGeLuckyWithOptional(input *WuGeLucky) *WuGeLuckyCreate {
-	wglc.SetLastStroke1(input.LastStroke1)
-	wglc.SetLastStroke2(input.LastStroke2)
-	wglc.SetFirstStroke1(input.FirstStroke1)
-	wglc.SetFirstStroke2(input.FirstStroke2)
-	wglc.SetTianGe(input.TianGe)
-	wglc.SetTianDaYan(input.TianDaYan)
-	wglc.SetRenGe(input.RenGe)
-	wglc.SetRenDaYan(input.RenDaYan)
-	wglc.SetDiGe(input.DiGe)
-	wglc.SetDiDaYan(input.DiDaYan)
-	wglc.SetWaiGe(input.WaiGe)
-	wglc.SetWaiDaYan(input.WaiDaYan)
-	wglc.SetZongGe(input.ZongGe)
-	wglc.SetZongDaYan(input.ZongDaYan)
-	wglc.SetZongLucky(input.ZongLucky)
-	wglc.SetZongSex(input.ZongSex)
-	wglc.SetZongMax(input.ZongMax)
-	return wglc
-}
-
-func (wgluo *WuGeLuckyUpdateOne) SetWuGeLucky(input *WuGeLucky) *WuGeLuckyUpdateOne {
-	return wgluo
-}
-
-func (wglu *WuGeLuckyUpdate) SetWuGeLucky(input *WuGeLucky) *WuGeLuckyUpdate {
-	return wglu
-}
-
-func (wglu *WuGeLuckyUpdate) SetWuGeLuckyWithOptional(input *WuGeLucky) *WuGeLuckyUpdate {
-	wglu.SetLastStroke1(input.LastStroke1)
-	wglu.SetLastStroke2(input.LastStroke2)
-	wglu.SetFirstStroke1(input.FirstStroke1)
-	wglu.SetFirstStroke2(input.FirstStroke2)
-	wglu.SetTianGe(input.TianGe)
-	wglu.SetTianDaYan(input.TianDaYan)
-	wglu.SetRenGe(input.RenGe)
-	wglu.SetRenDaYan(input.RenDaYan)
-	wglu.SetDiGe(input.DiGe)
-	wglu.SetDiDaYan(input.DiDaYan)
-	wglu.SetWaiGe(input.WaiGe)
-	wglu.SetWaiDaYan(input.WaiDaYan)
-	wglu.SetZongGe(input.ZongGe)
-	wglu.SetZongDaYan(input.ZongDaYan)
-	wglu.SetZongLucky(input.ZongLucky)
-	wglu.SetZongSex(input.ZongSex)
-	wglu.SetZongMax(input.ZongMax)
-	return wglu
-}
-
 func (wxc *WuXingCreate) SetWuXing(input *WuXing) *WuXingCreate {
 	return wxc
 }
