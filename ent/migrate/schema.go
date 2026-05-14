@@ -35,7 +35,7 @@ var (
 		{Name: "source", Type: field.TypeString, Nullable: true},
 		{Name: "source_confidence", Type: field.TypeFloat64, Nullable: true},
 		{Name: "comment", Type: field.TypeString, Nullable: true},
-		{Name: "character_traditional_to_simplified", Type: field.TypeInt, Unique: true, Nullable: true},
+		{Name: "character_traditional_to_simplified", Type: field.TypeInt, Nullable: true},
 		{Name: "character_standard_to_variant", Type: field.TypeInt, Nullable: true},
 	}
 	// CharacterTable holds the schema information for the "character" table.
