@@ -76,7 +76,8 @@ type CharacterMutation struct {
 	addsource_confidence             *float64
 	comment                          *string
 	clearedFields                    map[string]struct{}
-	simplified_of                    *int
+	simplified_of                    map[int]struct{}
+	removedsimplified_of             map[int]struct{}
 	clearedsimplified_of             bool
 	traditional_to_simplified        *int
 	clearedtraditional_to_simplified bool
@@ -1380,9 +1381,14 @@ func (m *CharacterMutation) ResetComment() {
 	delete(m.clearedFields, character.FieldComment)
 }
 
-// SetSimplifiedOfID sets the "simplified_of" edge to the Character entity by id.
-func (m *CharacterMutation) SetSimplifiedOfID(id int) {
-	m.simplified_of = &id
+// AddSimplifiedOfIDs adds the "simplified_of" edge to the Character entity by ids.
+func (m *CharacterMutation) AddSimplifiedOfIDs(ids ...int) {
+	if m.simplified_of == nil {
+		m.simplified_of = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.simplified_of[ids[i]] = struct{}{}
+	}
 }
 
 // ClearSimplifiedOf clears the "simplified_of" edge to the Character entity.
@@ -1395,20 +1401,29 @@ func (m *CharacterMutation) SimplifiedOfCleared() bool {
 	return m.clearedsimplified_of
 }
 
-// SimplifiedOfID returns the "simplified_of" edge ID in the mutation.
-func (m *CharacterMutation) SimplifiedOfID() (id int, exists bool) {
-	if m.simplified_of != nil {
-		return *m.simplified_of, true
+// RemoveSimplifiedOfIDs removes the "simplified_of" edge to the Character entity by IDs.
+func (m *CharacterMutation) RemoveSimplifiedOfIDs(ids ...int) {
+	if m.removedsimplified_of == nil {
+		m.removedsimplified_of = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.simplified_of, ids[i])
+		m.removedsimplified_of[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSimplifiedOf returns the removed IDs of the "simplified_of" edge to the Character entity.
+func (m *CharacterMutation) RemovedSimplifiedOfIDs() (ids []int) {
+	for id := range m.removedsimplified_of {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // SimplifiedOfIDs returns the "simplified_of" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// SimplifiedOfID instead. It exists only for internal usage by the builders.
 func (m *CharacterMutation) SimplifiedOfIDs() (ids []int) {
-	if id := m.simplified_of; id != nil {
-		ids = append(ids, *id)
+	for id := range m.simplified_of {
+		ids = append(ids, id)
 	}
 	return
 }
@@ -1417,6 +1432,7 @@ func (m *CharacterMutation) SimplifiedOfIDs() (ids []int) {
 func (m *CharacterMutation) ResetSimplifiedOf() {
 	m.simplified_of = nil
 	m.clearedsimplified_of = false
+	m.removedsimplified_of = nil
 }
 
 // SetTraditionalToSimplifiedID sets the "traditional_to_simplified" edge to the Character entity by id.
@@ -2259,9 +2275,11 @@ func (m *CharacterMutation) AddedEdges() []string {
 func (m *CharacterMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case character.EdgeSimplifiedOf:
-		if id := m.simplified_of; id != nil {
-			return []ent.Value{*id}
+		ids := make([]ent.Value, 0, len(m.simplified_of))
+		for id := range m.simplified_of {
+			ids = append(ids, id)
 		}
+		return ids
 	case character.EdgeTraditionalToSimplified:
 		if id := m.traditional_to_simplified; id != nil {
 			return []ent.Value{*id}
@@ -2283,6 +2301,9 @@ func (m *CharacterMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CharacterMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 4)
+	if m.removedsimplified_of != nil {
+		edges = append(edges, character.EdgeSimplifiedOf)
+	}
 	if m.removedstandard_to_variant != nil {
 		edges = append(edges, character.EdgeStandardToVariant)
 	}
@@ -2293,6 +2314,12 @@ func (m *CharacterMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *CharacterMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case character.EdgeSimplifiedOf:
+		ids := make([]ent.Value, 0, len(m.removedsimplified_of))
+		for id := range m.removedsimplified_of {
+			ids = append(ids, id)
+		}
+		return ids
 	case character.EdgeStandardToVariant:
 		ids := make([]ent.Value, 0, len(m.removedstandard_to_variant))
 		for id := range m.removedstandard_to_variant {
@@ -2341,9 +2368,6 @@ func (m *CharacterMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *CharacterMutation) ClearEdge(name string) error {
 	switch name {
-	case character.EdgeSimplifiedOf:
-		m.ClearSimplifiedOf()
-		return nil
 	case character.EdgeTraditionalToSimplified:
 		m.ClearTraditionalToSimplified()
 		return nil
