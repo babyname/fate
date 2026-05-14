@@ -460,6 +460,12 @@ func (e *Exporter) loadUnihanData() error {
 		log.Printf("Warning: failed to load Unihan_IRGSources: %v", err)
 	}
 
+	if err := e.loadWuxingJSON(filepath.Join(e.rawDataDir, "wuxing.json")); err != nil {
+		log.Printf("Warning: failed to load wuxing.json: %v", err)
+	} else {
+		log.Printf("  → %d wuxing entries from yw11.com", len(e.wuxingMap))
+	}
+
 	return nil
 }
 
@@ -578,4 +584,26 @@ func (e *Exporter) loadUnihanIRG(path string) error {
 	}
 
 	return scanner.Err()
+}
+
+func (e *Exporter) loadWuxingJSON(path string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+
+	var result struct {
+		Data map[string]string `json:"data"`
+	}
+	if err := json.Unmarshal(data, &result); err != nil {
+		return err
+	}
+
+	for char, wuxing := range result.Data {
+		if wuxing != "" {
+			e.wuxingMap[char] = wuxing
+		}
+	}
+
+	return nil
 }
