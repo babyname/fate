@@ -22,11 +22,11 @@ func (e *Exporter) transformNCharacter(old oldNCharacter, idLookup map[int]strin
 		wx = ""
 	}
 	if wx == "" {
-		inferred := inferWuXing(old.Radical)
+		inferred, source := e.inferWuXingForChar(old.Char, old.Radical)
 		if inferred != "" {
-			e.recordChange(old.Char, "wu_xing", "", inferred, "infer_from_radical:"+old.Radical, "n_character")
+			e.recordChange(old.Char, "wu_xing", "", inferred, source, "n_character")
 			wx = inferred
-			wxSource = "inferred:radical"
+			wxSource = "inferred:" + source
 		}
 	}
 
@@ -149,9 +149,9 @@ func (e *Exporter) transformCharacter(old oldCharacter) SeedCharacter {
 		wx = ""
 	}
 	if wx == "" {
-		inferred := inferWuXing(old.Radical)
+		inferred, source := e.inferWuXingForChar(old.Ch, old.Radical)
 		if inferred != "" {
-			e.recordChange(old.Ch, "wu_xing", "", inferred, "infer_from_radical:"+old.Radical, "character")
+			e.recordChange(old.Ch, "wu_xing", "", inferred, source, "character")
 			wx = inferred
 		}
 	}
@@ -387,6 +387,17 @@ func min(a, b int) int {
 		return a
 	}
 	return b
+}
+
+func (e *Exporter) inferWuXingForChar(char, radical string) (string, string) {
+	if wx, ok := e.wuxingMap[char]; ok && wx != "" {
+		return wx, "yw11_wuxing"
+	}
+	wx := inferWuXing(radical)
+	if wx != "" {
+		return wx, "infer_from_radical:" + radical
+	}
+	return "", ""
 }
 
 func inferWuXing(radical string) string {
