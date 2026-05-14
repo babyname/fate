@@ -84,6 +84,22 @@ func (e *Exporter) transformNCharacter(old oldNCharacter, idLookup map[int]strin
 
 	if old.Explanation != "" {
 		sc.Meaning = old.Explanation
+	} else if def, ok := e.definitions[old.Char]; ok && def != "" {
+		e.recordChange(old.Char, "meaning", "", def[:min(100, len(def))], "unihan_definition", "Unihan")
+		sc.Meaning = def
+	}
+
+	if sc.ScienceStroke == 0 || sc.KangxiStroke == 0 {
+		if strokes, ok := e.totalStrokes[old.Char]; ok && strokes > 0 {
+			if sc.ScienceStroke == 0 {
+				e.recordChange(old.Char, "science_stroke", "0", fmt.Sprintf("%d", strokes), "unihan_stroke", "Unihan")
+				sc.ScienceStroke = strokes
+			}
+			if sc.KangxiStroke == 0 {
+				e.recordChange(old.Char, "kangxi_stroke", "0", fmt.Sprintf("%d", strokes), "unihan_stroke", "Unihan")
+				sc.KangxiStroke = strokes
+			}
+		}
 	}
 
 	commentParts := parseJSONString(old.Comment)
@@ -364,6 +380,13 @@ var radicalWuXing = map[string]string{
 	"齐": "金", "龙": "土", "龟": "水",
 	"马": "火", "鱼": "水", "鸟": "火", "麦": "木", "黄": "土",
 	"见": "火", "页": "金", "风": "火", "飞": "水", "齿": "土",
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func inferWuXing(radical string) string {
