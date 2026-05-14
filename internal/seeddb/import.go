@@ -9,7 +9,6 @@ import (
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/database"
-	"github.com/google/uuid"
 	"golang.org/x/net/context"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -48,16 +47,6 @@ func (imp *Importer) Import() error {
 		}
 	} else {
 		log.Printf("Skipping characters: %s not found", charFile)
-	}
-
-	wugeFile := filepath.Join(imp.seedDir, "wu_ge_lucky.json")
-	if _, err := os.Stat(wugeFile); err == nil {
-		log.Println("Importing wu_ge_lucky...")
-		if err := imp.importWuGeLucky(ctx, client, wugeFile); err != nil {
-			return fmt.Errorf("import wu_ge_lucky: %w", err)
-		}
-	} else {
-		log.Printf("Skipping wu_ge_lucky: %s not found", wugeFile)
 	}
 
 	wuxingFile := filepath.Join(imp.seedDir, "wu_xing.json")
@@ -215,59 +204,6 @@ func (imp *Importer) linkCharacterEdges(ctx context.Context, client *ent.Client,
 	}
 
 	log.Printf("  Linked %d character edges (trad→simp: %d, variant→std: %d)", linked, len(traditionalToSimplified), len(variantOf))
-	return nil
-}
-
-func (imp *Importer) importWuGeLucky(ctx context.Context, client *ent.Client, filename string) error {
-	var seeds []SeedWuGeLucky
-	if err := readJSON(filename, &seeds); err != nil {
-		return err
-	}
-
-	total := len(seeds)
-	imported := 0
-
-	for i := 0; i < total; i += batchSize {
-		end := i + batchSize
-		if end > total {
-			end = total
-		}
-		batch := seeds[i:end]
-
-		builders := make([]*ent.WuGeLuckyCreate, 0, len(batch))
-		for _, sw := range batch {
-			uid := uuid.New()
-			builder := client.WuGeLucky.Create().
-				SetID(uid).
-				SetLastStroke1(sw.LastStroke1).
-				SetLastStroke2(sw.LastStroke2).
-				SetFirstStroke1(sw.FirstStroke1).
-				SetFirstStroke2(sw.FirstStroke2).
-				SetTianGe(sw.TianGe).
-				SetTianDaYan(sw.TianDaYan).
-				SetRenGe(sw.RenGe).
-				SetRenDaYan(sw.RenDaYan).
-				SetDiGe(sw.DiGe).
-				SetDiDaYan(sw.DiDaYan).
-				SetWaiGe(sw.WaiGe).
-				SetWaiDaYan(sw.WaiDaYan).
-				SetZongGe(sw.ZongGe).
-				SetZongDaYan(sw.ZongDaYan).
-				SetZongLucky(sw.ZongLucky).
-				SetZongSex(sw.ZongSex).
-				SetZongMax(sw.ZongMax)
-
-			builders = append(builders, builder)
-		}
-
-		created, err := client.WuGeLucky.CreateBulk(builders...).Save(ctx)
-		if err != nil {
-			return fmt.Errorf("batch %d-%d: %w", i, end, err)
-		}
-		imported += len(created)
-		log.Printf("  WuGeLucky: %d/%d", imported, total)
-	}
-
 	return nil
 }
 

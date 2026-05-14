@@ -29,8 +29,6 @@ func (t transferDatabase) Start(ctx context.Context) error {
 	}
 	for _, table := range t.Tables {
 		switch table {
-		case "WuGeLucky":
-			err = t.transferWuGeLucky(ctx)
 		case "Character":
 			err = t.transferCharacter(ctx)
 		case "WuXing":
@@ -46,38 +44,6 @@ func (t transferDatabase) Start(ctx context.Context) error {
 	}
 	if err := t.Target.Close(); err != nil {
 		return err
-	}
-	return nil
-}
-
-func (t transferDatabase) transferWuGeLucky(ctx context.Context) error {
-	c, err := t.Source.WuGeLucky.Query().Count(ctx)
-	if err != nil {
-		return err
-	}
-	if c == 0 {
-		return nil
-	}
-
-	for i := 0; i < c; i += t.Limit {
-		luckies, err := t.Source.WuGeLucky.Query().Limit(t.Limit).Offset(i).All(ctx)
-		if err != nil {
-			return err
-		}
-		var bluks []*ent.WuGeLuckyCreate
-		for x := range luckies {
-			lucky := t.Target.WuGeLucky.Create().SetID(luckies[x].ID).SetWuGeLuckyWithOptional(luckies[x])
-			bluks = append(bluks, lucky)
-			//fmt.Println("insert wugelucky to database:", i, "total", c, "updated", lucky)
-		}
-
-		if len(bluks) != 0 {
-			saved, err := t.Target.WuGeLucky.CreateBulk(bluks...).Save(ctx)
-			if err != nil {
-				return err
-			}
-			fmt.Println("insert wugelucky to database:", i, "total", c, "updated", len(saved))
-		}
 	}
 	return nil
 }

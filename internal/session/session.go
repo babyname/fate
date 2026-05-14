@@ -8,6 +8,7 @@ import (
 	filterpkg "github.com/babyname/fate/internal/filter"
 	"github.com/babyname/fate/internal/naming"
 	"github.com/babyname/fate/internal/repository"
+	"github.com/babyname/fate/internal/wuge"
 	"github.com/babyname/fate/log"
 	"golang.org/x/net/context"
 	"golang.org/x/sync/errgroup"
@@ -28,17 +29,19 @@ type Session interface {
 	Start(input *Input) error
 	Stop() error
 	Err() error
+	Wait()
 }
 
 type session struct {
-	ctx    context.Context
-	cancel context.CancelFunc
-	db     *repository.Repository
-	group  errgroup.Group
-	state  int32
-	filter filterpkg.Filter
+		ctx        context.Context
+		cancel     context.CancelFunc
+		db         *repository.Repository
+		group      errgroup.Group
+		state      int32
+		filter     filterpkg.Filter
+		outputDone chan struct{}
 
-	chars map[int][]*ent.Character
+		chars map[int][]*ent.Character
 
 	name   chan naming.FirstName
 	output *Output
@@ -79,7 +82,12 @@ func (s *session) Start(input *Input) error {
 	s.SetState(SessionStateGenerating)
 
 	s.group.Go(s.generate)
-	go s.startOutput()
+	outputDone := make(chan struct{})
+	go func() {
+		s.startOutput()
+		close(outputDone)
+	}()
+	s.outputDone = outputDone
 	return nil
 }
 
@@ -88,13 +96,23 @@ func (s *session) startOutput() {
 	defer s.output.SetCacheFilter(put)
 	for {
 		select {
-		case <-s.Context().Done():
-			return
 		case name, ok := <-s.name:
 			if !ok {
 				return
 			}
 			put.Put(name)
+		case <-s.Context().Done():
+			for {
+				select {
+				case name, ok := <-s.name:
+					if !ok {
+						return
+					}
+					put.Put(name)
+				default:
+					return
+				}
+			}
 		}
 	}
 }
@@ -116,20 +134,23 @@ func (s *session) Context() context.Context {
 	return s.ctx
 }
 
+func (s *session) Wait() {
+	if s.outputDone != nil {
+		<-s.outputDone
+	}
+}
+
 func (s *session) generate() error {
 	defer close(s.name)
 	defer s.close()
-	lucky, err := s.db.GetWuGeLuckyCached(s.Context(), getLastStrokeFromBasic(s.filter, s.output.Basic()))
-	if err != nil {
-		log.Error("get wuge lucky", err)
-		s.SetState(SessionStateFailed)
-		return err
-	}
-	log.Info("wuge lucky list", "size", len(lucky))
+
+	basic := s.output.Basic()
+	strokes := getLastStrokeFromBasic(s.filter, basic)
+	lucky := wuge.GetLuckyByLastName(strokes[0], strokes[1])
 
 	strokesNeeded := make(map[int]struct{})
 	for i := range lucky {
-		tmp := lucky[i]
+		tmp := &lucky[i]
 		if !s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) &&
 			!s.filter.CheckSkipSexFilter(tmp) &&
 			!s.filter.CheckSkipDaYanFilter(tmp) &&
@@ -153,7 +174,7 @@ func (s *session) generate() error {
 
 	wg := sync.WaitGroup{}
 	for i := range lucky {
-		tmp := lucky[i]
+		tmp := &lucky[i]
 		if s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) {
 			continue
 		}
