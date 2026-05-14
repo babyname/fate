@@ -18,6 +18,10 @@
 | dict 包同步更新 | ✅ | CharEntry/QueryFilter/DictIndex 适配新字段 |
 | 编译+测试通过 | ✅ | dict 8/8, rating 4/4, analysis 2/2 |
 
+| WuGeLucky 预计算查找表 | ✅ | [31][31][]WuGeResult + sync.Once，3.89ns/op，0 B alloc |
+| 美名腾风格分析输出 | ✅ | 字信息/五格/三才/基础运/成功运/人际关系/周易卦象/四项评分 |
+| 两种喜用神算法 | ✅ | 平衡用神法 + 格局用神法（用神/喜神/忌神/仇神/闲神） |
+
 ### 待完成
 
 | 优先级 | 任务 | 说明 |
@@ -27,8 +31,10 @@
 | P1 | Filter 重构 | 配置化开关 + dict 索引集成 |
 | P1 | Session 重构 | 集成 chronos/v2 + dict 索引 |
 | P1 | Rating 统一 | rating/ vs naming/raters 合并 |
+| P1 | 周易卦象数据完善 | yi包GuaXiang.XiangYue为空，需补充64卦大象/事业/经商/求名/婚恋/决策解读 |
+| P1 | 生肖星座中文化 | 当前输出Dragon/Gemini，需映射为龙/双子座 |
+| P1 | 简繁体对照表 | 当前TraditionalChar直接取原字，需建立简繁映射 |
 | P2 | 诗词库 | 数据导入 + 出处追溯 |
-| P2 | Analysis 完善 | 输出模板 + 多格式 |
 | P2 | CLI 完善 | console/fetchdata/character 功能补全 |
 
 ---

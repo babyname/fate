@@ -1,195 +1,187 @@
-# 命运起名 (Fate)
+# 命运起名 Fate
 
-![FATE](docs/fate.png)
+<p align="center">
+  <strong>Modern Scientific Naming Tool — Intelligent Naming System Based on Bazi Wuxing · Sancai Wuge · Zhouyi Hexagrams</strong>
+</p>
 
-![Go Version](https://img.shields.io/badge/go%20version-%3E=1.22.1-blue.svg?style=flat-square)
-[![GoDoc](https://godoc.org/github.com/babyname/fate?status.svg)](http://godoc.org/github.com/babyname/fate)
-[![license](https://img.shields.io/github/license/babyname/fate.svg)](https://github.com/babyname/fate/blob/master/LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/babyname/fate)](https://goreportcard.com/report/github.com/babyname/fate)
+<p align="center">
+  <img src="docs/images/architecture.svg" alt="Architecture" width="800"/>
+</p>
 
-[[ENGLISH](README_EN.md)][[中文](README.md)]
+<p align="center">
+  English | <a href="README.md">中文</a>
+</p>
 
-## A Modern Science-based Chinese Name Creation Tool
+---
 
-The first open-source Chinese name creation project on `Github`.
+## ✨ Features
 
-## Table of Contents
+- 🎂 **Bazi Calculation** — Four Pillars, Wuxing strength, Tiaohou Shen
+- ☯️ **Dual Xi-Yong Algorithm** — Balance Method + GeJu Method (10 pattern types)
+- 📐 **Sancai Wuge** — 81 Dayan numbers, Yin-Yang Wuxing, O(1) precomputed lookup (3.89ns/op)
+- 🔮 **Zhouyi Hexagrams** — 64 hexagram interpretations (Daxiang/Career/Business/Fame/Marriage/Decision)
+- 📊 **4-Dimension Scoring** — Cultural Impression / Wuxing Bazi / Zodiac / Wuge Shuli
+- 📝 **Multi-format Output** — Text / Markdown / JSON
+- 🏛️ **Simplified-Traditional Mapping** — 400+ character mapping table
 
-[TOR]
+## 📸 Report Preview
 
-### Introduction
+<p align="center">
+  <img src="docs/images/report_preview.svg" alt="Report Preview" width="800"/>
+</p>
 
-This program is suitable for generating two-character names with either a single or double surname (e.g., 独孤**, 李张**, 张**, 王**).
-A good name accompanies one throughout their life; Fate helps you choose an auspicious and meaningful name.
+## 🚀 Quick Start
 
-### Versions
+### Prerequisites
 
-Specific versions are released separately, with pre-release binary files generated for each commit going forward.
-The latest version uses Sqlite3 database, eliminating the need to import database files manually.
-Simply download the Sqlite3 database below and use it locally.
+- Go 1.22+
+- GCC (SQLite3 CGO dependency)
+- SQLite3
 
-- **[v3.5.5 Download](https://github.com/babyname/fate/releases/tag/v3.5.5)**
-- **[Sqlite3 Database](https://github.com/babyname/fate/releases/download/v3.5.4/fate_sqlite3_database.zip)**
-- **[Latest Self-Compiled Version](https://github.com/babyname/fate/releases/tag/auto_build)**
-- **[Older SQL Database File: 20200331](https://github.com/babyname/fate/releases/download/v3.5.1/fate_db_200331.7z)**
+### Install
 
-### Usage Methods
+```bash
+git clone https://github.com/babyname/fate.git
+cd fate
+go mod download
+```
 
-#### Generating Names via Go Code and API Calls
+### Generate Name Analysis Report
+
+```bash
+go run github.com/babyname/fate/cmd/gen_report
+
+# Output files in output/ directory
+ls output/
+# 张_姓名分析报告_平衡用神法.txt
+# 张_姓名分析报告_平衡用神法.md
+# 张_姓名分析报告_平衡用神法.json
+# 张_姓名分析报告_格局用神法.txt
+# 张_姓名分析报告_格局用神法.md
+# 张_姓名分析报告_格局用神法.json
+```
+
+### Usage in Code
 
 ```go
-// Import the database data before using (test character library is mostly complete; for peace of mind, you can verify generated names on some naming websites later).
-// Load configuration (refer to example/create_a_name for specific parameters).
-cfg := config.Default()
-// Birthdate
-born := chronos.New("2020/01/23 11:31")
-// Surname: lastName := "张"
-// First parameter: surname
-// Second parameter: birthdate
-f := fate.NewFate(lastName, born.Solar().Time(), fate.ConfigOption(cfg))
-e := f.MakeName(context.Background())
-if e != nil {
-t.Fatal(e)
+package main
+
+import (
+    "time"
+
+    "github.com/babyname/fate/internal/analysis"
+    v2 "github.com/godcong/chronos/v2"
+)
+
+func main() {
+    born, _ := time.Parse("2006/01/02 15:04", "2024/06/15 10:30")
+
+    // Balance Method
+    fateData, _ := v2.GetFateData(&v2.FateInput{
+        BirthDate: born,
+        Gender:    1,
+        Surname:   "张",
+        Method:    v2.XiYongMethodBalance,
+    })
+
+    // GeJu Method
+    fateData2, _ := v2.GetFateData(&v2.FateInput{
+        BirthDate: born,
+        Gender:    1,
+        Surname:   "张",
+        Method:    v2.XiYongMethodGeJu,
+    })
+
+    // Build name result
+    c1 := &ent.Character{Char: "驰", WuXing: "火", ScienceStroke: 13, ...}
+    c2 := &ent.Character{Char: "筎", WuXing: "木", ScienceStroke: 12, ...}
+    result := analysis.BuildNameResult(1, "张", c1, c2, 11, 0, fateData)
+
+    // Generate report
+    report := analysis.NewReport("张", "2024年06月15日", "男", fateData, 1000)
+    report.TopNames = append(report.TopNames, result)
+
+    f := &analysis.MarkdownFormatter{}
+    f.Format(os.Stdout, report)
 }
-
-}
 ```
 
-#### Generating Names Using Precompiled Binary Files
-
-```shell
-# 生成配置文件，可修改数据库，及一些基本参数
-fate.exe init
-# 输出姓名
-fate.exe name -l 张 -b "2020/02/06 15:04"
-```
-
-### Common Issues
-
-#### Error: count total error: The system cannot find the path specified
-
-- Time conversion failure due to missing zoneinfo (usually occurs in Windows environments). Download the zoneinfo file above and place it in the same directory as the executable file to resolve the issue.
-- The latest version no longer requires the zoneinfo file.
-
-#### How to Import Data (MySQL)
-
-1. Connect to the MySQL database: mysql -u username -p password
-2. Create the database: CREATE SCHEMA fate DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-3. Use the fate database: USE fate;
-4. Import the database file: SOURCE /path/to/sql/file;
-5. It is recommended to use tools like Navicat for faster import speeds.
-
-#### Database Configuration: Replace Relevant Parts in config.json
-
-- **MYSQL Configuration**
-
-```json
-"database": {
-  "host": "127.0.0.1",
-  "port": "3306",
-  "user": "root",
-  "pwd": "111111",
-  "name": "fate",
-  "max_idle_con": 0,
-  "max_open_con": 0,
-  "driver": "mysql",
-  "file": "",
-  "dsn": "",
-  "show_sql": false,
-  "show_exec_time": false
-}
+## 🏗️ Project Structure
 
 ```
-
-- **SQLITE3 Configuration**
-
-```json
-"database": { "name": "fate", "driver": "sqlite3" }
+fate/
+├── cmd/gen_report/           # Report generation tool
+├── ent/                      # Ent ORM entity definitions
+├── internal/
+│   ├── analysis/             # Core analysis module
+│   │   ├── analysis.go       # Data structures + formatters
+│   │   ├── sancai_data.go    # Sancai/Jichuyun/Chenggongyun/Renji data
+│   │   ├── zhouyi.go         # Zhouyi hexagram calculation
+│   │   ├── zhouyi_data.go    # 64 hexagram interpretation data
+│   │   └── simplified_traditional.go  # Simplified-Traditional mapping
+│   ├── wuge/                 # Sancai Wuge (3-5 elements)
+│   ├── wuxing/               # Wuxing analysis
+│   ├── rating/               # Scoring system
+│   ├── filter/               # Name filtering
+│   ├── naming/               # Naming logic
+│   └── session/              # Session management
+├── chronos/                  # Bazi calculation submodule
+│   ├── fate.go               # FateData main entry
+│   ├── xiyong_balance.go     # Balance Xi-Yong method
+│   ├── xiyong_geju.go        # GeJu Xi-Yong method
+│   └── fate_helpers.go       # Wuxing calculation helpers
+└── yi/                       # Zhouyi hexagram submodule
 ```
 
-## Version Plans
+## ☯️ Two Xi-Yong Shen Algorithms
 
-### Version 1
+### Balance Method
 
-Primarily manual work; now deprecated.
+Based on day-master strength, using ally/enemy force comparison:
 
-### Version 2
+| Day Master | Yong Shen | Xi Shen | Ji Shen | Chou Shen |
+|-----------|-----------|---------|---------|-----------|
+| Strong | Officer (Ke-Wo) | Wealth + Seal | Peer (Bi-Jie) | Ji Shen's parent |
+| Weak | Seal (Sheng-Wo) | Peer (Bi-Jie) | Officer + Food | Ji Shen's parent |
 
-Automatically generates name characters with manual screening.
+### GeJu (Pattern) Method
 
-### Version 3 (In Development)
+First determine the pattern (10 types), then select Yong Shen based on pattern + strength:
 
-1. Adds API query functionality (may require web-related work in the future; interested parties can sign up).
-2. Refines and simplifies the dictionary, migrating it to `Entgo`.
-3. Defines more comprehensive query rules.
+| Pattern | Strong Yong | Weak Yong |
+|---------|------------|-----------|
+| Zheng Guan | Officer | Seal |
+| Qi Sha | Food controls Sha | Seal transforms Sha |
+| Shi Shen | Food generates Wealth | Peer helps Self |
+| Shang Guan | Seal controls Shang | Seal |
+| Zheng/Pian Cai | Wealth | Seal |
+| Jian Lu/Yang Ren | Officer | Seal |
 
-### Version 4 (Planned)
+## 📊 Scoring System
 
-Optimizes algorithms, adjusts interfaces, databases, enhances documentation, and fixes bugs.
+| Dimension | Description |
+|-----------|-------------|
+| Cultural Impression | Common characters, regular script, meaning richness |
+| Wuxing Bazi | Name Wuxing matching with Xi-Yong Shen |
+| Zodiac | Zodiac Wuxing generation/restriction with name |
+| Wuge Shuli | Tian/Ren/Di/Wai/Zong Ge luck/inauspicious |
 
-### Version 7 (Planned)
+## 🔧 Performance
 
-Utilizes AI and big data matching algorithms to generate even better names.
+| Metric | Value |
+|--------|-------|
+| WuGeLucky Lookup | 3.89 ns/op, 0 B alloc |
+| Zhang Surname Full | ~50ms / 61,730 names |
+| Li Surname Full | ~127ms / 165,852 names |
 
-### About Fate
+## 🛠️ Tech Stack
 
-Fate employs the following algorithms to automatically generate names based on dictionary rules:
+- **Go 1.22+** — Main language
+- **Ent ORM** — Database ORM
+- **SQLite3** — Data storage (`github.com/sqlite3ent/sqlite3` driver)
+- **chronos/v2** — Bazi calculation submodule (local `replace`)
+- **yi** — Zhouyi hexagram calculation (`github.com/godcong/yi`)
 
-- I Ching Hexagrams
-- Da Yan's Numbers
-- Three Talents and Five Elements
-- Auspicious Deities (Balancing Deities)
-- Zodiac Characters
-- Eight Characters' Auspiciousness
+## 📜 License
 
-Currently, Fate calculates names using a comprehensive approach based on six schools:
-
-- Stroke Count School: Believes that all auspicious strokes ensure a prosperous life. Accuracy: 12.5%.
-- Three Talents School: Completely disregards stroke auspiciousness, believing that harmony among the five elements associated with Heaven, Earth, and Man ensures a prosperous life. Accuracy: 56.6%.
-- Augmenting Eight Characters: Disregards stroke auspiciousness, asserting that names compensating for deficiencies in one's innate eight-character birth chart guarantee prosperity. In reality, this method's accuracy is very low.
-- Hexagram Image School: Ignores stroke auspiciousness, considering only the beauty of the hexagram derived from the name as indicative of a fortunate life. Accuracy: 40.26%.
-- Heavenly Fortune School: Pays no attention to stroke auspiciousness, maintaining that avoiding being subdued by the five elements of the year of birth in one's name leads to a prosperous life. Accuracy: 25.32%.
-- Zodiac Sign School: Disregards stroke auspiciousness, asserting that using the correct character shapes associated with one's zodiac sign ensures a fortunate life. Accuracy: 27.55%.
-
-Currently used libraries:
-
-- BaZi calculation (for determining birth charts)::
-  <https://github.com/godcong/chronos>
-- Dictionary data (a crawler tool populating the dictionary database):
-  <https://github.com/godcong/excavator>
-  If you know of any better alternatives, please let us know.
-
-### 资料查询
-
-1. Compilation of websites for nationwide and provincial name duplication checks
-
-Provided by a netizen：`https://zhuanlan.zhihu.com/p/89654568` (**Please exercise caution when accessing non-official sites**)
-[Repository address](./docs/chinese_name_query.md)
-
-### Contributors
-
-<table>
-<tr>
-    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
-        <a href=https://github.com/godcong>
-            <img src=https://avatars.githubusercontent.com/u/2727298?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=godcong/>
-            <br />
-            <sub style="font-size:14px"><b>godcong</b></sub>
-        </a>
-    </td>
-    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
-        <a href=https://github.com/Z-fly>
-            <img src=https://avatars.githubusercontent.com/u/10470892?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Z-fly/>
-            <br />
-            <sub style="font-size:14px"><b>Z-fly</b></sub>
-        </a>
-    </td>
-    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
-        <a href=https://github.com/fesiong>
-            <img src=https://avatars.githubusercontent.com/u/9912496?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Sinclair/>
-            <br />
-            <sub style="font-size:14px"><b>Sinclair</b></sub>
-        </a>
-    </td>
-</tr>
-</table>
+MIT License
