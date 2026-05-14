@@ -115,7 +115,7 @@ func (e *Exporter) Export() error {
 	}
 	nSeeds := e.transformNCharacters(nChars, idToChar)
 	log.Printf("  → %d from n_character", len(nSeeds))
-	allChars = append(allChars, nSeeds...)
+	allChars = dedupCharacters(nSeeds)
 
 	log.Println("Exporting character table (supplement)...")
 	oldChars, err := e.queryCharacters(db)
@@ -127,6 +127,8 @@ func (e *Exporter) Export() error {
 
 	allChars = e.mergeCharacters(allChars, cSeeds)
 	log.Printf("  → %d after merge (dedup by char)", len(allChars))
+
+	e.enrichFromVariants(allChars)
 
 	log.Println("Exporting wu_ge_lucky table...")
 	oldWuGes, err := e.queryWuGeLucky(db)
@@ -170,6 +172,95 @@ func (e *Exporter) Export() error {
 
 	log.Println("Export completed!")
 	return nil
+}
+
+func (e *Exporter) enrichFromVariants(chars []SeedCharacter) {
+	charMap := make(map[string]*SeedCharacter, len(chars))
+	for i := range chars {
+		charMap[chars[i].Char] = &chars[i]
+	}
+
+	enriched := 0
+	for i, c := range chars {
+		if c.WuXing != "" {
+			continue
+		}
+		variants := []string{c.SimplifiedOfChar, c.VariantOfChar}
+		for _, v := range variants {
+			if v == "" {
+				continue
+			}
+			if vc, ok := charMap[v]; ok && vc.WuXing != "" {
+				e.recordChange(c.Char, "wu_xing", "", vc.WuXing, "variant:"+v, "enrich_from_variants")
+				chars[i].WuXing = vc.WuXing
+				enriched++
+				break
+			}
+		}
+	}
+	if enriched > 0 {
+		log.Printf("  Enriched %d WuXing from variant relationships", enriched)
+	}
+}
+
+func dedupCharacters(chars []SeedCharacter) []SeedCharacter {
+	seen := make(map[string]int, len(chars))
+	result := make([]SeedCharacter, 0, len(chars))
+	for _, c := range chars {
+		if idx, ok := seen[c.Char]; ok {
+			enrichSeedCharacter(&result[idx], c)
+			continue
+		}
+		seen[c.Char] = len(result)
+		result = append(result, c)
+	}
+	dupes := len(chars) - len(result)
+	if dupes > 0 {
+		log.Printf("  Dedup: removed %d duplicate chars", dupes)
+	}
+	return result
+}
+
+func enrichSeedCharacter(dst *SeedCharacter, src SeedCharacter) {
+	if len(dst.Pinyin) == 0 && len(src.Pinyin) > 0 {
+		dst.Pinyin = src.Pinyin
+	}
+	if dst.WuXing == "" && src.WuXing != "" {
+		dst.WuXing = src.WuXing
+	}
+	if dst.Radical == "" && src.Radical != "" {
+		dst.Radical = src.Radical
+	}
+	if dst.ScienceStroke == 0 && src.ScienceStroke > 0 {
+		dst.ScienceStroke = src.ScienceStroke
+	}
+	if dst.KangxiStroke == 0 && src.KangxiStroke > 0 {
+		dst.KangxiStroke = src.KangxiStroke
+	}
+	if dst.SimplifiedStroke == 0 && src.SimplifiedStroke > 0 {
+		dst.SimplifiedStroke = src.SimplifiedStroke
+	}
+	if dst.TraditionalStroke == 0 && src.TraditionalStroke > 0 {
+		dst.TraditionalStroke = src.TraditionalStroke
+	}
+	if dst.Meaning == "" && src.Meaning != "" {
+		dst.Meaning = src.Meaning
+	}
+	if src.IsSimplified && !dst.IsSimplified {
+		dst.IsSimplified = true
+	}
+	if src.IsTraditional && !dst.IsTraditional {
+		dst.IsTraditional = true
+	}
+	if src.IsKangxi && !dst.IsKangxi {
+		dst.IsKangxi = true
+	}
+	if src.Regular && !dst.Regular {
+		dst.Regular = true
+	}
+	if src.Nameable && !dst.Nameable {
+		dst.Nameable = true
+	}
 }
 
 func (e *Exporter) buildIDLookup(db *sql.DB) (map[int]string, error) {

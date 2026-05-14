@@ -479,23 +479,19 @@ func (cu *CharacterUpdate) ClearComment() *CharacterUpdate {
 	return cu
 }
 
-// SetSimplifiedOfID sets the "simplified_of" edge to the Character entity by ID.
-func (cu *CharacterUpdate) SetSimplifiedOfID(id int) *CharacterUpdate {
-	cu.mutation.SetSimplifiedOfID(id)
+// AddSimplifiedOfIDs adds the "simplified_of" edge to the Character entity by IDs.
+func (cu *CharacterUpdate) AddSimplifiedOfIDs(ids ...int) *CharacterUpdate {
+	cu.mutation.AddSimplifiedOfIDs(ids...)
 	return cu
 }
 
-// SetNillableSimplifiedOfID sets the "simplified_of" edge to the Character entity by ID if the given value is not nil.
-func (cu *CharacterUpdate) SetNillableSimplifiedOfID(id *int) *CharacterUpdate {
-	if id != nil {
-		cu = cu.SetSimplifiedOfID(*id)
+// AddSimplifiedOf adds the "simplified_of" edges to the Character entity.
+func (cu *CharacterUpdate) AddSimplifiedOf(c ...*Character) *CharacterUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return cu
-}
-
-// SetSimplifiedOf sets the "simplified_of" edge to the Character entity.
-func (cu *CharacterUpdate) SetSimplifiedOf(c *Character) *CharacterUpdate {
-	return cu.SetSimplifiedOfID(c.ID)
+	return cu.AddSimplifiedOfIDs(ids...)
 }
 
 // SetTraditionalToSimplifiedID sets the "traditional_to_simplified" edge to the Character entity by ID.
@@ -556,10 +552,25 @@ func (cu *CharacterUpdate) Mutation() *CharacterMutation {
 	return cu.mutation
 }
 
-// ClearSimplifiedOf clears the "simplified_of" edge to the Character entity.
+// ClearSimplifiedOf clears all "simplified_of" edges to the Character entity.
 func (cu *CharacterUpdate) ClearSimplifiedOf() *CharacterUpdate {
 	cu.mutation.ClearSimplifiedOf()
 	return cu
+}
+
+// RemoveSimplifiedOfIDs removes the "simplified_of" edge to Character entities by IDs.
+func (cu *CharacterUpdate) RemoveSimplifiedOfIDs(ids ...int) *CharacterUpdate {
+	cu.mutation.RemoveSimplifiedOfIDs(ids...)
+	return cu
+}
+
+// RemoveSimplifiedOf removes "simplified_of" edges to Character entities.
+func (cu *CharacterUpdate) RemoveSimplifiedOf(c ...*Character) *CharacterUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.RemoveSimplifiedOfIDs(ids...)
 }
 
 // ClearTraditionalToSimplified clears the "traditional_to_simplified" edge to the Character entity.
@@ -816,7 +827,7 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.SimplifiedOfCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   character.SimplifiedOfTable,
 			Columns: []string{character.SimplifiedOfColumn},
@@ -830,9 +841,28 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := cu.mutation.RemovedSimplifiedOfIDs(); len(nodes) > 0 && !cu.mutation.SimplifiedOfCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   character.SimplifiedOfTable,
+			Columns: []string{character.SimplifiedOfColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := cu.mutation.SimplifiedOfIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   character.SimplifiedOfTable,
 			Columns: []string{character.SimplifiedOfColumn},
@@ -851,7 +881,7 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.TraditionalToSimplifiedCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   character.TraditionalToSimplifiedTable,
 			Columns: []string{character.TraditionalToSimplifiedColumn},
@@ -867,7 +897,7 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := cu.mutation.TraditionalToSimplifiedIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   character.TraditionalToSimplifiedTable,
 			Columns: []string{character.TraditionalToSimplifiedColumn},
@@ -1444,23 +1474,19 @@ func (cuo *CharacterUpdateOne) ClearComment() *CharacterUpdateOne {
 	return cuo
 }
 
-// SetSimplifiedOfID sets the "simplified_of" edge to the Character entity by ID.
-func (cuo *CharacterUpdateOne) SetSimplifiedOfID(id int) *CharacterUpdateOne {
-	cuo.mutation.SetSimplifiedOfID(id)
+// AddSimplifiedOfIDs adds the "simplified_of" edge to the Character entity by IDs.
+func (cuo *CharacterUpdateOne) AddSimplifiedOfIDs(ids ...int) *CharacterUpdateOne {
+	cuo.mutation.AddSimplifiedOfIDs(ids...)
 	return cuo
 }
 
-// SetNillableSimplifiedOfID sets the "simplified_of" edge to the Character entity by ID if the given value is not nil.
-func (cuo *CharacterUpdateOne) SetNillableSimplifiedOfID(id *int) *CharacterUpdateOne {
-	if id != nil {
-		cuo = cuo.SetSimplifiedOfID(*id)
+// AddSimplifiedOf adds the "simplified_of" edges to the Character entity.
+func (cuo *CharacterUpdateOne) AddSimplifiedOf(c ...*Character) *CharacterUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return cuo
-}
-
-// SetSimplifiedOf sets the "simplified_of" edge to the Character entity.
-func (cuo *CharacterUpdateOne) SetSimplifiedOf(c *Character) *CharacterUpdateOne {
-	return cuo.SetSimplifiedOfID(c.ID)
+	return cuo.AddSimplifiedOfIDs(ids...)
 }
 
 // SetTraditionalToSimplifiedID sets the "traditional_to_simplified" edge to the Character entity by ID.
@@ -1521,10 +1547,25 @@ func (cuo *CharacterUpdateOne) Mutation() *CharacterMutation {
 	return cuo.mutation
 }
 
-// ClearSimplifiedOf clears the "simplified_of" edge to the Character entity.
+// ClearSimplifiedOf clears all "simplified_of" edges to the Character entity.
 func (cuo *CharacterUpdateOne) ClearSimplifiedOf() *CharacterUpdateOne {
 	cuo.mutation.ClearSimplifiedOf()
 	return cuo
+}
+
+// RemoveSimplifiedOfIDs removes the "simplified_of" edge to Character entities by IDs.
+func (cuo *CharacterUpdateOne) RemoveSimplifiedOfIDs(ids ...int) *CharacterUpdateOne {
+	cuo.mutation.RemoveSimplifiedOfIDs(ids...)
+	return cuo
+}
+
+// RemoveSimplifiedOf removes "simplified_of" edges to Character entities.
+func (cuo *CharacterUpdateOne) RemoveSimplifiedOf(c ...*Character) *CharacterUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.RemoveSimplifiedOfIDs(ids...)
 }
 
 // ClearTraditionalToSimplified clears the "traditional_to_simplified" edge to the Character entity.
@@ -1811,7 +1852,7 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 	}
 	if cuo.mutation.SimplifiedOfCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   character.SimplifiedOfTable,
 			Columns: []string{character.SimplifiedOfColumn},
@@ -1825,9 +1866,28 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := cuo.mutation.RemovedSimplifiedOfIDs(); len(nodes) > 0 && !cuo.mutation.SimplifiedOfCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   character.SimplifiedOfTable,
+			Columns: []string{character.SimplifiedOfColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: character.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := cuo.mutation.SimplifiedOfIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   character.SimplifiedOfTable,
 			Columns: []string{character.SimplifiedOfColumn},
@@ -1846,7 +1906,7 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 	}
 	if cuo.mutation.TraditionalToSimplifiedCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   character.TraditionalToSimplifiedTable,
 			Columns: []string{character.TraditionalToSimplifiedColumn},
@@ -1862,7 +1922,7 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 	}
 	if nodes := cuo.mutation.TraditionalToSimplifiedIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   character.TraditionalToSimplifiedTable,
 			Columns: []string{character.TraditionalToSimplifiedColumn},
