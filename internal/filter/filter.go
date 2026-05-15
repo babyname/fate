@@ -17,9 +17,8 @@ var defaultFilter = newFilter()
 // character query filtering, stroke-based filtering, WuGe luck checks,
 // gender filtering, and display name formatting.
 type Filter interface {
-	// FilterType returns the active CharacterFilterType used for stroke selection.
 	FilterType() CharacterFilterType
-	// CustomFilter applies a named custom filter with the given value.
+	PoetryMode() int
 	CustomFilter(name string, v any) error
 	// QueryCharacterFilter applies character-level predicates to a CharacterQuery.
 	QueryCharacterFilter(query *ent.CharacterQuery) *ent.CharacterQuery
@@ -52,6 +51,7 @@ type filter struct {
 	strokeMode                 StrokeMode
 	nameStyle                  NameStyle
 	genderFilter               string
+	poetryMode                 int
 	requireCharacters          []string
 	avoidPinyin                []string
 	checkSkipSexFilter         func(lucky *wuge.WuGeResult) bool
@@ -69,6 +69,10 @@ type filter struct {
 // FilterType returns the active CharacterFilterType.
 func (f *filter) FilterType() CharacterFilterType {
 	return f.characterFilterType
+}
+
+func (f *filter) PoetryMode() int {
+	return f.poetryMode
 }
 
 // CheckSkipStrokeNumberScope checks if any stroke value falls outside the configured scope.
@@ -231,6 +235,7 @@ func NewFilter(fo FilterOption) Filter {
 	f.genderFilter = fo.GenderFilter
 	f.requireCharacters = fo.RequireCharacters
 	f.avoidPinyin = fo.AvoidPinyin
+	f.poetryMode = fo.PoetryMode
 
 	if fo.SexFilter {
 		f.checkSkipSexFilter = func(lucky *wuge.WuGeResult) bool {

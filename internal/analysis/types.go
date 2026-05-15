@@ -47,6 +47,14 @@ type ScoreDetail struct {
 	WuGeShuLi      float64 `json:"wu_ge_shu_li"`
 }
 
+type PoetrySourceInfo struct {
+	Title    string `json:"title"`
+	Author   string `json:"author"`
+	Dynasty  string `json:"dynasty"`
+	Sentence string `json:"sentence"`
+	Type     string `json:"type"`
+}
+
 // NameResult represents a single name analysis result
 type NameResult struct {
 	Rank         int           `json:"rank"`
@@ -66,8 +74,9 @@ type NameResult struct {
 	ZhouYi       *ZhouYiResult `json:"zhou_yi"`
 	Score        float64       `json:"score"`
 	Grade        string        `json:"grade"`
-	ScoreDetail  ScoreDetail   `json:"score_detail"`
-	Interpret    string        `json:"interpret"`
+	ScoreDetail  ScoreDetail       `json:"score_detail"`
+	Interpret    string            `json:"interpret"`
+	PoetrySource *PoetrySourceInfo `json:"poetry_source,omitempty"`
 }
 
 // BaziSection represents bazi information section
