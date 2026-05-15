@@ -7,9 +7,11 @@ import (
 	"sync/atomic"
 
 	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/ent/character"
 	"github.com/babyname/fate/internal/analysis"
 	filterpkg "github.com/babyname/fate/internal/filter"
 	"github.com/babyname/fate/internal/naming"
+	"github.com/babyname/fate/internal/poetry"
 	"github.com/babyname/fate/internal/rating"
 	"github.com/babyname/fate/internal/repository"
 	"github.com/babyname/fate/internal/wuge"
@@ -46,14 +48,15 @@ type Session interface {
 }
 
 type session struct {
-	ctx        context.Context
-	cancel     context.CancelFunc
-	db         *repository.Repository
-	group      errgroup.Group
-	state      int32
-	filter     filterpkg.Filter
-	outputDone chan struct{}
-	fateData   *v2.FateData
+	ctx         context.Context
+	cancel      context.CancelFunc
+	db          *repository.Repository
+	group       errgroup.Group
+	state       int32
+	filter      filterpkg.Filter
+	outputDone  chan struct{}
+	fateData    *v2.FateData
+	poetryNamer *poetry.Namer
 
 	chars map[int][]*ent.Character
 
@@ -64,9 +67,10 @@ type session struct {
 // NewSession 创建一个新的命名会话。
 func NewSession(db *repository.Repository, f filterpkg.Filter) Session {
 	return &session{
-		db:     db,
-		chars:  make(map[int][]*ent.Character, 128),
-		filter: f,
+		db:          db,
+		chars:       make(map[int][]*ent.Character, 128),
+		filter:      f,
+		poetryNamer: poetry.NewNamer(db.Client),
 	}
 }
 
@@ -200,42 +204,47 @@ func (s *session) generate() error {
 		}
 	}
 
+	type scoredEntry struct {
+		name         naming.FirstName
+		score        float64
+		grade        string
+		poetrySource *analysis.PoetrySourceInfo
+	}
+
+	poetryMode := s.filter.PoetryMode()
+
 	var candidates []naming.FirstName
-	for i := range lucky {
-		tmp := &lucky[i]
-		if s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) {
-			continue
-		}
-		if s.filter.CheckSkipSexFilter(tmp) {
-			continue
-		}
-		if s.filter.CheckSkipDaYanFilter(tmp) {
-			continue
-		}
-		if s.filter.CheckSkipWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
-			continue
-		}
+	if poetryMode != 2 {
+		for i := range lucky {
+			tmp := &lucky[i]
+			if s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) {
+				continue
+			}
+			if s.filter.CheckSkipSexFilter(tmp) {
+				continue
+			}
+			if s.filter.CheckSkipDaYanFilter(tmp) {
+				continue
+			}
+			if s.filter.CheckSkipWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
+				continue
+			}
 
-		f1s := s.chars[tmp.FirstStroke1]
-		f2s := s.chars[tmp.FirstStroke2]
+			f1s := s.chars[tmp.FirstStroke1]
+			f2s := s.chars[tmp.FirstStroke2]
 
-		for i1 := range f1s {
-			for i2 := range f2s {
-				select {
-				case <-s.Context().Done():
-					s.SetState(SessionStateCanceled)
-					return nil
-				default:
-					candidates = append(candidates, naming.FirstName{f1s[i1], f2s[i2]})
+			for i1 := range f1s {
+				for i2 := range f2s {
+					select {
+					case <-s.Context().Done():
+						s.SetState(SessionStateCanceled)
+						return nil
+					default:
+						candidates = append(candidates, naming.FirstName{f1s[i1], f2s[i2]})
+					}
 				}
 			}
 		}
-	}
-
-	type scoredEntry struct {
-		name  naming.FirstName
-		score float64
-		grade string
 	}
 
 	rater := rating.NewRater(s.fateData)
@@ -243,6 +252,79 @@ func (s *session) generate() error {
 	for _, fn := range candidates {
 		nr := rater.RateName("", fn[0], fn[1])
 		scored = append(scored, scoredEntry{name: fn, score: nr.TotalScore, grade: nr.Grade})
+	}
+
+	if poetryMode > 0 && s.fateData != nil && s.fateData.WuxingXiji != nil {
+		xiWuxing := s.fateData.WuxingXiji.XiWuxing
+		if len(xiWuxing) >= 2 {
+			pairs, err := s.poetryNamer.FindPairsByWuXing(s.Context(), xiWuxing[0], xiWuxing[1], 100)
+			if err != nil {
+				log.Error("find poetry pairs", err)
+			} else {
+				for _, pair := range pairs {
+					nr := rater.RateName("", pair.Char1, pair.Char2)
+					bonus := 0.0
+					if poetryMode == 1 {
+						bonus = 5.0
+					}
+					ps := &analysis.PoetrySourceInfo{}
+					if len(pair.Sources) > 0 {
+						ps.Title = pair.Sources[0].Title
+						ps.Author = pair.Sources[0].Author
+						ps.Dynasty = pair.Sources[0].Dynasty
+						ps.Sentence = pair.Sources[0].Sentence
+						ps.Type = pair.Sources[0].Type
+					}
+					scored = append(scored, scoredEntry{
+						name:         naming.FirstName{pair.Char1, pair.Char2},
+						score:        nr.TotalScore + bonus,
+						grade:        nr.Grade,
+						poetrySource: ps,
+					})
+				}
+			}
+		} else if len(xiWuxing) == 1 {
+			chars, err := s.poetryNamer.FindCharsByWuXing(s.Context(), xiWuxing[0], 50)
+			if err != nil {
+				log.Error("find poetry chars", err)
+			} else {
+				for _, cr := range chars {
+					c1, err := s.db.Character.Query().Where(
+						character.CharEQ(cr.Char),
+					).First(s.Context())
+					if err != nil {
+						continue
+					}
+					for stroke, charsList := range s.chars {
+						for _, c2 := range charsList {
+							if c2.Char == cr.Char {
+								continue
+							}
+							nr := rater.RateName("", c1, c2)
+							ps := &analysis.PoetrySourceInfo{}
+							if len(cr.Sources) > 0 {
+								ps.Title = cr.Sources[0].Title
+								ps.Author = cr.Sources[0].Author
+								ps.Dynasty = cr.Sources[0].Dynasty
+								ps.Sentence = cr.Sources[0].Sentence
+								ps.Type = cr.Sources[0].Type
+							}
+							bonus := 0.0
+							if poetryMode == 1 {
+								bonus = 3.0
+							}
+							_ = stroke
+							scored = append(scored, scoredEntry{
+								name:         naming.FirstName{c1, c2},
+								score:        nr.TotalScore + bonus,
+								grade:        nr.Grade,
+								poetrySource: ps,
+							})
+						}
+					}
+				}
+			}
+		}
 	}
 
 	sort.Slice(scored, func(i, j int) bool {
@@ -264,6 +346,7 @@ func (s *session) generate() error {
 	topResults := make([]analysis.NameResult, 0, topN)
 	for i := 0; i < topN; i++ {
 		nr := analysis.BuildNameResult(i+1, surname, scored[i].name[0], scored[i].name[1], l1, l2, s.fateData)
+		nr.PoetrySource = scored[i].poetrySource
 		topResults = append(topResults, nr)
 	}
 

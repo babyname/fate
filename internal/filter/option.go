@@ -82,6 +82,9 @@ type FilterOption struct {
 
 	// Pinyin options
 	AvoidPinyin []string // Pinyin to avoid (for better sound)
+
+	// Poetry options
+	PoetryMode int // 0=off, 1=prefer, 2=only
 }
 
 // NewDefaultFilterOption creates a FilterOption with sensible defaults.
@@ -166,5 +169,10 @@ func (fo FilterOption) WithRequireCharacters(chars ...string) FilterOption {
 // WithAvoidPinyin adds pinyin to avoid for better phonetic results.
 func (fo FilterOption) WithAvoidPinyin(pinyin ...string) FilterOption {
 	fo.AvoidPinyin = append(fo.AvoidPinyin, pinyin...)
+	return fo
+}
+
+func (fo FilterOption) WithPoetryMode(mode int) FilterOption {
+	fo.PoetryMode = mode
 	return fo
 }
