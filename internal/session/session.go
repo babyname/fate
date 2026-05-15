@@ -98,10 +98,15 @@ func (s *session) Start(input *Input) error {
 	}
 	s.output.SetLastName(ln)
 
+	method := v2.XiYongMethodBalance
+	if s.filter.XiYongMethod() == "geju" {
+		method = v2.XiYongMethodGeJu
+	}
 	fateData, err := v2.GetFateData(&v2.FateInput{
 		BirthDate: input.Born,
 		Gender:    int(input.Sex),
 		Surname:   input.Last[0],
+		Method:    method,
 	})
 	if err != nil {
 		log.Error("get fate data", err)
@@ -180,29 +185,7 @@ func (s *session) generate() error {
 	strokes := getLastStrokeFromBasic(s.filter, basic)
 	lucky := wuge.GetLuckyByLastName(strokes[0], strokes[1])
 
-	strokesNeeded := make(map[int]struct{})
-	for i := range lucky {
-		tmp := &lucky[i]
-		if !s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) &&
-			!s.filter.CheckSkipSexFilter(tmp) &&
-			!s.filter.CheckSkipDaYanFilter(tmp) &&
-			!s.filter.CheckSkipWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
-			strokesNeeded[tmp.FirstStroke1] = struct{}{}
-			strokesNeeded[tmp.FirstStroke2] = struct{}{}
-		}
-	}
-
-	for stroke := range strokesNeeded {
-		if _, ok := s.chars[stroke]; !ok {
-			cs, err := s.db.GetCharactersCached(s.Context(), stroke, s.filter.QueryStrokeFilter(stroke), s.filter.QueryRegularFilter)
-			if err != nil {
-				log.Error("preload characters", err)
-				s.SetState(SessionStateFailed)
-				return err
-			}
-			s.chars[stroke] = cs
-		}
-	}
+	s.preloadChars(lucky)
 
 	type scoredEntry struct {
 		name         naming.FirstName
@@ -213,41 +196,19 @@ func (s *session) generate() error {
 
 	poetryMode := s.filter.PoetryMode()
 
-	var candidates []naming.FirstName
-	if poetryMode != 2 {
-		for i := range lucky {
-			tmp := &lucky[i]
-			if s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) {
-				continue
-			}
-			if s.filter.CheckSkipSexFilter(tmp) {
-				continue
-			}
-			if s.filter.CheckSkipDaYanFilter(tmp) {
-				continue
-			}
-			if s.filter.CheckSkipWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
-				continue
-			}
-
-			f1s := s.chars[tmp.FirstStroke1]
-			f2s := s.chars[tmp.FirstStroke2]
-
-			for i1 := range f1s {
-				for i2 := range f2s {
-					select {
-					case <-s.Context().Done():
-						s.SetState(SessionStateCanceled)
-						return nil
-					default:
-						candidates = append(candidates, naming.FirstName{f1s[i1], f2s[i2]})
-					}
-				}
-			}
-		}
+	candidates := s.filterCandidates(lucky)
+	if len(candidates) == 0 && s.filter.FilterStrictness() != "relaxed" {
+		s.filter.SetFilterStrictness("moderate")
+		s.preloadChars(lucky)
+		candidates = s.filterCandidates(lucky)
+	}
+	if len(candidates) == 0 && s.filter.FilterStrictness() != "relaxed" {
+		s.filter.SetFilterStrictness("relaxed")
+		s.preloadChars(lucky)
+		candidates = s.filterCandidates(lucky)
 	}
 
-	rater := rating.NewRater(s.fateData)
+	rater := rating.NewRaterWithStrokes(s.fateData, strokes[0], strokes[1])
 	scored := make([]scoredEntry, 0, len(candidates))
 	for _, fn := range candidates {
 		nr := rater.RateName("", fn[0], fn[1])
@@ -366,6 +327,68 @@ func (s *session) generate() error {
 
 	s.SetState(SessionStateFinish)
 	return nil
+}
+
+func (s *session) preloadChars(lucky []wuge.WuGeResult) {
+	strokesNeeded := make(map[int]struct{})
+	for i := range lucky {
+		tmp := &lucky[i]
+		if !s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) &&
+			!s.filter.CheckSkipSexFilter(tmp) &&
+			!s.filter.CheckSkipDaYanFilter(tmp) &&
+			!s.filter.CheckSkipWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
+			strokesNeeded[tmp.FirstStroke1] = struct{}{}
+			strokesNeeded[tmp.FirstStroke2] = struct{}{}
+		}
+	}
+
+	for stroke := range strokesNeeded {
+		if _, ok := s.chars[stroke]; !ok {
+			cs, err := s.db.GetCharactersCached(s.Context(), stroke, s.filter.QueryStrokeFilter(stroke), s.filter.QueryRegularFilter)
+			if err != nil {
+				log.Error("preload characters", err)
+				continue
+			}
+			s.chars[stroke] = cs
+		}
+	}
+}
+
+func (s *session) filterCandidates(lucky []wuge.WuGeResult) []naming.FirstName {
+	if s.filter.PoetryMode() == 2 {
+		return nil
+	}
+	var candidates []naming.FirstName
+	for i := range lucky {
+		tmp := &lucky[i]
+		if s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) {
+			continue
+		}
+		if s.filter.CheckSkipSexFilter(tmp) {
+			continue
+		}
+		if s.filter.CheckSkipDaYanFilter(tmp) {
+			continue
+		}
+		if s.filter.CheckSkipWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
+			continue
+		}
+
+		f1s := s.chars[tmp.FirstStroke1]
+		f2s := s.chars[tmp.FirstStroke2]
+
+		for i1 := range f1s {
+			for i2 := range f2s {
+				select {
+				case <-s.Context().Done():
+					return candidates
+				default:
+					candidates = append(candidates, naming.FirstName{f1s[i1], f2s[i2]})
+				}
+			}
+		}
+	}
+	return candidates
 }
 
 func (s *session) close() {
