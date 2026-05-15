@@ -74,10 +74,12 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 }
 
 type GenerateRequest struct {
-	Surname    string `json:"surname"`
-	Born       string `json:"born"`
-	Sex        string `json:"sex"`
-	PoetryMode int    `json:"poetry_mode"`
+	Surname         string `json:"surname"`
+	Born            string `json:"born"`
+	Sex             string `json:"sex"`
+	PoetryMode      int    `json:"poetry_mode"`
+	XiYongMethod    string `json:"xiyong_method"`
+	FilterStrictness string `json:"filter_strictness"`
 }
 
 type GenerateResponse struct {
@@ -131,6 +133,8 @@ func (s *Server) handleGenerate(w http.ResponseWriter, r *http.Request) {
 	filterOpt.DaYanFilter = true
 	filterOpt.WuXingFilter = true
 	filterOpt.PoetryMode = req.PoetryMode
+	filterOpt.XiYongMethod = req.XiYongMethod
+	filterOpt.FilterStrictness = req.FilterStrictness
 
 	sess := s.fate.NewSessionWithFilter(filterpkg.NewFilter(filterOpt))
 
