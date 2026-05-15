@@ -143,6 +143,7 @@ func (f *filterCache) GetOne(idx int) ([2]*ent.Character, bool) {
 	return ret.Value, true
 }
 
+// NewCache 创建一个新的名字过滤器缓存实例。
 func NewCache() FilterCache {
 	return &filterCache{
 		done:   make(chan struct{}),
@@ -150,6 +151,7 @@ func NewCache() FilterCache {
 	}
 }
 
+// NewCacheWithPut 使用指定的过滤器创建名字缓存实例。
 func NewCacheWithPut(filter *PutFilter) FilterCache {
 	return &filterCache{
 		done:   make(chan struct{}),

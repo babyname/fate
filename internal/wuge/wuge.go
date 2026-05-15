@@ -1,5 +1,6 @@
 package wuge
 
+// WuGe 表示五格（天格、人格、地格、外格、总格）的计算结果。
 type WuGe struct {
 	tianGe int
 	renGe  int
@@ -8,26 +9,32 @@ type WuGe struct {
 	zongGe int
 }
 
+// ZongGe 返回总格数理。
 func (ge *WuGe) ZongGe() int {
 	return ge.zongGe
 }
 
+// WaiGe 返回外格数理。
 func (ge *WuGe) WaiGe() int {
 	return ge.waiGe
 }
 
+// DiGe 返回地格数理。
 func (ge *WuGe) DiGe() int {
 	return ge.diGe
 }
 
+// RenGe 返回人格数理。
 func (ge *WuGe) RenGe() int {
 	return ge.renGe
 }
 
+// TianGe 返回天格数理。
 func (ge *WuGe) TianGe() int {
 	return ge.tianGe
 }
 
+// CalcWuGe 根据姓氏笔画（l1、l2）和名字笔画（f1、f2）计算五格数理。
 func CalcWuGe(l1, l2, f1, f2 int) *WuGe {
 	return &WuGe{
 		tianGe: tianGe(l1, l2, f1, f2),

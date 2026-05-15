@@ -147,6 +147,7 @@ var simplifiedToTraditional = map[string]string{
 	"梓": "梓", "萱": "萱", "安": "安", "宇": "宇",
 }
 
+// GetTraditionalChar 将简体字转换为对应的繁体字，若无映射则返回原字
 func GetTraditionalChar(simplified string) string {
 	if v, ok := simplifiedToTraditional[simplified]; ok {
 		return v

@@ -1,0 +1,74 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - staticcheck
+    - unused
+    - ineffassign
+    - misspell
+    - revive
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+
+  revive:
+    rules:
+      - name: exported
+        arguments:
+          - "checkPrivateReceivers"
+      - name: unused-parameter
+      - name: unreachable-code
+      - name: context-as-argument
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: if-return
+      - name: increment-decrement
+      - name: var-naming
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: indent-error-flow
+      - name: errorf
+      - name: unnecessary-stmt
+
+  misspell:
+    locale: US
+
+  goimports:
+    local-prefixes: github.com/babyname/fate
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - revive
+    - path: ent/
+      linters:
+        - revive
+        - misspell
+    - path: cmd/
+      linters:
+        - revive
+      text: "package-comments"
+
+  max-issues-per-linter: 50
+  max-same-issues: 10
+
+severity:
+  default-severity: warning

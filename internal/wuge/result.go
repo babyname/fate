@@ -7,7 +7,8 @@ import (
 
 const maxStroke = 30
 
-type WuGeResult struct {
+// WuGeResult 表示五格计算结果，包含各格数理及总格吉凶信息。
+type WuGeResult struct { //nolint:revive // 类型名以包名前缀开头是有意为之，表示五格专属结果
 	FirstStroke1 int
 	FirstStroke2 int
 	TianGe       int
@@ -21,10 +22,11 @@ type WuGeResult struct {
 }
 
 var (
-	luckyOnce sync.Once
+	luckyOnce  sync.Once
 	luckyTable [maxStroke + 1][maxStroke + 1][]WuGeResult
 )
 
+// GetLuckyByLastName 根据姓氏笔画查找所有吉利的五格组合。
 func GetLuckyByLastName(l1, l2 int) []WuGeResult {
 	if l1 < 1 || l1 > maxStroke || l2 < 0 || l2 > maxStroke {
 		return nil
@@ -74,5 +76,5 @@ func calcWuGeResult(l1, l2, f1, f2 int) WuGeResult {
 }
 
 func isLucky(s string) bool {
-	return strings.Index(s, "吉") != -1
+	return strings.Contains(s, "吉")
 }
