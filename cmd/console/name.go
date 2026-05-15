@@ -22,6 +22,8 @@ func cmdName() *cobra.Command {
 	var output string
 	var filter string
 	var sex string
+	var xiyong string
+	var strictness string
 	cmd := &cobra.Command{
 		Use:   "name",
 		Short: "生成姓名列表",
@@ -41,6 +43,8 @@ func cmdName() *cobra.Command {
 				DaYanFilter:         true,
 				WuXingFilter:        true,
 				SexFilter:           false,
+				XiYongMethod:        xiyong,
+				FilterStrictness:    strictness,
 			}))
 			fmt.Println("last", last)
 			l, ok := getLastChar(last)
@@ -99,6 +103,8 @@ func cmdName() *cobra.Command {
 	cmd.Flags().StringVarP(&sex, "sex", "s", "boy", "设置新生儿性别")
 	cmd.Flags().StringVarP(&filter, "filter", "f", "", "从结果中过滤掉指定汉字")
 	cmd.Flags().StringVarP(&output, "output", "o", "", "设置输出路径")
+	cmd.Flags().StringVar(&xiyong, "xiyong", "balance", "喜用神算法: balance(平衡用神法) 或 geju(格局用神法)")
+	cmd.Flags().StringVar(&strictness, "strictness", "moderate", "五格筛选严格度: strict, moderate, relaxed")
 
 	cmd.AddCommand(cmdNameDetail())
 	return cmd

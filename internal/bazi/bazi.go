@@ -181,18 +181,14 @@ func (z *BaZi) point() *BaZi {
 }
 
 func (z *BaZi) calcSimilar() *BaZi {
-	for i := range sheng {
-		if wuXingTianGan[z.RiZhu()] == sheng[i] {
-			z.xiyong.Similar = append(z.xiyong.Similar, sheng[i])
-			z.xiyong.SimilarPoint = z.xiyong.GetFen(sheng[i])
-			if i == 0 {
-				i = len(sheng) - 1
-				z.xiyong.Similar = append(z.xiyong.Similar, sheng[i])
-				z.xiyong.SimilarPoint += z.xiyong.GetFen(sheng[i])
-			} else {
-				z.xiyong.Similar = append(z.xiyong.Similar, sheng[i-1])
-				z.xiyong.SimilarPoint += z.xiyong.GetFen(sheng[i-1])
-			}
+	riZhuWX := wuXingTianGan[z.RiZhu()]
+	for i, wx := range sheng {
+		if riZhuWX == wx {
+			z.xiyong.Similar = append(z.xiyong.Similar, wx)
+			z.xiyong.SimilarPoint = z.xiyong.GetFen(wx)
+			shengWX := sheng[(i+4)%5]
+			z.xiyong.Similar = append(z.xiyong.Similar, shengWX)
+			z.xiyong.SimilarPoint += z.xiyong.GetFen(shengWX)
 			break
 		}
 	}

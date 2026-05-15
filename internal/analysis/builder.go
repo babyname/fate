@@ -75,7 +75,7 @@ func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int
 	}
 
 	var nr *rating.NameRating
-	rater := rating.NewRater(fateData)
+	rater := rating.NewRaterWithStrokes(fateData, l1, l2)
 	nr = rater.RateName(surname, c1, c2)
 
 	strokeStr := fmt.Sprintf("%d,%d,%d", l1, f1, f2)
@@ -87,7 +87,7 @@ func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int
 	traditionalChar2 := getTraditionalChar(c2)
 
 	zhouyiResult := CalcZhouYi(l1, l2, f1, f2)
-	scoreDetail := calcScoreDetail(nr, zhouyiResult, c1, c2, fateData)
+	scoreDetail := calcScoreDetail(nr)
 
 	return NameResult{
 		Rank:      rank,

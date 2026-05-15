@@ -83,9 +83,5 @@ func waiGe(l1, l2, _, f2 int) (n int) {
 }
 
 func zongGe(l1, l2, f1, f2 int) int {
-	zg := (l1 + l2 + f1 + f2) - 1
-	if zg < 0 {
-		zg = zg + 81
-	}
-	return zg%81 + 1
+	return l1 + l2 + f1 + f2
 }

@@ -152,6 +152,21 @@ body{font-family:"Noto Serif SC","Source Han Serif SC","SimSun","Songti SC",seri
             <option value="2">仅限诗词</option>
           </select>
         </div>
+        <div class="form-group">
+          <label>喜用神算法</label>
+          <div style="display:flex;gap:16px;padding-top:6px">
+            <label style="font-size:0.9rem;font-weight:400;display:flex;align-items:center;gap:4px"><input type="radio" name="xiyong_method" value="balance" checked> 平衡用神法</label>
+            <label style="font-size:0.9rem;font-weight:400;display:flex;align-items:center;gap:4px"><input type="radio" name="xiyong_method" value="geju"> 格局用神法</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>五格筛选严格度</label>
+          <select id="filter_strictness">
+            <option value="strict">严格（四格全吉+三才大吉/吉）</option>
+            <option value="moderate" selected>适中（三格吉+三才吉多于凶）</option>
+            <option value="relaxed">宽松（人格总格吉+三才吉凶参半）</option>
+          </select>
+        </div>
       </div>
       <div class="btn-row">
         <button class="btn btn-primary" id="btn-generate" onclick="generate()">开始起名</button>
@@ -238,6 +253,9 @@ function generate(){
   var born=document.getElementById('born').value;
   var sex=document.getElementById('sex').value;
   var poetryMode=parseInt(document.getElementById('poetry_mode').value);
+  var xiyongMethodEl=document.querySelector('input[name="xiyong_method"]:checked');
+  var xiyongMethod=xiyongMethodEl?xiyongMethodEl.value:'balance';
+  var filterStrictness=document.getElementById('filter_strictness').value;
   var errEl=document.getElementById('generate-error');
   errEl.style.display='none';
 
@@ -256,7 +274,7 @@ function generate(){
   fetch('/api/generate',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({surname:surname,born:bornStr,sex:sex,poetry_mode:poetryMode})
+    body:JSON.stringify({surname:surname,born:bornStr,sex:sex,poetry_mode:poetryMode,xiyong_method:xiyongMethod,filter_strictness:filterStrictness})
   }).then(function(r){return r.json()}).then(function(data){
     btn.disabled=false;
     btn.textContent='开始起名';
