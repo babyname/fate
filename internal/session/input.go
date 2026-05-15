@@ -1,10 +1,13 @@
 package session
 
 import (
+	"sync"
 	"time"
 
 	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/internal/analysis"
 	"github.com/babyname/fate/internal/naming"
+	v2 "github.com/godcong/chronos/v2"
 )
 
 // Input 命名会话的输入参数，包含姓氏、出生时间和性别信息。
@@ -28,11 +31,22 @@ func (i *Input) Output() *Output {
 	return i.output
 }
 
-// Output 命名会话的输出结果，封装名字缓存和基础信息。
+// ScoredName 表示已评分的名字，包含名字字符、分数和等级。
+type ScoredName struct {
+	Name  naming.FirstName
+	Score float64
+	Grade string
+}
+
+// Output 命名会话的输出结果，封装名字缓存、基础信息和评分结果。
 type Output struct {
-	basic *naming.NameBasic
-	cache FilterCache
-	name  chan naming.FirstName
+	basic    *naming.NameBasic
+	cache    FilterCache
+	name     chan naming.FirstName
+	fateData *v2.FateData
+	topNames []analysis.NameResult
+	allNames []ScoredName
+	mu       sync.RWMutex
 }
 
 // Basic 返回命名的基础信息。
@@ -75,4 +89,42 @@ func (o *Output) Total() int {
 // SetCacheFilter 设置输出的名字过滤器缓存。
 func (o *Output) SetCacheFilter(filterCache *PutFilter) {
 	o.cache.SetFilter(filterCache)
+}
+
+// SetFateData 设置八字命理数据。
+func (o *Output) SetFateData(fd *v2.FateData) {
+	o.fateData = fd
+}
+
+// FateData 返回八字命理数据。
+func (o *Output) FateData() *v2.FateData {
+	return o.fateData
+}
+
+// SetTopNames 设置 Top10 详细分析结果。
+func (o *Output) SetTopNames(names []analysis.NameResult) {
+	o.mu.Lock()
+	o.topNames = names
+	o.mu.Unlock()
+}
+
+// TopNames 返回 Top10 详细分析结果。
+func (o *Output) TopNames() []analysis.NameResult {
+	o.mu.RLock()
+	defer o.mu.RUnlock()
+	return o.topNames
+}
+
+// SetAllNames 设置所有已评分的名字列表。
+func (o *Output) SetAllNames(names []ScoredName) {
+	o.mu.Lock()
+	o.allNames = names
+	o.mu.Unlock()
+}
+
+// AllNames 返回所有已评分的名字列表。
+func (o *Output) AllNames() []ScoredName {
+	o.mu.RLock()
+	defer o.mu.RUnlock()
+	return o.allNames
 }

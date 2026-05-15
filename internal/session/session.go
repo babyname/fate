@@ -3,15 +3,18 @@ package session
 
 import (
 	"context"
-	"sync"
+	"sort"
 	"sync/atomic"
 
 	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/internal/analysis"
 	filterpkg "github.com/babyname/fate/internal/filter"
 	"github.com/babyname/fate/internal/naming"
+	"github.com/babyname/fate/internal/rating"
 	"github.com/babyname/fate/internal/repository"
 	"github.com/babyname/fate/internal/wuge"
 	"github.com/babyname/fate/log"
+	v2 "github.com/godcong/chronos/v2"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -50,6 +53,7 @@ type session struct {
 	state      int32
 	filter     filterpkg.Filter
 	outputDone chan struct{}
+	fateData   *v2.FateData
 
 	chars map[int][]*ent.Character
 
@@ -89,6 +93,19 @@ func (s *session) Start(input *Input) error {
 		return err
 	}
 	s.output.SetLastName(ln)
+
+	fateData, err := v2.GetFateData(&v2.FateInput{
+		BirthDate: input.Born,
+		Gender:    int(input.Sex),
+		Surname:   input.Last[0],
+	})
+	if err != nil {
+		log.Error("get fate data", err)
+	} else {
+		s.fateData = fateData
+		s.output.SetFateData(fateData)
+	}
+
 	log.Info("generate", "base", s.output.Basic())
 	s.SetState(SessionStateGenerating)
 
@@ -183,7 +200,7 @@ func (s *session) generate() error {
 		}
 	}
 
-	wg := sync.WaitGroup{}
+	var candidates []naming.FirstName
 	for i := range lucky {
 		tmp := &lucky[i]
 		if s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) {
@@ -202,26 +219,68 @@ func (s *session) generate() error {
 		f1s := s.chars[tmp.FirstStroke1]
 		f2s := s.chars[tmp.FirstStroke2]
 
-		wg.Add(1)
-		go func(wg *sync.WaitGroup, f1s, f2s []*ent.Character) {
-			defer wg.Done()
-			for i1 := range f1s {
-				for i2 := range f2s {
-					select {
-					case <-s.Context().Done():
-						s.SetState(SessionStateCanceled)
-						return
-					default:
-						s.name <- naming.FirstName{
-							f1s[i1],
-							f2s[i2],
-						}
-					}
+		for i1 := range f1s {
+			for i2 := range f2s {
+				select {
+				case <-s.Context().Done():
+					s.SetState(SessionStateCanceled)
+					return nil
+				default:
+					candidates = append(candidates, naming.FirstName{f1s[i1], f2s[i2]})
 				}
 			}
-		}(&wg, f1s, f2s)
+		}
 	}
-	wg.Wait()
+
+	type scoredEntry struct {
+		name  naming.FirstName
+		score float64
+		grade string
+	}
+
+	rater := rating.NewRater(s.fateData)
+	scored := make([]scoredEntry, 0, len(candidates))
+	for _, fn := range candidates {
+		nr := rater.RateName("", fn[0], fn[1])
+		scored = append(scored, scoredEntry{name: fn, score: nr.TotalScore, grade: nr.Grade})
+	}
+
+	sort.Slice(scored, func(i, j int) bool {
+		return scored[i].score > scored[j].score
+	})
+
+	surname := ""
+	if basic.LastName[0] != nil {
+		surname = basic.LastName[0].Char
+	}
+	l1 := strokes[0]
+	l2 := strokes[1]
+
+	topN := 10
+	if topN > len(scored) {
+		topN = len(scored)
+	}
+
+	topResults := make([]analysis.NameResult, 0, topN)
+	for i := 0; i < topN; i++ {
+		nr := analysis.BuildNameResult(i+1, surname, scored[i].name[0], scored[i].name[1], l1, l2, s.fateData)
+		topResults = append(topResults, nr)
+	}
+
+	allScored := make([]ScoredName, 0, len(scored))
+	for _, se := range scored {
+		allScored = append(allScored, ScoredName{Name: se.name, Score: se.score, Grade: se.grade})
+	}
+	s.output.SetTopNames(topResults)
+	s.output.SetAllNames(allScored)
+
+	for _, se := range scored {
+		select {
+		case s.name <- se.name:
+		default:
+		}
+	}
+
 	s.SetState(SessionStateFinish)
 	return nil
 }
