@@ -28,7 +28,7 @@ func TestRateName(t *testing.T) {
 		Surname:   "张",
 	})
 
-	rater := NewRater(fateData)
+	rater := NewRaterWithStrokes(fateData, 11, 0)
 
 	c1 := &ent.Character{
 		Char:          "伟",
@@ -54,8 +54,8 @@ func TestRateName(t *testing.T) {
 	if rating.WuXingScore <= 0 || rating.WuXingScore > 100 {
 		t.Errorf("WuXingScore should be between 0 and 100, got %.1f", rating.WuXingScore)
 	}
-	if rating.BiHuaScore <= 0 || rating.BiHuaScore > 100 {
-		t.Errorf("BiHuaScore should be between 0 and 100, got %.1f", rating.BiHuaScore)
+	if rating.WuGeScore <= 0 || rating.WuGeScore > 100 {
+		t.Errorf("WuGeScore should be between 0 and 100, got %.1f", rating.WuGeScore)
 	}
 	if rating.YinYunScore <= 0 || rating.YinYunScore > 100 {
 		t.Errorf("YinYunScore should be between 0 and 100, got %.1f", rating.YinYunScore)
@@ -68,8 +68,10 @@ func TestRateName(t *testing.T) {
 	}
 
 	t.Logf("Total: %.1f (%s)", rating.TotalScore, rating.Grade)
+	t.Logf("WenHua: %.1f - %s", rating.WenHuaScore, rating.WenHuaDetail)
 	t.Logf("WuXing: %.1f - %s", rating.WuXingScore, rating.WuXingDetail)
-	t.Logf("BiHua: %.1f - %s", rating.BiHuaScore, rating.BiHuaDetail)
+	t.Logf("ShengXiao: %.1f - %s", rating.ShengXiaoScore, rating.ShengXiaoDetail)
+	t.Logf("WuGe: %.1f - %s", rating.WuGeScore, rating.WuGeDetail)
 	t.Logf("YinYun: %.1f - %s", rating.YinYunScore, rating.YinYunDetail)
 	t.Logf("Interpret: %s", rating.Interpret)
 }
@@ -102,7 +104,7 @@ func TestRateNameWithXiWuxing(t *testing.T) {
 		Surname:   "张",
 	})
 
-	rater := NewRater(fateData)
+	rater := NewRaterWithStrokes(fateData, 11, 0)
 
 	c1 := &ent.Character{
 		Char:          "浩",
@@ -118,6 +120,6 @@ func TestRateNameWithXiWuxing(t *testing.T) {
 	}
 
 	rating := rater.RateName("张", c1, c2)
-	t.Logf("浩然: Total=%.1f, WuXing=%.1f, Grade=%s", rating.TotalScore, rating.WuXingScore, rating.Grade)
+	t.Logf("浩然: Total=%.1f, WuXing=%.1f, WuGe=%.1f, Grade=%s", rating.TotalScore, rating.WuXingScore, rating.WuGeScore, rating.Grade)
 	t.Logf("Interpret: %s", rating.Interpret)
 }

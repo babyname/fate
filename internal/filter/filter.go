@@ -19,6 +19,9 @@ var defaultFilter = newFilter()
 type Filter interface {
 	FilterType() CharacterFilterType
 	PoetryMode() int
+	XiYongMethod() string
+	FilterStrictness() string
+	SetFilterStrictness(strictness string)
 	CustomFilter(name string, v any) error
 	// QueryCharacterFilter applies character-level predicates to a CharacterQuery.
 	QueryCharacterFilter(query *ent.CharacterQuery) *ent.CharacterQuery
@@ -52,6 +55,8 @@ type filter struct {
 	nameStyle                  NameStyle
 	genderFilter               string
 	poetryMode                 int
+	xiYongMethod               string
+	filterStrictness           string
 	requireCharacters          []string
 	avoidPinyin                []string
 	checkSkipSexFilter         func(lucky *wuge.WuGeResult) bool
@@ -73,6 +78,20 @@ func (f *filter) FilterType() CharacterFilterType {
 
 func (f *filter) PoetryMode() int {
 	return f.poetryMode
+}
+
+func (f *filter) XiYongMethod() string {
+	return f.xiYongMethod
+}
+
+func (f *filter) FilterStrictness() string {
+	return f.filterStrictness
+}
+
+func (f *filter) SetFilterStrictness(strictness string) {
+	f.filterStrictness = strictness
+	f.checkSkipDaYanFilter = daYanFilterForStrictness(strictness)
+	f.checkSkipWuXingFilter = wuXingFilterForStrictness(strictness)
 }
 
 // CheckSkipStrokeNumberScope checks if any stroke value falls outside the configured scope.
@@ -236,6 +255,8 @@ func NewFilter(fo FilterOption) Filter {
 	f.requireCharacters = fo.RequireCharacters
 	f.avoidPinyin = fo.AvoidPinyin
 	f.poetryMode = fo.PoetryMode
+	f.xiYongMethod = fo.XiYongMethod
+	f.filterStrictness = fo.FilterStrictness
 
 	if fo.SexFilter {
 		f.checkSkipSexFilter = func(lucky *wuge.WuGeResult) bool {
@@ -278,11 +299,11 @@ func NewFilter(fo FilterOption) Filter {
 	}
 
 	if fo.DaYanFilter {
-		f.checkSkipDaYanFilter = daYanFilter
+		f.checkSkipDaYanFilter = daYanFilterForStrictness(fo.FilterStrictness)
 	}
 
 	if fo.WuXingFilter {
-		f.checkSkipWuXingFilter = wuXingFilter
+		f.checkSkipWuXingFilter = wuXingFilterForStrictness(fo.FilterStrictness)
 	}
 
 	if fo.RegularFilter {
@@ -502,20 +523,55 @@ func regularFilter(query *ent.CharacterQuery) *ent.CharacterQuery {
 	return query.Where(character.RegularEQ(true), character.NameableEQ(true))
 }
 
-// wuXingFilter returns true if the SanCai WuXing combination should be skipped
-// (i.e. the combination does not pass the level-5 check).
-func wuXingFilter(ge int, ge2 int, ge3 int) bool {
-	sc := wuxing.NewSanCai(ge, ge2, ge3)
-	return !sc.Check(5)
+// wuXingFilterForStrictness returns a WuXing filter function whose strictness
+// determines the SanCai check level: strict uses level 6, relaxed uses level 4,
+// and the default uses level 5.
+func wuXingFilterForStrictness(strictness string) func(int, int, int) bool {
+	switch strictness {
+	case "strict":
+		return func(ge int, ge2 int, ge3 int) bool {
+			sc := wuxing.NewSanCai(ge, ge2, ge3)
+			return !sc.Check(6)
+		}
+	case "relaxed":
+		return func(ge int, ge2 int, ge3 int) bool {
+			sc := wuxing.NewSanCai(ge, ge2, ge3)
+			return !sc.Check(4)
+		}
+	default:
+		return func(ge int, ge2 int, ge3 int) bool {
+			sc := wuxing.NewSanCai(ge, ge2, ge3)
+			return !sc.Check(5)
+		}
+	}
 }
 
-// daYanFilter returns true if the WuGe result should be skipped because not all
-// four Ge positions (Di, Ren, Wai, Zong) are lucky.
-func daYanFilter(lucky *wuge.WuGeResult) bool {
-	return !isLucky(wuge.Find(lucky.DiGe).Lucky) ||
-		!isLucky(wuge.Find(lucky.RenGe).Lucky) ||
-		!isLucky(wuge.Find(lucky.WaiGe).Lucky) ||
-		!isLucky(wuge.Find(lucky.ZongGe).Lucky)
+// daYanFilterForStrictness returns a DaYan filter function whose strictness
+// determines how many Ge positions must be lucky: strict requires all four,
+// moderate requires Di, Ren, and Zong, and relaxed requires only Ren and Zong.
+func daYanFilterForStrictness(strictness string) func(*wuge.WuGeResult) bool {
+	switch strictness {
+	case "strict":
+		return func(lucky *wuge.WuGeResult) bool {
+			return !isLucky(wuge.Find(lucky.DiGe).Lucky) ||
+				!isLucky(wuge.Find(lucky.RenGe).Lucky) ||
+				!isLucky(wuge.Find(lucky.WaiGe).Lucky) ||
+				!isLucky(wuge.Find(lucky.ZongGe).Lucky)
+		}
+	case "moderate":
+		return func(lucky *wuge.WuGeResult) bool {
+			return !isLucky(wuge.Find(lucky.RenGe).Lucky) ||
+				!isLucky(wuge.Find(lucky.DiGe).Lucky) ||
+				!isLucky(wuge.Find(lucky.ZongGe).Lucky)
+		}
+	case "relaxed":
+		return func(lucky *wuge.WuGeResult) bool {
+			return !isLucky(wuge.Find(lucky.RenGe).Lucky) ||
+				!isLucky(wuge.Find(lucky.ZongGe).Lucky)
+		}
+	default:
+		return daYanFilterForStrictness("moderate")
+	}
 }
 
 // isLucky returns true if the luck description contains the character 吉.

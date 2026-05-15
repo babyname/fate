@@ -45,6 +45,7 @@ type ScoreDetail struct {
 	WuXingBaZi     float64 `json:"wu_xing_ba_zi"`
 	ShengXiao      float64 `json:"sheng_xiao"`
 	WuGeShuLi      float64 `json:"wu_ge_shu_li"`
+	YinYun         float64 `json:"yin_yun"`
 }
 
 type PoetrySourceInfo struct {
