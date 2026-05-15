@@ -4,11 +4,13 @@ import (
 	"github.com/babyname/fate/ent"
 )
 
+// PutFilter 名字过滤器，使用链表和字符索引实现名字的存储、过滤和移除。
 type PutFilter struct {
 	filterList map[string][]*Element[[2]*ent.Character]
 	list       *List[[2]*ent.Character]
 }
 
+// NewPutFilter 创建一个新的名字过滤器实例。
 func NewPutFilter() *PutFilter {
 	return &PutFilter{
 		filterList: make(map[string][]*Element[[2]*ent.Character], 128),
@@ -16,6 +18,7 @@ func NewPutFilter() *PutFilter {
 	}
 }
 
+// Put 将名字对添加到过滤器中，同时建立字符到链表节点的索引。
 func (f *PutFilter) Put(names ...[2]*ent.Character) {
 	for i := range names {
 		e := f.list.PushBack(names[i])
@@ -24,6 +27,7 @@ func (f *PutFilter) Put(names ...[2]*ent.Character) {
 	}
 }
 
+// Len 返回过滤器中名字的数量。
 func (f *PutFilter) Len() int {
 	return f.list.Len()
 }
@@ -59,6 +63,7 @@ func (f *PutFilter) gc() {
 	}
 }
 
+// Filter 按指定字符过滤名字，移除并返回包含该字符的所有名字对。
 func (f *PutFilter) Filter(s string) [][2]*ent.Character {
 	var filtered [][2]*ent.Character
 	if v, ok := f.filterList[s]; ok {

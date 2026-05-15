@@ -168,12 +168,12 @@ func (e *Exporter) transformCharacter(old oldCharacter) SeedCharacter {
 	}
 
 	sc := SeedCharacter{
-		Char:      old.Ch,
-		IsKangxi:  old.IsKangXi,
-		Regular:   old.Regular,
-		Nameable:  newNameable,
-		WuXing:    wx,
-		Source:    "character",
+		Char:     old.Ch,
+		IsKangxi: old.IsKangXi,
+		Regular:  old.Regular,
+		Nameable: newNameable,
+		WuXing:   wx,
+		Source:   "character",
 	}
 
 	sc.Pinyin = parseJSONString(old.PinYin)
@@ -287,13 +287,7 @@ func formatDaYan(dy wuge.DaYan) string {
 func transformWuXing(oldList []oldWuXing) []SeedWuXing {
 	result := make([]SeedWuXing, 0, len(oldList))
 	for _, old := range oldList {
-		result = append(result, SeedWuXing{
-			ID:      old.ID,
-			First:   old.First,
-			Second:  old.Second,
-			Third:   old.Third,
-			Fortune: old.Fortune,
-		})
+		result = append(result, SeedWuXing(old))
 	}
 	return result
 }
@@ -439,13 +433,6 @@ var kangxiRadicalNames = map[int]string{
 	199: "麻", 200: "黃", 201: "黍", 202: "黑", 203: "黹", 204: "黽",
 	205: "鼎", 206: "鼓", 207: "鼠", 208: "鼻", 209: "齊", 210: "齒",
 	211: "龍", 212: "龜", 213: "龠",
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
 
 func (e *Exporter) inferWuXingForChar(char, radical string) (string, string) {

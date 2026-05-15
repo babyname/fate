@@ -1,16 +1,21 @@
+// Package wuge 实现五格数理计算，包含大衍数查找与吉凶判断。
 package wuge
 
 import (
 	"fmt"
 )
 
+// Sex 表示性别的布尔类型，false 为男，true 为女。
 type Sex bool
 
+// 性别常量，SexBoy 为男性，SexGirl 为女性。
 const (
+	// SexBoy 表示男性。
 	SexBoy  Sex = false
 	SexGirl Sex = true
 )
 
+// DaYan 表示一个大衍数记录，包含数理编号、吉凶、性别适用性等信息。
 type DaYan struct {
 	Number  int
 	Lucky   string
@@ -20,6 +25,7 @@ type DaYan struct {
 	Comment string
 }
 
+// Max 为大衍数的最大值 81。
 const Max = 81
 
 var daYanList = [Max]DaYan{
@@ -106,14 +112,17 @@ var daYanList = [Max]DaYan{
 	{Number: 81, Lucky: "吉", SkyNine: "万物回春", Comment: "最吉之数，还本归元，吉祥重叠，富贵尊荣。"},
 }
 
+// IsNotSuitableSex 判断该大衍数是否不适合当前性别（女性不宜此数）。
 func (dy DaYan) IsNotSuitableSex() bool {
 	return dy.Sex == SexGirl
 }
 
+// IsMax 判断该大衍数是否为最大好运数。
 func (dy DaYan) IsMax() bool {
 	return dy.Max
 }
 
+// Find 根据数理编号查找对应的大衍数记录，编号为正整数，超过 81 则循环取模。
 func Find(number int) DaYan {
 	if number <= 0 {
 		panic(fmt.Sprintf("the number %v is negative", number))

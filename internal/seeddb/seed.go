@@ -1,5 +1,6 @@
 package seeddb
 
+// SeedCharacter 种子汉字数据，用于导入到目标数据库。
 type SeedCharacter struct {
 	Char              string   `json:"char"`
 	Unicode           string   `json:"unicode,omitempty"`
@@ -28,6 +29,7 @@ type SeedCharacter struct {
 	VariantOfChar     string   `json:"variant_of_char,omitempty"`
 }
 
+// SeedWuGeLucky 种子五格吉凶数据。
 type SeedWuGeLucky struct {
 	LastStroke1  int    `json:"last_stroke_1"`
 	LastStroke2  int    `json:"last_stroke_2"`
@@ -48,6 +50,7 @@ type SeedWuGeLucky struct {
 	ZongMax      bool   `json:"zong_max"`
 }
 
+// SeedWuXing 种子五行数据。
 type SeedWuXing struct {
 	ID      string `json:"id"`
 	First   string `json:"first"`
@@ -56,21 +59,24 @@ type SeedWuXing struct {
 	Fortune string `json:"fortune"`
 }
 
+// FieldChange 记录字段变更详情。
 type FieldChange struct {
-	Char      string `json:"char"`
-	Field     string `json:"field"`
-	OldValue  string `json:"old_value"`
-	NewValue  string `json:"new_value"`
-	Reason    string `json:"reason"`
-	Source    string `json:"source"`
+	Char     string `json:"char"`
+	Field    string `json:"field"`
+	OldValue string `json:"old_value"`
+	NewValue string `json:"new_value"`
+	Reason   string `json:"reason"`
+	Source   string `json:"source"`
 }
 
+// DataReport 数据质量报告。
 type DataReport struct {
 	Characters CharacterReport `json:"characters"`
 	WuGeLucky  WuGeLuckyReport `json:"wu_ge_lucky"`
 	WuXing     WuXingReport    `json:"wu_xing"`
 }
 
+// CharacterReport 汉字数据统计报告。
 type CharacterReport struct {
 	Total            int            `json:"total"`
 	WithWuXing       int            `json:"with_wu_xing"`
@@ -88,6 +94,7 @@ type CharacterReport struct {
 	StrokeIssues     []StrokeIssue  `json:"stroke_issues,omitempty"`
 }
 
+// StrokeIssue 笔画数据问题记录。
 type StrokeIssue struct {
 	Char    string `json:"char"`
 	Field   string `json:"field"`
@@ -95,6 +102,7 @@ type StrokeIssue struct {
 	Message string `json:"message"`
 }
 
+// WuGeLuckyReport 五格吉凶统计报告。
 type WuGeLuckyReport struct {
 	Total      int     `json:"total"`
 	LuckyCount int     `json:"lucky_count"`
@@ -103,6 +111,7 @@ type WuGeLuckyReport struct {
 	SexCount   int     `json:"sex_count"`
 }
 
+// WuXingReport 五行统计报告。
 type WuXingReport struct {
 	Total        int            `json:"total"`
 	LuckyCount   int            `json:"lucky_count"`
@@ -110,28 +119,32 @@ type WuXingReport struct {
 	FortuneDist  map[string]int `json:"fortune_distribution"`
 }
 
+// Exporter 从源数据库导出数据为种子 JSON 文件的导出器。
 type Exporter struct {
 	dbPath     string
 	seedDir    string
 	rawDataDir string
 	changes    []FieldChange
 
-	pinyinMap    map[string][]string // char -> []pinyin
-	totalStrokes map[string]int     // char -> stroke count
-	definitions  map[string]string   // char -> definition
-	wuxingMap    map[string]string   // char -> wuxing (from yw11.com)
-	rsUnicode    map[string]int      // char -> kangxi radical number (from kRSUnicode)
+	pinyinMap    map[string][]string
+	totalStrokes map[string]int
+	definitions  map[string]string
+	wuxingMap    map[string]string
+	rsUnicode    map[string]int
 }
 
+// Importer 将种子 JSON 数据导入到目标数据库的导入器。
 type Importer struct {
 	seedDir string
 	cfg     DBConfig
 }
 
+// Reporter 生成数据质量报告的报告器。
 type Reporter struct {
 	seedDir string
 }
 
+// DBConfig 数据库连接配置。
 type DBConfig struct {
 	Driver string
 	DSN    string
@@ -142,27 +155,30 @@ type DBConfig struct {
 	Name   string
 }
 
+// NewExporter 创建数据导出器实例。
 func NewExporter(dbPath, seedDir string, rawDataDirs ...string) *Exporter {
 	rawDataDir := "data/raw"
 	if len(rawDataDirs) > 0 {
 		rawDataDir = rawDataDirs[0]
 	}
 	return &Exporter{
-		dbPath:        dbPath,
-		seedDir:       seedDir,
-		rawDataDir:    rawDataDir,
-		pinyinMap:     make(map[string][]string),
-		totalStrokes:  make(map[string]int),
-		definitions:   make(map[string]string),
-		wuxingMap:     make(map[string]string),
-		rsUnicode:     make(map[string]int),
+		dbPath:       dbPath,
+		seedDir:      seedDir,
+		rawDataDir:   rawDataDir,
+		pinyinMap:    make(map[string][]string),
+		totalStrokes: make(map[string]int),
+		definitions:  make(map[string]string),
+		wuxingMap:    make(map[string]string),
+		rsUnicode:    make(map[string]int),
 	}
 }
 
+// NewImporter 创建数据导入器实例。
 func NewImporter(seedDir string, cfg DBConfig) *Importer {
 	return &Importer{seedDir: seedDir, cfg: cfg}
 }
 
+// NewReporter 创建数据报告器实例。
 func NewReporter(seedDir string) *Reporter {
 	return &Reporter{seedDir: seedDir}
 }

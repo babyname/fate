@@ -1,5 +1,6 @@
 package config
 
+// DBConfig 数据库连接配置
 type DBConfig struct {
 	Driver  string `json:"driver,omitempty"`
 	DSN     string `json:"dsn,omitempty"`
@@ -9,22 +10,4 @@ type DBConfig struct {
 	Pwd     string `json:"pwd,omitempty"`
 	Name    string `json:"name,omitempty"`
 	Timeout int    `json:"timeout,omitempty"`
-}
-
-func defaultDBSqlite3() DBConfig {
-	return DBConfig{
-		Name:   "fate",
-		Driver: "sqlite3",
-	}
-}
-
-func defaultDBMysql() DBConfig {
-	return DBConfig{
-		Host:   "127.0.0.1",
-		Port:   "3306",
-		User:   "root",
-		Pwd:    "111111",
-		Name:   "fate",
-		Driver: "mysql",
-	}
 }

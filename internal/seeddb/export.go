@@ -1,3 +1,5 @@
+// Package seeddb 提供种子数据库的导出与导入功能，支持从源 SQLite 数据库导出字符数据并生成 JSON 种子文件，
+// 以及将种子数据导入到目标数据库。
 package seeddb
 
 import (
@@ -11,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 
+	// import sqlite3 driver
 	_ "github.com/sqlite3ent/sqlite3"
 )
 
@@ -41,29 +44,29 @@ type oldCharacter struct {
 }
 
 type oldNCharacter struct {
-	ID             int
-	PinYin         string
-	Char           string
-	CharStroke     int
-	Radical        string
-	RadicalStroke  int
-	IsRegular      bool
-	IsSimplified   bool
-	SimplifiedID   string
-	IsTraditional  bool
-	TraditionalID  string
-	IsKangXi       bool
-	KangXiID       string
-	KangXiStroke   int
-	IsVariant      bool
-	VariantID      string
-	IsScience      bool
-	ScienceStroke  int
-	WuXing         string
-	Lucky          string
-	Explanation    string
-	Comment        string
-	NeedFix        bool
+	ID            int
+	PinYin        string
+	Char          string
+	CharStroke    int
+	Radical       string
+	RadicalStroke int
+	IsRegular     bool
+	IsSimplified  bool
+	SimplifiedID  string
+	IsTraditional bool
+	TraditionalID string
+	IsKangXi      bool
+	KangXiID      string
+	KangXiStroke  int
+	IsVariant     bool
+	VariantID     string
+	IsScience     bool
+	ScienceStroke int
+	WuXing        string
+	Lucky         string
+	Explanation   string
+	Comment       string
+	NeedFix       bool
 }
 
 type oldWuGeLucky struct {
@@ -82,8 +85,7 @@ type oldWuXing struct {
 	Fortune string
 }
 
-
-
+// Export 从源数据库导出数据并生成种子 JSON 文件。
 func (e *Exporter) Export() error {
 	log.Println("Loading external reference data...")
 	if err := e.loadUnihanData(); err != nil {
@@ -97,7 +99,11 @@ func (e *Exporter) Export() error {
 	if err != nil {
 		return fmt.Errorf("open database: %w", err)
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Printf("close db: %v", err)
+		}
+	}()
 
 	log.Println("Building ID→Char lookup from n_character...")
 	idToChar, err := e.buildIDLookup(db)
@@ -268,7 +274,7 @@ func (e *Exporter) buildIDLookup(db *sql.DB) (map[int]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("query n_character for lookup: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	lookup := make(map[int]string)
 	for rows.Next() {
@@ -287,7 +293,7 @@ func (e *Exporter) queryNCharacters(db *sql.DB) ([]oldNCharacter, error) {
 	if err != nil {
 		return nil, fmt.Errorf("query n_character: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var results []oldNCharacter
 	for rows.Next() {
@@ -315,7 +321,7 @@ func (e *Exporter) queryCharacters(db *sql.DB) ([]oldCharacter, error) {
 	if err != nil {
 		return nil, fmt.Errorf("query character: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var results []oldCharacter
 	for rows.Next() {
@@ -342,7 +348,7 @@ func (e *Exporter) queryWuGeLucky(db *sql.DB) ([]oldWuGeLucky, error) {
 	if err != nil {
 		return nil, fmt.Errorf("query wu_ge_lucky: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var results []oldWuGeLucky
 	for rows.Next() {
@@ -370,7 +376,7 @@ func (e *Exporter) queryWuXing(db *sql.DB) ([]oldWuXing, error) {
 	if err != nil {
 		return nil, fmt.Errorf("query wu_xing: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var results []oldWuXing
 	for rows.Next() {
@@ -486,7 +492,7 @@ func writeJSON(filename string, data interface{}) error {
 	if err != nil {
 		return fmt.Errorf("create %s: %w", filename, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", "  ")
@@ -498,7 +504,7 @@ func readJSON(filename string, v interface{}) error {
 	if err != nil {
 		return fmt.Errorf("open %s: %w", filename, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	if err := json.NewDecoder(f).Decode(v); err != nil {
 		return fmt.Errorf("decode %s: %w", filename, err)
@@ -565,7 +571,7 @@ func (e *Exporter) loadUnihanReadings(path string) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -639,7 +645,7 @@ func (e *Exporter) loadUnihanIRG(path string) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -667,11 +673,12 @@ func (e *Exporter) loadUnihanIRG(path string) error {
 		}
 		char := string(rune(r))
 
-		if field == "kTotalStrokes" {
+		switch field {
+		case "kTotalStrokes":
 			if strokes, err := strconv.Atoi(value); err == nil && e.totalStrokes[char] == 0 {
 				e.totalStrokes[char] = strokes
 			}
-		} else if field == "kRSUnicode" {
+		case "kRSUnicode":
 			rsValues := strings.Split(value, " ")
 			if len(rsValues) > 0 {
 				firstRS := rsValues[0]
