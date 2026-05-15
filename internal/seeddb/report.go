@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Generate 生成数据质量报告并保存到文件。
 func (r *Reporter) Generate() error {
 	report := DataReport{}
 

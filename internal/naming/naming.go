@@ -1,30 +1,35 @@
+// Package naming 提供姓名生成与评分功能，支持五行、笔画、音韵等多维度筛选与推荐。
 package naming
 
 import (
-	v2 "github.com/godcong/chronos/v2"
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/repository"
+	v2 "github.com/godcong/chronos/v2"
 )
 
+// Interface 定义姓名生成与评分的接口。
 type Interface interface {
 	FilterNames(char1, char2 []*ent.Character, filter *NameFilter) ([]*NameInfo, error)
 	RateNames(names []*NameInfo, fateData *v2.FateData) (*RatedNames, error)
 	RecommendNames(surname string, char1, char2 []*ent.Character, fateData *v2.FateData, opts *RecommendOptions) (*RecommendedNames, error)
 }
 
+// Naming 姓名生成与评分的核心实现。
 type Naming struct {
 	cfg    *config.Config
 	model  *repository.Repository
 	raters []Rater
 }
 
+// Rater 定义单个评分维度的接口。
 type Rater interface {
 	Rate(name *NameInfo, fateData *v2.FateData) (float64, string)
 	Name() string
 	Weight() float64
 }
 
+// NameInfo 表示一个姓名的基本信息。
 type NameInfo struct {
 	Surname   string         `json:"surname"`
 	GivenName string         `json:"given_name"`
@@ -33,6 +38,7 @@ type NameInfo struct {
 	Char2     *ent.Character `json:"char2"`
 }
 
+// RatedName 表示一个已评分的姓名。
 type RatedName struct {
 	Name   *NameInfo          `json:"name"`
 	Score  float64            `json:"score"`
@@ -41,20 +47,24 @@ type RatedName struct {
 	Notes  map[string]string  `json:"notes"`
 }
 
+// RatedNames 表示一组已评分的姓名集合。
 type RatedNames struct {
 	Names []*RatedName `json:"names"`
 }
 
+// RecommendedNames 表示一组推荐姓名及其数量。
 type RecommendedNames struct {
 	Names []*RecommendedName `json:"names"`
 	Count int                `json:"count"`
 }
 
+// RecommendedName 表示一个推荐姓名，包含评分结果和解读。
 type RecommendedName struct {
 	*RatedName
 	Interpretation string `json:"interpretation"`
 }
 
+// NameFilter 定义姓名筛选条件。
 type NameFilter struct {
 	PreferredWuxing []string
 	AvoidedWuxing   []string
@@ -65,12 +75,14 @@ type NameFilter struct {
 	OnlyRegular     bool
 }
 
+// RecommendOptions 定义姓名推荐的选项。
 type RecommendOptions struct {
 	MaxResults int
 	OnlyTop    bool
 	SortBy     string
 }
 
+// New 创建一个新的姓名生成与评分实例。
 func New(cfg *config.Config, model *repository.Repository) Interface {
 	n := &Naming{
 		cfg:   cfg,
@@ -86,6 +98,7 @@ func New(cfg *config.Config, model *repository.Repository) Interface {
 	return n
 }
 
+// FilterNames 根据筛选条件过滤字符组合，生成候选姓名列表。
 func (n *Naming) FilterNames(char1, char2 []*ent.Character, filter *NameFilter) ([]*NameInfo, error) {
 	if filter == nil {
 		filter = &NameFilter{
@@ -130,6 +143,7 @@ func (n *Naming) filterChar(c *ent.Character, filter *NameFilter) bool {
 	return true
 }
 
+// RateNames 对候选姓名列表进行多维度评分并排序。
 func (n *Naming) RateNames(names []*NameInfo, fateData *v2.FateData) (*RatedNames, error) {
 	rated := make([]*RatedName, 0, len(names))
 
@@ -164,6 +178,7 @@ func (n *Naming) rateName(name *NameInfo, fateData *v2.FateData) *RatedName {
 	}
 }
 
+// RecommendNames 根据八字命理数据推荐最优姓名。
 func (n *Naming) RecommendNames(surname string, char1, char2 []*ent.Character, fateData *v2.FateData, opts *RecommendOptions) (*RecommendedNames, error) {
 	if opts == nil {
 		opts = &RecommendOptions{
@@ -224,9 +239,9 @@ func scoreToGrade(score float64) string {
 	}
 }
 
-func generateInterpretation(r *RatedName, fateData *v2.FateData) string {
+func generateInterpretation(r *RatedName, _ *v2.FateData) string {
 	return r.Name.FullName + " - 评分: " + r.Grade
 }
 
-func sortRatedNames(names []*RatedName, sortBy string) {
+func sortRatedNames(_ []*RatedName, _ string) {
 }

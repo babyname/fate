@@ -1,3 +1,4 @@
+// Package rating 提供姓名评分功能，基于五行、笔画、音韵等维度对名字进行综合评价。
 package rating
 
 import (
@@ -5,10 +6,11 @@ import (
 	"math"
 	"strings"
 
-	v2 "github.com/godcong/chronos/v2"
 	"github.com/babyname/fate/ent"
+	v2 "github.com/godcong/chronos/v2"
 )
 
+// NameRating 表示姓名评分结果，包含各维度分数及详细说明。
 type NameRating struct {
 	WuXingScore  float64
 	BiHuaScore   float64
@@ -21,14 +23,17 @@ type NameRating struct {
 	YinYunDetail string
 }
 
+// Rater 姓名评分器，根据八字命理数据对姓名进行多维度评分。
 type Rater struct {
 	fateData *v2.FateData
 }
 
+// NewRater 创建一个新的评分器实例。
 func NewRater(fateData *v2.FateData) *Rater {
 	return &Rater{fateData: fateData}
 }
 
+// RateName 对姓名进行综合评分，返回包含各维度得分的评分结果。
 func (r *Rater) RateName(surname string, c1, c2 *ent.Character) *NameRating {
 	rating := &NameRating{}
 
@@ -190,11 +195,12 @@ func (r *Rater) generateInterpret(surname string, c1, c2 *ent.Character, rating 
 
 	if r.fateData != nil && r.fateData.WuxingXiji != nil {
 		parts = append(parts, fmt.Sprintf("日主%s五行属%s，", r.fateData.WuxingXiji.DayGan, r.fateData.WuxingXiji.DayWuxing))
-		if r.fateData.WuxingXiji.QiangRuo == "强" {
+		switch r.fateData.WuxingXiji.QiangRuo {
+		case "强":
 			parts = append(parts, "八字偏强，")
-		} else if r.fateData.WuxingXiji.QiangRuo == "弱" {
+		case "弱":
 			parts = append(parts, "八字偏弱，")
-		} else {
+		default:
 			parts = append(parts, "八字中和，")
 		}
 		parts = append(parts, fmt.Sprintf("喜用%s。", strings.Join(r.fateData.WuxingXiji.XiWuxing, "、")))

@@ -105,7 +105,7 @@ func TestGetLuckyByLastName_TotalCount(t *testing.T) {
 }
 
 func isLucky(s string) bool {
-	return strings.Index(s, "吉") != -1
+	return strings.Contains(s, "吉")
 }
 
 func BenchmarkGetLuckyByLastName(b *testing.B) {
