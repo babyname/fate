@@ -53,6 +53,13 @@ type Name = naming.Name
 type NameBasic = naming.NameBasic
 type FirstName = naming.FirstName
 
+type ScoredName = session.ScoredName
+
+const (
+	SexBoy  Sex = naming.SexBoy
+	SexGirl Sex = naming.SexGirl
+)
+
 var (
 	NewFilter     = filterpkg.NewFilter
 	DefaultFilter = filterpkg.DefaultFilter
