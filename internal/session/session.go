@@ -1,6 +1,8 @@
+// Package session 提供命名会话管理，负责控制命名生成的生命周期和并发调度。
 package session
 
 import (
+	"context"
 	"sync"
 	"sync/atomic"
 
@@ -10,20 +12,28 @@ import (
 	"github.com/babyname/fate/internal/repository"
 	"github.com/babyname/fate/internal/wuge"
 	"github.com/babyname/fate/log"
-	"golang.org/x/net/context"
 	"golang.org/x/sync/errgroup"
 )
 
+// SessionState 表示会话的运行状态。
+//
+//nolint:revive // stutter name is intentional: SessionState is clearer than State in a session package
 type SessionState int32
 
 const (
+	// SessionStateWaiting 会话等待启动。
 	SessionStateWaiting SessionState = iota
+	// SessionStateGenerating 会话正在生成名字。
 	SessionStateGenerating
+	// SessionStateFinish 会话已完成生成。
 	SessionStateFinish
+	// SessionStateCanceled 会话已被取消。
 	SessionStateCanceled
+	// SessionStateFailed 会话生成失败。
 	SessionStateFailed
 )
 
+// Session 定义命名会话的接口，提供启动、停止和等待等操作。
 type Session interface {
 	Context() context.Context
 	Start(input *Input) error
@@ -33,20 +43,21 @@ type Session interface {
 }
 
 type session struct {
-		ctx        context.Context
-		cancel     context.CancelFunc
-		db         *repository.Repository
-		group      errgroup.Group
-		state      int32
-		filter     filterpkg.Filter
-		outputDone chan struct{}
+	ctx        context.Context
+	cancel     context.CancelFunc
+	db         *repository.Repository
+	group      errgroup.Group
+	state      int32
+	filter     filterpkg.Filter
+	outputDone chan struct{}
 
-		chars map[int][]*ent.Character
+	chars map[int][]*ent.Character
 
 	name   chan naming.FirstName
 	output *Output
 }
 
+// NewSession 创建一个新的命名会话。
 func NewSession(db *repository.Repository, f filterpkg.Filter) Session {
 	return &session{
 		db:     db,

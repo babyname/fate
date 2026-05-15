@@ -4,8 +4,9 @@ import (
 	logger "github.com/babyname/fate/log"
 )
 
-var log logger.Logger
+var _ logger.Logger
 
+// Logger 设置包级别的日志记录器。
 func Logger(name string) {
-	log = logger.WithGroup(name)
+	_ = logger.WithGroup(name)
 }

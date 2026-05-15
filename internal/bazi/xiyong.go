@@ -2,11 +2,9 @@ package bazi
 
 import (
 	"math"
-	"strings"
-
-	"github.com/babyname/fate/ent"
 )
 
+// XiYong 表示八字喜用神的计算结果，包含五行分数及同类/异类信息。
 type XiYong struct {
 	WuXingFen          map[string]int
 	Similar            []string
@@ -16,8 +14,8 @@ type XiYong struct {
 }
 
 var sheng = []string{"木", "火", "土", "金", "水"}
-var ke = []string{"木", "土", "水", "火", "金"}
 
+// AddFen 为指定五行累加分数。
 func (xy *XiYong) AddFen(s string, point int) {
 	if xy.WuXingFen == nil {
 		xy.WuXingFen = make(map[string]int)
@@ -30,6 +28,7 @@ func (xy *XiYong) AddFen(s string, point int) {
 	}
 }
 
+// GetFen 获取指定五行的累计分数。
 func (xy *XiYong) GetFen(s string) (point int) {
 	if xy.WuXingFen == nil {
 		return 0
@@ -41,18 +40,19 @@ func (xy *XiYong) GetFen(s string) (point int) {
 }
 
 func (xy *XiYong) minFenWuXing(ss ...string) (wx string) {
-	min := math.MaxInt32
+	minFen := math.MaxInt32
 	for _, s := range ss {
-		if xy.WuXingFen[s] < min {
-			min = xy.WuXingFen[s]
+		if xy.WuXingFen[s] < minFen {
+			minFen = xy.WuXingFen[s]
 			wx = s
-		} else if xy.WuXingFen[s] == min {
+		} else if xy.WuXingFen[s] == minFen {
 			wx += s
 		}
 	}
 	return
 }
 
+// Shen 返回喜用神对应的五行属性。
 func (xy *XiYong) Shen() string {
 	if !xy.QiangRuo() {
 		return xy.minFenWuXing(xy.Similar...)
@@ -60,15 +60,7 @@ func (xy *XiYong) Shen() string {
 	return xy.minFenWuXing(xy.Heterogeneous...)
 }
 
+// QiangRuo 判断日主强弱，同类分数大于异类则为强。
 func (xy *XiYong) QiangRuo() bool {
 	return xy.SimilarPoint > xy.HeterogeneousPoint
-}
-
-func filterXiYong(yong string, cs ...*ent.Character) (b bool) {
-	for _, c := range cs {
-		if strings.Contains(yong, c.WuXing) {
-			return true
-		}
-	}
-	return false
 }

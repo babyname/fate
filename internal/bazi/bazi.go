@@ -1,3 +1,4 @@
+// Package bazi 实现八字命理计算，包括五行分析、喜用神推算等核心功能。
 package bazi
 
 import (
@@ -99,14 +100,17 @@ var wuXingDiZhi = map[string]string{
 	"亥": "水",
 }
 
+// WuXingTianGan 根据天干返回对应的五行属性。
 func WuXingTianGan(s string) string {
 	return wuXingTianGan[s]
 }
 
+// WuXingDiZhi 根据地支返回对应的五行属性。
 func WuXingDiZhi(s string) string {
 	return wuXingDiZhi[s]
 }
 
+// BaZi 表示一个八字命盘，包含四柱、五行及喜用神信息。
 type BaZi struct {
 	baZi   v2.EightChar
 	wuXing [4]string
@@ -114,6 +118,7 @@ type BaZi struct {
 	bridge *v2.Bridge
 }
 
+// NewBazi 根据日历创建八字命盘实例。
 func NewBazi(calendar v2.Calendar) *BaZi {
 	ec := calendar.Lunar().GetEightChar()
 	return &BaZi{
@@ -122,6 +127,7 @@ func NewBazi(calendar v2.Calendar) *BaZi {
 	}
 }
 
+// NewBaziFromBridge 根据桥接对象创建八字命盘实例。
 func NewBaziFromBridge(bridge *v2.Bridge) *BaZi {
 	ec := bridge.EightChar()
 	return &BaZi{
@@ -136,6 +142,7 @@ func (z *BaZi) String() string {
 	return siZhu[0] + siZhu[1] + siZhu[2] + siZhu[3]
 }
 
+// RiZhu 返回日柱的天干地支字符串。
 func (z *BaZi) RiZhu() string {
 	return z.baZi.GetSiZhu()[3]
 }
@@ -145,6 +152,7 @@ func (z *BaZi) calcXiYong() {
 	z.point().calcSimilar().calcHeterogeneous()
 }
 
+// XiYong 返回喜用神信息，若尚未计算则自动触发计算。
 func (z *BaZi) XiYong() *XiYong {
 	if z.xiyong == nil {
 		z.calcXiYong()
@@ -152,6 +160,7 @@ func (z *BaZi) XiYong() *XiYong {
 	return z.xiyong
 }
 
+// XiYongShen 返回喜用神对应的五行属性。
 func (z *BaZi) XiYongShen() string {
 	return z.XiYong().Shen()
 }
@@ -169,18 +178,6 @@ func (z *BaZi) point() *BaZi {
 		}
 	}
 	return z
-}
-
-func baziToWuXing(bazi []string) []string {
-	var wx []string
-	for idx, v := range bazi {
-		if idx%2 == 0 {
-			wx = append(wx, WuXingTianGan(v))
-		} else {
-			wx = append(wx, WuXingDiZhi(v))
-		}
-	}
-	return wx
 }
 
 func (z *BaZi) calcSimilar() *BaZi {

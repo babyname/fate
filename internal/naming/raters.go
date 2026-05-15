@@ -1,26 +1,31 @@
 package naming
 
 import (
-	v2 "github.com/godcong/chronos/v2"
 	"github.com/babyname/fate/config"
+	v2 "github.com/godcong/chronos/v2"
 )
 
+// WuxingRater 五行评分器，根据八字喜忌五行对名字进行评分。
 type WuxingRater struct {
 	cfg *config.Config
 }
 
+// NewWuxingRater 创建一个新的五行评分器。
 func NewWuxingRater(cfg *config.Config) *WuxingRater {
 	return &WuxingRater{cfg: cfg}
 }
 
+// Name 返回评分器名称。
 func (r *WuxingRater) Name() string {
 	return "wuxing"
 }
 
+// Weight 返回评分器权重。
 func (r *WuxingRater) Weight() float64 {
 	return r.cfg.Rate.WuxingWeight
 }
 
+// Rate 对姓名进行五行维度评分。
 func (r *WuxingRater) Rate(name *NameInfo, fateData *v2.FateData) (float64, string) {
 	if fateData == nil || fateData.WuxingXiji == nil {
 		return 60.0, "缺少八字信息"
@@ -76,23 +81,28 @@ func (r *WuxingRater) Rate(name *NameInfo, fateData *v2.FateData) (float64, stri
 	return score, noteStr
 }
 
+// BihuaRater 笔画评分器，根据康熙笔画对名字进行评分。
 type BihuaRater struct {
 	cfg *config.Config
 }
 
+// NewBihuaRater 创建一个新的笔画评分器。
 func NewBihuaRater(cfg *config.Config) *BihuaRater {
 	return &BihuaRater{cfg: cfg}
 }
 
+// Name 返回评分器名称。
 func (r *BihuaRater) Name() string {
 	return "bihua"
 }
 
+// Weight 返回评分器权重。
 func (r *BihuaRater) Weight() float64 {
 	return r.cfg.Rate.BihuaWeight
 }
 
-func (r *BihuaRater) Rate(name *NameInfo, fateData *v2.FateData) (float64, string) {
+// Rate 对姓名进行笔画维度评分。
+func (r *BihuaRater) Rate(name *NameInfo, _ *v2.FateData) (float64, string) {
 	score := 70.0
 	var notes []string
 
@@ -112,7 +122,7 @@ func (r *BihuaRater) Rate(name *NameInfo, fateData *v2.FateData) (float64, strin
 		notes = append(notes, name.Char2.Char+"笔画偏多/偏少")
 	}
 
-	diff := abs(stroke1-stroke2)
+	diff := abs(stroke1 - stroke2)
 	if diff <= 5 {
 		score += 10.0
 		notes = append(notes, "笔画搭配匀称")
@@ -145,23 +155,28 @@ func (r *BihuaRater) Rate(name *NameInfo, fateData *v2.FateData) (float64, strin
 	return score, noteStr
 }
 
+// YinyunRater 音韵评分器，根据拼音声调声母韵母对名字进行评分。
 type YinyunRater struct {
 	cfg *config.Config
 }
 
+// NewYinyunRater 创建一个新的音韵评分器。
 func NewYinyunRater(cfg *config.Config) *YinyunRater {
 	return &YinyunRater{cfg: cfg}
 }
 
+// Name 返回评分器名称。
 func (r *YinyunRater) Name() string {
 	return "yinyun"
 }
 
+// Weight 返回评分器权重。
 func (r *YinyunRater) Weight() float64 {
 	return r.cfg.Rate.YinyunWeight
 }
 
-func (r *YinyunRater) Rate(name *NameInfo, fateData *v2.FateData) (float64, string) {
+// Rate 对姓名进行音韵维度评分。
+func (r *YinyunRater) Rate(name *NameInfo, _ *v2.FateData) (float64, string) {
 	score := 70.0
 	var notes []string
 
