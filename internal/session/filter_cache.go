@@ -32,6 +32,13 @@ func (f *PutFilter) Len() int {
 	return f.list.Len()
 }
 
+// ForEach 遍历过滤器中的所有名字对，对每个名字调用 fn。
+func (f *PutFilter) ForEach(fn func([2]*ent.Character)) {
+	for e := f.list.Front(); e != nil; e = e.Next() {
+		fn(e.Value)
+	}
+}
+
 func (f *PutFilter) front() *Element[[2]*ent.Character] {
 	return f.list.Front()
 }
