@@ -11,6 +11,13 @@ import (
 // Sex 表示性别类型。
 type Sex int
 
+const (
+	// SexBoy 表示男性。
+	SexBoy  Sex = 1
+	// SexGirl 表示女性。
+	SexGirl Sex = 0
+)
+
 // NameBasic 表示姓名基础信息，包含姓氏、出生时间、八字和性别。
 type NameBasic struct {
 	LastName  [2]*ent.Character
