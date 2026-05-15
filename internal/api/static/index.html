@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fate 起名</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#8B2500;--primary-light:#C41E3A;--gold:#C9A96E;--gold-light:#E8D5B7;--bg:#FAF5EF;--bg-card:#FFFDF9;--text:#2C1810;--text-light:#6B5B4F;--border:#E8DDD0;--shadow:0 2px 12px rgba(139,37,0,0.08);--radius:12px}
+body{font-family:"Noto Serif SC","Source Han Serif SC","SimSun","Songti SC",serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.header{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);color:#fff;padding:32px 0 28px;text-align:center;position:relative;overflow:hidden}
+.header::before{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(201,169,110,0.1) 0%,transparent 60%);animation:shimmer 8s ease-in-out infinite}
+@keyframes shimmer{0%,100%{transform:translate(0,0)}50%{transform:translate(5%,5%)}}
+.header h1{font-size:2.4rem;font-weight:700;letter-spacing:0.15em;position:relative;z-index:1}
+.header h1 span{color:var(--gold)}
+.header p{font-size:0.95rem;opacity:0.85;margin-top:6px;position:relative;z-index:1;font-family:system-ui,-apple-system,sans-serif}
+.container{max-width:960px;margin:0 auto;padding:24px 16px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:24px}
+.card-title{font-size:1.25rem;font-weight:600;color:var(--primary);margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--gold-light);display:flex;align-items:center;gap:8px}
+.card-title::before{content:"◆";color:var(--gold);font-size:0.8rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:0.9rem;font-weight:600;color:var(--text-light)}
+.form-group input,.form-group select{padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:0.95rem;font-family:inherit;background:#fff;transition:border-color 0.2s,box-shadow 0.2s;outline:none}
+.form-group input:focus,.form-group select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,0.2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 32px;border:none;border-radius:8px;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.2s}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;box-shadow:0 4px 12px rgba(139,37,0,0.25)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(139,37,0,0.35)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.btn-secondary{background:var(--gold-light);color:var(--primary);border:1px solid var(--gold)}
+.btn-secondary:hover{background:var(--gold);color:#fff}
+.btn-row{display:flex;gap:12px;margin-top:20px;justify-content:center}
+.top-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.name-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden}
+.name-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(139,37,0,0.12);border-color:var(--gold)}
+.name-card::after{content:"";position:absolute;top:0;right:0;width:60px;height:60px;background:linear-gradient(135deg,transparent 50%,rgba(201,169,110,0.1) 50%)}
+.name-card .rank{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#fff}
+.rank-1{background:linear-gradient(135deg,#FFD700,#FFA500)}
+.rank-2{background:linear-gradient(135deg,#C0C0C0,#A0A0A0)}
+.rank-3{background:linear-gradient(135deg,#CD7F32,#A0522D)}
+.rank-n{background:var(--gold);color:var(--primary)}
+.name-card .name-text{font-size:1.6rem;font-weight:700;color:var(--primary);margin-bottom:8px}
+.name-card .name-meta{font-size:0.85rem;color:var(--text-light);display:flex;flex-wrap:wrap;gap:8px}
+.name-card .name-meta span{background:var(--gold-light);padding:2px 8px;border-radius:4px;font-family:system-ui,-apple-system,sans-serif}
+.name-card .score-bar{margin-top:12px;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.name-card .score-fill{height:100%;border-radius:3px;transition:width 0.6s ease}
+.score-high{background:linear-gradient(90deg,var(--gold),#D4A574)}
+.score-mid{background:linear-gradient(90deg,var(--primary-light),var(--primary))}
+.score-low{background:linear-gradient(90deg,#999,#666)}
+.name-card .poetry-tag{margin-top:10px;font-size:0.82rem;color:var(--primary-light);font-style:italic;border-left:3px solid var(--gold);padding-left:8px}
+.name-list{width:100%;border-collapse:separate;border-spacing:0}
+.name-list th{background:var(--gold-light);color:var(--primary);padding:10px 14px;text-align:left;font-size:0.85rem;font-weight:600;border-bottom:2px solid var(--gold)}
+.name-list th:first-child{border-radius:8px 0 0 0}
+.name-list th:last-child{border-radius:0 8px 0 0}
+.name-list td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:0.9rem;font-family:system-ui,-apple-system,sans-serif}
+.name-list tr:hover td{background:rgba(201,169,110,0.08)}
+.name-list .name-link{color:var(--primary);cursor:pointer;font-weight:600;font-family:inherit;text-decoration:none;border-bottom:1px dashed var(--gold)}
+.name-list .name-link:hover{color:var(--primary-light)}
+.pagination{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:16px;font-family:system-ui,-apple-system,sans-serif}
+.pagination button{padding:6px 14px;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:0.85rem;transition:all 0.2s}
+.pagination button:hover{border-color:var(--gold);color:var(--primary)}
+.pagination button:disabled{opacity:0.4;cursor:not-allowed}
+.pagination .page-info{font-size:0.85rem;color:var(--text-light)}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(44,24,16,0.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.modal-overlay.active{display:flex}
+.modal{background:var(--bg-card);border-radius:16px;max-width:680px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(139,37,0,0.2);position:relative}
+.modal-header{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;padding:20px 24px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1}
+.modal-header h2{font-size:1.5rem;letter-spacing:0.05em}
+.modal-close{width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s}
+.modal-close:hover{background:rgba(255,255,255,0.35)}
+.modal-body{padding:24px}
+.detail-section{margin-bottom:20px}
+.detail-section h3{font-size:1rem;color:var(--primary);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--gold-light)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.detail-item{padding:8px 12px;background:var(--bg);border-radius:8px;font-size:0.88rem;font-family:system-ui,-apple-system,sans-serif}
+.detail-item .label{color:var(--text-light);font-size:0.8rem;margin-bottom:2px}
+.detail-item .value{font-weight:600;color:var(--text)}
+.wuge-table{width:100%;border-collapse:collapse;font-size:0.85rem;font-family:system-ui,-apple-system,sans-serif}
+.wuge-table th{background:var(--gold-light);color:var(--primary);padding:8px 10px;text-align:center;font-weight:600}
+.wuge-table td{padding:8px 10px;text-align:center;border-bottom:1px solid var(--border)}
+.wuge-table .lucky{color:#2E7D32;font-weight:600}
+.wuge-table .unlucky{color:#C62828;font-weight:600}
+.score-display{text-align:center;padding:16px;margin-bottom:16px}
+.score-display .score-num{font-size:2.8rem;font-weight:700;background:linear-gradient(135deg,var(--primary),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.score-display .score-grade{font-size:1.1rem;color:var(--gold);font-weight:600;margin-top:4px}
+.poetry-box{background:linear-gradient(135deg,rgba(201,169,110,0.08),rgba(201,169,110,0.15));border:1px solid var(--gold-light);border-radius:8px;padding:16px;margin-top:8px}
+.poetry-box .poem-title{font-weight:600;color:var(--primary);margin-bottom:4px}
+.poetry-box .poem-meta{font-size:0.85rem;color:var(--text-light);margin-bottom:8px;font-family:system-ui,-apple-system,sans-serif}
+.poetry-box .poem-sentence{font-style:italic;line-height:1.8;color:var(--text)}
+.search-row{display:flex;gap:10px;margin-bottom:16px}
+.search-row input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:0.95rem;font-family:inherit;outline:none}
+.search-row input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,0.2)}
+.poetry-results{display:grid;gap:12px}
+.poetry-item{background:var(--bg);border-radius:8px;padding:14px;border-left:3px solid var(--gold)}
+.poetry-item .poem-title{font-weight:600;color:var(--primary)}
+.poetry-item .poem-meta{font-size:0.82rem;color:var(--text-light);margin:4px 0;font-family:system-ui,-apple-system,sans-serif}
+.poetry-item .poem-sentence{font-size:0.9rem;color:var(--text);line-height:1.7}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
+.tab{padding:10px 24px;border:none;background:none;font-size:0.95rem;font-weight:600;font-family:inherit;color:var(--text-light);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s}
+.tab:hover{color:var(--primary)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.loading{text-align:center;padding:40px;color:var(--text-light)}
+.loading .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:40px;color:var(--text-light)}
+.error-msg{background:#FFF0F0;border:1px solid #FFCDD2;color:#C62828;padding:12px 16px;border-radius:8px;margin:12px 0;font-size:0.9rem;font-family:system-ui,-apple-system,sans-serif}
+.footer{text-align:center;padding:24px;color:var(--text-light);font-size:0.82rem;font-family:system-ui,-apple-system,sans-serif}
+@media(max-width:640px){.form-grid{grid-template-columns:1fr}.top-grid{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.header h1{font-size:1.8rem}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Fate <span>起名</span></h1>
+  <p>基于八字命理 · 诗词典故 · 五格数理的智能起名系统</p>
+</div>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('generate')">起名</button>
+    <button class="tab" onclick="switchTab('poetry')">诗词查字</button>
+  </div>
+
+  <div id="tab-generate" class="tab-content active">
+    <div class="card">
+      <div class="card-title">输入信息</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>姓氏</label>
+          <input type="text" id="surname" placeholder="如：李" maxlength="2">
+        </div>
+        <div class="form-group">
+          <label>性别</label>
+          <select id="sex">
+            <option value="boy">男</option>
+            <option value="girl">女</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>出生日期</label>
+          <input type="datetime-local" id="born">
+        </div>
+        <div class="form-group">
+          <label>诗词模式</label>
+          <select id="poetry_mode">
+            <option value="0">关闭</option>
+            <option value="1" selected>偏好诗词</option>
+            <option value="2">仅限诗词</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-generate" onclick="generate()">开始起名</button>
+      </div>
+      <div id="generate-error" style="display:none" class="error-msg"></div>
+    </div>
+
+    <div id="results-area" style="display:none">
+      <div class="card">
+        <div class="card-title">推荐名字 Top 10</div>
+        <div id="top-names" class="top-grid"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">全部候选 <span id="total-count" style="font-size:0.85rem;color:var(--text-light);font-weight:400"></span></div>
+        <table class="name-list">
+          <thead>
+            <tr><th>序号</th><th>姓名</th><th>评分</th><th>等级</th><th>操作</th></tr>
+          </thead>
+          <tbody id="name-list-body"></tbody>
+        </table>
+        <div id="pagination" class="pagination"></div>
+      </div>
+    </div>
+
+    <div id="loading-area" style="display:none">
+      <div class="card">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>正在根据八字命理生成名字，请稍候...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-poetry" class="tab-content">
+    <div class="card">
+      <div class="card-title">诗词查字</div>
+      <div class="search-row">
+        <input type="text" id="poetry-char" placeholder="输入汉字，查找相关诗词典故" maxlength="1">
+        <button class="btn btn-secondary" onclick="searchPoetry()">搜索</button>
+      </div>
+      <div id="poetry-results" class="poetry-results"></div>
+      <div id="poetry-empty" class="empty" style="display:none">暂无结果，请输入其他汉字</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Fate 起名系统 · 基于传统文化智慧的智能起名</div>
+
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-name"></h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+var currentTaskID='';
+var currentPage=1;
+var pageSize=20;
+var totalNames=0;
+
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active')});
+  event.target.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function formatDateForAPI(dtLocal){
+  var parts=dtLocal.split('T');
+  if(parts.length!==2)return'';
+  var dp=parts[0].split('-');
+  var tp=parts[1].split(':');
+  return dp[0]+'/'+dp[1]+'/'+dp[2]+' '+tp[0]+':'+tp[1];
+}
+
+function generate(){
+  var surname=document.getElementById('surname').value.trim();
+  var born=document.getElementById('born').value;
+  var sex=document.getElementById('sex').value;
+  var poetryMode=parseInt(document.getElementById('poetry_mode').value);
+  var errEl=document.getElementById('generate-error');
+  errEl.style.display='none';
+
+  if(!surname){showError('请输入姓氏');return}
+  if(!born){showError('请选择出生日期');return}
+
+  var bornStr=formatDateForAPI(born);
+  if(!bornStr){showError('日期格式错误');return}
+
+  var btn=document.getElementById('btn-generate');
+  btn.disabled=true;
+  btn.textContent='生成中...';
+  document.getElementById('results-area').style.display='none';
+  document.getElementById('loading-area').style.display='block';
+
+  fetch('/api/generate',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({surname:surname,born:bornStr,sex:sex,poetry_mode:poetryMode})
+  }).then(function(r){return r.json()}).then(function(data){
+    btn.disabled=false;
+    btn.textContent='开始起名';
+    document.getElementById('loading-area').style.display='none';
+    if(data.error){showError(data.error);return}
+    currentTaskID=data.task_id;
+    totalNames=data.total||0;
+    renderTopNames(data.top_names||[]);
+    document.getElementById('total-count').textContent='共 '+totalNames+' 个';
+    document.getElementById('results-area').style.display='block';
+    currentPage=1;
+    loadNameList();
+  }).catch(function(e){
+    btn.disabled=false;
+    btn.textContent='开始起名';
+    document.getElementById('loading-area').style.display='none';
+    showError('请求失败: '+e.message);
+  });
+}
+
+function showError(msg){
+  var el=document.getElementById('generate-error');
+  el.textContent=msg;
+  el.style.display='block';
+}
+
+function renderTopNames(names){
+  var container=document.getElementById('top-names');
+  container.innerHTML='';
+  names.forEach(function(nr){
+    var card=document.createElement('div');
+    card.className='name-card';
+    card.onclick=function(){showDetail(nr)};
+
+    var rankClass=nr.rank<=3?'rank-'+nr.rank:'rank-n';
+    var scoreClass=nr.score>=80?'score-high':nr.score>=60?'score-mid':'score-low';
+    var scorePct=Math.min(nr.score,100);
+
+    var html='<div class="rank '+rankClass+'">'+nr.rank+'</div>';
+    html+='<div class="name-text">'+esc(nr.full_name)+'</div>';
+    html+='<div class="name-meta">';
+    html+='<span>'+esc(nr.char1.wu_xing)+'</span>';
+    html+='<span>'+esc(nr.char2.wu_xing)+'</span>';
+    html+='<span>'+nr.score.toFixed(1)+'分</span>';
+    html+='<span>'+esc(nr.grade)+'</span>';
+    html+='</div>';
+    html+='<div class="score-bar"><div class="score-fill '+scoreClass+'" style="width:'+scorePct+'%"></div></div>';
+    if(nr.poetry_source&&nr.poetry_source.title){
+      html+='<div class="poetry-tag">「'+esc(nr.poetry_source.sentence)+'」—— '+esc(nr.poetry_source.dynasty)+'·'+esc(nr.poetry_source.author)+'《'+esc(nr.poetry_source.title)+'》</div>';
+    }
+    card.innerHTML=html;
+    container.appendChild(card);
+  });
+}
+
+function loadNameList(){
+  fetch('/api/generate/'+currentTaskID+'/names?page='+currentPage+'&size='+pageSize)
+    .then(function(r){return r.json()})
+    .then(function(data){
+      if(data.error){return}
+      renderNameList(data.names||[]);
+      renderPagination(data.total,data.page,data.size);
+    });
+}
+
+function renderNameList(names){
+  var tbody=document.getElementById('name-list-body');
+  tbody.innerHTML='';
+  names.forEach(function(n,i){
+    var tr=document.createElement('tr');
+    var idx=(currentPage-1)*pageSize+i+1;
+    var fullName=(n.surname||'')+(n.char1||'')+(n.char2||'');
+    tr.innerHTML='<td>'+idx+'</td><td class="name-link" onclick="loadDetail(\''+esc(n.surname||'')+'\',\''+esc(n.char1||'')+'\',\''+esc(n.char2||'')+'\')">'+esc(fullName)+'</td><td>'+(n.score||0).toFixed(1)+'</td><td>'+esc(n.grade||'')+'</td><td><button class="btn btn-secondary" style="padding:4px 12px;font-size:0.8rem" onclick="loadDetail(\''+esc(n.surname||'')+'\',\''+esc(n.char1||'')+'\',\''+esc(n.char2||'')+'\')">详情</button></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function renderPagination(total,page,size){
+  var container=document.getElementById('pagination');
+  var totalPages=Math.ceil(total/size)||1;
+  var html='';
+  html+='<button '+(page<=1?'disabled':'')+' onclick="goPage('+(page-1)+')">上一页</button>';
+  html+='<span class="page-info">第 '+page+' / '+totalPages+' 页</span>';
+  html+='<button '+(page>=totalPages?'disabled':'')+' onclick="goPage('+(page+1)+')">下一页</button>';
+  container.innerHTML=html;
+}
+
+function goPage(p){
+  currentPage=p;
+  loadNameList();
+}
+
+function loadDetail(surname,char1,char2){
+  var born=document.getElementById('born').value;
+  var sex=document.getElementById('sex').value;
+  var bornStr=formatDateForAPI(born);
+  fetch('/api/name/detail?surname='+encodeURIComponent(surname)+'&char1='+encodeURIComponent(char1)+'&char2='+encodeURIComponent(char2)+'&born='+encodeURIComponent(bornStr)+'&sex='+sex)
+    .then(function(r){return r.json()})
+    .then(function(data){
+      if(data.error){alert(data.error);return}
+      showDetail(data.name_result);
+    });
+}
+
+function showDetail(nr){
+  if(!nr)return;
+  document.getElementById('modal-name').textContent=nr.full_name||'';
+
+  var body=document.getElementById('modal-body');
+  var html='';
+
+  html+='<div class="score-display">';
+  html+='<div class="score-num">'+(nr.score||0).toFixed(1)+'</div>';
+  html+='<div class="score-grade">'+esc(nr.grade||'')+'</div>';
+  html+='</div>';
+
+  if(nr.interpret){
+    html+='<div class="detail-section"><h3>综合解读</h3><p style="font-size:0.9rem;line-height:1.8">'+esc(nr.interpret)+'</p></div>';
+  }
+
+  html+='<div class="detail-section"><h3>汉字信息</h3><div class="detail-grid">';
+  html+=charInfoHTML('第一字',nr.char1);
+  html+=charInfoHTML('第二字',nr.char2);
+  html+='</div></div>';
+
+  if(nr.wu_ge){
+    html+='<div class="detail-section"><h3>五格分析</h3>';
+    html+='<table class="wuge-table"><thead><tr><th>格名</th><th>笔画</th><th>吉凶</th><th>阴阳五行</th><th>解读</th></tr></thead><tbody>';
+    var ges=[nr.wu_ge.tian_ge,nr.wu_ge.ren_ge,nr.wu_ge.di_ge,nr.wu_ge.wai_ge,nr.wu_ge.zong_ge];
+    ges.forEach(function(g){
+      if(!g)return;
+      var luckyClass=g.lucky&&g.lucky.indexOf('吉')>=0?'lucky':'unlucky';
+      html+='<tr><td>'+esc(g.name)+'</td><td>'+g.stroke+'</td><td class="'+luckyClass+'">'+esc(g.lucky)+'</td><td>'+esc(g.yin_yang_wu_xing)+'</td><td style="text-align:left;font-size:0.82rem">'+esc(g.analysis)+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+  }
+
+  html+='<div class="detail-section"><h3>三才运势</h3><div class="detail-grid">';
+  html+='<div class="detail-item"><div class="label">三才</div><div class="value">'+esc(nr.san_cai||'-')+'</div></div>';
+  html+='<div class="detail-item"><div class="label">三才吉凶</div><div class="value">'+esc(nr.san_cai_luck||'-')+'</div></div>';
+  html+='<div class="detail-item"><div class="label">基础运</div><div class="value">'+esc(nr.ji_chu_yun||'-')+'</div></div>';
+  html+='<div class="detail-item"><div class="label">成功运</div><div class="value">'+esc(nr.cheng_gong_yun||'-')+'</div></div>';
+  html+='<div class="detail-item"><div class="label">人际关系</div><div class="value">'+esc(nr.ren_ji_guan_xi||'-')+'</div></div>';
+  html+='<div class="detail-item"><div class="label">三才详析</div><div class="value" style="font-size:0.82rem">'+esc(nr.san_cai_detail||'-')+'</div></div>';
+  html+='</div></div>';
+
+  if(nr.score_detail){
+    html+='<div class="detail-section"><h3>评分明细</h3><div class="detail-grid">';
+    html+='<div class="detail-item"><div class="label">文化印象</div><div class="value">'+(nr.score_detail.wen_hua_yin_xiang||0).toFixed(1)+'</div></div>';
+    html+='<div class="detail-item"><div class="label">五行八字</div><div class="value">'+(nr.score_detail.wu_xing_ba_zi||0).toFixed(1)+'</div></div>';
+    html+='<div class="detail-item"><div class="label">生肖</div><div class="value">'+(nr.score_detail.sheng_xiao||0).toFixed(1)+'</div></div>';
+    html+='<div class="detail-item"><div class="label">五格数理</div><div class="value">'+(nr.score_detail.wu_ge_shu_li||0).toFixed(1)+'</div></div>';
+    html+='</div></div>';
+  }
+
+  if(nr.zhou_yi){
+    html+='<div class="detail-section"><h3>周易卦象</h3><div class="detail-grid">';
+    html+='<div class="detail-item"><div class="label">卦名</div><div class="value">'+esc(nr.zhou_yi.gua_name||'-')+'</div></div>';
+    html+='<div class="detail-item"><div class="label">卦辞</div><div class="value" style="font-size:0.82rem">'+esc(nr.zhou_yi.gua_ci||'-')+'</div></div>';
+    if(nr.zhou_yi.yao_ci){
+      html+='<div class="detail-item full" style="grid-column:1/-1"><div class="label">爻辞</div><div class="value" style="font-size:0.82rem">'+esc(nr.zhou_yi.yao_ci)+'</div></div>';
+    }
+    html+='</div></div>';
+  }
+
+  if(nr.poetry_source&&nr.poetry_source.title){
+    html+='<div class="detail-section"><h3>诗词出处</h3>';
+    html+='<div class="poetry-box">';
+    html+='<div class="poem-title">《'+esc(nr.poetry_source.title)+'》</div>';
+    html+='<div class="poem-meta">'+esc(nr.poetry_source.dynasty||'')+' · '+esc(nr.poetry_source.author||'')+(nr.poetry_source.type?' · '+esc(nr.poetry_source.type):'')+'</div>';
+    html+='<div class="poem-sentence">「'+esc(nr.poetry_source.sentence)+'」</div>';
+    html+='</div></div>';
+  }
+
+  body.innerHTML=html;
+  document.getElementById('detail-modal').classList.add('active');
+}
+
+function charInfoHTML(label,c){
+  if(!c)return'<div class="detail-item"><div class="label">'+label+'</div><div class="value">-</div></div>';
+  var html='';
+  html+='<div class="detail-item"><div class="label">'+label+' · 汉字</div><div class="value">'+esc(c.char||'-')+'</div></div>';
+  html+='<div class="detail-item"><div class="label">'+label+' · 五行</div><div class="value">'+esc(c.wu_xing||'-')+(c.is_xi_yong?' ★喜用':'')+'</div></div>';
+  html+='<div class="detail-item"><div class="label">'+label+' · 拼音</div><div class="value">'+esc(c.pinyin||'-')+'</div></div>';
+  html+='<div class="detail-item"><div class="label">'+label+' · 笔画</div><div class="value">姓名学'+c.science_stroke+' / 康熙'+c.kangxi_stroke+'</div></div>';
+  if(c.meaning){
+    html+='<div class="detail-item" style="grid-column:1/-1"><div class="label">'+label+' · 释义</div><div class="value" style="font-size:0.82rem">'+esc(c.meaning)+'</div></div>';
+  }
+  return html;
+}
+
+function closeModal(){
+  document.getElementById('detail-modal').classList.remove('active');
+}
+
+document.getElementById('detail-modal').addEventListener('click',function(e){
+  if(e.target===this)closeModal();
+});
+
+function searchPoetry(){
+  var char=document.getElementById('poetry-char').value.trim();
+  if(!char)return;
+  fetch('/api/poetry/search?char='+encodeURIComponent(char))
+    .then(function(r){return r.json()})
+    .then(function(data){
+      var container=document.getElementById('poetry-results');
+      var emptyEl=document.getElementById('poetry-empty');
+      container.innerHTML='';
+      if(data.error||!data.results||data.results.length===0){
+        emptyEl.style.display='block';
+        return;
+      }
+      emptyEl.style.display='none';
+      data.results.forEach(function(p){
+        var div=document.createElement('div');
+        div.className='poetry-item';
+        div.innerHTML='<div class="poem-title">《'+esc(p.title)+'》</div><div class="poem-meta">'+esc(p.dynasty||'')+' · '+esc(p.author||'')+(p.type?' · '+esc(p.type):'')+'</div><div class="poem-sentence">「'+esc(p.sentence)+'」</div>';
+        container.appendChild(div);
+      });
+    });
+}
+
+document.getElementById('poetry-char').addEventListener('keydown',function(e){
+  if(e.key==='Enter')searchPoetry();
+});
+
+function esc(s){
+  if(!s)return'';
+  var d=document.createElement('div');
+  d.textContent=s;
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>
