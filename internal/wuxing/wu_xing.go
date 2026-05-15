@@ -130,11 +130,13 @@ var luckyPoint = map[string]int{
 	"大凶": 1, "凶": 2, "凶多于吉": 3, "吉凶参半": 4, "吉多于凶": 5, "吉": 6, "大吉": 7,
 }
 
+// GetWuXing 根据三才五行字符串查找对应的吉凶描述。
 func GetWuXing(s string) (wx string, exist bool) {
 	wx, exist = wuXing[s]
 	return
 }
 
+// GetLuckyPoint 根据三才五行字符串返回吉凶分数，未找到则返回 -1。
 func GetLuckyPoint(s string) int {
 	wx, exist := GetWuXing(s)
 	if !exist {

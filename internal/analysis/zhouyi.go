@@ -6,6 +6,7 @@ import (
 	"github.com/godcong/yi"
 )
 
+// ZhouYiResult 表示周易卦象计算的结果
 type ZhouYiResult struct {
 	BenGuaName     string `json:"ben_gua_name"`
 	BenGuaDesc     string `json:"ben_gua_desc"`
@@ -23,6 +24,7 @@ type ZhouYiResult struct {
 	Score          int    `json:"score"`
 }
 
+// CalcZhouYi 根据姓名笔画数计算周易卦象结果
 func CalcZhouYi(l1, l2, f1, f2 int) *ZhouYiResult {
 	shang := (l1 + l2 + f1) % 8
 	if shang == 0 {

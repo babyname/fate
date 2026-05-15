@@ -1,6 +1,7 @@
 package seeddb
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -9,14 +10,16 @@ import (
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/database"
-	"golang.org/x/net/context"
 
+	// import mysql driver
 	_ "github.com/go-sql-driver/mysql"
+	// import sqlite3 driver
 	_ "github.com/sqlite3ent/sqlite3"
 )
 
 const batchSize = 500
 
+// Import 将种子数据导入到目标数据库。
 func (imp *Importer) Import() error {
 	ctx := context.Background()
 
@@ -35,7 +38,11 @@ func (imp *Importer) Import() error {
 	if err != nil {
 		return fmt.Errorf("connect database: %w", err)
 	}
-	defer client.Close()
+	defer func() {
+		if err := client.Close(); err != nil {
+			log.Printf("close client: %v", err)
+		}
+	}()
 
 	log.Printf("Connected to %s database", imp.cfg.Driver)
 

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0d1117; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; }
+.report { width: 780px; background: #161b22; border-radius: 16px; padding: 36px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 1px solid #30363d; }
+.header { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #30363d; }
+.header h1 { color: #f0e6d3; font-size: 28px; margin-bottom: 6px; }
+.header .meta { color: #8b949e; font-size: 13px; }
+.section { margin-bottom: 24px; }
+.section-title { color: #f0e6d3; font-size: 15px; font-weight: 600; margin-bottom: 12px; padding-left: 10px; border-left: 3px solid #d4a574; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+th { background: rgba(212,165,116,0.1); color: #d4a574; font-size: 12px; padding: 8px 12px; text-align: left; border-bottom: 1px solid #30363d; }
+td { color: #c9d1d9; font-size: 12px; padding: 7px 12px; border-bottom: 1px solid #21262d; }
+.lucky { color: #3fb950; } .half-lucky { color: #d29922; } .unlucky { color: #f85149; }
+.score-bar { display: flex; gap: 16px; margin-top: 12px; }
+.score-item { flex: 1; text-align: center; }
+.score-label { color: #8b949e; font-size: 11px; margin-bottom: 4px; }
+.score-value { color: #f0e6d3; font-size: 22px; font-weight: 700; }
+.score-total { color: #d4a574; font-size: 28px; font-weight: 700; }
+.gua { background: rgba(212,165,116,0.05); border: 1px solid #30363d; border-radius: 8px; padding: 14px; margin-top: 8px; }
+.gua-title { color: #d4a574; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.gua-items { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.gua-item { color: #c9d1d9; font-size: 12px; }
+.gua-item span { color: #8b949e; }
+</style>
+</head>
+<body>
+<div class="report">
+  <div class="header">
+    <h1>张驰筎</h1>
+    <div class="meta">格局用神法 · 正官格 · 庚金日主 · 强</div>
+  </div>
+  <div class="section">
+    <div class="section-title">八字信息</div>
+    <table>
+      <tr><th>项目</th><th>年柱</th><th>月柱</th><th>日柱</th><th>时柱</th></tr>
+      <tr><td>四柱</td><td>甲辰</td><td>庚午</td><td>庚戌</td><td>乙酉</td></tr>
+      <tr><td>五行</td><td>木土</td><td>金火</td><td>金土</td><td>木金</td></tr>
+      <tr><td>纳音</td><td>覆灯火</td><td>路旁土</td><td>钗钏金</td><td>泉中水</td></tr>
+    </table>
+  </div>
+  <div class="section">
+    <div class="section-title">五行喜忌</div>
+    <table>
+      <tr><th>用神</th><th>喜神</th><th>忌神</th><th>仇神</th><th>闲神</th></tr>
+      <tr><td class="lucky">火</td><td class="lucky">木、金</td><td class="unlucky">土</td><td class="unlucky">火</td><td>水</td></tr>
+    </table>
+  </div>
+  <div class="section">
+    <div class="section-title">五格图</div>
+    <table>
+      <tr><th>格</th><th>笔画</th><th>阴阳五行</th><th>吉凶</th><th>解析</th></tr>
+      <tr><td>天格</td><td>12</td><td>阴木</td><td class="unlucky">凶</td><td>无理之数，发展薄弱</td></tr>
+      <tr><td>人格</td><td>24</td><td>阴火</td><td class="lucky">吉</td><td>家门余庆，金钱丰盈</td></tr>
+      <tr><td>地格</td><td>25</td><td>阳土</td><td class="half-lucky">半吉</td><td>资性英敏，才能奇特</td></tr>
+      <tr><td>外格</td><td>13</td><td>阳火</td><td class="lucky">吉</td><td>才艺多能，智谋奇略</td></tr>
+      <tr><td>总格</td><td>36</td><td>阴土</td><td class="half-lucky">半吉</td><td>波澜重叠，侠肝义胆</td></tr>
+    </table>
+  </div>
+  <div class="section">
+    <div class="section-title">周易卦象</div>
+    <div class="gua">
+      <div class="gua-title">地天泰 → 山天大畜</div>
+      <div class="gua-items">
+        <div class="gua-item"><span>大象：</span>天地交泰，君子以裁成天地之道</div>
+        <div class="gua-item"><span>事业：</span>事业通达，万事亨通</div>
+        <div class="gua-item"><span>经商：</span>财运亨通，宜大胆经营</div>
+        <div class="gua-item"><span>婚恋：</span>感情和谐，天作之合</div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">综合评分</div>
+    <div class="score-bar">
+      <div class="score-item"><div class="score-label">文化印象</div><div class="score-value">100</div></div>
+      <div class="score-item"><div class="score-label">五行八字</div><div class="score-value">65</div></div>
+      <div class="score-item"><div class="score-label">生肖</div><div class="score-value">70</div></div>
+      <div class="score-item"><div class="score-label">五格数理</div><div class="score-value">80</div></div>
+      <div class="score-item"><div class="score-label">综合</div><div class="score-total">70</div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

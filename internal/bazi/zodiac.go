@@ -9,6 +9,7 @@ import (
 	v2 "github.com/godcong/chronos/v2"
 )
 
+// 十二生肖常量
 const (
 	ZodiacRat     = "鼠"
 	ZodiacCow     = "牛"
@@ -24,6 +25,7 @@ const (
 	ZodiacPig     = "猪"
 )
 
+// Zodiac 表示生肖信息，包含喜忌用字及部首。
 type Zodiac struct {
 	Name      string
 	Xi        string
@@ -99,6 +101,7 @@ var zodiacSupportList = map[string]bool{
 	ZodiacPig:     true,
 }
 
+// GetZodiac 根据日历获取对应的生肖信息。
 func GetZodiac(c v2.Calendar) *Zodiac {
 	z := c.Lunar().GetZodiac().String()
 	b := zodiacSupportList[z]
@@ -112,16 +115,13 @@ func GetZodiac(c v2.Calendar) *Zodiac {
 }
 
 func (z *Zodiac) zodiacJi(character *ent.Character) int {
-	if strings.IndexRune(z.Ji, []rune(character.Char)[0]) != -1 {
+	if strings.ContainsRune(z.Ji, []rune(character.Char)[0]) {
 		return -3
 	}
 	return 0
 }
 
-func filterZodiac(c v2.Calendar, chars ...*ent.Character) bool {
-	return GetZodiac(c).PointCheck(3, chars...)
-}
-
+// PointCheck 检查所有字符的生肖评分是否均达到指定下限。
 func (z *Zodiac) PointCheck(limit int, chars ...*ent.Character) bool {
 	for _, c := range chars {
 		if z.Point(c) < limit {
@@ -131,6 +131,7 @@ func (z *Zodiac) PointCheck(limit int, chars ...*ent.Character) bool {
 	return true
 }
 
+// Point 计算单个字符的生肖评分。
 func (z *Zodiac) Point(character *ent.Character) int {
 	dp := 3
 	dp += z.zodiacJi(character)
@@ -139,7 +140,7 @@ func (z *Zodiac) Point(character *ent.Character) int {
 }
 
 func (z *Zodiac) zodiacXi(character *ent.Character) int {
-	if strings.IndexRune(z.Xi, []rune(character.Char)[0]) != -1 {
+	if strings.ContainsRune(z.Xi, []rune(character.Char)[0]) {
 		return 2
 	}
 	return 0

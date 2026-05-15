@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0f0f1a; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Segoe UI', sans-serif; }
+.card { width: 800px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 20px; padding: 48px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.title { text-align: center; margin-bottom: 36px; }
+.title h1 { color: #e8d5b7; font-size: 42px; letter-spacing: 8px; margin-bottom: 8px; }
+.title p { color: #8b7e6a; font-size: 16px; letter-spacing: 4px; }
+.arch { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+.module { background: rgba(255,255,255,0.05); border: 1px solid rgba(232,213,183,0.15); border-radius: 12px; padding: 20px; text-align: center; }
+.module-icon { font-size: 28px; margin-bottom: 8px; }
+.module-name { color: #e8d5b7; font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.module-desc { color: #8b7e6a; font-size: 12px; line-height: 1.5; }
+.flow { display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; }
+.flow-item { background: rgba(232,213,183,0.1); border: 1px solid rgba(232,213,183,0.2); border-radius: 8px; padding: 10px 18px; color: #e8d5b7; font-size: 13px; }
+.flow-arrow { color: #8b7e6a; font-size: 18px; }
+.footer { text-align: center; margin-top: 28px; color: #5a5040; font-size: 12px; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="title">
+    <h1>命 运 起 名</h1>
+    <p>FATE — 现代科学取名工具</p>
+  </div>
+  <div class="arch">
+    <div class="module">
+      <div class="module-icon">🎂</div>
+      <div class="module-name">八字计算</div>
+      <div class="module-desc">四柱八字<br>五行强弱<br>调候用神</div>
+    </div>
+    <div class="module">
+      <div class="module-icon">☯️</div>
+      <div class="module-name">喜用神</div>
+      <div class="module-desc">平衡用神法<br>格局用神法<br>用/喜/忌/仇/闲</div>
+    </div>
+    <div class="module">
+      <div class="module-icon">📐</div>
+      <div class="module-name">三才五格</div>
+      <div class="module-desc">81数大衍<br>阴阳五行<br>O(1)预计算</div>
+    </div>
+    <div class="module">
+      <div class="module-icon">🔮</div>
+      <div class="module-name">周易卦象</div>
+      <div class="module-desc">64卦解读<br>本卦变卦<br>事业婚恋决策</div>
+    </div>
+    <div class="module">
+      <div class="module-icon">📊</div>
+      <div class="module-name">评分系统</div>
+      <div class="module-desc">文化印象<br>五行八字<br>生肖·五格数理</div>
+    </div>
+    <div class="module">
+      <div class="module-icon">📝</div>
+      <div class="module-name">报告输出</div>
+      <div class="module-desc">Text / Markdown<br>JSON<br>美名腾风格</div>
+    </div>
+  </div>
+  <div class="flow">
+    <div class="flow-item">生辰八字</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">喜用神分析</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">候选字筛选</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">五格评分</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">卦象分析</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">报告生成</div>
+  </div>
+  <div class="footer">Go 1.22+ · Ent ORM · SQLite3 · chronos/v2 · yi</div>
+</div>
+</body>
+</html>
