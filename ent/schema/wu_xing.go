@@ -13,7 +13,7 @@ type WuXing struct {
 
 func (WuXing) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id"),
+		field.Int("id"),
 		field.Time("created").Optional(),
 		field.Time("updated").Optional(),
 		field.Time("deleted").Optional(),
@@ -21,7 +21,8 @@ func (WuXing) Fields() []ent.Field {
 		field.String("first").Optional(),
 		field.String("second").Optional(),
 		field.String("third").Optional(),
-		field.String("fortune").Optional()}
+		field.String("fortune").Optional(),
+	}
 }
 func (WuXing) Edges() []ent.Edge {
 	return nil

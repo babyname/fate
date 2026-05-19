@@ -21,30 +21,6 @@ func (f CharacterFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CharacterMutation", m)
 }
 
-// The PoemFunc type is an adapter to allow the use of ordinary
-// function as Poem mutator.
-type PoemFunc func(context.Context, *ent.PoemMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f PoemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.PoemMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PoemMutation", m)
-}
-
-// The PoemCharFunc type is an adapter to allow the use of ordinary
-// function as PoemChar mutator.
-type PoemCharFunc func(context.Context, *ent.PoemCharMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f PoemCharFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.PoemCharMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PoemCharMutation", m)
-}
-
 // The VersionFunc type is an adapter to allow the use of ordinary
 // function as Version mutator.
 type VersionFunc func(context.Context, *ent.VersionMutation) (ent.Value, error)

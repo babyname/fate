@@ -15,7 +15,7 @@ import (
 type WuXing struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
+	ID int `json:"id,omitempty"`
 	// Created holds the value of the "created" field.
 	Created time.Time `json:"created,omitempty"`
 	// Updated holds the value of the "updated" field.
@@ -39,9 +39,9 @@ func (*WuXing) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case wuxing.FieldVersion:
+		case wuxing.FieldID, wuxing.FieldVersion:
 			values[i] = new(sql.NullInt64)
-		case wuxing.FieldID, wuxing.FieldFirst, wuxing.FieldSecond, wuxing.FieldThird, wuxing.FieldFortune:
+		case wuxing.FieldFirst, wuxing.FieldSecond, wuxing.FieldThird, wuxing.FieldFortune:
 			values[i] = new(sql.NullString)
 		case wuxing.FieldCreated, wuxing.FieldUpdated, wuxing.FieldDeleted:
 			values[i] = new(sql.NullTime)
@@ -61,11 +61,11 @@ func (wx *WuXing) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case wuxing.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				wx.ID = value.String
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
 			}
+			wx.ID = int(value.Int64)
 		case wuxing.FieldCreated:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created", values[i])

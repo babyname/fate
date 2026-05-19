@@ -1,11 +1,8 @@
-# 命运起名 Fate
+# fate
 
 <p align="center">
-  <strong>Modern Scientific Naming Tool — Intelligent Naming System Based on Bazi Wuxing · Sancai Wuge · Zhouyi Hexagrams</strong>
-</p>
-
-<p align="center">
-  <img src="docs/images/architecture.svg" alt="Architecture" width="800"/>
+  <strong>fate — Bazi Wuxing Naming Algorithm Engine</strong><br>
+  <em>Intelligent naming algorithm engine and CLI based on Bazi Wuxing, Sancai Wuge, and Zhouyi hexagrams</em>
 </p>
 
 <p align="center">
@@ -14,29 +11,37 @@
 
 ---
 
-## ✨ Features
+## Features
 
-- 🎂 **Bazi Calculation** — Four Pillars, Wuxing strength, Tiaohou Shen
-- ☯️ **Dual Xi-Yong Algorithm** — Balance Method + GeJu Method (10 pattern types)
-- 📐 **Sancai Wuge** — 81 Dayan numbers, Yin-Yang Wuxing, O(1) precomputed lookup (3.89ns/op)
-- 🔮 **Zhouyi Hexagrams** — 64 hexagram interpretations (Daxiang/Career/Business/Fame/Marriage/Decision)
-- 📊 **4-Dimension Scoring** — Cultural Impression / Wuxing Bazi / Zodiac / Wuge Shuli
-- 📝 **Multi-format Output** — Text / Markdown / JSON
-- 🏛️ **Simplified-Traditional Mapping** — 400+ character mapping table
+- Bazi Calculation — Four Pillars, Wuxing strength, Tiaohou Shen
+- Dual Xi-Yong Algorithm — Balance Method + GeJu Method (10 pattern types)
+- Sancai Wuge — 81 Dayan numbers, Yin-Yang Wuxing, O(1) lookup
+- Zhouyi Hexagrams — 64 hexagram interpretations
+- 5-Dimension Scoring — Cultural/Wuxing/Zodiac/Wuge/Yinyun
 
-## 📸 Report Preview
+---
 
-<p align="center">
-  <img src="docs/images/report_preview.svg" alt="Report Preview" width="800"/>
-</p>
+## About fate and qiming
 
-## 🚀 Quick Start
+**fate** is an open-source naming algorithm engine that provides core Bazi calculation, Xi-Yong analysis, Wuge filtering, and name generation capabilities, delivered as both a CLI tool and a Go library.
 
-### Prerequisites
+**qiming** is a commercial naming service built on top of fate, providing a web interface, poetry-based naming, and other end-user features.
+
+| | fate | qiming |
+|---|---|---|
+| Purpose | Algorithm engine + CLI | Commercial service |
+| Bazi/Xi-Yong/5D scoring | Included | Included |
+| Poetry naming | Not included | Included |
+| Web interface | Not included | Included |
+| Open source | Yes | No |
+
+---
+
+## Quick Start
+
+### Requirements
 
 - Go 1.22+
-- GCC (SQLite3 CGO dependency)
-- SQLite3
 
 ### Install
 
@@ -46,142 +51,153 @@ cd fate
 go mod download
 ```
 
-### Generate Name Analysis Report
+---
+
+## Two Usage Modes
+
+### Mode 1: Command Line
+
+Fast name generation with clean output:
 
 ```bash
-go run github.com/babyname/fate/cmd/gen_report
+# Generate names
+go run ./cmd/console name -s 张 -b "2024/06/15 10:30" -g boy
 
-# Output files in output/ directory
-ls output/
-# 张_姓名分析报告_平衡用神法.txt
-# 张_姓名分析报告_平衡用神法.md
-# 张_姓名分析报告_平衡用神法.json
-# 张_姓名分析报告_格局用神法.txt
-# 张_姓名分析报告_格局用神法.md
-# 张_姓名分析报告_格局用神法.json
+# View detailed analysis for a specific name
+go run ./cmd/console name detail 峰 瑞 -s 张 -b "2024/06/15 10:30" -g boy
+
+# View all options
+go run ./cmd/console name -h
 ```
 
-### Usage in Code
+**Options:**
+
+| Flag | Description | Example |
+|------|-------------|---------|
+| `-s, --surname` | Surname | `-s 张` |
+| `-b, --born` | Birth date | `-b "2024/06/15 10:30"` |
+| `-g, --gender` | Gender | `-g boy` or `-g girl` |
+| `--xiyong` | Xi-Yong algorithm | `--xiyong balance` or `--xiyong geju` |
+| `--strictness` | Wuge filter strictness | `--strictness moderate` |
+| `-f, --filter` | Filter out specific characters | `-f 病死` |
+| `-o, --output` | Output to file | `-o result.txt` |
+
+---
+
+### Mode 2: Library Import
+
+Integrate into your Go project:
+
+```bash
+go get github.com/babyname/fate
+```
 
 ```go
 package main
 
 import (
+    "fmt"
     "time"
 
-    "github.com/babyname/fate/internal/analysis"
-    v2 "github.com/godcong/chronos/v2"
+    "github.com/babyname/fate"
+    "github.com/babyname/fate/config"
 )
 
 func main() {
+    cfg := config.DefaultConfig()
+
+    f, err := fate.New(cfg)
+    if err != nil {
+        panic(err)
+    }
+
+    filter := fate.NewFilter(fate.FilterOption{
+        CharacterFilter:     true,
+        CharacterFilterType: fate.CharacterFilterTypeDefault,
+        MinStroke:           3,
+        MaxStroke:           18,
+        RegularFilter:       true,
+        DaYanFilter:         true,
+        WuXingFilter:        true,
+    })
+
+    s := f.NewSessionWithFilter(filter)
+
     born, _ := time.Parse("2006/01/02 15:04", "2024/06/15 10:30")
+    input := &fate.Input{
+        Last: [2]string{"张", ""},
+        Born: born,
+        Sex:  fate.SexBoy,
+    }
 
-    // Balance Method
-    fateData, _ := v2.GetFateData(&v2.FateInput{
-        BirthDate: born,
-        Gender:    1,
-        Surname:   "张",
-        Method:    v2.XiYongMethodBalance,
-    })
+    err = s.Start(input)
+    if err != nil {
+        panic(err)
+    }
+    s.Wait()
 
-    // GeJu Method
-    fateData2, _ := v2.GetFateData(&v2.FateInput{
-        BirthDate: born,
-        Gender:    1,
-        Surname:   "张",
-        Method:    v2.XiYongMethodGeJu,
-    })
+    output := input.Output()
+    fmt.Printf("Generated %d names\n", output.Total())
 
-    // Build name result
-    c1 := &ent.Character{Char: "驰", WuXing: "火", ScienceStroke: 13, ...}
-    c2 := &ent.Character{Char: "筎", WuXing: "木", ScienceStroke: 12, ...}
-    result := analysis.BuildNameResult(1, "张", c1, c2, 11, 0, fateData)
-
-    // Generate report
-    report := analysis.NewReport("张", "2024年06月15日", "男", fateData, 1000)
-    report.TopNames = append(report.TopNames, result)
-
-    f := &analysis.MarkdownFormatter{}
-    f.Format(os.Stdout, report)
+    for _, nr := range output.TopNames() {
+        fmt.Printf("  %s - Score: %.1f\n", nr.FullName, nr.Score)
+    }
 }
 ```
 
-## 🏗️ Project Structure
+**Core API:**
 
-```
-fate/
-├── cmd/gen_report/           # Report generation tool
-├── ent/                      # Ent ORM entity definitions
-├── internal/
-│   ├── analysis/             # Core analysis module
-│   │   ├── analysis.go       # Data structures + formatters
-│   │   ├── sancai_data.go    # Sancai/Jichuyun/Chenggongyun/Renji data
-│   │   ├── zhouyi.go         # Zhouyi hexagram calculation
-│   │   ├── zhouyi_data.go    # 64 hexagram interpretation data
-│   │   └── simplified_traditional.go  # Simplified-Traditional mapping
-│   ├── wuge/                 # Sancai Wuge (3-5 elements)
-│   ├── wuxing/               # Wuxing analysis
-│   ├── rating/               # Scoring system
-│   ├── filter/               # Name filtering
-│   ├── naming/               # Naming logic
-│   └── session/              # Session management
-├── chronos/                  # Bazi calculation submodule
-│   ├── fate.go               # FateData main entry
-│   ├── xiyong_balance.go     # Balance Xi-Yong method
-│   ├── xiyong_geju.go        # GeJu Xi-Yong method
-│   └── fate_helpers.go       # Wuxing calculation helpers
-└── yi/                       # Zhouyi hexagram submodule
-```
+| Type | Description |
+|------|-------------|
+| `fate.New(cfg)` | Create Fate instance |
+| `fate.NewSessionWithFilter(filter)` | Create session with filter options |
+| `fate.NewFilter(option)` | Create filter from options |
+| `fate.FilterOption{}` | Filter options (stroke range / Wuxing / Dayan / gender etc.) |
+| `fate.Input{}` | Input parameters (surname / birthday / gender) |
+| `fate.Output` | Output results (TopNames / AllNames / Total) |
+| `fate.Session` | Session interface (Start / Stop / Wait) |
 
-## ☯️ Two Xi-Yong Shen Algorithms
+---
+
+## Xi-Yong Algorithms
 
 ### Balance Method
 
-Based on day-master strength, using ally/enemy force comparison:
+Determines Xi-Yong based on Day Master's strength (same vs opposite camp):
 
-| Day Master | Yong Shen | Xi Shen | Ji Shen | Chou Shen |
-|-----------|-----------|---------|---------|-----------|
-| Strong | Officer (Ke-Wo) | Wealth + Seal | Peer (Bi-Jie) | Ji Shen's parent |
-| Weak | Seal (Sheng-Wo) | Peer (Bi-Jie) | Officer + Food | Ji Shen's parent |
+| Day Master | Yong Shen | Xi Shen | Ji Shen |
+|------------|-----------|---------|---------|
+| Strong | Officer/Kill (克制) | Wealth+Resource (我克+生我) | Peer/Rob (同我) |
+| Weak | Resource (生我) | Peer/Rob (同我) | Officer+Output (克我+我生) |
 
-### GeJu (Pattern) Method
+### GeJu Method
 
-First determine the pattern (10 types), then select Yong Shen based on pattern + strength:
+First determines pattern type (10 types: Zheng Guan, Qi Sha, Shi Shen, Shang Guan, Zheng Cai, Pian Cai, Jian Lu, Yang Ren, etc.), then selects Xi-Yong accordingly.
 
-| Pattern | Strong Yong | Weak Yong |
-|---------|------------|-----------|
-| Zheng Guan | Officer | Seal |
-| Qi Sha | Food controls Sha | Seal transforms Sha |
-| Shi Shen | Food generates Wealth | Peer helps Self |
-| Shang Guan | Seal controls Shang | Seal |
-| Zheng/Pian Cai | Wealth | Seal |
-| Jian Lu/Yang Ren | Officer | Seal |
+---
 
-## 📊 Scoring System
+## 5-Dimension Scoring
 
-| Dimension | Description |
-|-----------|-------------|
-| Cultural Impression | Common characters, regular script, meaning richness |
-| Wuxing Bazi | Name Wuxing matching with Xi-Yong Shen |
-| Zodiac | Zodiac Wuxing generation/restriction with name |
-| Wuge Shuli | Tian/Ren/Di/Wai/Zong Ge luck/inauspicious |
+| Dimension | Weight | Description |
+|-----------|--------|-------------|
+| Cultural Impression | 20% | Common characters, regular forms, meaning richness |
+| Wuxing Bazi | 25% | Name Wuxing match with Xi-Yong |
+| Zodiac | 10% | Zodiac and name Wuxing relationship |
+| Wuge Shuli | 25% | Tian/Ren/Di/Wai/Zong Ge fortune |
+| Yinyun | 20% | Name phonetic harmony |
 
-## 🔧 Performance
+---
 
-| Metric | Value |
-|--------|-------|
-| WuGeLucky Lookup | 3.89 ns/op, 0 B alloc |
-| Zhang Surname Full | ~50ms / 61,730 names |
-| Li Surname Full | ~127ms / 165,852 names |
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Go 1.22+** — Main language
 - **Ent ORM** — Database ORM
-- **SQLite3** — Data storage (`github.com/sqlite3ent/sqlite3` driver)
-- **chronos/v2** — Bazi calculation submodule (local `replace`)
-- **yi** — Zhouyi hexagram calculation (`github.com/godcong/yi`)
+- **SQLite3** — Data storage
+- **chronos/v2** — Bazi calculation
+- **yi** — Zhouyi hexagrams
 
-## 📜 License
+---
+
+## License
 
 MIT License

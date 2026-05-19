@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/babyname/fate"
 	"github.com/babyname/fate/config"
@@ -14,7 +15,7 @@ const (
 	programName = `fate`
 
 	// helpContent ...
-	helpContent = "正在使用Fate生成姓名列表，如遇到问题请访问项目地址：https://github.com/babyname/fate获取帮助!"
+	helpContent = "正在使用启命宝生成姓名列表，如遇到问题请访问项目地址：https://github.com/babyname/fate获取帮助!"
 )
 
 var (
@@ -64,6 +65,7 @@ func main() {
 	rootCmd.AddCommand(cmdInit(), cmdName())
 	e := rootCmd.Execute()
 	if e != nil {
-		panic(e)
+		fmt.Fprintln(os.Stderr, e)
+		os.Exit(1)
 	}
 }

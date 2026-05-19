@@ -1,5 +1,7 @@
 # fate 项目结构重组方案 v2
 
+> 注意：此文档描述的功能中，transfer/（数据迁移）、cmd/fetchdata（数据抓取）已迁移至 qiming 项目。
+
 > 在 v1 基础上增加分组分层和内外部访问控制
 
 ---
@@ -44,7 +46,7 @@ fate/
 | 🔓 log | `package log` | 所有人 | 日志工具 |
 | 🔒 internal/* | `internal` 机制 | 仅 fate 模块内部 | 实现细节，不暴露 |
 | 🔒 ent/ | 不导出给外部 | 仅 internal 包 | ent 生成代码 |
-| 🔒 transfer/ | 不导出给外部 | 仅 cmd/ | 数据迁移工具 |
+| 🔒 transfer/ | 不导出给外部 | ~~仅 cmd/~~ 已迁移至 qiming |
 
 ---
 
@@ -56,9 +58,8 @@ fate/
 │   ├── console/                    #   交互式起名
 │   ├── character/                  #   字表管理
 │   ├── dictctl/                    #   字典工具
-│   ├── fetchdata/                  #   数据抓取
 │   ├── inspectdb/                  #   数据库检查
-│   └── migratedb/                  #   数据迁移
+│   └── seeddb/                     #   数据库种子数据
 │
 ├── config/                         # 🔓 公开 — 配置
 │   ├── config.go                   #   Config, LoadConfig()
@@ -128,7 +129,7 @@ fate/
 │   └── analysis/                   #   输出格式化
 │       └── analysis.go             #     NameResult, FateAnalysis, Formatter
 │
-├── transfer/                       # 🔒 数据迁移（仅 cmd 使用）
+├── transfer/                       # 🔒 数据迁移（已迁移至 qiming，仅保留历史参考）
 │   ├── config.go
 │   └── transfer.go
 │

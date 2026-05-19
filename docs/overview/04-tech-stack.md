@@ -1,14 +1,17 @@
 # fate 技术栈选型
 
+> 注意：此文档描述的功能中，API服务已迁移至 qiming 项目。lunar-go 现通过 chronos/v2 间接依赖，Go 版本已升级至 1.25.0+，SQLite 驱动已替换为 sqlite3ent/sqlite3（纯Go）。
+
 ## 技术栈总览
 
 fate 采用以下技术栈：
 
 | 技术 | 版本 | 用途 | 说明 |
 |-----|------|------|------|
-| Go | 1.21+ | 主语言 | 性能好、并发强、编译快 |
-| lunar-go | v1.3.0+ | 农历库 | 功能完整的农历计算库 |
-| SQLite/MySQL | 3.x / 8.x | 数据库 | 存储汉字数据库 |
+| Go | 1.25.0+ | 主语言 | 性能好、并发强、编译快 |
+| chronos/v2 | v2.0.7+ | 八字计算库 | 封装 lunar-go，提供 FateData |
+| yi | v1.0.2+ | 周易数据 | 六十四卦数据 |
+| sqlite3ent/sqlite3 | v1.50.0+ | SQLite 驱动 | 纯 Go，CGO_ENABLED=0 |
 | YAML/JSON | 1.2 | 配置文件 | 配置参数管理 |
 | Go testing | 内置 | 测试工具 | 单元测试、集成测试 |
 

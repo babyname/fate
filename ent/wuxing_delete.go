@@ -40,7 +40,7 @@ func (wxd *WuXingDelete) ExecX(ctx context.Context) int {
 }
 
 func (wxd *WuXingDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(wuxing.Table, sqlgraph.NewFieldSpec(wuxing.FieldID, field.TypeString))
+	_spec := sqlgraph.NewDeleteSpec(wuxing.Table, sqlgraph.NewFieldSpec(wuxing.FieldID, field.TypeInt))
 	if ps := wxd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
