@@ -162,7 +162,7 @@ sequenceDiagram
 
 ### API服务调用关系
 
-使用 Mermaid 绘制 API 服务调用关系图：
+> **注意**：API 服务已迁移至 qiming 项目，以下仅为历史参考。
 
 ```mermaid
 sequenceDiagram
