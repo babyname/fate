@@ -73,6 +73,8 @@ type NameResult struct {
 	ChengGongYun string        `json:"cheng_gong_yun"`
 	RenJiGuanXi  string        `json:"ren_ji_guan_xi"`
 	ZhouYi       *ZhouYiResult `json:"zhou_yi"`
+	Bazi         *BaziSection  `json:"bazi,omitempty"`
+	WuXing       *WuXingSection `json:"wu_xing,omitempty"`
 	Score        float64       `json:"score"`
 	Grade        string        `json:"grade"`
 	ScoreDetail  ScoreDetail       `json:"score_detail"`
@@ -82,11 +84,21 @@ type NameResult struct {
 
 // BaziSection represents bazi information section
 type BaziSection struct {
-	Sizhu         [4]string `json:"sizhu"`
-	Wuxing        [4]string `json:"wuxing"`
-	Nayin         [4]string `json:"nayin"`
-	Zodiac        string    `json:"zodiac"`
-	Constellation string    `json:"constellation"`
+	Sizhu                [4]string      `json:"sizhu"`
+	Wuxing               [4]string      `json:"wuxing"`
+	Nayin                [4]string      `json:"nayin"`
+	Zodiac               string         `json:"zodiac"`
+	Constellation        string         `json:"constellation"`
+	ConstellationDetail  *ConstellationDetail `json:"constellation_detail,omitempty"`
+}
+
+type ConstellationDetail struct {
+	Element      string `json:"element"`
+	Trait        string `json:"trait"`
+	LuckyColor   string `json:"lucky_color"`
+	LuckyNumber  string `json:"lucky_number"`
+	Compatibility string `json:"compatibility"`
+	Description  string `json:"description"`
 }
 
 // WuXingSection represents wuxing analysis section

@@ -132,8 +132,8 @@ func (wxc *WuXingCreate) SetNillableFortune(s *string) *WuXingCreate {
 }
 
 // SetID sets the "id" field.
-func (wxc *WuXingCreate) SetID(s string) *WuXingCreate {
-	wxc.mutation.SetID(s)
+func (wxc *WuXingCreate) SetID(i int) *WuXingCreate {
+	wxc.mutation.SetID(i)
 	return wxc
 }
 
@@ -185,12 +185,9 @@ func (wxc *WuXingCreate) sqlSave(ctx context.Context) (*WuXing, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected WuXing.ID type: %T", _spec.ID.Value)
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
 	}
 	wxc.mutation.id = &_node.ID
 	wxc.mutation.done = true
@@ -200,7 +197,7 @@ func (wxc *WuXingCreate) sqlSave(ctx context.Context) (*WuXing, error) {
 func (wxc *WuXingCreate) createSpec() (*WuXing, *sqlgraph.CreateSpec) {
 	var (
 		_node = &WuXing{config: wxc.config}
-		_spec = sqlgraph.NewCreateSpec(wuxing.Table, sqlgraph.NewFieldSpec(wuxing.FieldID, field.TypeString))
+		_spec = sqlgraph.NewCreateSpec(wuxing.Table, sqlgraph.NewFieldSpec(wuxing.FieldID, field.TypeInt))
 	)
 	if id, ok := wxc.mutation.ID(); ok {
 		_node.ID = id
@@ -281,6 +278,10 @@ func (wxcb *WuXingCreateBulk) Save(ctx context.Context) ([]*WuXing, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})

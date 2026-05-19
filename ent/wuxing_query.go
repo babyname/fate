@@ -81,8 +81,8 @@ func (wxq *WuXingQuery) FirstX(ctx context.Context) *WuXing {
 
 // FirstID returns the first WuXing ID from the query.
 // Returns a *NotFoundError when no WuXing ID was found.
-func (wxq *WuXingQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (wxq *WuXingQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = wxq.Limit(1).IDs(setContextOp(ctx, wxq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -94,7 +94,7 @@ func (wxq *WuXingQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (wxq *WuXingQuery) FirstIDX(ctx context.Context) string {
+func (wxq *WuXingQuery) FirstIDX(ctx context.Context) int {
 	id, err := wxq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -132,8 +132,8 @@ func (wxq *WuXingQuery) OnlyX(ctx context.Context) *WuXing {
 // OnlyID is like Only, but returns the only WuXing ID in the query.
 // Returns a *NotSingularError when more than one WuXing ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (wxq *WuXingQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (wxq *WuXingQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = wxq.Limit(2).IDs(setContextOp(ctx, wxq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -149,7 +149,7 @@ func (wxq *WuXingQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (wxq *WuXingQuery) OnlyIDX(ctx context.Context) string {
+func (wxq *WuXingQuery) OnlyIDX(ctx context.Context) int {
 	id, err := wxq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -177,7 +177,7 @@ func (wxq *WuXingQuery) AllX(ctx context.Context) []*WuXing {
 }
 
 // IDs executes the query and returns a list of WuXing IDs.
-func (wxq *WuXingQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (wxq *WuXingQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if wxq.ctx.Unique == nil && wxq.path != nil {
 		wxq.Unique(true)
 	}
@@ -189,7 +189,7 @@ func (wxq *WuXingQuery) IDs(ctx context.Context) (ids []string, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (wxq *WuXingQuery) IDsX(ctx context.Context) []string {
+func (wxq *WuXingQuery) IDsX(ctx context.Context) []int {
 	ids, err := wxq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -364,7 +364,7 @@ func (wxq *WuXingQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (wxq *WuXingQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(wuxing.Table, wuxing.Columns, sqlgraph.NewFieldSpec(wuxing.FieldID, field.TypeString))
+	_spec := sqlgraph.NewQuerySpec(wuxing.Table, wuxing.Columns, sqlgraph.NewFieldSpec(wuxing.FieldID, field.TypeInt))
 	_spec.From = wxq.sql
 	if unique := wxq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

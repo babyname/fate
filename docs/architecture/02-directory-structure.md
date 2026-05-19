@@ -4,82 +4,135 @@
 
 fate 项目目录结构如下：
 
+> **注意**：Web API 服务、诗词取名、数据抓取、报告生成、数据迁移等模块已迁移至 qiming 项目。fate 现仅保留核心起名计算能力。
+
 ```
 fate/
-├── cmd/                    # 入口层（CLI命令、API服务）
-│   ├── fate-cli/           # CLI命令行工具
-│   │   └── main.go         # CLI入口
-│   ├── fate-api/           # HTTP API服务
-│   │   └── main.go         # API入口
-│   │   └── server.go       # API服务器
-│   │   └── handlers.go     # API处理器
-│   └── fate-batch/         # 批量处理工具
-│   │   └── main.go         # 批量入口
-│   │   └── batch.go        # 批量处理逻辑
+├── cmd/                    # 入口层（CLI命令）
+│   ├── console/            # 交互式起名
+│   │   ├── main.go         # 入口
+│   │   ├── init.go         # 初始化
+│   │   └── name.go         # 起名命令
+│   ├── character/          # 字表管理
+│   │   └── main.go         # 入口
+│   ├── dictctl/            # 字典工具
+│   │   └── main.go         # 入口
+│   ├── seeddb/             # 数据库种子数据
+│   │   └── main.go         # 入口
+│   └── inspectdb/          # 数据库检查
+│       └── main.go         # 入口
 │
 ├── config/                 # 配置层（配置管理）
 │   ├── config.go           # 配置加载和管理
-│   ├── validator.go        # 配置验证
-│   ├── default.go          # 默认配置
-│   └── types.go            # 配置类型定义
+│   ├── database.go         # 数据库配置
+│   ├── log.go              # 日志配置
+│   └── config_test.go      # 配置测试
 │
-├── chronos/                # 计算层（八字、五行喜忌）
-│   ├── chronos.go          # chronos 入口（FateAPI）
-│   ├── bazi.go             # 八字计算
-│   ├── wuxing_xiji.go      # 五行喜忌分析
-│   ├── bridge.go           # lunar-go 桥接
-│   ├── lunar_adapter.go    # lunar-go 适配器
-│   ├── types.go            # 类型定义（BaziInfo, WuxingXijiInfo等）
-│   ├── constants.go        # 常量定义（天干、地支等）
-│   └── errors.go           # 错误定义
+├── dict/                   # 字典/字表（公开，可独立使用）
+│   ├── dict.go             # CharEntry, MergeEntries, ValidateEntries
+│   ├── index.go            # DictIndex, QueryFilter, Build
+│   ├── kangxi_stroke.go    # 康熙笔画修正表
+│   └── dict_test.go        # 字典测试
 │
-├── naming/                 # 推荐层（名字筛选、评分、推荐）
-│   ├── naming.go           # naming 入口
-│   ├── filter.go           # 名字筛选
-│   ├── rating.go           # 名字评分
-│   ├── recommend.go        # 名字推荐
-│   ├── database.go         # 汉字数据库
-│   ├── strokes.go          # 笔画计算
-│   ├── types.go            # 类型定义（NameInfo, RatingInfo等）
-│   ├── constants.go        # 常量定义（评分权重等）
-│   └── errors.go           # 错误定义
+├── log/                    # 日志工具（公开）
+│   ├── log.go              # Logger 接口
+│   ├── file.go             # 文件日志
+│   └── wrap.go             # 日志包装器
 │
-├── analysis/               # 输出层（格式化输出）
-│   ├── analysis.go         # analysis 入口
-│   ├── bazi_output.go      # 八字输出
-│   ├── name_output.go      # 名字输出
-│   ├── formatter.go        # 格式化器
-│   ├── template.go         # 模板管理
-│   ├── types.go            # 类型定义（OutputFormat等）
-│   ├── constants.go        # 常量定义（输出模板等）
-│   └── errors.go           # 错误定义
+├── ent/                    # ent 生成代码（内部自动可见）
+│   └── schema/             # Schema 定义
+│       ├── character.go    # 字符 Schema
+│       ├── version.go      # 版本 Schema
+│       └── wu_xing.go      # 五行 Schema
+│
+├── internal/               # 内部实现（外部不可导入）
+│   ├── bazi/               # 八字命理计算
+│   │   ├── bazi.go         # BaZi, NewBaZi()
+│   │   ├── xiyong.go       # 喜用神计算
+│   │   ├── nayin.go        # 纳音
+│   │   └── zodiac.go       # 生肖
+│   │
+│   ├── wuxing/             # 五行生克计算
+│   │   ├── wu_xing.go      # 五行生克关系
+│   │   └── san_cai.go      # 三才
+│   │
+│   ├── wuge/               # 五格计算
+│   │   ├── wuge.go         # WuGe, CalcWuGe()
+│   │   ├── dayan.go        # 大衍之数
+│   │   └── result.go       # 计算结果
+│   │
+│   ├── zhouyi/             # 周易起卦
+│   │   ├── zhouyi.go       # QiGua(), GuaYao
+│   │   └── yao.go          # 爻
+│   │
+│   ├── filter/             # 过滤器系统
+│   │   ├── filter.go       # Filter 接口和实现
+│   │   └── option.go       # FilterOption
+│   │
+│   ├── rating/             # 评分系统
+│   │   └── rating.go       # Rater, NameRating
+│   │
+│   ├── naming/             # 名字推荐
+│   │   ├── naming.go       # Interface, Naming
+│   │   ├── name.go         # Name, NameBasic
+│   │   ├── raters.go       # 评分器
+│   │   └── stroke.go       # 笔画
+│   │
+│   ├── session/            # 会话管理
+│   │   ├── session.go      # Session 接口和实现
+│   │   ├── input.go        # Input, Output
+│   │   ├── cache.go        # 缓存
+│   │   ├── filter_cache.go # 过滤缓存
+│   │   ├── filter_cache2.go# 过滤缓存2
+│   │   └── list.go         # 列表
+│   │
+│   ├── repository/         # 数据访问层
+│   │   ├── repository.go   # Repository, New()
+│   │   ├── character.go    # 字符查询/缓存
+│   │   ├── wuxing.go       # 五行查询
+│   │   ├── cache.go        # 内部缓存
+│   │   └── log.go          # 日志
+│   │
+│   ├── database/           # 数据库连接层
+│   │   └── database.go     # Builder, Client()
+│   │
+│   ├── seeddb/             # 种子数据
+│   │   ├── seed.go         # 种子数据入口
+│   │   ├── builtin_seed.go # 内置种子
+│   │   ├── export.go       # 数据导出
+│   │   ├── import.go       # 数据导入
+│   │   ├── transform.go    # 数据转换
+│   │   └── report.go       # 数据报告
+│   │
+│   └── analysis/           # 输出格式化
+│       ├── analysis.go     # NameResult, FateAnalysis
+│       ├── builder.go      # 输出构建器
+│       ├── helpers.go      # 辅助函数
+│       ├── scoring.go      # 评分输出
+│       ├── sancai_data.go  # 三才数据
+│       ├── zhouyi.go       # 周易卦象输出
+│       ├── simplified_traditional.go # 简繁体
+│       └── types.go        # 类型定义
+│
+├── example/                # 示例代码
+│   └── create_a_name/      # 起名示例
+│       └── main.go         # 示例入口
 │
 ├── docs/                   # 文档目录
-│   ├── overview/           # 项目概述文档
 │   ├── architecture/       # 架构设计文档
 │   ├── chronos-module/     # chronos 模块文档
 │   ├── naming-module/      # naming 模块文档
 │   ├── analysis-module/    # analysis 模块文档
 │   ├── config-module/      # config 模块文档
+│   ├── overview/           # 项目概述文档
 │   ├── implementation/     # 实施计划文档
 │   └── reference/          # 参考资料
 │
 ├── data/                   # 数据目录
-│   ├── characters.db       # 汉字数据库（SQLite）
-│   ├── characters.json     # 汉字数据（JSON格式）
-│   └── config.yaml         # 配置文件
+│   └── gua.data            # 卦象数据
 │
-├── test/                   # 测试目录
-│   ├── chronos_test.go     # chronos 测试
-│   ├── naming_test.go      # naming 测试
-│   ├── analysis_test.go    # analysis 测试
-│   └── config_test.go      # config 测试
-│
-├── scripts/                # 脚本目录
-│   ├── build.sh            # 构建脚本
-│   ├── test.sh             # 测试脚本
-│   ├── deploy.sh           # 部署脚本
-│
+├── fate.go                 # 🔓 公开 API 入口
+├── version.go              # 🔓 版本号
 ├── go.mod                  # Go模块定义
 ├── go.sum                  # Go依赖锁定
 ├── Makefile                # Make构建文件
@@ -95,33 +148,27 @@ fate/
 
 **职责**：
 - 提供CLI命令入口
-- 提供HTTP API服务入口
-- 提供批量处理入口
+- 提供起名交互入口
 - 协调各模块工作流程
 
 **子目录**：
 
 | 子目录 | 职责 | 文件 |
 |-----|------|------|
-| **fate-cli** | CLI命令行工具 | main.go（CLI入口） |
-| **fate-api** | HTTP API服务 | main.go（API入口）、server.go（服务器）、handlers.go（处理器） |
-| **fate-batch** | 批量处理工具 | main.go（批量入口）、batch.go（批量逻辑） |
-
-**文件说明**：
-
-- **main.go**：入口文件，解析命令行参数、调用各模块
-- **server.go**：API服务器，HTTP服务器配置
-- **handlers.go**：API处理器，处理HTTP请求
-- **batch.go**：批量逻辑，批量处理起名任务
+| **console** | 交互式起名 | main.go（入口）、init.go（初始化）、name.go（起名命令） |
+| **character** | 字表管理 | main.go（入口） |
+| **dictctl** | 字典工具 | main.go（入口） |
+| **seeddb** | 数据库种子数据 | main.go（入口） |
+| **inspectdb** | 数据库检查 | main.go（入口） |
 
 ---
 
 ### 2. config 目录（配置层）
 
 **职责**：
-- 配置文件加载（YAML/JSON）
-- 配置参数验证
-- 配置参数管理
+- 配置文件加载（YAML）
+- 数据库配置管理
+- 日志配置管理
 - 默认配置提供
 
 **文件**：
@@ -129,83 +176,90 @@ fate/
 | 文件 | 职责 | 说明 |
 |-----|------|------|
 | **config.go** | 配置加载和管理 | LoadConfig()、GetConfig() |
-| **validator.go** | 配置验证 | ValidateConfig() |
-| **default.go** | 默认配置 | DefaultConfig() |
-| **types.go** | 配置类型定义 | Config结构体 |
+| **database.go** | 数据库配置 | DatabaseConfig |
+| **log.go** | 日志配置 | 日志配置参数 |
+| **config_test.go** | 配置测试 | 配置单元测试 |
 
 ---
 
-### 3. chronos 目录（计算层）
+### 3. internal 目录（内部实现）
 
 **职责**：
-- 八字计算（年柱、月柱、日柱、时柱）
-- 五行喜忌分析（喜用五行、忌神五行）
-- 数据提供（为 naming 和 analysis 提供数据）
-- lunar-go 桥接（适配器模式）
+- 核心计算逻辑（八字、五行、五格、周易）
+- 业务逻辑（过滤、评分、推荐、会话）
+- 数据访问（repository、database）
+- 输出格式化（analysis）
+
+**子目录**：
+
+| 子目录 | 职责 | 说明 |
+|-----|------|------|
+| **bazi** | 八字命理计算 | BaZi, XiYong, NaYin, Zodiac |
+| **wuxing** | 五行生克计算 | WuXing, SanCai |
+| **wuge** | 五格计算 | WuGe, DaYan |
+| **zhouyi** | 周易起卦 | QiGua, GuaYao |
+| **filter** | 过滤器系统 | Filter, FilterOption |
+| **rating** | 评分系统 | Rater, NameRating |
+| **naming** | 名字推荐 | Interface, Naming, Name |
+| **session** | 会话管理 | Session, Input, Output |
+| **repository** | 数据访问层 | Repository, 缓存 |
+| **database** | 数据库连接层 | Builder, Client() |
+| **seeddb** | 种子数据 | 导入/导出/转换 |
+| **analysis** | 输出格式化 | NameResult, FateAnalysis |
+
+---
+
+### 4. dict 目录（字典/字表）
+
+**职责**：
+- 字条数据管理（CharEntry）
+- 内存索引构建和查询（DictIndex）
+- 康熙笔画修正表
 
 **文件**：
 
 | 文件 | 职责 | 说明 |
 |-----|------|------|
-| **chronos.go** | chronos 入口（FateAPI） | GetFateData() |
-| **bazi.go** | 八字计算 | CalculateBazi() |
-| **wuxing_xiji.go** | 五行喜忌分析 | CalculateWuxingXiji() |
-| **bridge.go** | lunar-go 桥接 | 桥接逻辑 |
-| **lunar_adapter.go** | lunar-go 适配器 | 适配 lunar-go API |
-| **types.go** | 类型定义 | BaziInfo, WuxingXijiInfo, FateData等 |
-| **constants.go** | 常量定义 | 天干、地支、五行等 |
-| **errors.go** | 错误定义 | 错误类型 |
+| **dict.go** | 字条数据 | CharEntry, MergeEntries, ValidateEntries |
+| **index.go** | 内存索引 | DictIndex, QueryFilter, Build |
+| **kangxi_stroke.go** | 康熙笔画修正 | GetScienceStrokeCorrection |
 
 ---
 
-### 4. naming 目录（推荐层）
+### 5. log 目录（日志工具）
 
 **职责**：
-- 名字筛选（根据五行喜忌筛选）
-- 名字评分（综合评分：五行、笔画、音韵）
-- 名字推荐（排序推荐最佳名字）
-- 名字生成（组合规则）
+- 日志接口定义
+- 文件日志实现
+- 日志包装器
 
 **文件**：
 
 | 文件 | 职责 | 说明 |
 |-----|------|------|
-| **naming.go** | naming 入口 | FilterNames()、RateNames()、RecommendNames() |
-| **filter.go** | 名字筛选 | 筛选逻辑 |
-| **rating.go** | 名字评分 | 评分逻辑 |
-| **recommend.go** | 名字推荐 | 推荐逻辑 |
-| **database.go** | 汉字数据库 | 数据库查询 |
-| **strokes.go** | 笔画计算 | 笔画计算逻辑 |
-| **types.go** | 类型定义 | NameInfo, RatingInfo等 |
-| **constants.go** | 常量定义 | 评分权重等 |
-| **errors.go** | 错误定义 | 错误类型 |
+| **log.go** | Logger 接口 | 日志接口定义 |
+| **file.go** | 文件日志 | 文件日志实现 |
+| **wrap.go** | 日志包装器 | 日志包装 |
 
 ---
 
-### 5. analysis 目录（输出层）
+### 6. ent 目录（ORM 生成代码）
 
 **职责**：
-- 八字解析输出（格式化八字信息）
-- 名字解析输出（格式化名字信息）
-- 格式化（文本、JSON、HTML等格式）
-- 模板管理（输出模板设计）
+- ent schema 定义
+- ent 自动生成的 CRUD 代码
 
-**文件**：
+**Schema 文件**：
 
 | 文件 | 职责 | 说明 |
 |-----|------|------|
-| **analysis.go** | analysis 入口 | FormatOutput() |
-| **bazi_output.go** | 八字输出 | FormatBaziOutput() |
-| **name_output.go** | 名字输出 | FormatNameOutput() |
-| **formatter.go** | 格式化器 | 格式化逻辑 |
-| **template.go** | 模板管理 | 模板定义和管理 |
-| **types.go** | 类型定义 | OutputFormat等 |
-| **constants.go** | 常量定义 | 输出模板等 |
-| **errors.go** | 错误定义 | 错误类型 |
+| **character.go** | 字符 Schema | Character 表定义 |
+| **version.go** | 版本 Schema | Version 表定义 |
+| **wu_xing.go** | 五行 Schema | WuXing 表定义 |
 
 ---
 
-### 6. docs 目录（文档目录）
+### 7. docs 目录（文档目录）
 
 **职责**：
 - 项目文档管理
@@ -213,78 +267,30 @@ fate/
 
 **子目录**：
 
-| 子目录 | 职责 | 文件数量 |
-|-----|------|---------|
-| **overview** | 项目概述文档 | 6个 |
-| **architecture** | 架构设计文档 | 6个 |
-| **chronos-module** | chronos 模块文档 | 12个 |
-| **naming-module** | naming 模块文档 | 12个 |
-| **analysis-module** | analysis 模块文档 | 10个 |
-| **config-module** | config 模块文档 | 8个 |
-| **implementation** | 实施计划文档 | 10个 |
-| **reference** | 参考资料 | 10个 |
-
-**总计**：74个文档
+| 子目录 | 职责 |
+|-----|------|
+| **architecture** | 架构设计文档 |
+| **chronos-module** | chronos 模块文档 |
+| **naming-module** | naming 模块文档 |
+| **analysis-module** | analysis 模块文档 |
+| **config-module** | config 模块文档 |
+| **overview** | 项目概述文档 |
+| **implementation** | 实施计划文档 |
+| **reference** | 参考资料 |
 
 ---
 
-### 7. data 目录（数据目录）
+### 8. 根目录文件
 
 **职责**：
-- 数据文件管理
-- 配置文件、数据库文件
+- 项目公开 API 入口、版本号、配置
 
 **文件**：
 
 | 文件 | 职责 | 说明 |
 |-----|------|------|
-| **characters.db** | 汉字数据库 | SQLite数据库 |
-| **characters.json** | 汉字数据 | JSON格式数据 |
-| **config.yaml** | 配置文件 | YAML格式配置 |
-
----
-
-### 8. test 目录（测试目录）
-
-**职责**：
-- 测试文件管理
-- 单元测试、集成测试
-
-**文件**：
-
-| 文件 | 职责 | 说明 |
-|-----|------|------|
-| **chronos_test.go** | chronos 测试 | chronos 单元测试 |
-| **naming_test.go** | naming 测试 | naming 单元测试 |
-| **analysis_test.go** | analysis 测试 | analysis 单元测试 |
-| **config_test.go** | config 测试 | config 单元测试 |
-
----
-
-### 9. scripts 目录（脚本目录）
-
-**职责**：
-- 构建脚本、测试脚本、部署脚本
-
-**文件**：
-
-| 文件 | 职责 | 说明 |
-|-----|------|------|
-| **build.sh** | 构建脚本 | 构建可执行文件 |
-| **test.sh** | 测试脚本 | 运行测试 |
-| **deploy.sh** | 部署脚本 | 部署应用 |
-
----
-
-### 10. 根目录文件
-
-**职责**：
-- 项目配置、说明、许可证
-
-**文件**：
-
-| 文件 | 职责 | 说明 |
-|-----|------|------|
+| **fate.go** | 公开 API 入口 | Fate, Session, NameResult |
+| **version.go** | 版本号 | Version |
 | **go.mod** | Go模块定义 | 模块名称、依赖 |
 | **go.sum** | Go依赖锁定 | 依赖版本锁定 |
 | **Makefile** | Make构建文件 | 构建规则 |
@@ -430,8 +436,9 @@ fate/
 
 ## 总结
 
-fate 项目目录结构清晰，分为10个主要目录：cmd（入口层）、config（配置层）、chronos（计算层）、naming（推荐层）、analysis（输出层）、docs（文档目录）、data（数据目录）、test（测试目录）、scripts（脚本目录）、根目录文件。每个目录职责明确，文件命名规范，易于理解、易于开发、易于维护、易于测试、易于部署。
+fate 项目目录结构清晰，分为8个主要部分：cmd（入口层）、config（配置层）、internal（内部实现）、dict（字典/字表）、log（日志工具）、ent（ORM 生成代码）、docs（文档目录）、根目录文件。每个目录职责明确，文件命名规范，易于理解、易于开发、易于维护、易于测试。
 
-**核心目录**：cmd, config, chronos, naming, analysis（5个模块目录）
-**辅助目录**：docs, data, test, scripts, 根目录文件
-**目录结构意义**：易于理解、易于开发、易于维护、易于测试、易于部署
+**核心目录**：cmd, config, internal, dict, ent（核心模块）
+**公开包**：根包(fate.go), config, dict, log（外部可导入）
+**内部包**：internal/*（外部不可导入，包含 bazi, wuxing, wuge, zhouyi, filter, rating, naming, session, repository, database, seeddb, analysis）
+**目录结构意义**：易于理解、易于开发、易于维护、易于测试

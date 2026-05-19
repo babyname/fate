@@ -12,8 +12,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/babyname/fate/ent/character"
-	"github.com/babyname/fate/ent/poem"
-	"github.com/babyname/fate/ent/poemchar"
 	"github.com/babyname/fate/ent/version"
 	"github.com/babyname/fate/ent/wuxing"
 )
@@ -70,8 +68,6 @@ type OrderFunc func(*sql.Selector)
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		character.Table: character.ValidColumn,
-		poem.Table:      poem.ValidColumn,
-		poemchar.Table:  poemchar.ValidColumn,
 		version.Table:   version.ValidColumn,
 		wuxing.Table:    wuxing.ValidColumn,
 	}

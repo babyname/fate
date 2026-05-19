@@ -10,6 +10,8 @@ cmd（入口） → config（配置） → chronos（计算） → naming（推�
 
 每个模块职责清晰，接口定义明确，依赖关系单向。
 
+> **注意**：Web API 服务、诗词取名、报告生成等商业功能已迁移至 **qiming** 项目。fate 现仅保留核心起名计算能力。
+
 ---
 
 ## 模块划分
@@ -18,7 +20,7 @@ cmd（入口） → config（配置） → chronos（计算） → naming（推�
 
 | 模块 | 职责 | 核心功能 | 依赖 |
 |-----|------|---------|------|
-| **cmd** | 入口层 | CLI命令、API服务、批量处理 | config, chronos, naming, analysis |
+| **cmd** | 入口层 | CLI命令、起名交互 | config, chronos, naming, analysis |
 | **config** | 配置层 | 配置加载、配置验证、配置管理 | 无 |
 | **chronos** | 计算层 | 八字计算、五行喜忌分析、数据提供 | config, lunar-go |
 | **naming** | 推荐层 | 名字筛选、名字评分、名字推荐 | config, chronos |
@@ -30,14 +32,15 @@ cmd（入口） → config（配置） → chronos（计算） → naming（推�
 
 **职责**：
 - 提供CLI命令入口
-- 提供HTTP API服务入口
-- 提供批量处理入口
+- 提供起名交互入口
 - 协调各模块工作流程
 
 **核心功能**：
-- `fate-cli`：CLI命令行工具
-- `fate-api`：HTTP API服务
-- `fate-batch`：批量处理工具
+- `console`：交互式起名工具
+- `character`：字表管理工具
+- `dictctl`：字典工具
+- `seeddb`：数据库种子数据
+- `inspectdb`：数据库检查
 
 **依赖**：
 - config（配置管理）
@@ -117,8 +120,8 @@ cmd（入口） → config（配置） → chronos（计算） → naming（推�
 **职责**：
 - 八字解析输出（格式化八字信息）
 - 名字解析输出（格式化名字信息）
-- 格式化（文本、JSON、HTML等格式）
-- 模板管理（输出模板设计）
+- 评分图表输出
+- 周易卦象输出
 
 **核心功能**：
 - `FormatBaziOutput()`：格式化八字输出
@@ -131,9 +134,9 @@ cmd（入口） → config（配置） → chronos（计算） → naming（推�
 - naming（名字数据）
 
 **关键特点**：
-- 多格式支持（文本、JSON、HTML）
-- 模板化设计（可定制模板）
-- 输出清晰（完整解析）
+- 多格式支持（文本、JSON）
+- 美名腾风格分析输出
+- 评分图表展示
 
 ---
 
@@ -385,12 +388,12 @@ func NewNaming(chronos ChronosInterface, config *Config) *Naming {
 **架构优化**：
 - 性能优化（缓存、并发）
 - 批量处理优化
-- API服务优化
 
 **目标**：
 - 提高性能
 - 支持批量处理
-- 支持API服务
+
+> Web API 服务、诗词取名等功能已迁移至 qiming 项目。
 
 ---
 
@@ -399,7 +402,6 @@ func NewNaming(chronos ChronosInterface, config *Config) *Naming {
 **架构扩展**：
 - 添加新模块（如 logging、metrics）
 - 添加新功能（如更多输出格式）
-- 添加新接口（如更多API）
 
 **目标**：
 - 扩展功能
@@ -464,7 +466,7 @@ func NewNaming(chronos ChronosInterface, config *Config) *Naming {
 ### 架构目标
 
 **阶段1目标**：完成核心起名功能，确保架构稳定
-**阶段2目标**：提高性能，支持批量处理、API服务
+**阶段2目标**：提高性能，支持批量处理
 **阶段3目标**：扩展功能，提高用户体验，支持更多场景
 
 ---

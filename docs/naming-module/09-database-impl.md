@@ -6,7 +6,7 @@
 package naming
 
 import "database/sql"
-import _ "github.com/mattn/go-sqlite3"
+import _ "github.com/sqlite3ent/sqlite3"
 
 func queryDatabase(xiWuxing []string) ([]NameInfo, error) {
     db, err := sql.Open("sqlite3", "hanzi.db")
