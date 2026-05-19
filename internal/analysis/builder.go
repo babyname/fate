@@ -9,7 +9,7 @@ import (
 	"github.com/babyname/fate/internal/rating"
 	"github.com/babyname/fate/internal/wuge"
 	"github.com/babyname/fate/internal/wuxing"
-	v2 "github.com/godcong/chronos/v2"
+	v2 "github.com/babyname/chronos/v2"
 )
 
 // BuildNameResult builds a single NameResult from the given character data and fate information.
@@ -175,6 +175,8 @@ func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int
 		ChengGongYun: chengGongYun,
 		RenJiGuanXi:  renJiGuanXi,
 		ZhouYi:       zhouyiResult,
+		Bazi:         buildBaziSection(fateData),
+		WuXing:       buildWuXingSection(fateData),
 		Score:        nr.TotalScore,
 		Grade:        nr.Grade,
 		ScoreDetail:  scoreDetail,
@@ -211,4 +213,44 @@ func CollectTopNames(names []NameSource, surname string, l1, l2 int, fateData *v
 		result[i].Rank = i + 1
 	}
 	return result
+}
+
+func buildBaziSection(fateData *v2.FateData) *BaziSection {
+	if fateData == nil || fateData.Bazi == nil {
+		return nil
+	}
+	bs := &BaziSection{
+		Sizhu:         fateData.Bazi.Sizhu,
+		Wuxing:        fateData.Bazi.Wuxing,
+		Nayin:         fateData.Bazi.Nayin,
+		Zodiac:        fateData.Bazi.Zodiac,
+		Constellation: fateData.Bazi.Constellation,
+	}
+	if bs.Constellation != "" {
+		bs.ConstellationDetail = nil
+	}
+	return bs
+}
+
+func buildWuXingSection(fateData *v2.FateData) *WuXingSection {
+	if fateData == nil || fateData.WuxingXiji == nil {
+		return nil
+	}
+	ws := &WuXingSection{
+		DayGan:     fateData.WuxingXiji.DayGan,
+		DayWuxing:  fateData.WuxingXiji.DayWuxing,
+		QiangRuo:   fateData.WuxingXiji.QiangRuo,
+		XiWuxing:   fateData.WuxingXiji.XiWuxing,
+		YongWuxing: fateData.WuxingXiji.YongWuxing,
+		JiWuxing:   fateData.WuxingXiji.JiWuxing,
+		ChouWuxing: fateData.WuxingXiji.ChouWuxing,
+		XianWuxing: fateData.WuxingXiji.XianWuxing,
+		Method:     fateData.WuxingXiji.MethodName,
+		MethodName: fateData.WuxingXiji.MethodName,
+		Analysis:   fateData.WuxingXiji.Analysis,
+	}
+	if fateData.WuxingXiji.GeJu != nil {
+		ws.GeJuName = fateData.WuxingXiji.GeJu.Name
+	}
+	return ws
 }

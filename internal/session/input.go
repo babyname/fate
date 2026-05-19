@@ -7,7 +7,7 @@ import (
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/analysis"
 	"github.com/babyname/fate/internal/naming"
-	v2 "github.com/godcong/chronos/v2"
+	v2 "github.com/babyname/chronos/v2"
 )
 
 // Input 命名会话的输入参数，包含姓氏、出生时间和性别信息。
@@ -83,6 +83,11 @@ func (o *Output) Filter(s string) int {
 
 // Total 返回当前缓存中的名字总数。
 func (o *Output) Total() int {
+	o.mu.RLock()
+	defer o.mu.RUnlock()
+	if len(o.allNames) > 0 {
+		return len(o.allNames)
+	}
 	return o.cache.Len()
 }
 

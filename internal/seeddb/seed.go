@@ -52,7 +52,7 @@ type SeedWuGeLucky struct {
 
 // SeedWuXing 种子五行数据。
 type SeedWuXing struct {
-	ID      string `json:"id"`
+	ID      int    `json:"id"`
 	First   string `json:"first"`
 	Second  string `json:"second"`
 	Third   string `json:"third"`

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/babyname/fate/internal/bazi"
-	"github.com/godcong/chronos/v2"
+	"github.com/babyname/chronos/v2"
 )
 
 func TestPoint(t *testing.T) {

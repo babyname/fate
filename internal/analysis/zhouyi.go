@@ -3,7 +3,7 @@ package analysis
 import (
 	"fmt"
 
-	"github.com/godcong/yi"
+	"github.com/babyname/yi"
 )
 
 // ZhouYiResult 表示周易卦象计算的结果
@@ -39,31 +39,31 @@ func CalcZhouYi(l1, l2, f1, f2 int) *ZhouYiResult {
 		bianYao = 6
 	}
 
-	y := yi.NumberQiGua(xia, shang, bianYao)
+	y := yi.DivineByNumber(shang, xia, bianYao)
 	if y == nil {
 		return nil
 	}
 
 	result := &ZhouYiResult{}
 
-	benGua := y.Get(yi.BenGua)
-	bianGua := y.Get(yi.BianGua)
+	benGua := y.GetGua(yi.Ben)
+	bianGua := y.GetGua(yi.Bian)
 
 	if benGua != nil {
-		result.BenGuaName = benGua.GuaMing
+		result.BenGuaName = benGua.Ming
 		result.BenGuaDesc = benGua.GuaYi
 		result.BenGuaJiXiong = benGua.JiXiong
 	}
 
-	if benGua != nil && benGua.XiangYue != "" {
-		result.DaXiang = benGua.XiangYue
+	if benGua != nil && benGua.XiangText != "" {
+		result.DaXiang = benGua.XiangText
 	}
 
 	if bianGua != nil {
-		result.BianGuaName = bianGua.GuaMing
+		result.BianGuaName = bianGua.Ming
 	}
 
-	bianYaoPos := y.BianYao()
+	bianYaoPos := y.GetBianYao()
 	if bianGua != nil && bianYaoPos >= 0 && bianYaoPos < 6 {
 		yaoNames := []string{"初爻", "二爻", "三爻", "四爻", "五爻", "上爻"}
 		result.DongYaoDesc = fmt.Sprintf("动爻%s（在第%d爻）", yaoNames[bianYaoPos], bianYaoPos+1)
@@ -72,22 +72,13 @@ func CalcZhouYi(l1, l2, f1, f2 int) *ZhouYiResult {
 	}
 
 	if benGua != nil {
-		detail := getGuaDetail(benGua.GuaMing)
-		if detail != nil {
-			if result.DaXiang == "" {
-				result.DaXiang = detail.DaXiang
-			}
-			result.YunShi = detail.YunShi
-			result.ShiYe = detail.ShiYe
-			result.JingShang = detail.JingShang
-			result.QiuMing = detail.QiuMing
-			result.HunLian = detail.HunLian
-			result.JueCe = detail.JueCe
+		if result.DaXiang == "" {
+			result.DaXiang = benGua.XiangText
 		}
 	}
 
 	if result.YunShi == "" && benGua != nil {
-		result.YunShi = fmt.Sprintf("本卦%s（%s），变卦%s", benGua.GuaMing, benGua.JiXiong, result.BianGuaName)
+		result.YunShi = fmt.Sprintf("本卦%s（%s），变卦%s", benGua.Ming, benGua.JiXiong, result.BianGuaName)
 	}
 
 	result.Score = calcZhouYiScore(result)
@@ -95,23 +86,11 @@ func CalcZhouYi(l1, l2, f1, f2 int) *ZhouYiResult {
 	return result
 }
 
-func getYaoJiXiong(gx *yi.GuaXiang, pos int) string {
-	switch pos {
-	case 0:
-		return gx.ChuYaoJiXiong
-	case 1:
-		return gx.ErYaoJiXiong
-	case 2:
-		return gx.SanYaoJiXiong
-	case 3:
-		return gx.SiYaoJiXiong
-	case 4:
-		return gx.WuYaoJiXiong
-	case 5:
-		return gx.ShangYaoJiXiong
-	default:
+func getYaoJiXiong(gx *yi.Gua, pos int) string {
+	if pos < 0 || pos >= 6 || gx.Yaos[pos] == nil {
 		return ""
 	}
+	return gx.Yaos[pos].JiXiong
 }
 
 func calcZhouYiScore(r *ZhouYiResult) int {
