@@ -47,8 +47,12 @@ fate-shm
 fate-wal
 *.zip
 
-# Seed data (too large for git, managed by seeddb tool)
-data/seed/
+# Seed data - character.json is tracked (core data, MUST NOT be lost)
+# Only large/temporary seed files are excluded
+data/seed/wu_xing.json
+data/seed/wu_ge_lucky.json
+data/seed/changelog.json
+data/seed/report.json
 data/raw/
 
 # Generated output

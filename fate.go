@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/character"
 	"github.com/babyname/fate/internal/database"
 	filterpkg "github.com/babyname/fate/internal/filter"
@@ -14,6 +15,10 @@ import (
 	"github.com/babyname/fate/internal/seeddb"
 	"github.com/babyname/fate/internal/session"
 )
+
+const minCharacterCount = 10000
+
+var criticalChars = []string{"西", "门", "东", "南", "北", "上", "诸葛", "司马", "欧阳"}
 
 type Fate interface {
 	NewSession() Session
@@ -55,10 +60,81 @@ func ensureDataSeeded(repo *repository.Repository) error {
 	if err != nil {
 		return fmt.Errorf("check character count: %w", err)
 	}
-	if count > 0 {
+
+	if count >= minCharacterCount {
+		log.Printf("[DATA-CHECK] Database has %d characters (>= %d threshold), OK", count, minCharacterCount)
+		if err := verifyCriticalChars(ctx, repo); err != nil {
+			log.Printf("[DATA-WARN] Critical character verification failed: %v", err)
+			log.Println("[DATA-REPAIR] Re-importing from embedded seed data to fix missing characters...")
+			seeds, loadErr := seeddb.LoadEmbeddedCharacters()
+			if loadErr != nil {
+				log.Printf("[DATA-ERROR] Failed to load embedded seed data for repair: %v", loadErr)
+			} else {
+				imported, importErr := importSeedCharacters(ctx, repo, seeds)
+				if importErr != nil {
+					log.Printf("[DATA-ERROR] Repair import failed: %v", importErr)
+				} else {
+					log.Printf("[DATA-REPAIR] Imported %d characters for repair", imported)
+				}
+			}
+		}
 		return ensureMeaningUpdated(repo)
 	}
-	log.Println("Database is empty, seeding with built-in character data...")
+
+	if count > 0 {
+		log.Printf("[DATA-WARN] Database has only %d characters (threshold: %d), data is incomplete!", count, minCharacterCount)
+	}
+
+	log.Println("[DATA-REPAIR] Loading embedded seed data (compiled into binary, always available)...")
+	seeds, err := seeddb.LoadEmbeddedCharacters()
+	if err != nil {
+		log.Printf("[DATA-ERROR] Failed to load embedded seed data: %v", err)
+		log.Println("[DATA-FALLBACK] Falling back to builtin seeds (limited: ~340 chars)")
+		return seedBuiltinCharacters(ctx, repo)
+	}
+
+	log.Printf("[DATA-REPAIR] Importing %d characters from embedded seed data...", len(seeds))
+	imported, err := importSeedCharacters(ctx, repo, seeds)
+	if err != nil {
+		log.Printf("[DATA-ERROR] Embedded seed import failed: %v", err)
+		log.Println("[DATA-FALLBACK] Falling back to builtin seeds (limited: ~340 chars)")
+		return seedBuiltinCharacters(ctx, repo)
+	}
+
+	newCount, _ := repo.Character.Query().Count(ctx)
+	log.Printf("[DATA-REPAIR] Imported %d characters, database now has %d total", imported, newCount)
+
+	if newCount >= minCharacterCount {
+		log.Printf("[DATA-CHECK] Database integrity verified: %d characters >= %d threshold", newCount, minCharacterCount)
+		return nil
+	}
+
+	log.Printf("[DATA-WARN] After import only %d characters, still below threshold %d", newCount, minCharacterCount)
+	return seedBuiltinCharacters(ctx, repo)
+}
+
+func verifyCriticalChars(ctx context.Context, repo *repository.Repository) error {
+	var missing []string
+	for _, ch := range criticalChars {
+		exists, err := repo.Character.Query().
+			Where(character.CharEQ(ch)).
+			Exist(ctx)
+		if err != nil {
+			return fmt.Errorf("verify char %q: %w", ch, err)
+		}
+		if !exists {
+			missing = append(missing, ch)
+		}
+	}
+	if len(missing) > 0 {
+		return fmt.Errorf("missing %d critical characters: %v (database data is corrupted)", len(missing), missing)
+	}
+	log.Printf("[DATA-CHECK] All %d critical characters verified present", len(criticalChars))
+	return nil
+}
+
+func seedBuiltinCharacters(ctx context.Context, repo *repository.Repository) error {
+	log.Println("[DATA-FALLBACK] Seeding with built-in character data (limited coverage, ~340 chars)...")
 	seeds := seeddb.BuiltinCharacterSeeds()
 	created := 0
 	for i := range seeds {
@@ -114,7 +190,7 @@ func ensureDataSeeded(repo *repository.Repository) error {
 		}
 		created++
 	}
-	log.Printf("Seeded %d characters into empty database", created)
+	log.Printf("[DATA-FALLBACK] Seeded %d characters into database", created)
 
 	wxSeeds := seeddb.BuiltinWuXingSeeds()
 	wxCreated := 0
@@ -138,8 +214,85 @@ func ensureDataSeeded(repo *repository.Repository) error {
 		}
 		wxCreated++
 	}
-	log.Printf("Seeded %d wu_xing records into empty database", wxCreated)
+	log.Printf("[DATA-FALLBACK] Seeded %d wu_xing records into database", wxCreated)
 	return nil
+}
+
+func importSeedCharacters(ctx context.Context, repo *repository.Repository, seeds []seeddb.SeedCharacter) (int, error) {
+	total := len(seeds)
+	imported := 0
+	batchSize := 500
+
+	for i := 0; i < total; i += batchSize {
+		end := i + batchSize
+		if end > total {
+			end = total
+		}
+		batch := seeds[i:end]
+
+		builders := make([]*ent.CharacterCreate, 0, len(batch))
+		for _, s := range batch {
+			builder := repo.Character.Create().
+				SetChar(s.Char).
+				SetIsSimplified(s.IsSimplified).
+				SetIsTraditional(s.IsTraditional).
+				SetIsKangxi(s.IsKangxi).
+				SetIsVariant(s.IsVariant).
+				SetIsAncient(s.IsAncient).
+				SetRegular(s.Regular).
+				SetNameable(s.Nameable)
+			if len(s.Pinyin) > 0 {
+				builder.SetPinyin(s.Pinyin)
+			}
+			if s.Radical != "" {
+				builder.SetRadical(s.Radical)
+			}
+			if s.RadicalStroke > 0 {
+				builder.SetRadicalStroke(s.RadicalStroke)
+			}
+			if s.SimplifiedStroke > 0 {
+				builder.SetSimplifiedStroke(s.SimplifiedStroke)
+			}
+			if s.TraditionalStroke > 0 {
+				builder.SetTraditionalStroke(s.TraditionalStroke)
+			}
+			if s.KangxiStroke > 0 {
+				builder.SetKangxiStroke(s.KangxiStroke)
+			}
+			if s.ScienceStroke > 0 {
+				builder.SetScienceStroke(s.ScienceStroke)
+			}
+			if s.WuXing != "" {
+				builder.SetWuXing(s.WuXing)
+			}
+			if s.CommonLevel > 0 {
+				builder.SetCommonLevel(s.CommonLevel)
+			}
+			if s.GenderHint != "" {
+				builder.SetGenderHint(s.GenderHint)
+			}
+			if s.Meaning != "" {
+				builder.SetMeaning(s.Meaning)
+			}
+			if s.Source != "" {
+				builder.SetSource(s.Source)
+			}
+			if s.Comment != "" {
+				builder.SetComment(s.Comment)
+			}
+			builders = append(builders, builder)
+		}
+
+		created, err := repo.Character.CreateBulk(builders...).Save(ctx)
+		if err != nil {
+			log.Printf("  Warning: batch %d-%d import error: %v", i, end, err)
+			continue
+		}
+		imported += len(created)
+		log.Printf("  Characters: %d/%d", imported, total)
+	}
+
+	return imported, nil
 }
 
 func ensureMeaningUpdated(repo *repository.Repository) error {
