@@ -5,6 +5,7 @@ require (
 	github.com/babyname/chronos/v2 v2.0.7
 	github.com/babyname/yi v1.0.2
 	github.com/go-sql-driver/mysql v1.7.0
+	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.6.1
 	github.com/sqlite3ent/sqlite3 v1.50.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
