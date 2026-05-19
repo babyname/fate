@@ -3,7 +3,7 @@
 ## 示例1：新生儿起名
 
 ```go
-import "github.com/godcong/fate/chronos"
+import "github.com/babyname/fate"
 
 input := &chronos.FateInput{
     Birthday: "2024-01-01 08:30",

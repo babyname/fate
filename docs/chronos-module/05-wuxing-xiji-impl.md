@@ -22,7 +22,7 @@ package chronos
 
 import (
     "strings"
-    "github.com/godcong/fate/errors"
+    "github.com/babyname/fate/internal/bazi"
 )
 
 // 计算五行喜忌

@@ -78,7 +78,7 @@ type oldWuGeLucky struct {
 }
 
 type oldWuXing struct {
-	ID      string
+	ID      int
 	First   string
 	Second  string
 	Third   string

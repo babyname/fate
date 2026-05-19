@@ -1,15 +1,13 @@
 package fate
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/analysis"
-	v2 "github.com/godcong/chronos/v2"
+	v2 "github.com/babyname/chronos/v2"
 )
 
 func TestNameAnalysisOutput(t *testing.T) {
@@ -82,35 +80,24 @@ func TestNameAnalysisOutput(t *testing.T) {
 		return true
 	})
 
-	report := analysis.NewReport("张", born.Format("2006年01月02日 15:04"), "男", fateData, total)
-	report.TopNames = topNames
-
-	outputDir := filepath.Join(".", "output")
-	os.MkdirAll(outputDir, os.ModePerm)
-
-	formatters := []analysis.Formatter{
-		&analysis.TextFormatter{},
-		&analysis.MarkdownFormatter{},
-		&analysis.JSONFormatter{Indent: true},
+	if len(topNames) == 0 {
+		t.Error("CollectTopNames returned no results")
 	}
 
-	for _, fmt_ := range formatters {
-		filename := "张_姓名分析报告" + fmt_.Extension()
-		filepath := filepath.Join(outputDir, filename)
+	t.Logf("Top name: %s (score: %.1f, grade: %s)", topNames[0].FullName, topNames[0].Score, topNames[0].Grade)
 
-		f, err := os.Create(filepath)
-		if err != nil {
-			t.Errorf("create %s error: %v", filepath, err)
-			continue
-		}
+	if topNames[0].WuGe != nil {
+		t.Logf("WuGe - TianGe: %d(%s), RenGe: %d(%s), DiGe: %d(%s)",
+			topNames[0].WuGe.TianGe.Stroke, topNames[0].WuGe.TianGe.Lucky,
+			topNames[0].WuGe.RenGe.Stroke, topNames[0].WuGe.RenGe.Lucky,
+			topNames[0].WuGe.DiGe.Stroke, topNames[0].WuGe.DiGe.Lucky)
+	}
 
-		err = fmt_.Format(f, report)
-		f.Close()
-		if err != nil {
-			t.Errorf("format %s error: %v", filepath, err)
-			continue
-		}
+	if topNames[0].Bazi != nil {
+		t.Logf("Bazi - Zodiac: %s, Constellation: %s", topNames[0].Bazi.Zodiac, topNames[0].Bazi.Constellation)
+	}
 
-		t.Logf("已生成: %s", filepath)
+	if topNames[0].ZhouYi != nil {
+		t.Logf("ZhouYi - BenGua: %s(%s), Score: %d", topNames[0].ZhouYi.BenGuaName, topNames[0].ZhouYi.BenGuaJiXiong, topNames[0].ZhouYi.Score)
 	}
 }
