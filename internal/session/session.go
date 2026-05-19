@@ -216,6 +216,9 @@ func (s *session) generate() error {
 	if basic.LastName[0] != nil {
 		surname = basic.LastName[0].Char
 	}
+	if basic.LastName[1] != nil && basic.LastName[1].Char != "" {
+		surname += basic.LastName[1].Char
+	}
 	l1 := strokes[0]
 	l2 := strokes[1]
 

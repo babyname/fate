@@ -108,45 +108,55 @@ func (e *Exporter) Export() error {
 	log.Println("Building ID→Char lookup from n_character...")
 	idToChar, err := e.buildIDLookup(db)
 	if err != nil {
-		return err
+		log.Printf("  Warning: n_character lookup failed (%v), skipping n_character export", err)
+		idToChar = nil
+	} else {
+		log.Printf("  → %d ID mappings", len(idToChar))
 	}
-	log.Printf("  → %d ID mappings", len(idToChar))
 
 	var allChars []SeedCharacter
 
-	log.Println("Exporting n_character table (primary)...")
-	nChars, err := e.queryNCharacters(db)
-	if err != nil {
-		return err
+	if idToChar != nil {
+		log.Println("Exporting n_character table (primary)...")
+		nChars, err := e.queryNCharacters(db)
+		if err != nil {
+			log.Printf("  Warning: n_character query failed (%v), skipping", err)
+		} else {
+			nSeeds := e.transformNCharacters(nChars, idToChar)
+			log.Printf("  → %d from n_character", len(nSeeds))
+			allChars = dedupCharacters(nSeeds)
+		}
 	}
-	nSeeds := e.transformNCharacters(nChars, idToChar)
-	log.Printf("  → %d from n_character", len(nSeeds))
-	allChars = dedupCharacters(nSeeds)
 
-	log.Println("Exporting character table (supplement)...")
+	log.Println("Exporting character table...")
 	oldChars, err := e.queryCharacters(db)
 	if err != nil {
-		return err
+		return fmt.Errorf("query character table: %w", err)
 	}
 	cSeeds := e.transformCharacters(oldChars)
 	log.Printf("  → %d from character", len(cSeeds))
 
-	allChars = e.mergeCharacters(allChars, cSeeds)
-	log.Printf("  → %d after merge (dedup by char)", len(allChars))
+	if len(allChars) > 0 {
+		allChars = e.mergeCharacters(allChars, cSeeds)
+		log.Printf("  → %d after merge (dedup by char)", len(allChars))
+	} else {
+		allChars = cSeeds
+		log.Printf("  → %d characters (character table only)", len(allChars))
+	}
 
 	e.enrichFromVariants(allChars)
 
 	log.Println("Exporting wu_ge_lucky table...")
 	oldWuGes, err := e.queryWuGeLucky(db)
 	if err != nil {
-		return err
+		log.Printf("  Warning: wu_ge_lucky query failed (%v), skipping", err)
 	}
 	seedWuGes := transformWuGeLucky(oldWuGes)
 
 	log.Println("Exporting wu_xing table...")
 	oldWuXings, err := e.queryWuXing(db)
 	if err != nil {
-		return err
+		log.Printf("  Warning: wu_xing query failed (%v), skipping", err)
 	}
 	seedWuXings := transformWuXing(oldWuXings)
 
