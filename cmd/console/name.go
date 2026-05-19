@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/babyname/fate"
@@ -11,7 +12,7 @@ import (
 	"github.com/babyname/fate/internal/database"
 	"github.com/babyname/fate/internal/repository"
 	"github.com/babyname/fate/log"
-	v2 "github.com/godcong/chronos/v2"
+	v2 "github.com/babyname/chronos/v2"
 
 	"github.com/spf13/cobra"
 )
@@ -27,7 +28,8 @@ func cmdName() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "name",
 		Short: "生成姓名列表",
-		Run: func(_ *cobra.Command, _ []string) {
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(_ *cobra.Command, args []string) {
 			fmt.Println("start", time.Now().String())
 			f, err := fate.New(cfg)
 			if err != nil {
@@ -52,10 +54,14 @@ func cmdName() *cobra.Command {
 				fmt.Println("请输入姓氏")
 				return
 			}
-			fmt.Println("born", born)
-			b, err := time.Parse(v2.DateFormatYMDHMS, born)
+			bornStr := born
+			if len(args) > 0 {
+				bornStr = born + " " + args[0]
+			}
+			fmt.Println("born", bornStr)
+			b, err := parseBornTime(bornStr)
 			if err != nil {
-				fmt.Println("请输入正确的出生日期")
+				fmt.Println("请输入正确的出生日期，格式: 2024/06/15 10:30 或 2024/06/15")
 				return
 			}
 			sx := 1
@@ -98,9 +104,9 @@ func cmdName() *cobra.Command {
 			fmt.Println("Finished")
 		},
 	}
-	cmd.Flags().StringVarP(&last, "last", "l", "", "指定姓氏")
+	cmd.Flags().StringVarP(&last, "surname", "s", "", "指定姓氏")
 	cmd.Flags().StringVarP(&born, "born", "b", time.Now().Format(v2.DateFormatYMDHMS), "设置新生儿生日 2016/01/02 15:04")
-	cmd.Flags().StringVarP(&sex, "sex", "s", "boy", "设置新生儿性别")
+	cmd.Flags().StringVarP(&sex, "gender", "g", "boy", "设置新生儿性别(boy/girl)")
 	cmd.Flags().StringVarP(&filter, "filter", "f", "", "从结果中过滤掉指定汉字")
 	cmd.Flags().StringVarP(&output, "output", "o", "", "设置输出路径")
 	cmd.Flags().StringVar(&xiyong, "xiyong", "balance", "喜用神算法: balance(平衡用神法) 或 geju(格局用神法)")
@@ -128,10 +134,9 @@ func cmdNameDetail() *cobra.Command {
 				fmt.Println("请输入姓氏")
 				return
 			}
-			fmt.Println("born", born)
-			b, err := time.Parse(v2.DateFormatYMDHMS, born)
+			b, err := parseBornTime(born)
 			if err != nil {
-				fmt.Println("请输入正确的出生日期")
+				fmt.Println("请输入正确的出生日期，格式: 2024/06/15 10:30 或 2024/06/15")
 				return
 			}
 			sx := 1
@@ -188,9 +193,9 @@ func cmdNameDetail() *cobra.Command {
 			printNameDetail(nr)
 		},
 	}
-	cmd.Flags().StringVarP(&last, "last", "l", "", "指定姓氏")
+	cmd.Flags().StringVarP(&last, "surname", "s", "", "指定姓氏")
 	cmd.Flags().StringVarP(&born, "born", "b", time.Now().Format(v2.DateFormatYMDHMS), "设置新生儿生日 2016/01/02 15:04")
-	cmd.Flags().StringVarP(&sex, "sex", "s", "boy", "设置新生儿性别")
+	cmd.Flags().StringVarP(&sex, "gender", "g", "boy", "设置新生儿性别(boy/girl)")
 	return cmd
 }
 
@@ -214,6 +219,9 @@ func printNameDetail(nr analysis.NameResult) {
 		nr.Char1.Char, nr.Char1.Pinyin, nr.Char1.WuXing,
 		nr.Char1.SimplifiedStroke, nr.Char1.TraditionalStroke,
 		nr.Char1.ScienceStroke, nr.Char1.KangxiStroke)
+	if nr.Char1.Meaning != "" {
+		fmt.Printf("    释义: %s\n", nr.Char1.Meaning)
+	}
 	if nr.Char1.IsXiYong {
 		fmt.Printf("    ★ 喜用神\n")
 	}
@@ -221,6 +229,9 @@ func printNameDetail(nr analysis.NameResult) {
 		nr.Char2.Char, nr.Char2.Pinyin, nr.Char2.WuXing,
 		nr.Char2.SimplifiedStroke, nr.Char2.TraditionalStroke,
 		nr.Char2.ScienceStroke, nr.Char2.KangxiStroke)
+	if nr.Char2.Meaning != "" {
+		fmt.Printf("    释义: %s\n", nr.Char2.Meaning)
+	}
 	if nr.Char2.IsXiYong {
 		fmt.Printf("    ★ 喜用神\n")
 	}
@@ -253,8 +264,61 @@ func printNameDetail(nr analysis.NameResult) {
 		if nr.ZhouYi.DaXiang != "" {
 			fmt.Printf("  大象: %s\n", nr.ZhouYi.DaXiang)
 		}
+		if nr.ZhouYi.YunShi != "" {
+			fmt.Printf("  运势: %s\n", nr.ZhouYi.YunShi)
+		}
+		if nr.ZhouYi.ShiYe != "" {
+			fmt.Printf("  事业: %s\n", nr.ZhouYi.ShiYe)
+		}
+		if nr.ZhouYi.HunLian != "" {
+			fmt.Printf("  婚恋: %s\n", nr.ZhouYi.HunLian)
+		}
+		if nr.ZhouYi.JueCe != "" {
+			fmt.Printf("  决策: %s\n", nr.ZhouYi.JueCe)
+		}
 		fmt.Println()
 	}
+	if nr.Bazi != nil {
+		fmt.Println("  【八字分析】")
+		fmt.Printf("  四柱: %s\n", strings.Join(nr.Bazi.Sizhu[:], " "))
+		fmt.Printf("  五行: %s\n", strings.Join(nr.Bazi.Wuxing[:], " "))
+		fmt.Printf("  纳音: %s\n", strings.Join(nr.Bazi.Nayin[:], " "))
+		fmt.Printf("  生肖: %s  星座: %s\n", nr.Bazi.Zodiac, nr.Bazi.Constellation)
+		if nr.Bazi.ConstellationDetail != nil {
+			cd := nr.Bazi.ConstellationDetail
+			fmt.Printf("  星座详情: 守护%s 性格%s 幸运色%s 幸运数字%s\n",
+				cd.Element, cd.Trait, cd.LuckyColor, cd.LuckyNumber)
+			if cd.Description != "" {
+				fmt.Printf("  起名建议: %s\n", cd.Description)
+			}
+		}
+		fmt.Println()
+	}
+	if nr.WuXing != nil {
+		fmt.Println("  【五行喜用神】")
+		fmt.Printf("  日主: %s(%s)  八字强弱: %s\n", nr.WuXing.DayGan, nr.WuXing.DayWuxing, nr.WuXing.QiangRuo)
+		fmt.Printf("  喜用神: %s\n", strings.Join(nr.WuXing.XiWuxing, "、"))
+		fmt.Printf("  忌神: %s\n", strings.Join(nr.WuXing.JiWuxing, "、"))
+		if nr.WuXing.YongWuxing != "" {
+			fmt.Printf("  用神: %s\n", nr.WuXing.YongWuxing)
+		}
+		if len(nr.WuXing.ChouWuxing) > 0 {
+			fmt.Printf("  仇神: %s\n", strings.Join(nr.WuXing.ChouWuxing, "、"))
+		}
+		if len(nr.WuXing.XianWuxing) > 0 {
+			fmt.Printf("  闲神: %s\n", strings.Join(nr.WuXing.XianWuxing, "、"))
+		}
+		fmt.Printf("  算法: %s\n", nr.WuXing.MethodName)
+		if nr.WuXing.Analysis != "" {
+			fmt.Printf("  分析: %s\n", nr.WuXing.Analysis)
+		}
+		fmt.Println()
+	}
+	fmt.Println("  【评分明细】")
+	sd := nr.ScoreDetail
+	fmt.Printf("  文化印象: %.1f  五行八字: %.1f  生肖: %.1f  五格数理: %.1f  音韵: %.1f\n",
+		sd.WenHuaYinXiang, sd.WuXingBaZi, sd.ShengXiao, sd.WuGeShuLi, sd.YinYun)
+	fmt.Println()
 	fmt.Println("  【综合解读】")
 	fmt.Printf("  %s\n", nr.Interpret)
 	fmt.Println("═══════════════════════════════════════")
@@ -277,6 +341,24 @@ func getLastChar(s string) ([2]string, bool) {
 		return l, false
 	}
 	return l, true
+}
+
+func parseBornTime(s string) (time.Time, error) {
+	formats := []string{
+		v2.DateFormatYMDHMS,
+		"2006/01/02 15:04",
+		"2006/01/02 15:04:05",
+		"2006-01-02 15:04:05",
+		"2006-01-02 15:04",
+		"2006/01/02",
+		"2006-01-02",
+	}
+	for _, f := range formats {
+		if t, err := time.Parse(f, s); err == nil {
+			return t, nil
+		}
+	}
+	return time.Time{}, fmt.Errorf("无法解析日期: %s", s)
 }
 
 func PrintScreen(output *fate.Output) {

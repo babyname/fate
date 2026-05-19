@@ -4,7 +4,7 @@
 
 | 参数 | 值 |
 |-----|-----|
-| 语言 | Go 1.21+ |
+| 语言 | Go 1.25.0+ |
 | 构建 | go build |
 | 平台 | Windows/Linux/macOS |
 
@@ -14,7 +14,7 @@
 
 ```
 # 1. 克隆代码
-git clone https://github.com/godcong/fate.git
+git clone https://github.com/babyname/fate.git
 
 # 2. 构建
 go build -o fate ./cmd/fate

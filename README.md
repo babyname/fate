@@ -1,11 +1,8 @@
-# 命运起名 Fate
+# 启命宝 fate
 
 <p align="center">
-  <strong>现代科学取名工具 — 基于八字五行·三才五格·周易卦象的智能起名系统</strong>
-</p>
-
-<p align="center">
-  <img src="docs/images/architecture.svg" alt="Architecture" width="800"/>
+  <strong>fate — 八字五行起名算法引擎</strong><br>
+  <em>基于八字五行·三才五格·周易卦象的智能起名算法引擎与命令行工具</em>
 </p>
 
 <p align="center">
@@ -14,29 +11,37 @@
 
 ---
 
-## ✨ 特性
+## 功能特性
 
-- 🎂 **八字计算** — 四柱八字、五行强弱、调候用神
-- ☯️ **双算法喜用神** — 平衡用神法 + 格局用神法（正官格/七杀格/食神格等10种格局）
-- 📐 **三才五格** — 81数大衍、阴阳五行、预计算O(1)查找（3.89ns/op）
-- 🔮 **周易卦象** — 64卦完整解读（大象/事业/经商/求名/婚恋/决策）
-- 📊 **四维评分** — 文化印象 / 五行八字 / 生肖 / 五格数理
-- 📝 **多格式输出** — Text / Markdown / JSON（美名腾风格）
-- 🏛️ **简繁对照** — 400+常用汉字简繁体映射
+- 八字计算 — 四柱八字、五行强弱、调候用神
+- 双算法喜用神 — 平衡用神法 + 格局用神法（10种格局）
+- 三才五格 — 81数大衍、阴阳五行、O(1)查找
+- 周易卦象 — 64卦完整解读
+- 五维评分 — 文化印象/五行八字/生肖/五格数理/音韵
 
-## 📸 报告预览
+---
 
-<p align="center">
-  <img src="docs/images/report_preview.svg" alt="Report Preview" width="800"/>
-</p>
+## 关于 fate 与 qiming
 
-## 🚀 快速开始
+**fate** 是开源的起名算法引擎，提供核心的八字计算、喜用神分析、五格筛选和名字生成能力，以命令行工具和 Go 库两种形式交付。
+
+**qiming** 是基于 fate 构建的商业起名服务，提供 Web 界面、诗词取名等面向终端用户的功能。
+
+| | fate | qiming |
+|---|---|---|
+| 定位 | 算法引擎 + CLI | 商业服务 |
+| 八字/喜用神/五维评分 | 包含 | 包含 |
+| 诗词取名 | 不包含 | 包含 |
+| Web 界面 | 不包含 | 包含 |
+| 开源 | 是 | 否 |
+
+---
+
+## 快速开始
 
 ### 环境要求
 
 - Go 1.22+
-- GCC（SQLite3 CGO 依赖）
-- SQLite3
 
 ### 安装
 
@@ -46,23 +51,46 @@ cd fate
 go mod download
 ```
 
-### 生成姓名分析报告
+---
+
+## 两种使用方式
+
+### 方式一：命令行起名
+
+适合快速生成名字列表，输出简洁高效：
 
 ```bash
-# 使用内置工具生成示例报告
-go run github.com/babyname/fate/cmd/gen_report
+# 生成名字
+go run ./cmd/console name -s 张 -b "2024/06/15 10:30" -g boy
 
-# 输出文件在 output/ 目录
-ls output/
-# 张_姓名分析报告_平衡用神法.txt
-# 张_姓名分析报告_平衡用神法.md
-# 张_姓名分析报告_平衡用神法.json
-# 张_姓名分析报告_格局用神法.txt
-# 张_姓名分析报告_格局用神法.md
-# 张_姓名分析报告_格局用神法.json
+# 查看单个名字的详细分析
+go run ./cmd/console name detail 峰 瑞 -s 张 -b "2024/06/15 10:30" -g boy
+
+# 查看所有参数
+go run ./cmd/console name -h
 ```
 
-### 代码中使用
+**参数说明：**
+
+| 参数 | 说明 | 示例 |
+|------|------|------|
+| `-s, --surname` | 姓氏 | `-s 张` |
+| `-b, --born` | 出生日期 | `-b "2024/06/15 10:30"` |
+| `-g, --gender` | 性别 | `-g boy` 或 `-g girl` |
+| `--xiyong` | 喜用神算法 | `--xiyong balance` 或 `--xiyong geju` |
+| `--strictness` | 五格筛选严格度 | `--strictness moderate` |
+| `-f, --filter` | 从结果中过滤指定汉字 | `-f 病死` |
+| `-o, --output` | 输出到文件 | `-o result.txt` |
+
+---
+
+### 方式二：代码导入使用
+
+适合集成到其他 Go 项目中：
+
+```bash
+go get github.com/babyname/fate
+```
 
 ```go
 package main
@@ -71,177 +99,105 @@ import (
     "fmt"
     "time"
 
-    "github.com/babyname/fate/internal/analysis"
-    v2 "github.com/godcong/chronos/v2"
+    "github.com/babyname/fate"
+    "github.com/babyname/fate/config"
 )
 
 func main() {
-    // 1. 计算八字和喜用神
+    cfg := config.DefaultConfig()
+
+    f, err := fate.New(cfg)
+    if err != nil {
+        panic(err)
+    }
+
+    filter := fate.NewFilter(fate.FilterOption{
+        CharacterFilter:     true,
+        CharacterFilterType: fate.CharacterFilterTypeDefault,
+        MinStroke:           3,
+        MaxStroke:           18,
+        RegularFilter:       true,
+        DaYanFilter:         true,
+        WuXingFilter:        true,
+    })
+
+    s := f.NewSessionWithFilter(filter)
+
     born, _ := time.Parse("2006/01/02 15:04", "2024/06/15 10:30")
+    input := &fate.Input{
+        Last: [2]string{"张", ""},
+        Born: born,
+        Sex:  fate.SexBoy,
+    }
 
-    // 平衡用神法
-    fateData, _ := v2.GetFateData(&v2.FateInput{
-        BirthDate: born,
-        Gender:    1,       // 1=男, 2=女
-        Surname:   "张",
-        Method:    v2.XiYongMethodBalance, // 平衡用神法
-    })
+    err = s.Start(input)
+    if err != nil {
+        panic(err)
+    }
+    s.Wait()
 
-    // 格局用神法
-    fateData2, _ := v2.GetFateData(&v2.FateInput{
-        BirthDate: born,
-        Gender:    1,
-        Surname:   "张",
-        Method:    v2.XiYongMethodGeJu,   // 格局用神法
-    })
+    output := input.Output()
+    fmt.Printf("共生成 %d 个名字\n", output.Total())
 
-    // 2. 构建名字分析结果
-    c1 := &ent.Character{Char: "驰", WuXing: "火", ScienceStroke: 13, ...}
-    c2 := &ent.Character{Char: "筎", WuXing: "木", ScienceStroke: 12, ...}
-    result := analysis.BuildNameResult(1, "张", c1, c2, 11, 0, fateData)
-
-    // 3. 生成报告
-    report := analysis.NewReport("张", "2024年06月15日", "男", fateData, 1000)
-    report.TopNames = append(report.TopNames, result)
-
-    // 输出 Markdown
-    f := &analysis.MarkdownFormatter{}
-    f.Format(os.Stdout, report)
+    for _, nr := range output.TopNames() {
+        fmt.Printf("  %s - 评分: %.1f\n", nr.FullName, nr.Score)
+    }
 }
 ```
 
-## 🏗️ 项目结构
+**核心 API：**
 
-```
-fate/
-├── cmd/
-│   └── gen_report/          # 报告生成工具
-├── ent/                     # Ent ORM 实体定义
-│   └── character.go         # 字符实体（简/繁笔画、五行、偏旁等）
-├── internal/
-│   ├── analysis/            # 核心分析模块
-│   │   ├── analysis.go      # 数据结构 + 格式化器
-│   │   ├── sancai_data.go   # 三才/基础运/成功运/人际关系数据
-│   │   ├── zhouyi.go        # 周易卦象计算
-│   │   ├── zhouyi_data.go   # 64卦解读数据
-│   │   └── simplified_traditional.go  # 简繁对照表
-│   ├── wuge/                # 三才五格
-│   │   ├── wuge.go          # 五格计算
-│   │   ├── dayan.go         # 81数大衍
-│   │   └── result.go        # O(1)预计算查找表
-│   ├── wuxing/              # 五行分析
-│   │   ├── san_cai.go       # 三才五行
-│   │   └── wu_xing.go       # 125种三才组合吉凶
-│   ├── rating/              # 评分系统
-│   ├── zhouyi/              # 周易辅助
-│   ├── filter/              # 名字筛选
-│   ├── naming/              # 起名逻辑
-│   └── session/             # 会话管理
-├── chronos/                 # 八字计算子模块
-│   ├── fate.go              # FateData 主入口
-│   ├── xiyong_balance.go    # 平衡用神法
-│   ├── xiyong_geju.go       # 格局用神法
-│   └── fate_helpers.go      # 五行计算辅助函数
-└── yi/                      # 周易卦象子模块
-```
+| 类型 | 说明 |
+|------|------|
+| `fate.New(cfg)` | 创建 Fate 实例 |
+| `fate.NewSessionWithFilter(filter)` | 创建带筛选条件的会话 |
+| `fate.NewFilter(option)` | 根据选项创建筛选器 |
+| `fate.FilterOption{}` | 筛选选项（笔画范围/五行/大衍/性别等） |
+| `fate.Input{}` | 输入参数（姓氏/生日/性别） |
+| `fate.Output` | 输出结果（TopNames/AllNames/Total） |
+| `fate.Session` | 会话接口（Start/Stop/Wait） |
 
-## ☯️ 两种喜用神算法
+---
+
+## 喜用神算法
 
 ### 平衡用神法
 
-基于日主强弱判断，通过同党/异党力量对比取用神：
+基于日主强弱，通过同党/异党力量对比取用神：
 
-| 日主 | 用神 | 喜神 | 忌神 | 仇神 |
-|------|------|------|------|------|
-| 强 | 克我者（官杀） | 我克者+生我者 | 同我者（比劫） | 生忌神者 |
-| 弱 | 生我者（印星） | 同我者（比劫） | 克我者+我生者 | 生忌神者 |
+| 日主状态 | 用神 | 喜神 | 忌神 |
+|----------|------|------|------|
+| 日主强 | 克我者（官杀） | 我克者+生我者 | 同我者（比劫） |
+| 日主弱 | 生我者（印星） | 同我者（比劫） | 克我者+我生者 |
 
 ### 格局用神法
 
-先定格局（10种），再根据格局+强弱取用神：
+先定格局（正官/七杀/食神/伤官/正财/偏财/建禄/阳刃等10种），再根据格局取用神。
 
-| 格局 | 强日主用神 | 弱日主用神 |
-|------|-----------|-----------|
-| 正官格 | 官星 | 印星 |
-| 七杀格 | 食神制杀 | 印星化杀 |
-| 食神格 | 食神生财 | 比劫帮身 |
-| 伤官格 | 印星制伤 | 印星 |
-| 正财/偏财格 | 财星 | 印星 |
-| 建禄/阳刃格 | 官星 | 印星 |
+---
 
-## 📊 评分体系
+## 五维评分体系
 
 | 维度 | 权重 | 说明 |
 |------|------|------|
-| 文化印象 | — | 常用字、正体字、字义丰富度 |
-| 五行八字 | — | 名字五行与喜用神匹配度 |
-| 生肖 | — | 生肖五行与名字五行生克关系 |
-| 五格数理 | — | 天/人/地/外/总格吉凶 |
+| 文化印象 | 20% | 常用字、正体字、字义丰富度 |
+| 五行八字 | 25% | 名字五行与喜用神匹配度 |
+| 生肖 | 10% | 生肖与名字五行生克关系 |
+| 五格数理 | 25% | 天/人/地/外/总格吉凶 |
+| 音韵 | 20% | 姓名音韵和谐度 |
 
-## 🔧 性能
+---
 
-| 指标 | 数值 |
-|------|------|
-| WuGeLucky 查找 | 3.89 ns/op, 0 B alloc |
-| 张姓全量起名 | ~50ms / 61730名 |
-| 李姓全量起名 | ~127ms / 165852名 |
-
-## 📄 输出格式
-
-### Text 格式
-```
-════════════════════════════════════════════════════════════
-                      姓名分析报告
-════════════════════════════════════════════════════════════
-  姓氏: 张    性别: 男    出生: 2024年06月15日 10:30
-
-【五行喜忌分析】
-  算法: 格局用神法  格局: 正官格
-  日主: 庚（金）    强弱: 强
-  用  神: 火
-  喜  神: 木、金
-  忌  神: 土
-  仇  神: 火
-  闲  神: 水
-```
-
-### Markdown 格式
-```markdown
-## 五行喜忌分析
-
-| 项目 | 内容 |
-|------|------|
-| 算法 | 格局用神法 |
-| 格局 | 正官格 |
-| 用神 | 火 |
-| 喜神 | 木、金 |
-| 忌神 | 土 |
-```
-
-### JSON 格式
-```json
-{
-  "wuxing_xiji": {
-    "day_gan": "庚",
-    "yong_wuxing": "火",
-    "xi_wuxing": ["木", "金"],
-    "ji_wuxing": ["土"],
-    "chou_wuxing": ["火"],
-    "xian_wuxing": ["水"],
-    "method_name": "格局用神法",
-    "geju_name": "正官格"
-  }
-}
-```
-
-## 🛠️ 技术栈
+## 技术栈
 
 - **Go 1.22+** — 主语言
 - **Ent ORM** — 数据库 ORM
-- **SQLite3** — 数据存储（`github.com/sqlite3ent/sqlite3` 驱动）
-- **chronos/v2** — 八字计算子模块（本地 `replace`）
-- **yi** — 周易卦象计算（`github.com/godcong/yi`）
+- **SQLite3** — 数据存储
+- **chronos/v2** — 八字计算
+- **yi** — 周易卦象
 
-## 📜 License
+---
+
+## License
 
 MIT License

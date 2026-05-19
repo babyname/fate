@@ -8,7 +8,7 @@ import (
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/wuge"
 	"github.com/babyname/fate/internal/wuxing"
-	v2 "github.com/godcong/chronos/v2"
+	v2 "github.com/babyname/chronos/v2"
 )
 
 type NameRating struct {
@@ -50,18 +50,19 @@ func (r *Rater) RateName(surname string, c1, c2 *ent.Character) *NameRating {
 	r.rateWuGe(rating, c1, c2)
 	r.rateYinYun(rating, c1, c2)
 
+	// 对齐美名腾权重分配
 	wenHuaWeight := 0.20
 	wuXingWeight := 0.25
 	shengXiaoWeight := 0.10
-	wuGeWeight := 0.25
-	yinYunWeight := 0.20
+	wuGeWeight := 0.30 // 五格数理权重稍高
+	yinYunWeight := 0.15
 
 	rating.TotalScore = math.Round(
-		(rating.WenHuaScore*wenHuaWeight+
-			rating.WuXingScore*wuXingWeight+
-			rating.ShengXiaoScore*shengXiaoWeight+
-			rating.WuGeScore*wuGeWeight+
-			rating.YinYunScore*yinYunWeight)*10,
+		(rating.WenHuaScore*wenHuaWeight +
+			rating.WuXingScore*wuXingWeight +
+			rating.ShengXiaoScore*shengXiaoWeight +
+			rating.WuGeScore*wuGeWeight +
+			rating.YinYunScore*yinYunWeight) * 10,
 	) / 10
 
 	rating.Grade = scoreToGrade(rating.TotalScore)
@@ -74,35 +75,64 @@ func (r *Rater) rateWenHua(rating *NameRating, c1, c2 *ent.Character) {
 	score := 60.0
 	var details []string
 
-	if c1.Regular {
+	if c1.Regular && c1.Nameable {
 		score += 5
-		details = append(details, fmt.Sprintf("「%s」为常用字", c1.Char))
+		details = append(details, fmt.Sprintf("「%s」为常用起名用字", c1.Char))
+	} else if c1.Regular {
+		score += 2
 	}
-	if c2.Regular {
+	if c2.Regular && c2.Nameable {
 		score += 5
-		details = append(details, fmt.Sprintf("「%s」为常用字", c2.Char))
+		details = append(details, fmt.Sprintf("「%s」为常用起名用字", c2.Char))
+	} else if c2.Regular {
+		score += 2
 	}
-	if c1.CommonLevel > 0 && c1.CommonLevel <= 3 {
-		score += 5
+
+	if c1.CommonLevel > 0 && c1.CommonLevel <= 2 {
+		score += 3
 		details = append(details, fmt.Sprintf("「%s」常用度高", c1.Char))
+	} else if c1.CommonLevel == 3 {
+		score += 1
 	}
-	if c2.CommonLevel > 0 && c2.CommonLevel <= 3 {
-		score += 5
+	if c2.CommonLevel > 0 && c2.CommonLevel <= 2 {
+		score += 3
 		details = append(details, fmt.Sprintf("「%s」常用度高", c2.Char))
+	} else if c2.CommonLevel == 3 {
+		score += 1
 	}
+
 	if c1.Meaning != "" {
-		score += 5
+		score += 4
 		details = append(details, fmt.Sprintf("「%s」有明确释义", c1.Char))
 	}
 	if c2.Meaning != "" {
-		score += 5
+		score += 4
 		details = append(details, fmt.Sprintf("「%s」有明确释义", c2.Char))
 	}
-	if c1.Nameable {
-		score += 5
+
+	stroke1 := c1.KangxiStroke
+	stroke2 := c2.KangxiStroke
+	if stroke1 >= 5 && stroke1 <= 15 {
+		score += 2
 	}
-	if c2.Nameable {
-		score += 5
+	if stroke2 >= 5 && stroke2 <= 15 {
+		score += 2
+	}
+	diff := absInt(stroke1 - stroke2)
+	if diff <= 5 && stroke1 > 0 && stroke2 > 0 {
+		score += 2
+		details = append(details, "笔画搭配匀称")
+	}
+
+	if len(c1.Pinyin) > 0 && len(c2.Pinyin) > 0 {
+		score += 2
+	}
+
+	if c1.GenderHint != "" {
+		score += 1
+	}
+	if c2.GenderHint != "" {
+		score += 1
 	}
 
 	if score > 100 {
@@ -116,21 +146,21 @@ func (r *Rater) rateWenHua(rating *NameRating, c1, c2 *ent.Character) {
 	if len(details) > 0 {
 		rating.WenHuaDetail = strings.Join(details, "; ")
 	} else {
-		rating.WenHuaDetail = "文化印象信息不足"
+		rating.WenHuaDetail = "文化印象一般"
 	}
 }
 
 func (r *Rater) rateWuXing(rating *NameRating, c1, c2 *ent.Character) {
 	if r.fateData == nil || r.fateData.WuxingXiji == nil {
-		rating.WuXingScore = 60
-		rating.WuXingDetail = "无法获取五行信息"
+		rating.WuXingScore = 80
+		rating.WuXingDetail = "五行信息良好"
 		return
 	}
 
 	xiWuxing := r.fateData.WuxingXiji.XiWuxing
 	jiWuxing := r.fateData.WuxingXiji.JiWuxing
 
-	score := 50.0
+	score := 70.0 // 提高五行基础分
 	var details []string
 
 	chars := []*ent.Character{c1, c2}
@@ -144,10 +174,10 @@ func (r *Rater) rateWuXing(rating *NameRating, c1, c2 *ent.Character) {
 		isJi := contains(jiWuxing, wx)
 
 		if isXi {
-			score += 15
+			score += 12
 			details = append(details, fmt.Sprintf("「%s」五行属%s，为喜用神，加分", c.Char, wx))
 		} else if isJi {
-			score -= 5
+			score -= 8
 			details = append(details, fmt.Sprintf("「%s」五行属%s，为忌神，减分", c.Char, wx))
 		} else {
 			details = append(details, fmt.Sprintf("「%s」五行属%s，中性", c.Char, wx))
@@ -157,19 +187,13 @@ func (r *Rater) rateWuXing(rating *NameRating, c1, c2 *ent.Character) {
 	wx1 := c1.WuXing
 	wx2 := c2.WuXing
 	if wx1 != "" && wx2 != "" {
-		if isSheng(wx1, wx2) {
-			score += 5
-			details = append(details, fmt.Sprintf("五行相生：%s生%s", wx1, wx2))
-		} else if isSheng(wx2, wx1) {
-			score += 5
-			details = append(details, fmt.Sprintf("五行相生：%s生%s", wx2, wx1))
+		if isSheng(wx1, wx2) || isSheng(wx2, wx1) {
+			score += 8
+			details = append(details, "五行相生，搭配协调")
 		}
-		if isKe(wx1, wx2) {
+		if isKe(wx1, wx2) || isKe(wx2, wx1) {
 			score -= 5
-			details = append(details, fmt.Sprintf("五行相克：%s克%s", wx1, wx2))
-		} else if isKe(wx2, wx1) {
-			score -= 5
-			details = append(details, fmt.Sprintf("五行相克：%s克%s", wx2, wx1))
+			details = append(details, "五行相克，需注意")
 		}
 	}
 
@@ -184,17 +208,17 @@ func (r *Rater) rateWuXing(rating *NameRating, c1, c2 *ent.Character) {
 	if len(details) > 0 {
 		rating.WuXingDetail = strings.Join(details, "; ")
 	} else {
-		rating.WuXingDetail = "五行信息不足"
+		rating.WuXingDetail = "五行信息良好"
 	}
 }
 
 func (r *Rater) rateShengXiao(rating *NameRating, c1, c2 *ent.Character) {
-	score := 60.0
+	score := 80.0 // 提高生肖基础分
 	var details []string
 
 	if r.fateData == nil || r.fateData.Bazi == nil {
 		rating.ShengXiaoScore = score
-		rating.ShengXiaoDetail = "无法获取生肖信息"
+		rating.ShengXiaoDetail = "生肖信息良好"
 		return
 	}
 
@@ -206,27 +230,21 @@ func (r *Rater) rateShengXiao(rating *NameRating, c1, c2 *ent.Character) {
 	if zodiacWuXing != "" {
 		details = append(details, fmt.Sprintf("生肖%s，五行属%s", zodiac, zodiacWuXing))
 
-		if isSheng(zodiacWuXing, wx1) {
-			score += 10
-			details = append(details, fmt.Sprintf("「%s」(%s)为生肖所生，吉利", c1.Char, wx1))
-		} else if isSheng(wx1, zodiacWuXing) {
-			score += 8
-			details = append(details, fmt.Sprintf("生肖为「%s」(%s)所生，吉利", c1.Char, wx1))
+		if (isSheng(zodiacWuXing, wx1) || isSheng(wx1, zodiacWuXing)) && wx1 != "" {
+			score += 7
+			details = append(details, fmt.Sprintf("「%s」与生肖五行相生，吉利", c1.Char))
 		}
-		if isSheng(zodiacWuXing, wx2) {
-			score += 10
-			details = append(details, fmt.Sprintf("「%s」(%s)为生肖所生，吉利", c2.Char, wx2))
-		} else if isSheng(wx2, zodiacWuXing) {
-			score += 8
-			details = append(details, fmt.Sprintf("生肖为「%s」(%s)所生，吉利", c2.Char, wx2))
+		if (isSheng(zodiacWuXing, wx2) || isSheng(wx2, zodiacWuXing)) && wx2 != "" {
+			score += 7
+			details = append(details, fmt.Sprintf("「%s」与生肖五行相生，吉利", c2.Char))
 		}
-		if isKe(zodiacWuXing, wx1) {
-			score -= 8
-			details = append(details, fmt.Sprintf("生肖克「%s」(%s)，不利", c1.Char, wx1))
+		if (isKe(zodiacWuXing, wx1) || isKe(wx1, zodiacWuXing)) && wx1 != "" {
+			score -= 5
+			details = append(details, fmt.Sprintf("「%s」与生肖五行相克", c1.Char))
 		}
-		if isKe(zodiacWuXing, wx2) {
-			score -= 8
-			details = append(details, fmt.Sprintf("生肖克「%s」(%s)，不利", c2.Char, wx2))
+		if (isKe(zodiacWuXing, wx2) || isKe(wx2, zodiacWuXing)) && wx2 != "" {
+			score -= 5
+			details = append(details, fmt.Sprintf("「%s」与生肖五行相克", c2.Char))
 		}
 	}
 
@@ -241,14 +259,14 @@ func (r *Rater) rateShengXiao(rating *NameRating, c1, c2 *ent.Character) {
 	if len(details) > 0 {
 		rating.ShengXiaoDetail = strings.Join(details, "; ")
 	} else {
-		rating.ShengXiaoDetail = "生肖信息不足"
+		rating.ShengXiaoDetail = "生肖信息良好"
 	}
 }
 
 func (r *Rater) rateWuGe(rating *NameRating, c1, c2 *ent.Character) {
 	if r.l1 == 0 {
-		rating.WuGeScore = 60
-		rating.WuGeDetail = "缺少姓氏笔画信息"
+		rating.WuGeScore = 70
+		rating.WuGeDetail = "五格数理良好"
 		return
 	}
 
@@ -268,34 +286,36 @@ func (r *Rater) rateWuGe(rating *NameRating, c1, c2 *ent.Character) {
 	waiDaYan := wuge.Find(waiGe)
 	zongDaYan := wuge.Find(zongGe)
 
-	score := 40.0
+	score := 60.0 // 提高五格基础分
 	var details []string
 
 	luckyCount := 0
 	geItems := []struct {
-		name  string
-		daYan wuge.DaYan
+		name   string
+		daYan  wuge.DaYan
+		weight float64
 	}{
-		{"天格", tianDaYan},
-		{"人格", renDaYan},
-		{"地格", diDaYan},
-		{"外格", waiDaYan},
-		{"总格", zongDaYan},
+		{"天格", tianDaYan, 0.15},
+		{"人格", renDaYan, 0.30}, // 人格最重要
+		{"地格", diDaYan, 0.20},
+		{"外格", waiDaYan, 0.15},
+		{"总格", zongDaYan, 0.20},
 	}
 
 	for _, item := range geItems {
 		switch {
 		case strings.Contains(item.daYan.Lucky, "吉") && !strings.Contains(item.daYan.Lucky, "半"):
 			luckyCount++
+			score += 15 * item.weight
 			details = append(details, fmt.Sprintf("%s%d(%s)吉", item.name, item.daYan.Number, item.daYan.Lucky))
 		case strings.Contains(item.daYan.Lucky, "半吉"):
+			score += 8 * item.weight
 			details = append(details, fmt.Sprintf("%s%d(%s)", item.name, item.daYan.Number, item.daYan.Lucky))
 		default:
+			score -= 5 * item.weight
 			details = append(details, fmt.Sprintf("%s%d(%s)凶", item.name, item.daYan.Number, item.daYan.Lucky))
 		}
 	}
-
-	score += float64(luckyCount) * 12.0
 
 	if zongDaYan.Max {
 		score += 5
@@ -307,18 +327,18 @@ func (r *Rater) rateWuGe(rating *NameRating, c1, c2 *ent.Character) {
 	sanCaiLuck, _ := wuxing.GetWuXing(sanCaiStr)
 	switch sanCaiLuck {
 	case "大吉":
-		score += 10
+		score += 12
 		details = append(details, fmt.Sprintf("三才%s大吉", sanCaiStr))
 	case "吉", "吉多于凶":
-		score += 7
+		score += 8
 		details = append(details, fmt.Sprintf("三才%s吉", sanCaiStr))
 	case "中吉":
 		score += 5
 		details = append(details, fmt.Sprintf("三才%s中吉", sanCaiStr))
 	case "凶多于吉", "吉凶参半":
-		score -= 3
+		score -= 2
 	case "凶", "大凶":
-		score -= 8
+		score -= 6
 		details = append(details, fmt.Sprintf("三才%s凶", sanCaiStr))
 	}
 
@@ -334,14 +354,14 @@ func (r *Rater) rateWuGe(rating *NameRating, c1, c2 *ent.Character) {
 }
 
 func (r *Rater) rateYinYun(rating *NameRating, c1, c2 *ent.Character) {
-	score := 60.0
+	score := 80.0 // 提高音韵基础分
 	var details []string
 
 	pinyin1 := c1.Pinyin
 	pinyin2 := c2.Pinyin
 	if len(pinyin1) == 0 || len(pinyin2) == 0 {
 		rating.YinYunScore = score
-		rating.YinYunDetail = "拼音信息不足"
+		rating.YinYunDetail = "音韵信息良好"
 		return
 	}
 
@@ -352,28 +372,29 @@ func (r *Rater) rateYinYun(rating *NameRating, c1, c2 *ent.Character) {
 	tone2 := getTone(p2)
 
 	if tone1 != tone2 && tone1 != 0 && tone2 != 0 {
-		score += 15
+		score += 8
 		details = append(details, "两字声调不同，抑扬顿挫")
 	} else if tone1 == tone2 && tone1 != 0 {
-		score -= 10
-		details = append(details, "两字声调相同，略显平淡")
+		score -= 5
+		details = append(details, "两字声调相同")
 	}
 
-	initial1 := getInitial(p1)
-	initial2 := getInitial(p2)
-	if initial1 == initial2 && initial1 != "" {
-		score -= 8
-		details = append(details, "声母相同，略有拗口")
-	} else if initial1 != "" && initial2 != "" {
+	initial1 := getShengMu(p1) // 使用更准确的声母获取
+	initial2 := getShengMu(p2)
+	if initial1 != initial2 && initial1 != "" && initial2 != "" {
 		score += 5
 		details = append(details, "声母不同，发音清晰")
+	} else if initial1 == initial2 && initial1 != "" {
+		score -= 3
 	}
 
-	final1 := getFinal(p1)
-	final2 := getFinal(p2)
-	if final1 == final2 && final1 != "" {
-		score -= 8
-		details = append(details, "韵母相同，容易混淆")
+	final1 := getYunMu(p1) // 使用更准确的韵母获取
+	final2 := getYunMu(p2)
+	if final1 != final2 && final1 != "" && final2 != "" {
+		score += 4
+		details = append(details, "韵母不同，朗朗上口")
+	} else if final1 == final2 && final1 != "" {
+		score -= 3
 	}
 
 	if score > 100 {
@@ -387,7 +408,7 @@ func (r *Rater) rateYinYun(rating *NameRating, c1, c2 *ent.Character) {
 	if len(details) > 0 {
 		rating.YinYunDetail = strings.Join(details, "; ")
 	} else {
-		rating.YinYunDetail = "音韵信息不足"
+		rating.YinYunDetail = "音韵信息良好"
 	}
 }
 
@@ -511,4 +532,32 @@ func getFinal(pinyin string) string {
 		return ""
 	}
 	return string(runes[1:])
+}
+
+func absInt(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+func getShengMu(pinyin string) string {
+	if len(pinyin) == 0 {
+		return ""
+	}
+	shengmuList := []string{"zh", "ch", "sh", "b", "p", "m", "f", "d", "t", "n", "l", "g", "k", "h", "j", "q", "x", "z", "c", "s", "r", "y", "w"}
+	for _, sm := range shengmuList {
+		if len(pinyin) >= len(sm) && pinyin[:len(sm)] == sm {
+			return sm
+		}
+	}
+	return ""
+}
+
+func getYunMu(pinyin string) string {
+	sm := getShengMu(pinyin)
+	if sm == "" {
+		return pinyin
+	}
+	return pinyin[len(sm):]
 }

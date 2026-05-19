@@ -2,7 +2,7 @@
 package bazi
 
 import (
-	v2 "github.com/godcong/chronos/v2"
+	v2 "github.com/babyname/chronos/v2"
 )
 
 var diIndex = map[string]int{
