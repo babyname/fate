@@ -270,6 +270,69 @@ func LoadWuxingDict(path string) ([]*WuxingEntry, error) {
 	return entries, nil
 }
 
+type XinhuaWord struct {
+	Word        string `json:"word"`
+	OldWord     string `json:"oldword"`
+	Strokes     string `json:"strokes"`
+	Pinyin      string `json:"pinyin"`
+	Radicals    string `json:"radicals"`
+	Explanation string `json:"explanation"`
+	More        string `json:"more"`
+}
+
+func LoadXinhuaDict(path string) ([]*XinhuaWord, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("open xinhua dict: %w", err)
+	}
+	defer f.Close()
+
+	var entries []*XinhuaWord
+	if err := json.NewDecoder(f).Decode(&entries); err != nil {
+		return nil, fmt.Errorf("decode xinhua dict: %w", err)
+	}
+
+	return entries, nil
+}
+
+func ExtractShortMeaning(explanation string) string {
+	if explanation == "" {
+		return ""
+	}
+
+	lines := strings.Split(explanation, "\n")
+	var meaningful []string
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		runes := []rune(line)
+		if len(runes) <= 4 && strings.ContainsAny(line, "〈〉") {
+			continue
+		}
+		if len(runes) <= 2 {
+			continue
+		}
+		if strings.HasPrefix(line, "同\"") || strings.HasPrefix(line, "同'") || strings.HasPrefix(line, "另见") {
+			continue
+		}
+		meaningful = append(meaningful, line)
+		if len(meaningful) >= 3 {
+			break
+		}
+	}
+
+	result := strings.Join(meaningful, "；")
+	if len(result) > 200 {
+		r := []rune(result)
+		if len(r) > 200 {
+			result = string(r[:200]) + "…"
+		}
+	}
+	return result
+}
+
 type PinyinEntry struct {
 	Char   string   `json:"char"`
 	Pinyin []string `json:"pinyin"`

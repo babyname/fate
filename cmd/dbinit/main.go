@@ -8,63 +8,51 @@ import (
 	"log"
 	"os"
 
-	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/character"
-	"github.com/babyname/fate/internal/database"
+	"github.com/babyname/fate/ent/schema"
 	"github.com/babyname/fate/internal/seeddb"
+	_ "github.com/sqlite3ent/sqlite3"
 )
 
 func main() {
-	force := false
-	for _, arg := range os.Args[1:] {
-		if arg == "--force" || arg == "-f" {
-			force = true
-		}
-	}
-
 	dbName := "fate"
 	outputPath := "resources/fate.db.gz"
 
-	if force {
-		for _, p := range []string{dbName, dbName + "-shm", dbName + "-wal"} {
-			os.Remove(p)
-		}
-		log.Printf("Force mode: removed existing database files")
+	for _, p := range []string{dbName, dbName + "-shm", dbName + "-wal"} {
+		os.Remove(p)
 	}
+	log.Printf("Cleared existing database files")
 
-	cfg := config.DefaultConfig()
-	cfg.Database.Mode = "file"
-	cfg.Database.Name = dbName
-
-	b := database.New(cfg.Database)
-	client, err := b.Client()
+	client, err := ent.Open("sqlite3", fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", dbName))
 	if err != nil {
-		log.Fatalf("Failed to create database: %v", err)
+		log.Fatalf("Failed to open database: %v", err)
 	}
 
 	ctx := context.Background()
-	count, err := client.Character.Query().Count(ctx)
-	if err != nil {
-		log.Fatalf("Failed to count characters: %v", err)
+	if err := client.Schema.Create(ctx); err != nil {
+		log.Fatalf("Failed to create schema: %v", err)
 	}
 
-	if count > 0 && !force {
-		log.Printf("Database already has %d characters, skipping import", count)
-	} else {
-		if count > 0 && force {
-			log.Printf("Force mode: clearing %d existing characters", count)
-			_, err := client.Character.Delete().Exec(ctx)
-			if err != nil {
-				log.Fatalf("Failed to clear characters: %v", err)
-			}
+	_, err = client.Version.Query().First(ctx)
+	if err != nil && !ent.IsNotFound(err) {
+		log.Fatalf("Failed to query version: %v", err)
+	}
+	if ent.IsNotFound(err) {
+		_, err := client.Version.Create().
+			SetCurrentVersion(schema.CurrentDataVersion).
+			SetUpdatedUnix(0).
+			Save(ctx)
+		if err != nil {
+			log.Fatalf("Failed to create version: %v", err)
 		}
-		if err := importCharacters(ctx, client); err != nil {
-			log.Fatalf("Failed to import characters: %v", err)
-		}
-		if err := importWuXing(ctx, client); err != nil {
-			log.Fatalf("Failed to import wuxing: %v", err)
-		}
+	}
+
+	if err := importCharacters(ctx, client); err != nil {
+		log.Fatalf("Failed to import characters: %v", err)
+	}
+	if err := importWuXing(ctx, client); err != nil {
+		log.Fatalf("Failed to import wuxing: %v", err)
 	}
 
 	verifyCharacters(ctx, client)
@@ -187,10 +175,11 @@ func verifyCharacters(ctx context.Context, client *ent.Client) {
 }
 
 func truncate(s string, n int) string {
-	if len(s) <= n {
+	runes := []rune(s)
+	if len(runes) <= n {
 		return s
 	}
-	return s[:n] + "..."
+	return string(runes[:n]) + "..."
 }
 
 func compressFile(src, dst string) error {
