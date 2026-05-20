@@ -5,43 +5,45 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/ent/character"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/babyname/fate/internal/database"
+	"github.com/babyname/fate/internal/repository"
+	"github.com/babyname/fate/internal/seeddb"
 )
 
 func main() {
-	client, err := ent.Open("sqlite3", "file:fate?cache=shared&_journal=WAL&_fk=1")
+	cfg := config.DefaultConfig()
+	b := database.New(cfg.Database)
+	client, err := b.Client()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to connect: %v", err)
 	}
 	defer client.Close()
-	ctx := context.Background()
 
-	total, err := client.Character.Query().Count(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Total characters in DB: %d\n", total)
+	repo := repository.New(client)
 
-	for _, ch := range []string{"西", "门", "李", "王", "张", "赵", "东", "南"} {
-		n, err := client.Character.Query().Where(character.CharEQ(ch)).Count(ctx)
+	count, _ := repo.Character.Query().Count(context.Background())
+	fmt.Printf("Total characters: %d\n", count)
+
+	testChars := []string{"西", "门", "东", "南", "北", "上", "司", "马", "诸", "葛", "欧", "阳", "王", "李", "张"}
+	for _, ch := range testChars {
+		c, err := repo.Character.Query().Where(character.CharEQ(ch)).First(context.Background())
 		if err != nil {
-			fmt.Printf("  %s: error %v\n", ch, err)
-			continue
-		}
-		if n > 0 {
-			c, _ := client.Character.Query().Where(character.CharEQ(ch)).First(ctx)
-			fmt.Printf("  %s: found (stroke=%d, kangxi=%d, science=%d, wuxing=%s, regular=%v, nameable=%v)\n",
-				ch, c.SimplifiedStroke, c.KangxiStroke, c.ScienceStroke, c.WuXing, c.Regular, c.Nameable)
+			fmt.Printf("  %q: NOT FOUND (%v)\n", ch, err)
 		} else {
-			fmt.Printf("  %s: NOT FOUND\n", ch)
+			fmt.Printf("  %q: stroke=%d wuxing=%s pinyin=%v source=%s\n", ch, c.ScienceStroke, c.WuXing, c.Pinyin, c.Source)
 		}
 	}
 
-	regularCount, _ := client.Character.Query().Where(character.RegularEQ(true)).Count(ctx)
-	fmt.Printf("Regular characters: %d\n", regularCount)
+	seeds, _ := seeddb.LoadEmbeddedCharacters()
+	fmt.Printf("\nEmbedded seeds: %d\n", len(seeds))
 
-	nameableCount, _ := client.Character.Query().Where(character.NameableEQ(true)).Count(ctx)
-	fmt.Printf("Nameable characters: %d\n", nameableCount)
+	seedMap := make(map[string]bool)
+	for _, s := range seeds {
+		seedMap[s.Char] = true
+	}
+	for _, ch := range testChars {
+		fmt.Printf("  %q in seeds: %v\n", ch, seedMap[ch])
+	}
 }
