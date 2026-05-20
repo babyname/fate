@@ -78,6 +78,21 @@ func ensureDataSeeded(repo *repository.Repository) error {
 				}
 			}
 		}
+		if err := verifyDataQuality(ctx, repo); err != nil {
+			log.Printf("[DATA-WARN] Data quality check failed: %v", err)
+			log.Println("[DATA-REPAIR] Updating characters from embedded seed data...")
+			seeds, loadErr := seeddb.LoadEmbeddedCharacters()
+			if loadErr != nil {
+				log.Printf("[DATA-ERROR] Failed to load embedded seed data for quality repair: %v", loadErr)
+			} else {
+				updated, updateErr := updateCharactersFromSeeds(ctx, repo, seeds)
+				if updateErr != nil {
+					log.Printf("[DATA-ERROR] Quality repair failed: %v", updateErr)
+				} else {
+					log.Printf("[DATA-REPAIR] Updated %d characters for quality repair", updated)
+				}
+			}
+		}
 		return ensureMeaningUpdated(repo)
 	}
 
@@ -131,6 +146,111 @@ func verifyCriticalChars(ctx context.Context, repo *repository.Repository) error
 	}
 	log.Printf("[DATA-CHECK] All %d critical characters verified present", len(criticalChars))
 	return nil
+}
+
+const minWuXingCoverage = 0.80
+
+func verifyDataQuality(ctx context.Context, repo *repository.Repository) error {
+	total, err := repo.Character.Query().Count(ctx)
+	if err != nil {
+		return fmt.Errorf("count characters: %w", err)
+	}
+	if total == 0 {
+		return fmt.Errorf("no characters in database")
+	}
+
+	withWuXing, err := repo.Character.Query().
+		Where(
+			character.WuXingNEQ(""),
+			character.WuXingNotNil(),
+		).
+		Count(ctx)
+	if err != nil {
+		return fmt.Errorf("count characters with wu_xing: %w", err)
+	}
+
+	coverage := float64(withWuXing) / float64(total)
+	if coverage < minWuXingCoverage {
+		return fmt.Errorf("wu_xing coverage %.1f%% is below threshold %.0f%% (%d/%d)", coverage*100, minWuXingCoverage*100, withWuXing, total)
+	}
+
+	log.Printf("[DATA-CHECK] Data quality OK: wu_xing coverage %.1f%% (%d/%d)", coverage*100, withWuXing, total)
+	return nil
+}
+
+func updateCharactersFromSeeds(ctx context.Context, repo *repository.Repository, seeds []seeddb.SeedCharacter) (int, error) {
+	seedMap := make(map[string]*seeddb.SeedCharacter, len(seeds))
+	for i := range seeds {
+		seedMap[seeds[i].Char] = &seeds[i]
+	}
+
+	chars, err := repo.Character.Query().All(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("query all characters: %w", err)
+	}
+
+	updated := 0
+	for _, c := range chars {
+		s, ok := seedMap[c.Char]
+		if !ok {
+			continue
+		}
+
+		needsUpdate := false
+		builder := repo.Character.UpdateOneID(c.ID)
+
+		if (c.WuXing == "" || !isValidWuXing(c.WuXing)) && s.WuXing != "" && isValidWuXing(s.WuXing) {
+			builder.SetWuXing(s.WuXing)
+			needsUpdate = true
+		}
+		if !c.IsSimplified && s.IsSimplified {
+			builder.SetIsSimplified(s.IsSimplified)
+			needsUpdate = true
+		}
+		if !c.IsTraditional && s.IsTraditional {
+			builder.SetIsTraditional(s.IsTraditional)
+			needsUpdate = true
+		}
+		if c.KangxiStroke == 0 && s.KangxiStroke > 0 {
+			builder.SetKangxiStroke(s.KangxiStroke)
+			needsUpdate = true
+		}
+		if c.SimplifiedStroke == 0 && s.SimplifiedStroke > 0 {
+			builder.SetSimplifiedStroke(s.SimplifiedStroke)
+			needsUpdate = true
+		}
+		if c.TraditionalStroke == 0 && s.TraditionalStroke > 0 {
+			builder.SetTraditionalStroke(s.TraditionalStroke)
+			needsUpdate = true
+		}
+		if !c.Nameable && s.Nameable {
+			builder.SetNameable(s.Nameable)
+			needsUpdate = true
+		}
+		if !c.Regular && s.Regular {
+			builder.SetRegular(s.Regular)
+			needsUpdate = true
+		}
+
+		if needsUpdate {
+			if err := builder.Exec(ctx); err != nil {
+				log.Printf("  Warning: failed to update char %q: %v", c.Char, err)
+				continue
+			}
+			updated++
+		}
+	}
+
+	return updated, nil
+}
+
+func isValidWuXing(wx string) bool {
+	switch wx {
+	case "金", "木", "水", "火", "土":
+		return true
+	default:
+		return false
+	}
 }
 
 func seedBuiltinCharacters(ctx context.Context, repo *repository.Repository) error {
