@@ -24,6 +24,7 @@ func main() {
 		fmt.Println("  export <path>            Export to JSON")
 		fmt.Println("  update <base.json> <update.json>  Update only existing chars (no insert)")
 		fmt.Println("  fill-wuxing <path>      Fill missing wu_xing from kangxi stroke")
+		fmt.Println("  fill-xinhua <char.json> <xinhua.json>  Fill/replace meaning with Chinese definitions from xinhua")
 		os.Exit(1)
 	}
 
@@ -89,6 +90,12 @@ func main() {
 			os.Exit(1)
 		}
 		runFillWuxing(os.Args[2])
+	case "fill-xinhua":
+		if len(os.Args) < 4 {
+			fmt.Println("Usage: dictctl fill-xinhua <char.json> <xinhua.json>")
+			os.Exit(1)
+		}
+		runFillXinhua(os.Args[2], os.Args[3])
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 		os.Exit(1)
@@ -504,4 +511,76 @@ func runFillWuxing(path string) {
 		os.Exit(1)
 	}
 	fmt.Printf("Saved to %s\n", path)
+}
+
+func runFillXinhua(charPath, xinhuaPath string) {
+	entries, err := dict.LoadCharEntriesFromJSON(charPath)
+	if err != nil {
+		fmt.Printf("Error loading char entries: %v\n", err)
+		os.Exit(1)
+	}
+
+	xinhua, err := dict.LoadXinhuaDict(xinhuaPath)
+	if err != nil {
+		fmt.Printf("Error loading xinhua dict: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("Loaded %d xinhua entries\n", len(xinhua))
+
+	xinhuaMap := make(map[string]*dict.XinhuaWord, len(xinhua))
+	for _, x := range xinhua {
+		xinhuaMap[x.Word] = x
+	}
+
+	meaningFilled := 0
+	meaningReplaced := 0
+	pinyinFilled := 0
+	notFound := 0
+	noExplanation := 0
+
+	for _, e := range entries {
+		x, ok := xinhuaMap[e.Char]
+		if !ok {
+			notFound++
+			continue
+		}
+
+		if x.Explanation == "" && x.More == "" {
+			noExplanation++
+			continue
+		}
+
+		shortMeaning := dict.ExtractShortMeaning(x.Explanation)
+		if shortMeaning == "" {
+			shortMeaning = dict.ExtractShortMeaning(x.More)
+		}
+		if shortMeaning == "" {
+			noExplanation++
+			continue
+		}
+
+		if e.Meaning == "" {
+			e.Meaning = shortMeaning
+			meaningFilled++
+		} else {
+			e.Meaning = shortMeaning
+			meaningReplaced++
+		}
+
+		if len(e.Pinyin) == 0 && x.Pinyin != "" {
+			e.Pinyin = []string{x.Pinyin}
+			pinyinFilled++
+		}
+	}
+
+	fmt.Printf("Fill xinhua result:\n")
+	fmt.Printf("  meaning: %d filled (was empty), %d replaced (was English), %d not in xinhua, %d no explanation\n",
+		meaningFilled, meaningReplaced, notFound, noExplanation)
+	fmt.Printf("  pinyin: %d filled\n", pinyinFilled)
+
+	if err := dict.SaveCharEntriesToJSON(entries, charPath); err != nil {
+		fmt.Printf("Error saving: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("Saved to %s\n", charPath)
 }
