@@ -1,13 +1,9 @@
 package database
 
 import (
-	"bytes"
-	"compress/gzip"
 	"context"
-	_ "embed"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"time"
@@ -15,11 +11,9 @@ import (
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/schema"
+	"github.com/babyname/fate/resources"
 	_ "github.com/sqlite3ent/sqlite3"
 )
-
-//go:embed data/fate.db.gz
-var embeddedDB []byte
 
 const (
 	mysqlDSN = "%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=true"
@@ -60,9 +54,12 @@ func buildSqlite3(cfg config.DBConfig) (*ent.Client, error) {
 		if name == "" {
 			name = "fate"
 		}
-		if HasEmbeddedDB() {
-			if err := ExtractEmbeddedDB(name); err != nil {
-				return nil, fmt.Errorf("extract embedded db: %w", err)
+		if resources.HasDB() {
+			if _, err := os.Stat(name); err != nil {
+				log.Printf("[DB] Extracting embedded database to %s (%d bytes compressed)", name, resources.FateDBGZSize())
+				if err := resources.ExtractDB(name); err != nil {
+					return nil, fmt.Errorf("extract embedded db: %w", err)
+				}
 			}
 		}
 		return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", name))
@@ -120,36 +117,6 @@ func (d *database) Client() (*ent.Client, error) {
 
 func New(cfg config.DBConfig) Builder {
 	return &database{DBConfig: cfg}
-}
-
-func HasEmbeddedDB() bool {
-	return len(embeddedDB) > 0
-}
-
-func ExtractEmbeddedDB(destPath string) error {
-	if _, err := os.Stat(destPath); err == nil {
-		return nil
-	}
-	log.Printf("[DB] Extracting embedded database to %s (%d bytes compressed)", destPath, len(embeddedDB))
-	gr, err := gzip.NewReader(bytes.NewReader(embeddedDB))
-	if err != nil {
-		return fmt.Errorf("create gzip reader: %w", err)
-	}
-	defer gr.Close()
-
-	out, err := os.Create(destPath)
-	if err != nil {
-		return fmt.Errorf("create db file: %w", err)
-	}
-	defer out.Close()
-
-	written, err := io.Copy(out, gr)
-	if err != nil {
-		os.Remove(destPath)
-		return fmt.Errorf("decompress db: %w", err)
-	}
-	log.Printf("[DB] Extracted database: %d bytes", written)
-	return nil
 }
 
 var _ Builder = (*database)(nil)
