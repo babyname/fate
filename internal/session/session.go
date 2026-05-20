@@ -277,8 +277,9 @@ func (s *session) preloadChars(lucky []wuge.WuGeResult) {
 }
 
 func (s *session) filterCandidates(lucky []wuge.WuGeResult) []naming.FirstName {
-	if s.filter.PoetryMode() == 2 {
-		return nil
+	poetryMode := s.filter.PoetryMode()
+	if poetryMode == 2 {
+		return s.filterCandidatesPoetryOnly(lucky)
 	}
 	var candidates []naming.FirstName
 	for i := range lucky {
@@ -301,6 +302,55 @@ func (s *session) filterCandidates(lucky []wuge.WuGeResult) []naming.FirstName {
 
 		for i1 := range f1s {
 			for i2 := range f2s {
+				select {
+				case <-s.Context().Done():
+					return candidates
+				default:
+					candidates = append(candidates, naming.FirstName{f1s[i1], f2s[i2]})
+				}
+			}
+		}
+	}
+	return candidates
+}
+
+func (s *session) filterCandidatesPoetryOnly(lucky []wuge.WuGeResult) []naming.FirstName {
+	poetryChars, err := s.db.QueryPoetryChars(s.Context())
+	if err != nil || len(poetryChars) == 0 {
+		return nil
+	}
+	poetrySet := make(map[string]bool, len(poetryChars))
+	for _, ch := range poetryChars {
+		poetrySet[ch] = true
+	}
+
+	var candidates []naming.FirstName
+	for i := range lucky {
+		tmp := &lucky[i]
+		if s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) {
+			continue
+		}
+		if s.filter.CheckSkipSexFilter(tmp) {
+			continue
+		}
+		if s.filter.CheckSkipDaYanFilter(tmp) {
+			continue
+		}
+		if s.filter.CheckSkipWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
+			continue
+		}
+
+		f1s := s.chars[tmp.FirstStroke1]
+		f2s := s.chars[tmp.FirstStroke2]
+
+		for i1 := range f1s {
+			if !poetrySet[f1s[i1].Char] {
+				continue
+			}
+			for i2 := range f2s {
+				if !poetrySet[f2s[i2].Char] {
+					continue
+				}
 				select {
 				case <-s.Context().Done():
 					return candidates
