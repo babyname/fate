@@ -23,6 +23,7 @@ func main() {
 		fmt.Println("  stats <path>             Show statistics")
 		fmt.Println("  export <path>            Export to JSON")
 		fmt.Println("  update <base.json> <update.json>  Update only existing chars (no insert)")
+		fmt.Println("  fill-wuxing <path>      Fill missing wu_xing from kangxi stroke")
 		os.Exit(1)
 	}
 
@@ -82,6 +83,12 @@ func main() {
 			os.Exit(1)
 		}
 		runUpdate(os.Args[2], os.Args[3])
+	case "fill-wuxing":
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: dictctl fill-wuxing <path>")
+			os.Exit(1)
+		}
+		runFillWuxing(os.Args[2])
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 		os.Exit(1)
@@ -437,4 +444,64 @@ func isNumericRadical(s string) bool {
 		}
 	}
 	return len(s) > 0
+}
+
+func strokeToWuXing(stroke int) string {
+	switch stroke % 10 {
+	case 1, 2:
+		return "木"
+	case 3, 4:
+		return "火"
+	case 5, 6:
+		return "土"
+	case 7, 8:
+		return "金"
+	case 9, 0:
+		return "水"
+	default:
+		return ""
+	}
+}
+
+func runFillWuxing(path string) {
+	entries, err := dict.LoadCharEntriesFromJSON(path)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	filled := 0
+	skipped := 0
+	for _, e := range entries {
+		if e.WuXing != "" {
+			skipped++
+			continue
+		}
+		stroke := e.KangxiStroke
+		if stroke == 0 {
+			stroke = e.ScienceStroke
+		}
+		if stroke == 0 {
+			stroke = e.TraditionalStroke
+		}
+		if stroke == 0 {
+			stroke = e.SimplifiedStroke
+		}
+		if stroke == 0 {
+			skipped++
+			continue
+		}
+		e.WuXing = strokeToWuXing(stroke)
+		if e.WuXing != "" {
+			filled++
+		}
+	}
+
+	fmt.Printf("Fill wu_xing result: %d filled, %d skipped (already have or no stroke)\n", filled, skipped)
+
+	if err := dict.SaveCharEntriesToJSON(entries, path); err != nil {
+		fmt.Printf("Error saving: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("Saved to %s\n", path)
 }
