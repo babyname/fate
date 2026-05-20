@@ -40,14 +40,14 @@ type CharEntry struct {
 }
 
 type UnihanEntry struct {
-	CodePoint string
-	KMandarin string
-	KDefinition string
-	KTotalStrokes string
-	KRSKangXi string
-	KRSUnicode string
+	CodePoint           string
+	KMandarin           string
+	KDefinition         string
+	KTotalStrokes       string
+	KRSKangXi           string
+	KRSUnicode          string
 	KTraditionalVariant string
-	KSimplifiedVariant string
+	KSimplifiedVariant  string
 }
 
 func ParseUnihanIRGSource(path string) (map[rune]*UnihanEntry, error) {
@@ -59,7 +59,7 @@ func ParseUnihanIRGSource(path string) (map[rune]*UnihanEntry, error) {
 
 	entries := make(map[rune]*UnihanEntry)
 	scanner := bufio.NewScanner(f)
-	
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.HasPrefix(line, "#") || strings.HasPrefix(line, "//") {
@@ -108,21 +108,21 @@ func ParseUnihanIRGSource(path string) (map[rune]*UnihanEntry, error) {
 
 func UnihanToCharEntries(unihan map[rune]*UnihanEntry) []*CharEntry {
 	var entries []*CharEntry
-	
+
 	for r, u := range unihan {
 		if !unicode.Is(unicode.Han, r) {
 			continue
 		}
 
 		entry := &CharEntry{
-			Char:     string(r),
-			Unicode:  u.CodePoint,
-			IsSimplified: true,
-			IsTraditional: true,
-			IsKangxi: true,
-			Source:   "unihan",
+			Char:             string(r),
+			Unicode:          u.CodePoint,
+			IsSimplified:     true,
+			IsTraditional:    true,
+			IsKangxi:         true,
+			Source:           "unihan",
 			SourceConfidence: 0.9,
-			Nameable: true,
+			Nameable:         true,
 		}
 
 		if u.KMandarin != "" {
@@ -226,12 +226,12 @@ func SaveCharEntriesToJSON(entries []*CharEntry, path string) error {
 }
 
 type KangxiEntry struct {
-	Char     string `json:"char"`
-	Radical  string `json:"radical"`
-	Strokes  int    `json:"strokes"`
-	WuXing   string `json:"wu_xing"`
-	Pinyin   string `json:"pinyin"`
-	Meaning  string `json:"meaning"`
+	Char    string `json:"char"`
+	Radical string `json:"radical"`
+	Strokes int    `json:"strokes"`
+	WuXing  string `json:"wu_xing"`
+	Pinyin  string `json:"pinyin"`
+	Meaning string `json:"meaning"`
 }
 
 func LoadKangxiDict(path string) ([]*KangxiEntry, error) {
@@ -292,11 +292,11 @@ func LoadPinyinDict(path string) ([]*PinyinEntry, error) {
 }
 
 type MergeResult struct {
-	Total      int
-	Updated    int
-	Inserted   int
-	Skipped    int
-	Conflicts  []string
+	Total     int
+	Updated   int
+	Inserted  int
+	Skipped   int
+	Conflicts []string
 }
 
 func MergeEntries(base []*CharEntry, updates []*CharEntry, source string) (*MergeResult, []*CharEntry) {
@@ -384,10 +384,10 @@ func mergeSingle(existing *CharEntry, update *CharEntry, source string) bool {
 }
 
 type ValidateResult struct {
-	Total     int
-	Valid     int
-	Warnings  []string
-	Errors    []string
+	Total    int
+	Valid    int
+	Warnings []string
+	Errors   []string
 }
 
 func ValidateEntries(entries []*CharEntry) *ValidateResult {

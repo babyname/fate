@@ -4,10 +4,10 @@ import (
 	"sync"
 	"time"
 
+	v2 "github.com/babyname/chronos/v2"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/analysis"
 	"github.com/babyname/fate/internal/naming"
-	v2 "github.com/babyname/chronos/v2"
 )
 
 // Input 命名会话的输入参数，包含姓氏、出生时间和性别信息。
