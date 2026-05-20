@@ -58,25 +58,25 @@ type PoetrySourceInfo struct {
 
 // NameResult represents a single name analysis result
 type NameResult struct {
-	Rank         int           `json:"rank"`
-	FullName     string        `json:"full_name"`
-	Surname      string        `json:"surname"`
-	FirstName    string        `json:"first_name"`
-	Strokes      string        `json:"strokes"`
-	Char1        CharInfo      `json:"char1"`
-	Char2        CharInfo      `json:"char2"`
-	WuGe         *WuGeResult   `json:"wu_ge"`
-	SanCai       string        `json:"san_cai"`
-	SanCaiLuck   string        `json:"san_cai_luck"`
-	SanCaiDetail string        `json:"san_cai_detail"`
-	JiChuYun     string        `json:"ji_chu_yun"`
-	ChengGongYun string        `json:"cheng_gong_yun"`
-	RenJiGuanXi  string        `json:"ren_ji_guan_xi"`
-	ZhouYi       *ZhouYiResult `json:"zhou_yi"`
-	Bazi         *BaziSection  `json:"bazi,omitempty"`
-	WuXing       *WuXingSection `json:"wu_xing,omitempty"`
-	Score        float64       `json:"score"`
-	Grade        string        `json:"grade"`
+	Rank         int               `json:"rank"`
+	FullName     string            `json:"full_name"`
+	Surname      string            `json:"surname"`
+	FirstName    string            `json:"first_name"`
+	Strokes      string            `json:"strokes"`
+	Char1        CharInfo          `json:"char1"`
+	Char2        CharInfo          `json:"char2"`
+	WuGe         *WuGeResult       `json:"wu_ge"`
+	SanCai       string            `json:"san_cai"`
+	SanCaiLuck   string            `json:"san_cai_luck"`
+	SanCaiDetail string            `json:"san_cai_detail"`
+	JiChuYun     string            `json:"ji_chu_yun"`
+	ChengGongYun string            `json:"cheng_gong_yun"`
+	RenJiGuanXi  string            `json:"ren_ji_guan_xi"`
+	ZhouYi       *ZhouYiResult     `json:"zhou_yi"`
+	Bazi         *BaziSection      `json:"bazi,omitempty"`
+	WuXing       *WuXingSection    `json:"wu_xing,omitempty"`
+	Score        float64           `json:"score"`
+	Grade        string            `json:"grade"`
 	ScoreDetail  ScoreDetail       `json:"score_detail"`
 	Interpret    string            `json:"interpret"`
 	PoetrySource *PoetrySourceInfo `json:"poetry_source,omitempty"`
@@ -84,21 +84,21 @@ type NameResult struct {
 
 // BaziSection represents bazi information section
 type BaziSection struct {
-	Sizhu                [4]string      `json:"sizhu"`
-	Wuxing               [4]string      `json:"wuxing"`
-	Nayin                [4]string      `json:"nayin"`
-	Zodiac               string         `json:"zodiac"`
-	Constellation        string         `json:"constellation"`
-	ConstellationDetail  *ConstellationDetail `json:"constellation_detail,omitempty"`
+	Sizhu               [4]string            `json:"sizhu"`
+	Wuxing              [4]string            `json:"wuxing"`
+	Nayin               [4]string            `json:"nayin"`
+	Zodiac              string               `json:"zodiac"`
+	Constellation       string               `json:"constellation"`
+	ConstellationDetail *ConstellationDetail `json:"constellation_detail,omitempty"`
 }
 
 type ConstellationDetail struct {
-	Element      string `json:"element"`
-	Trait        string `json:"trait"`
-	LuckyColor   string `json:"lucky_color"`
-	LuckyNumber  string `json:"lucky_number"`
+	Element       string `json:"element"`
+	Trait         string `json:"trait"`
+	LuckyColor    string `json:"lucky_color"`
+	LuckyNumber   string `json:"lucky_number"`
 	Compatibility string `json:"compatibility"`
-	Description  string `json:"description"`
+	Description   string `json:"description"`
 }
 
 // WuXingSection represents wuxing analysis section

@@ -98,8 +98,8 @@ func (Character) Fields() []ent.Field {
 func (Character) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("simplified_of", Character.Type).
-		Ref("traditional_to_simplified").
-		Comment("简体字对应的繁体字"),
+			Ref("traditional_to_simplified").
+			Comment("简体字对应的繁体字"),
 		edge.To("traditional_to_simplified", Character.Type).
 			Comment("繁体字对应的简体字").
 			Unique(),
