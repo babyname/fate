@@ -22,6 +22,7 @@ func main() {
 		fmt.Println("  fix-strokes <path>       Fix science strokes")
 		fmt.Println("  stats <path>             Show statistics")
 		fmt.Println("  export <path>            Export to JSON")
+		fmt.Println("  update <base.json> <update.json>  Update only existing chars (no insert)")
 		os.Exit(1)
 	}
 
@@ -75,6 +76,12 @@ func main() {
 			os.Exit(1)
 		}
 		runStats(os.Args[2])
+	case "update":
+		if len(os.Args) < 4 {
+			fmt.Println("Usage: dictctl update <base.json> <update.json>")
+			os.Exit(1)
+		}
+		runUpdate(os.Args[2], os.Args[3])
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 		os.Exit(1)
@@ -328,4 +335,106 @@ func runStats(path string) {
 
 	data, _ := json.MarshalIndent(stats, "", "  ")
 	fmt.Println(string(data))
+}
+
+func runUpdate(basePath, updatePath string) {
+	base, err := dict.LoadCharEntriesFromJSON(basePath)
+	if err != nil {
+		fmt.Printf("Error loading base: %v\n", err)
+		os.Exit(1)
+	}
+
+	update, err := dict.LoadCharEntriesFromJSON(updatePath)
+	if err != nil {
+		fmt.Printf("Error loading update: %v\n", err)
+		os.Exit(1)
+	}
+
+	updateMap := make(map[string]*dict.CharEntry, len(update))
+	for _, u := range update {
+		updateMap[u.Char] = u
+	}
+
+	updated := 0
+	meaningUpdated := 0
+	pinyinUpdated := 0
+	wuxingUpdated := 0
+	radicalUpdated := 0
+	strokeUpdated := 0
+
+	for _, e := range base {
+		u, ok := updateMap[e.Char]
+		if !ok {
+			continue
+		}
+		changed := false
+		if e.Meaning == "" && u.Meaning != "" {
+			e.Meaning = u.Meaning
+			meaningUpdated++
+			changed = true
+		}
+		if len(e.Pinyin) == 0 && len(u.Pinyin) > 0 {
+			e.Pinyin = u.Pinyin
+			pinyinUpdated++
+			changed = true
+		}
+		if e.WuXing == "" && u.WuXing != "" {
+			e.WuXing = u.WuXing
+			wuxingUpdated++
+			changed = true
+		}
+		if e.Radical == "" && u.Radical != "" {
+			e.Radical = u.Radical
+			radicalUpdated++
+			changed = true
+		} else if e.Radical != "" && u.Radical != "" {
+			if isNumericRadical(e.Radical) && !isNumericRadical(u.Radical) {
+				e.Radical = u.Radical
+				radicalUpdated++
+				changed = true
+			}
+		}
+		if e.ScienceStroke == 0 && u.ScienceStroke > 0 {
+			e.ScienceStroke = u.ScienceStroke
+			strokeUpdated++
+			changed = true
+		}
+		if e.KangxiStroke == 0 && u.KangxiStroke > 0 {
+			e.KangxiStroke = u.KangxiStroke
+			if e.ScienceStroke == 0 {
+				e.ScienceStroke = u.KangxiStroke
+			}
+			strokeUpdated++
+			changed = true
+		}
+		if e.SimplifiedStroke == 0 && u.SimplifiedStroke > 0 {
+			e.SimplifiedStroke = u.SimplifiedStroke
+			changed = true
+		}
+		if e.TraditionalStroke == 0 && u.TraditionalStroke > 0 {
+			e.TraditionalStroke = u.TraditionalStroke
+			changed = true
+		}
+		if changed {
+			updated++
+		}
+	}
+
+	fmt.Printf("Update result: %d chars updated (meaning=%d pinyin=%d wuxing=%d radical=%d stroke=%d)\n",
+		updated, meaningUpdated, pinyinUpdated, wuxingUpdated, radicalUpdated, strokeUpdated)
+
+	if err := dict.SaveCharEntriesToJSON(base, basePath); err != nil {
+		fmt.Printf("Error saving: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("Saved updated result to %s\n", basePath)
+}
+
+func isNumericRadical(s string) bool {
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return len(s) > 0
 }
