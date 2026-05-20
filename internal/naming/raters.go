@@ -1,8 +1,8 @@
 package naming
 
 import (
-	"github.com/babyname/fate/config"
 	v2 "github.com/babyname/chronos/v2"
+	"github.com/babyname/fate/config"
 )
 
 // WuxingRater 五行评分器，根据八字喜忌五行对名字进行评分。

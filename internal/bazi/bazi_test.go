@@ -4,8 +4,8 @@ import (
 	"log"
 	"testing"
 
-	"github.com/babyname/fate/internal/bazi"
 	"github.com/babyname/chronos/v2"
+	"github.com/babyname/fate/internal/bazi"
 )
 
 func TestPoint(t *testing.T) {

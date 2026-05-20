@@ -117,16 +117,16 @@ func runImportKangxi(path string) {
 	charEntries := make([]*dict.CharEntry, 0, len(entries))
 	for _, k := range entries {
 		charEntries = append(charEntries, &dict.CharEntry{
-			Char:          k.Char,
-			KangxiStroke:  k.Strokes,
-			ScienceStroke: k.Strokes,
-			Radical:       k.Radical,
-			WuXing:        k.WuXing,
-			Pinyin:        []string{k.Pinyin},
-			Meaning:       k.Meaning,
-			Source:        "kangxi",
+			Char:             k.Char,
+			KangxiStroke:     k.Strokes,
+			ScienceStroke:    k.Strokes,
+			Radical:          k.Radical,
+			WuXing:           k.WuXing,
+			Pinyin:           []string{k.Pinyin},
+			Meaning:          k.Meaning,
+			Source:           "kangxi",
 			SourceConfidence: 0.95,
-			Nameable:      true,
+			Nameable:         true,
 		})
 	}
 
@@ -269,21 +269,21 @@ func runStats(path string) {
 	}
 
 	stats := struct {
-		Total            int            `json:"total"`
-		WithPinyin       int            `json:"with_pinyin"`
-		WithKangxiStroke int            `json:"with_kangxi_stroke"`
-		WithScienceStroke int           `json:"with_science_stroke"`
-		WithWuXing       int            `json:"with_wu_xing"`
-		WithRadical      int            `json:"with_radical"`
-		WithMeaning      int            `json:"with_meaning"`
-		Regular          int            `json:"regular"`
-		SimplifiedCount  int            `json:"simplified_count"`
-		TraditionalCount int            `json:"traditional_count"`
-		KangxiCount      int            `json:"kangxi_count"`
-		VariantCount     int            `json:"variant_count"`
-		AncientCount     int            `json:"ancient_count"`
-		WuXingDist       map[string]int `json:"wuxing_distribution"`
-		SourceDist       map[string]int `json:"source_distribution"`
+		Total             int            `json:"total"`
+		WithPinyin        int            `json:"with_pinyin"`
+		WithKangxiStroke  int            `json:"with_kangxi_stroke"`
+		WithScienceStroke int            `json:"with_science_stroke"`
+		WithWuXing        int            `json:"with_wu_xing"`
+		WithRadical       int            `json:"with_radical"`
+		WithMeaning       int            `json:"with_meaning"`
+		Regular           int            `json:"regular"`
+		SimplifiedCount   int            `json:"simplified_count"`
+		TraditionalCount  int            `json:"traditional_count"`
+		KangxiCount       int            `json:"kangxi_count"`
+		VariantCount      int            `json:"variant_count"`
+		AncientCount      int            `json:"ancient_count"`
+		WuXingDist        map[string]int `json:"wuxing_distribution"`
+		SourceDist        map[string]int `json:"source_distribution"`
 	}{
 		WuXingDist: make(map[string]int),
 		SourceDist: make(map[string]int),

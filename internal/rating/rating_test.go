@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/babyname/fate/ent"
 	v2 "github.com/babyname/chronos/v2"
+	"github.com/babyname/fate/ent"
 )
 
 func TestNewRater(t *testing.T) {

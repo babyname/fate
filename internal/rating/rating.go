@@ -5,26 +5,26 @@ import (
 	"math"
 	"strings"
 
+	v2 "github.com/babyname/chronos/v2"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/wuge"
 	"github.com/babyname/fate/internal/wuxing"
-	v2 "github.com/babyname/chronos/v2"
 )
 
 type NameRating struct {
-	WenHuaScore    float64
-	WuXingScore    float64
-	ShengXiaoScore float64
-	WuGeScore      float64
-	YinYunScore    float64
-	TotalScore     float64
-	Grade          string
-	Interpret      string
-	WenHuaDetail   string
-	WuXingDetail   string
+	WenHuaScore     float64
+	WuXingScore     float64
+	ShengXiaoScore  float64
+	WuGeScore       float64
+	YinYunScore     float64
+	TotalScore      float64
+	Grade           string
+	Interpret       string
+	WenHuaDetail    string
+	WuXingDetail    string
 	ShengXiaoDetail string
-	WuGeDetail     string
-	YinYunDetail   string
+	WuGeDetail      string
+	YinYunDetail    string
 }
 
 type Rater struct {
@@ -58,11 +58,11 @@ func (r *Rater) RateName(surname string, c1, c2 *ent.Character) *NameRating {
 	yinYunWeight := 0.15
 
 	rating.TotalScore = math.Round(
-		(rating.WenHuaScore*wenHuaWeight +
-			rating.WuXingScore*wuXingWeight +
-			rating.ShengXiaoScore*shengXiaoWeight +
-			rating.WuGeScore*wuGeWeight +
-			rating.YinYunScore*yinYunWeight) * 10,
+		(rating.WenHuaScore*wenHuaWeight+
+			rating.WuXingScore*wuXingWeight+
+			rating.ShengXiaoScore*shengXiaoWeight+
+			rating.WuGeScore*wuGeWeight+
+			rating.YinYunScore*yinYunWeight)*10,
 	) / 10
 
 	rating.Grade = scoreToGrade(rating.TotalScore)
