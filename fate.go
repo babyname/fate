@@ -18,8 +18,6 @@ import (
 
 const minCharacterCount = 10000
 
-var criticalChars = []string{"西", "门", "东", "南", "北", "上", "诸葛", "司马", "欧阳"}
-
 type Fate interface {
 	NewSession() Session
 	NewSessionWithFilter(f Filter) Session
@@ -62,49 +60,16 @@ func ensureDataSeeded(repo *repository.Repository) error {
 	}
 
 	if count >= minCharacterCount {
-		log.Printf("[DATA-CHECK] Database has %d characters (>= %d threshold), OK", count, minCharacterCount)
-		if err := verifyCriticalChars(ctx, repo); err != nil {
-			log.Printf("[DATA-WARN] Critical character verification failed: %v", err)
-			log.Println("[DATA-REPAIR] Re-importing from embedded seed data to fix missing characters...")
-			seeds, loadErr := seeddb.LoadEmbeddedCharacters()
-			if loadErr != nil {
-				log.Printf("[DATA-ERROR] Failed to load embedded seed data for repair: %v", loadErr)
-			} else {
-				imported, importErr := importSeedCharacters(ctx, repo, seeds)
-				if importErr != nil {
-					log.Printf("[DATA-ERROR] Repair import failed: %v", importErr)
-				} else {
-					log.Printf("[DATA-REPAIR] Imported %d characters for repair", imported)
-				}
-			}
-		}
-		if err := verifyDataQuality(ctx, repo); err != nil {
-			log.Printf("[DATA-WARN] Data quality check failed: %v", err)
-			log.Println("[DATA-REPAIR] Updating characters from embedded seed data...")
-			seeds, loadErr := seeddb.LoadEmbeddedCharacters()
-			if loadErr != nil {
-				log.Printf("[DATA-ERROR] Failed to load embedded seed data for quality repair: %v", loadErr)
-			} else {
-				updated, updateErr := updateCharactersFromSeeds(ctx, repo, seeds)
-				if updateErr != nil {
-					log.Printf("[DATA-ERROR] Quality repair failed: %v", updateErr)
-				} else {
-					log.Printf("[DATA-REPAIR] Updated %d characters for quality repair", updated)
-				}
-			}
-		}
+		log.Printf("[DATA-CHECK] Database OK: %d characters", count)
 		return ensureMeaningUpdated(repo)
 	}
 
-	if count > 0 {
-		log.Printf("[DATA-WARN] Database has only %d characters (threshold: %d), data is incomplete!", count, minCharacterCount)
-	}
+	log.Printf("[DATA-WARN] Database has only %d characters (threshold: %d)", count, minCharacterCount)
 
-	log.Println("[DATA-REPAIR] Loading embedded seed data (compiled into binary, always available)...")
 	seeds, err := seeddb.LoadEmbeddedCharacters()
 	if err != nil {
 		log.Printf("[DATA-ERROR] Failed to load embedded seed data: %v", err)
-		log.Println("[DATA-FALLBACK] Falling back to builtin seeds (limited: ~340 chars)")
+		log.Println("[DATA-FALLBACK] Falling back to builtin seeds (~340 chars)")
 		return seedBuiltinCharacters(ctx, repo)
 	}
 
@@ -112,136 +77,18 @@ func ensureDataSeeded(repo *repository.Repository) error {
 	imported, err := importSeedCharacters(ctx, repo, seeds)
 	if err != nil {
 		log.Printf("[DATA-ERROR] Embedded seed import failed: %v", err)
-		log.Println("[DATA-FALLBACK] Falling back to builtin seeds (limited: ~340 chars)")
+		log.Println("[DATA-FALLBACK] Falling back to builtin seeds (~340 chars)")
 		return seedBuiltinCharacters(ctx, repo)
 	}
 
 	newCount, _ := repo.Character.Query().Count(ctx)
 	log.Printf("[DATA-REPAIR] Imported %d characters, database now has %d total", imported, newCount)
 
-	if newCount >= minCharacterCount {
-		log.Printf("[DATA-CHECK] Database integrity verified: %d characters >= %d threshold", newCount, minCharacterCount)
-		return nil
+	if newCount < minCharacterCount {
+		log.Printf("[DATA-WARN] After import only %d characters, still below threshold %d", newCount, minCharacterCount)
+		return seedBuiltinCharacters(ctx, repo)
 	}
-
-	log.Printf("[DATA-WARN] After import only %d characters, still below threshold %d", newCount, minCharacterCount)
-	return seedBuiltinCharacters(ctx, repo)
-}
-
-func verifyCriticalChars(ctx context.Context, repo *repository.Repository) error {
-	var missing []string
-	for _, ch := range criticalChars {
-		exists, err := repo.Character.Query().
-			Where(character.CharEQ(ch)).
-			Exist(ctx)
-		if err != nil {
-			return fmt.Errorf("verify char %q: %w", ch, err)
-		}
-		if !exists {
-			missing = append(missing, ch)
-		}
-	}
-	if len(missing) > 0 {
-		return fmt.Errorf("missing %d critical characters: %v (database data is corrupted)", len(missing), missing)
-	}
-	log.Printf("[DATA-CHECK] All %d critical characters verified present", len(criticalChars))
 	return nil
-}
-
-const minWuXingCoverage = 0.80
-
-func verifyDataQuality(ctx context.Context, repo *repository.Repository) error {
-	total, err := repo.Character.Query().Count(ctx)
-	if err != nil {
-		return fmt.Errorf("count characters: %w", err)
-	}
-	if total == 0 {
-		return fmt.Errorf("no characters in database")
-	}
-
-	withWuXing, err := repo.Character.Query().
-		Where(
-			character.WuXingNEQ(""),
-			character.WuXingNotNil(),
-		).
-		Count(ctx)
-	if err != nil {
-		return fmt.Errorf("count characters with wu_xing: %w", err)
-	}
-
-	coverage := float64(withWuXing) / float64(total)
-	if coverage < minWuXingCoverage {
-		return fmt.Errorf("wu_xing coverage %.1f%% is below threshold %.0f%% (%d/%d)", coverage*100, minWuXingCoverage*100, withWuXing, total)
-	}
-
-	log.Printf("[DATA-CHECK] Data quality OK: wu_xing coverage %.1f%% (%d/%d)", coverage*100, withWuXing, total)
-	return nil
-}
-
-func updateCharactersFromSeeds(ctx context.Context, repo *repository.Repository, seeds []seeddb.SeedCharacter) (int, error) {
-	seedMap := make(map[string]*seeddb.SeedCharacter, len(seeds))
-	for i := range seeds {
-		seedMap[seeds[i].Char] = &seeds[i]
-	}
-
-	chars, err := repo.Character.Query().All(ctx)
-	if err != nil {
-		return 0, fmt.Errorf("query all characters: %w", err)
-	}
-
-	updated := 0
-	for _, c := range chars {
-		s, ok := seedMap[c.Char]
-		if !ok {
-			continue
-		}
-
-		needsUpdate := false
-		builder := repo.Character.UpdateOneID(c.ID)
-
-		if (c.WuXing == "" || !isValidWuXing(c.WuXing)) && s.WuXing != "" && isValidWuXing(s.WuXing) {
-			builder.SetWuXing(s.WuXing)
-			needsUpdate = true
-		}
-		if !c.IsSimplified && s.IsSimplified {
-			builder.SetIsSimplified(s.IsSimplified)
-			needsUpdate = true
-		}
-		if !c.IsTraditional && s.IsTraditional {
-			builder.SetIsTraditional(s.IsTraditional)
-			needsUpdate = true
-		}
-		if c.KangxiStroke == 0 && s.KangxiStroke > 0 {
-			builder.SetKangxiStroke(s.KangxiStroke)
-			needsUpdate = true
-		}
-		if c.SimplifiedStroke == 0 && s.SimplifiedStroke > 0 {
-			builder.SetSimplifiedStroke(s.SimplifiedStroke)
-			needsUpdate = true
-		}
-		if c.TraditionalStroke == 0 && s.TraditionalStroke > 0 {
-			builder.SetTraditionalStroke(s.TraditionalStroke)
-			needsUpdate = true
-		}
-		if !c.Nameable && s.Nameable {
-			builder.SetNameable(s.Nameable)
-			needsUpdate = true
-		}
-		if !c.Regular && s.Regular {
-			builder.SetRegular(s.Regular)
-			needsUpdate = true
-		}
-
-		if needsUpdate {
-			if err := builder.Exec(ctx); err != nil {
-				log.Printf("  Warning: failed to update char %q: %v", c.Char, err)
-				continue
-			}
-			updated++
-		}
-	}
-
-	return updated, nil
 }
 
 func isValidWuXing(wx string) bool {
@@ -341,17 +188,82 @@ func seedBuiltinCharacters(ctx context.Context, repo *repository.Repository) err
 func importSeedCharacters(ctx context.Context, repo *repository.Repository, seeds []seeddb.SeedCharacter) (int, error) {
 	total := len(seeds)
 	imported := 0
-	batchSize := 500
 
-	for i := 0; i < total; i += batchSize {
-		end := i + batchSize
-		if end > total {
-			end = total
-		}
-		batch := seeds[i:end]
+	existingChars, err := repo.Character.Query().All(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("query existing characters: %w", err)
+	}
+	existingMap := make(map[string]*ent.Character, len(existingChars))
+	for _, c := range existingChars {
+		existingMap[c.Char] = c
+	}
+	log.Printf("  Existing characters in DB: %d, seeds to import: %d", len(existingMap), total)
 
-		builders := make([]*ent.CharacterCreate, 0, len(batch))
-		for _, s := range batch {
+	for i, s := range seeds {
+		if existing, ok := existingMap[s.Char]; ok {
+			needsUpdate := false
+			builder := repo.Character.UpdateOneID(existing.ID)
+
+			if (existing.WuXing == "" || !isValidWuXing(existing.WuXing)) && s.WuXing != "" && isValidWuXing(s.WuXing) {
+				builder.SetWuXing(s.WuXing)
+				needsUpdate = true
+			}
+			if !existing.IsSimplified && s.IsSimplified {
+				builder.SetIsSimplified(s.IsSimplified)
+				needsUpdate = true
+			}
+			if !existing.IsTraditional && s.IsTraditional {
+				builder.SetIsTraditional(s.IsTraditional)
+				needsUpdate = true
+			}
+			if existing.KangxiStroke == 0 && s.KangxiStroke > 0 {
+				builder.SetKangxiStroke(s.KangxiStroke)
+				needsUpdate = true
+			}
+			if existing.SimplifiedStroke == 0 && s.SimplifiedStroke > 0 {
+				builder.SetSimplifiedStroke(s.SimplifiedStroke)
+				needsUpdate = true
+			}
+			if existing.TraditionalStroke == 0 && s.TraditionalStroke > 0 {
+				builder.SetTraditionalStroke(s.TraditionalStroke)
+				needsUpdate = true
+			}
+			if existing.ScienceStroke == 0 && s.ScienceStroke > 0 {
+				builder.SetScienceStroke(s.ScienceStroke)
+				needsUpdate = true
+			}
+			if len(existing.Pinyin) == 0 && len(s.Pinyin) > 0 {
+				builder.SetPinyin(s.Pinyin)
+				needsUpdate = true
+			}
+			if existing.Radical == "" && s.Radical != "" {
+				builder.SetRadical(s.Radical)
+				needsUpdate = true
+			}
+			if !existing.Nameable && s.Nameable {
+				builder.SetNameable(s.Nameable)
+				needsUpdate = true
+			}
+			if !existing.Regular && s.Regular {
+				builder.SetRegular(s.Regular)
+				needsUpdate = true
+			}
+			if existing.CommonLevel == 0 && s.CommonLevel > 0 {
+				builder.SetCommonLevel(s.CommonLevel)
+				needsUpdate = true
+			}
+			if existing.Meaning == "" && s.Meaning != "" {
+				builder.SetMeaning(s.Meaning)
+				needsUpdate = true
+			}
+
+			if needsUpdate {
+				if err := builder.Exec(ctx); err != nil {
+					log.Printf("  Warning: failed to update char %q: %v", s.Char, err)
+				}
+			}
+			imported++
+		} else {
 			builder := repo.Character.Create().
 				SetChar(s.Char).
 				SetIsSimplified(s.IsSimplified).
@@ -400,16 +312,16 @@ func importSeedCharacters(ctx context.Context, repo *repository.Repository, seed
 			if s.Comment != "" {
 				builder.SetComment(s.Comment)
 			}
-			builders = append(builders, builder)
+			if _, err := builder.Save(ctx); err != nil {
+				log.Printf("  Warning: failed to create char %q: %v", s.Char, err)
+				continue
+			}
+			imported++
 		}
 
-		created, err := repo.Character.CreateBulk(builders...).Save(ctx)
-		if err != nil {
-			log.Printf("  Warning: batch %d-%d import error: %v", i, end, err)
-			continue
+		if (i+1)%5000 == 0 {
+			log.Printf("  Characters: %d/%d", i+1, total)
 		}
-		imported += len(created)
-		log.Printf("  Characters: %d/%d", imported, total)
 	}
 
 	return imported, nil
