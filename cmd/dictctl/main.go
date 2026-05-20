@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/babyname/fate/dict"
+	"github.com/babyname/fate/internal/dict"
 )
 
 func main() {
