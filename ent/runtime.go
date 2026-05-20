@@ -4,6 +4,8 @@ package ent
 
 import (
 	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/ent/poem"
+	"github.com/babyname/fate/ent/poemchar"
 	"github.com/babyname/fate/ent/schema"
 )
 
@@ -69,4 +71,24 @@ func init() {
 	characterDescNameable := characterFields[19].Descriptor()
 	// character.DefaultNameable holds the default value on creation for the nameable field.
 	character.DefaultNameable = characterDescNameable.Default.(bool)
+	poemFields := schema.Poem{}.Fields()
+	_ = poemFields
+	// poemDescTitle is the schema descriptor for title field.
+	poemDescTitle := poemFields[1].Descriptor()
+	// poem.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	poem.TitleValidator = poemDescTitle.Validators[0].(func(string) error)
+	// poemDescContent is the schema descriptor for content field.
+	poemDescContent := poemFields[4].Descriptor()
+	// poem.ContentValidator is a validator for the "content" field. It is called by the builders before save.
+	poem.ContentValidator = poemDescContent.Validators[0].(func(string) error)
+	poemcharFields := schema.PoemChar{}.Fields()
+	_ = poemcharFields
+	// poemcharDescChar is the schema descriptor for char field.
+	poemcharDescChar := poemcharFields[2].Descriptor()
+	// poemchar.CharValidator is a validator for the "char" field. It is called by the builders before save.
+	poemchar.CharValidator = poemcharDescChar.Validators[0].(func(string) error)
+	// poemcharDescPosition is the schema descriptor for position field.
+	poemcharDescPosition := poemcharFields[3].Descriptor()
+	// poemchar.PositionValidator is a validator for the "position" field. It is called by the builders before save.
+	poemchar.PositionValidator = poemcharDescPosition.Validators[0].(func(int) error)
 }

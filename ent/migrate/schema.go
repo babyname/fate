@@ -150,6 +150,82 @@ var (
 			},
 		},
 	}
+	// PoemColumns holds the columns for the "poem" table.
+	PoemColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "author", Type: field.TypeString, Nullable: true},
+		{Name: "dynasty", Type: field.TypeString, Nullable: true},
+		{Name: "content", Type: field.TypeString, Size: 2147483647},
+		{Name: "preface", Type: field.TypeString, Nullable: true},
+		{Name: "keywords", Type: field.TypeJSON, Nullable: true},
+		{Name: "tags", Type: field.TypeJSON, Nullable: true},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"shi", "ci", "fu", "jing", "other"}, Default: "shi"},
+		{Name: "source", Type: field.TypeString, Nullable: true},
+	}
+	// PoemTable holds the schema information for the "poem" table.
+	PoemTable = &schema.Table{
+		Name:       "poem",
+		Columns:    PoemColumns,
+		PrimaryKey: []*schema.Column{PoemColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "poem_title_author",
+				Unique:  false,
+				Columns: []*schema.Column{PoemColumns[1], PoemColumns[2]},
+			},
+			{
+				Name:    "poem_dynasty",
+				Unique:  false,
+				Columns: []*schema.Column{PoemColumns[3]},
+			},
+			{
+				Name:    "poem_type",
+				Unique:  false,
+				Columns: []*schema.Column{PoemColumns[8]},
+			},
+		},
+	}
+	// PoemCharColumns holds the columns for the "poem_char" table.
+	PoemCharColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "char", Type: field.TypeString},
+		{Name: "position", Type: field.TypeInt},
+		{Name: "sentence", Type: field.TypeString, Nullable: true},
+		{Name: "context", Type: field.TypeString, Nullable: true},
+		{Name: "poem_id", Type: field.TypeInt},
+	}
+	// PoemCharTable holds the schema information for the "poem_char" table.
+	PoemCharTable = &schema.Table{
+		Name:       "poem_char",
+		Columns:    PoemCharColumns,
+		PrimaryKey: []*schema.Column{PoemCharColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "poem_char_poem_poem_chars",
+				Columns:    []*schema.Column{PoemCharColumns[5]},
+				RefColumns: []*schema.Column{PoemColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "poemchar_char",
+				Unique:  false,
+				Columns: []*schema.Column{PoemCharColumns[1]},
+			},
+			{
+				Name:    "poemchar_poem_id",
+				Unique:  false,
+				Columns: []*schema.Column{PoemCharColumns[5]},
+			},
+			{
+				Name:    "poemchar_char_poem_id",
+				Unique:  false,
+				Columns: []*schema.Column{PoemCharColumns[1], PoemCharColumns[5]},
+			},
+		},
+	}
 	// VersionsColumns holds the columns for the "versions" table.
 	VersionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -183,6 +259,8 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CharacterTable,
+		PoemTable,
+		PoemCharTable,
 		VersionsTable,
 		WuXingTable,
 	}
@@ -193,6 +271,13 @@ func init() {
 	CharacterTable.ForeignKeys[1].RefTable = CharacterTable
 	CharacterTable.Annotation = &entsql.Annotation{
 		Table: "character",
+	}
+	PoemTable.Annotation = &entsql.Annotation{
+		Table: "poem",
+	}
+	PoemCharTable.ForeignKeys[0].RefTable = PoemTable
+	PoemCharTable.Annotation = &entsql.Annotation{
+		Table: "poem_char",
 	}
 	WuXingTable.Annotation = &entsql.Annotation{
 		Table: "wu_xing",

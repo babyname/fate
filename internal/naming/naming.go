@@ -2,6 +2,8 @@
 package naming
 
 import (
+	"context"
+
 	v2 "github.com/babyname/chronos/v2"
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/ent"
@@ -89,10 +91,20 @@ func New(cfg *config.Config, model *repository.Repository) Interface {
 		model: model,
 	}
 
+	poetryChars := make(map[string]bool)
+	if model != nil {
+		if chars, err := model.QueryPoetryChars(context.Background()); err == nil {
+			for _, ch := range chars {
+				poetryChars[ch] = true
+			}
+		}
+	}
+
 	n.raters = []Rater{
 		NewWuxingRater(cfg),
 		NewBihuaRater(cfg),
 		NewYinyunRater(cfg),
+		NewPoetryRater(cfg, poetryChars),
 	}
 
 	return n

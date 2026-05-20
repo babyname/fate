@@ -15,6 +15,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/ent/poem"
+	"github.com/babyname/fate/ent/poemchar"
 	"github.com/babyname/fate/ent/version"
 	"github.com/babyname/fate/ent/wuxing"
 )
@@ -26,6 +28,10 @@ type Client struct {
 	Schema *migrate.Schema
 	// Character is the client for interacting with the Character builders.
 	Character *CharacterClient
+	// Poem is the client for interacting with the Poem builders.
+	Poem *PoemClient
+	// PoemChar is the client for interacting with the PoemChar builders.
+	PoemChar *PoemCharClient
 	// Version is the client for interacting with the Version builders.
 	Version *VersionClient
 	// WuXing is the client for interacting with the WuXing builders.
@@ -44,6 +50,8 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Character = NewCharacterClient(c.config)
+	c.Poem = NewPoemClient(c.config)
+	c.PoemChar = NewPoemCharClient(c.config)
 	c.Version = NewVersionClient(c.config)
 	c.WuXing = NewWuXingClient(c.config)
 }
@@ -129,6 +137,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:       ctx,
 		config:    cfg,
 		Character: NewCharacterClient(cfg),
+		Poem:      NewPoemClient(cfg),
+		PoemChar:  NewPoemCharClient(cfg),
 		Version:   NewVersionClient(cfg),
 		WuXing:    NewWuXingClient(cfg),
 	}, nil
@@ -151,6 +161,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:       ctx,
 		config:    cfg,
 		Character: NewCharacterClient(cfg),
+		Poem:      NewPoemClient(cfg),
+		PoemChar:  NewPoemCharClient(cfg),
 		Version:   NewVersionClient(cfg),
 		WuXing:    NewWuXingClient(cfg),
 	}, nil
@@ -182,6 +194,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Character.Use(hooks...)
+	c.Poem.Use(hooks...)
+	c.PoemChar.Use(hooks...)
 	c.Version.Use(hooks...)
 	c.WuXing.Use(hooks...)
 }
@@ -190,6 +204,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Character.Intercept(interceptors...)
+	c.Poem.Intercept(interceptors...)
+	c.PoemChar.Intercept(interceptors...)
 	c.Version.Intercept(interceptors...)
 	c.WuXing.Intercept(interceptors...)
 }
@@ -199,6 +215,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *CharacterMutation:
 		return c.Character.mutate(ctx, m)
+	case *PoemMutation:
+		return c.Poem.mutate(ctx, m)
+	case *PoemCharMutation:
+		return c.PoemChar.mutate(ctx, m)
 	case *VersionMutation:
 		return c.Version.mutate(ctx, m)
 	case *WuXingMutation:
@@ -387,6 +407,274 @@ func (c *CharacterClient) mutate(ctx context.Context, m *CharacterMutation) (Val
 		return (&CharacterDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Character mutation op: %q", m.Op())
+	}
+}
+
+// PoemClient is a client for the Poem schema.
+type PoemClient struct {
+	config
+}
+
+// NewPoemClient returns a client for the Poem from the given config.
+func NewPoemClient(c config) *PoemClient {
+	return &PoemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `poem.Hooks(f(g(h())))`.
+func (c *PoemClient) Use(hooks ...Hook) {
+	c.hooks.Poem = append(c.hooks.Poem, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `poem.Intercept(f(g(h())))`.
+func (c *PoemClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Poem = append(c.inters.Poem, interceptors...)
+}
+
+// Create returns a builder for creating a Poem entity.
+func (c *PoemClient) Create() *PoemCreate {
+	mutation := newPoemMutation(c.config, OpCreate)
+	return &PoemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Poem entities.
+func (c *PoemClient) CreateBulk(builders ...*PoemCreate) *PoemCreateBulk {
+	return &PoemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Poem.
+func (c *PoemClient) Update() *PoemUpdate {
+	mutation := newPoemMutation(c.config, OpUpdate)
+	return &PoemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PoemClient) UpdateOne(po *Poem) *PoemUpdateOne {
+	mutation := newPoemMutation(c.config, OpUpdateOne, withPoem(po))
+	return &PoemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PoemClient) UpdateOneID(id int) *PoemUpdateOne {
+	mutation := newPoemMutation(c.config, OpUpdateOne, withPoemID(id))
+	return &PoemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Poem.
+func (c *PoemClient) Delete() *PoemDelete {
+	mutation := newPoemMutation(c.config, OpDelete)
+	return &PoemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PoemClient) DeleteOne(po *Poem) *PoemDeleteOne {
+	return c.DeleteOneID(po.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PoemClient) DeleteOneID(id int) *PoemDeleteOne {
+	builder := c.Delete().Where(poem.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PoemDeleteOne{builder}
+}
+
+// Query returns a query builder for Poem.
+func (c *PoemClient) Query() *PoemQuery {
+	return &PoemQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePoem},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Poem entity by its id.
+func (c *PoemClient) Get(ctx context.Context, id int) (*Poem, error) {
+	return c.Query().Where(poem.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PoemClient) GetX(ctx context.Context, id int) *Poem {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryPoemChars queries the poem_chars edge of a Poem.
+func (c *PoemClient) QueryPoemChars(po *Poem) *PoemCharQuery {
+	query := (&PoemCharClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := po.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(poem.Table, poem.FieldID, id),
+			sqlgraph.To(poemchar.Table, poemchar.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, poem.PoemCharsTable, poem.PoemCharsColumn),
+		)
+		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PoemClient) Hooks() []Hook {
+	return c.hooks.Poem
+}
+
+// Interceptors returns the client interceptors.
+func (c *PoemClient) Interceptors() []Interceptor {
+	return c.inters.Poem
+}
+
+func (c *PoemClient) mutate(ctx context.Context, m *PoemMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PoemCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PoemUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PoemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PoemDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Poem mutation op: %q", m.Op())
+	}
+}
+
+// PoemCharClient is a client for the PoemChar schema.
+type PoemCharClient struct {
+	config
+}
+
+// NewPoemCharClient returns a client for the PoemChar from the given config.
+func NewPoemCharClient(c config) *PoemCharClient {
+	return &PoemCharClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `poemchar.Hooks(f(g(h())))`.
+func (c *PoemCharClient) Use(hooks ...Hook) {
+	c.hooks.PoemChar = append(c.hooks.PoemChar, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `poemchar.Intercept(f(g(h())))`.
+func (c *PoemCharClient) Intercept(interceptors ...Interceptor) {
+	c.inters.PoemChar = append(c.inters.PoemChar, interceptors...)
+}
+
+// Create returns a builder for creating a PoemChar entity.
+func (c *PoemCharClient) Create() *PoemCharCreate {
+	mutation := newPoemCharMutation(c.config, OpCreate)
+	return &PoemCharCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of PoemChar entities.
+func (c *PoemCharClient) CreateBulk(builders ...*PoemCharCreate) *PoemCharCreateBulk {
+	return &PoemCharCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for PoemChar.
+func (c *PoemCharClient) Update() *PoemCharUpdate {
+	mutation := newPoemCharMutation(c.config, OpUpdate)
+	return &PoemCharUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PoemCharClient) UpdateOne(pc *PoemChar) *PoemCharUpdateOne {
+	mutation := newPoemCharMutation(c.config, OpUpdateOne, withPoemChar(pc))
+	return &PoemCharUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PoemCharClient) UpdateOneID(id int) *PoemCharUpdateOne {
+	mutation := newPoemCharMutation(c.config, OpUpdateOne, withPoemCharID(id))
+	return &PoemCharUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for PoemChar.
+func (c *PoemCharClient) Delete() *PoemCharDelete {
+	mutation := newPoemCharMutation(c.config, OpDelete)
+	return &PoemCharDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PoemCharClient) DeleteOne(pc *PoemChar) *PoemCharDeleteOne {
+	return c.DeleteOneID(pc.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PoemCharClient) DeleteOneID(id int) *PoemCharDeleteOne {
+	builder := c.Delete().Where(poemchar.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PoemCharDeleteOne{builder}
+}
+
+// Query returns a query builder for PoemChar.
+func (c *PoemCharClient) Query() *PoemCharQuery {
+	return &PoemCharQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePoemChar},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a PoemChar entity by its id.
+func (c *PoemCharClient) Get(ctx context.Context, id int) (*PoemChar, error) {
+	return c.Query().Where(poemchar.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PoemCharClient) GetX(ctx context.Context, id int) *PoemChar {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryPoem queries the poem edge of a PoemChar.
+func (c *PoemCharClient) QueryPoem(pc *PoemChar) *PoemQuery {
+	query := (&PoemClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(poemchar.Table, poemchar.FieldID, id),
+			sqlgraph.To(poem.Table, poem.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, poemchar.PoemTable, poemchar.PoemColumn),
+		)
+		fromV = sqlgraph.Neighbors(pc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PoemCharClient) Hooks() []Hook {
+	return c.hooks.PoemChar
+}
+
+// Interceptors returns the client interceptors.
+func (c *PoemCharClient) Interceptors() []Interceptor {
+	return c.inters.PoemChar
+}
+
+func (c *PoemCharClient) mutate(ctx context.Context, m *PoemCharMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PoemCharCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PoemCharUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PoemCharUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PoemCharDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown PoemChar mutation op: %q", m.Op())
 	}
 }
 
@@ -629,9 +917,9 @@ func (c *WuXingClient) mutate(ctx context.Context, m *WuXingMutation) (Value, er
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Character, Version, WuXing []ent.Hook
+		Character, Poem, PoemChar, Version, WuXing []ent.Hook
 	}
 	inters struct {
-		Character, Version, WuXing []ent.Interceptor
+		Character, Poem, PoemChar, Version, WuXing []ent.Interceptor
 	}
 )

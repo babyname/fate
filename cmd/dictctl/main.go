@@ -25,6 +25,7 @@ func main() {
 		fmt.Println("  update <base.json> <update.json>  Update only existing chars (no insert)")
 		fmt.Println("  fill-wuxing <path>      Fill missing wu_xing from kangxi stroke")
 		fmt.Println("  fill-xinhua <char.json> <xinhua.json>  Fill/replace meaning with Chinese definitions from xinhua")
+		fmt.Println("  import-poetry <tang-dir> <ci-dir> [shijing.json]  Import poetry data and output poem_entries.json")
 		os.Exit(1)
 	}
 
@@ -96,6 +97,8 @@ func main() {
 			os.Exit(1)
 		}
 		runFillXinhua(os.Args[2], os.Args[3])
+	case "import-poetry":
+		runImportPoetry(os.Args[2:])
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 		os.Exit(1)
@@ -583,4 +586,55 @@ func runFillXinhua(charPath, xinhuaPath string) {
 		os.Exit(1)
 	}
 	fmt.Printf("Saved to %s\n", charPath)
+}
+
+func runImportPoetry(args []string) {
+	if len(args) < 1 {
+		fmt.Println("Usage: dictctl import-poetry <poetry-dir>")
+		fmt.Println("  poetry-dir should contain 全唐诗/ and 宋词/ and 诗经/ subdirectories")
+		os.Exit(1)
+	}
+
+	poetryDir := args[0]
+	entries, err := dict.LoadPoetryFromDir(poetryDir)
+	if err != nil {
+		fmt.Printf("Error loading poetry: %v\n", err)
+		os.Exit(1)
+	}
+
+	shiCount := 0
+	ciCount := 0
+	jingCount := 0
+	charRefCount := 0
+	charSet := make(map[string]bool)
+
+	for _, e := range entries {
+		switch e.Type {
+		case "shi":
+			shiCount++
+		case "ci":
+			ciCount++
+		case "jing":
+			jingCount++
+		}
+		refs := dict.ExtractCharRefs(e.Content)
+		charRefCount += len(refs)
+		for _, r := range refs {
+			charSet[r.Char] = true
+		}
+	}
+
+	fmt.Printf("Poetry import statistics:\n")
+	fmt.Printf("  Total poems: %d (唐诗=%d 宋词=%d 诗经=%d)\n", len(entries), shiCount, ciCount, jingCount)
+	fmt.Printf("  Total char references: %d\n", charRefCount)
+	fmt.Printf("  Unique chars with poetry source: %d\n", len(charSet))
+
+	outputPath := "data/poetry/poem_entries.json"
+	os.MkdirAll("data/poetry", 0755)
+	data, _ := json.MarshalIndent(entries, "", "  ")
+	if err := os.WriteFile(outputPath, data, 0644); err != nil {
+		fmt.Printf("Error saving: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("Saved poem entries to %s\n", outputPath)
 }
