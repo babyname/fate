@@ -2,17 +2,19 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"strings"
 	"time"
 
+	v2 "github.com/babyname/chronos/v2"
 	"github.com/babyname/fate"
 	"github.com/babyname/fate/internal/analysis"
 	"github.com/babyname/fate/internal/database"
-	"github.com/babyname/fate/internal/repository"
 	"github.com/babyname/fate/internal/log"
-	v2 "github.com/babyname/chronos/v2"
+	"github.com/babyname/fate/internal/repository"
+	"github.com/babyname/fate/internal/seeddb"
 
 	"github.com/spf13/cobra"
 )
@@ -31,11 +33,15 @@ func cmdName() *cobra.Command {
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(_ *cobra.Command, args []string) {
 			fmt.Println("start", time.Now().String())
-			f, err := fate.New(cfg)
-			if err != nil {
-				log.Error("new fate", err)
+			repo := getRepository()
+			if repo == nil {
+				fmt.Println("数据库未初始化")
 				return
 			}
+			if err := seeddb.EnsureSeeded(context.Background(), repo); err != nil {
+				log.Error("ensure seeded", err)
+			}
+			f := fate.NewWithRepo(cfg, repo)
 			s := f.NewSessionWithFilter(fate.NewFilter(fate.FilterOption{
 				CharacterFilter:     true,
 				CharacterFilterType: 0,
@@ -144,12 +150,11 @@ func cmdNameDetail() *cobra.Command {
 				sx = 0
 			}
 
-			f, err := fate.New(cfg)
-			if err != nil {
-				log.Error("new fate", err)
+			db := getRepository()
+			if db == nil {
+				fmt.Println("数据库未初始化")
 				return
 			}
-			_ = f
 
 			fateData, err := v2.GetFateData(&v2.FateInput{
 				BirthDate: b,
@@ -161,21 +166,15 @@ func cmdNameDetail() *cobra.Command {
 				return
 			}
 
-			db := getRepository()
-			if db == nil {
-				fmt.Println("数据库未初始化")
-				return
-			}
-
 			ctx := cmd.Context()
 			c1, err := db.GetCharacter(ctx, repository.Char(char1))
 			if err != nil {
-				fmt.Println("查询字「" + char1 + "」失败:", err)
+				fmt.Println("查询字「"+char1+"」失败:", err)
 				return
 			}
 			c2, err := db.GetCharacter(ctx, repository.Char(char2))
 			if err != nil {
-				fmt.Println("查询字「" + char2 + "」失败:", err)
+				fmt.Println("查询字「"+char2+"」失败:", err)
 				return
 			}
 
