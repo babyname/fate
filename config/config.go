@@ -93,8 +93,9 @@ type OutputConfig struct {
 func DefaultConfig() *Config {
 	return &Config{
 		Database: DBConfig{
-			Name:   "fate",
 			Driver: "sqlite3",
+			Mode:   "file",
+			Name:   "fate",
 		},
 		Rate: RateConfig{
 			WuxingWeight:          0.4,

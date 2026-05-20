@@ -1,10 +1,15 @@
-// Package database 提供数据库连接构建与初始化功能，支持 SQLite3 和 MySQL。
 package database
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
+	_ "embed"
 	"errors"
 	"fmt"
+	"io"
+	"log"
+	"os"
 	"time"
 
 	"github.com/babyname/fate/config"
@@ -12,21 +17,20 @@ import (
 	"github.com/babyname/fate/ent/schema"
 )
 
+//go:embed data/fate.db.gz
+var embeddedDB []byte
+
 const (
-	mysqlDSN   = "%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=true"
-	sqlite3DSN = "file:%v?cache=shared&_journal=WAL&_fk=1"
+	mysqlDSN = "%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=true"
 )
 
-// BuildFunc 根据数据库配置构建 ent 客户端的函数类型。
 type BuildFunc func(config.DBConfig) (*ent.Client, error)
 
 type database struct {
 	config.DBConfig
 }
 
-// Builder 数据库构建器接口，提供获取客户端的能力。
 type Builder interface {
-	// Client 创建并返回数据库客户端。
 	Client() (*ent.Client, error)
 }
 
@@ -44,12 +48,26 @@ func buildOther(cfg config.DBConfig) (*ent.Client, error) {
 }
 
 func buildSqlite3(cfg config.DBConfig) (*ent.Client, error) {
-	dsn := sqlite3DSN
 	if cfg.DSN != "" {
-		dsn = cfg.DSN
+		return ent.Open(cfg.Driver, cfg.DSN)
 	}
-	link := fmt.Sprintf(dsn, cfg.Name)
-	return ent.Open(cfg.Driver, link)
+	switch cfg.Mode {
+	case "memory":
+		return ent.Open(cfg.Driver, "file::memory:?cache=shared&_fk=1")
+	case "file", "":
+		name := cfg.Name
+		if name == "" {
+			name = "fate"
+		}
+		if HasEmbeddedDB() {
+			if err := ExtractEmbeddedDB(name); err != nil {
+				return nil, fmt.Errorf("extract embedded db: %w", err)
+			}
+		}
+		return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", name))
+	default:
+		return nil, fmt.Errorf("unknown sqlite3 mode: %s", cfg.Mode)
+	}
 }
 
 func buildMysql(cfg config.DBConfig) (*ent.Client, error) {
@@ -99,9 +117,38 @@ func (d *database) Client() (*ent.Client, error) {
 	return c, nil
 }
 
-// New 根据数据库配置创建 Builder 实例。
 func New(cfg config.DBConfig) Builder {
 	return &database{DBConfig: cfg}
+}
+
+func HasEmbeddedDB() bool {
+	return len(embeddedDB) > 0
+}
+
+func ExtractEmbeddedDB(destPath string) error {
+	if _, err := os.Stat(destPath); err == nil {
+		return nil
+	}
+	log.Printf("[DB] Extracting embedded database to %s (%d bytes compressed)", destPath, len(embeddedDB))
+	gr, err := gzip.NewReader(bytes.NewReader(embeddedDB))
+	if err != nil {
+		return fmt.Errorf("create gzip reader: %w", err)
+	}
+	defer gr.Close()
+
+	out, err := os.Create(destPath)
+	if err != nil {
+		return fmt.Errorf("create db file: %w", err)
+	}
+	defer out.Close()
+
+	written, err := io.Copy(out, gr)
+	if err != nil {
+		os.Remove(destPath)
+		return fmt.Errorf("decompress db: %w", err)
+	}
+	log.Printf("[DB] Extracted database: %d bytes", written)
+	return nil
 }
 
 var _ Builder = (*database)(nil)
