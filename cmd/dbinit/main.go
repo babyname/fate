@@ -24,7 +24,7 @@ func main() {
 	}
 
 	dbName := "fate"
-	outputPath := "internal/database/data/fate.db.gz"
+	outputPath := "resources/fate.db.gz"
 
 	if force {
 		for _, p := range []string{dbName, dbName + "-shm", dbName + "-wal"} {
