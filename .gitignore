@@ -59,3 +59,6 @@ data/raw/
 output/
 bench*.txt
 tools/
+
+# Unihan raw data (downloaded, not source)
+Unihan/
