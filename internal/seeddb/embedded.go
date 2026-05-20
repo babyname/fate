@@ -1,24 +1,18 @@
 package seeddb
 
 import (
-	"embed"
 	"encoding/json"
 	"fmt"
 	"log"
+
+	"github.com/babyname/fate/resources"
 )
 
-//go:embed data/character.json
-var embeddedSeedFS embed.FS
-
 func LoadEmbeddedCharacters() ([]SeedCharacter, error) {
-	data, err := embeddedSeedFS.ReadFile("data/character.json")
-	if err != nil {
-		return nil, fmt.Errorf("read embedded seed data: %w", err)
-	}
 	var seeds []SeedCharacter
-	if err := json.Unmarshal(data, &seeds); err != nil {
-		return nil, fmt.Errorf("parse embedded seed data: %w", err)
+	if err := json.Unmarshal(resources.CharacterJSON, &seeds); err != nil {
+		return nil, fmt.Errorf("parse character.json: %w", err)
 	}
-	log.Printf("Loaded %d characters from embedded seed data", len(seeds))
+	log.Printf("Loaded %d characters from embedded resources", len(seeds))
 	return seeds, nil
 }
