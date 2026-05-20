@@ -15,6 +15,7 @@ import (
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/schema"
+	_ "github.com/sqlite3ent/sqlite3"
 )
 
 //go:embed data/fate.db.gz
