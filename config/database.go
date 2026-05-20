@@ -1,13 +1,13 @@
 package config
 
-// DBConfig 数据库连接配置
 type DBConfig struct {
-	Driver  string `json:"driver,omitempty"`
-	DSN     string `json:"dsn,omitempty"`
-	Host    string `json:"host,omitempty"`
-	Port    string `json:"port,omitempty"`
-	User    string `json:"user,omitempty"`
-	Pwd     string `json:"pwd,omitempty"`
-	Name    string `json:"name,omitempty"`
-	Timeout int    `json:"timeout,omitempty"`
+	Driver  string `json:"driver,omitempty"  yaml:"driver"`
+	DSN     string `json:"dsn,omitempty"     yaml:"dsn"`
+	Mode    string `json:"mode,omitempty"    yaml:"mode"`
+	Host    string `json:"host,omitempty"    yaml:"host"`
+	Port    string `json:"port,omitempty"    yaml:"port"`
+	User    string `json:"user,omitempty"    yaml:"user"`
+	Pwd     string `json:"pwd,omitempty"     yaml:"pwd"`
+	Name    string `json:"name,omitempty"    yaml:"name"`
+	Timeout int    `json:"timeout,omitempty" yaml:"timeout"`
 }
