@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"sort"
 
+	v2 "github.com/babyname/chronos/v2"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/rating"
 	"github.com/babyname/fate/internal/wuge"
 	"github.com/babyname/fate/internal/wuxing"
-	v2 "github.com/babyname/chronos/v2"
 )
 
 // BuildNameResult builds a single NameResult from the given character data and fate information.

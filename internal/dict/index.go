@@ -9,19 +9,19 @@ import (
 type DictIndex struct {
 	mu sync.RWMutex
 
-	chars         map[rune]*CharEntry
-	byWuXing      map[string][]*CharEntry
-	byStroke      map[int][]*CharEntry
+	chars           map[rune]*CharEntry
+	byWuXing        map[string][]*CharEntry
+	byStroke        map[int][]*CharEntry
 	byScienceStroke map[int][]*CharEntry
 	byKangxiStroke  map[int][]*CharEntry
-	byRadical     map[string][]*CharEntry
-	byCommonLevel map[int][]*CharEntry
-	bySimplified  map[bool][]*CharEntry
-	byTraditional map[bool][]*CharEntry
-	byKangxi      map[bool][]*CharEntry
-	byVariant     map[bool][]*CharEntry
-	byAncient     map[bool][]*CharEntry
-	byPinyin      map[string][]*CharEntry
+	byRadical       map[string][]*CharEntry
+	byCommonLevel   map[int][]*CharEntry
+	bySimplified    map[bool][]*CharEntry
+	byTraditional   map[bool][]*CharEntry
+	byKangxi        map[bool][]*CharEntry
+	byVariant       map[bool][]*CharEntry
+	byAncient       map[bool][]*CharEntry
+	byPinyin        map[string][]*CharEntry
 
 	simplifiedToTraditional map[rune][]rune
 	traditionalToSimplified map[rune][]rune
@@ -118,21 +118,21 @@ func (idx *DictIndex) Build(entries []*CharEntry) {
 }
 
 type QueryFilter struct {
-	WuXing          string
-	MinStroke       int
-	MaxStroke       int
-	StrokeField     string
-	IsSimplified    *bool
-	IsTraditional   *bool
-	IsKangxi        *bool
-	IsVariant       *bool
-	IsAncient       *bool
-	RegularOnly     bool
-	CommonLevel     int
-	NameableOnly    bool
-	GenderHint      string
-	Radical         string
-	ExcludeChars    map[rune]bool
+	WuXing        string
+	MinStroke     int
+	MaxStroke     int
+	StrokeField   string
+	IsSimplified  *bool
+	IsTraditional *bool
+	IsKangxi      *bool
+	IsVariant     *bool
+	IsAncient     *bool
+	RegularOnly   bool
+	CommonLevel   int
+	NameableOnly  bool
+	GenderHint    string
+	Radical       string
+	ExcludeChars  map[rune]bool
 }
 
 func (idx *DictIndex) Query(filter *QueryFilter) []*CharEntry {
