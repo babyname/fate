@@ -7,10 +7,14 @@ import (
 	"io"
 	"log"
 	"os"
+	"unicode"
 
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/ent/poem"
+	"github.com/babyname/fate/ent/poemchar"
 	"github.com/babyname/fate/ent/schema"
+	"github.com/babyname/fate/internal/dict"
 	"github.com/babyname/fate/internal/seeddb"
 	_ "github.com/sqlite3ent/sqlite3"
 )
@@ -53,6 +57,18 @@ func main() {
 	}
 	if err := importWuXing(ctx, client); err != nil {
 		log.Fatalf("Failed to import wuxing: %v", err)
+	}
+
+	poetryDir := "data/chinese-poetry"
+	if len(os.Args) > 1 {
+		poetryDir = os.Args[1]
+	}
+	if info, err := os.Stat(poetryDir); err == nil && info.IsDir() {
+		if err := importPoetry(ctx, client, poetryDir); err != nil {
+			log.Printf("Warning: Failed to import poetry: %v", err)
+		}
+	} else {
+		log.Printf("Poetry directory %s not found, skipping poetry import", poetryDir)
 	}
 
 	verifyCharacters(ctx, client)
@@ -162,14 +178,111 @@ func importWuXing(ctx context.Context, client *ent.Client) error {
 	return nil
 }
 
+func importPoetry(ctx context.Context, client *ent.Client, poetryDir string) error {
+	log.Printf("Importing poetry from %s...", poetryDir)
+
+	entries, err := dict.LoadSelectedPoetryFromDir(poetryDir)
+	if err != nil {
+		return fmt.Errorf("load poetry: %w", err)
+	}
+	log.Printf("Loaded %d poems", len(entries))
+
+	poemCount := 0
+	charRefCount := 0
+	uniqueChars := make(map[string]bool)
+
+	for i, e := range entries {
+		poemBuilder := client.Poem.Create().
+			SetTitle(e.Title).
+			SetContent(e.Content).
+			SetType(poemType(e.Type)).
+			SetSource(e.Source)
+		if e.Author != "" {
+			poemBuilder.SetAuthor(e.Author)
+		}
+		if e.Dynasty != "" {
+			poemBuilder.SetDynasty(e.Dynasty)
+		}
+
+		poem, err := poemBuilder.Save(ctx)
+		if err != nil {
+			continue
+		}
+		poemCount++
+
+		refs := dict.ExtractCharRefs(e.Content)
+		for _, ref := range refs {
+			if !unicode.Is(unicode.Han, []rune(ref.Char)[0]) {
+				continue
+			}
+			charBuilder := client.PoemChar.Create().
+				SetPoemID(poem.ID).
+				SetChar(ref.Char).
+				SetPosition(ref.Position)
+			if ref.Sentence != "" {
+				charBuilder.SetSentence(ref.Sentence)
+			}
+			if ref.Context != "" {
+				charBuilder.SetContext(ref.Context)
+			}
+			if _, err := charBuilder.Save(ctx); err != nil {
+				continue
+			}
+			charRefCount++
+			uniqueChars[ref.Char] = true
+		}
+
+		if (i+1)%500 == 0 {
+			log.Printf("  Poetry progress: %d/%d", i+1, len(entries))
+		}
+	}
+
+	log.Printf("Imported %d poems, %d char references, %d unique chars with poetry source",
+		poemCount, charRefCount, len(uniqueChars))
+
+	charWithPoetry := 0
+	for ch := range uniqueChars {
+		_, err := client.Character.Update().
+			Where(character.CharEQ(ch)).
+			SetComment(addPoetryTag(ch)).
+			Save(ctx)
+		if err == nil {
+			charWithPoetry++
+		}
+	}
+	log.Printf("Updated %d characters with poetry tag", charWithPoetry)
+
+	return nil
+}
+
+func addPoetryTag(ch string) string {
+	return "poetry"
+}
+
+func poemType(t string) poem.Type {
+	switch t {
+	case "ci":
+		return poem.TypeCi
+	case "fu":
+		return poem.TypeFu
+	case "jing":
+		return poem.TypeJing
+	case "other":
+		return poem.TypeOther
+	default:
+		return poem.TypeShi
+	}
+}
+
 func verifyCharacters(ctx context.Context, client *ent.Client) {
-	testChars := []string{"西", "门", "王", "李", "张", "诸", "葛"}
+	testChars := []string{"西", "门", "明", "瑞", "轩"}
 	for _, ch := range testChars {
 		c, err := client.Character.Query().Where(character.CharEQ(ch)).First(ctx)
 		if err != nil {
 			log.Printf("  %q: NOT FOUND!", ch)
 		} else {
-			log.Printf("  %q: stroke=%d wuxing=%s radical=%s meaning=%s", ch, c.ScienceStroke, c.WuXing, c.Radical, truncate(c.Meaning, 30))
+			poemCount, _ := client.PoemChar.Query().Where(poemchar.CharEQ(ch)).Count(ctx)
+			log.Printf("  %q: stroke=%d wuxing=%s meaning=%s poetry_refs=%d", ch, c.ScienceStroke, c.WuXing, truncate(c.Meaning, 30), poemCount)
 		}
 	}
 }
