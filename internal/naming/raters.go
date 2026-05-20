@@ -315,3 +315,67 @@ func firstPinyin(py []string) string {
 	}
 	return ""
 }
+
+type PoetryRater struct {
+	cfg        *config.Config
+	poetryChar map[string]bool
+}
+
+func NewPoetryRater(cfg *config.Config, poetryChars map[string]bool) *PoetryRater {
+	return &PoetryRater{cfg: cfg, poetryChar: poetryChars}
+}
+
+func (r *PoetryRater) Name() string {
+	return "poetry"
+}
+
+func (r *PoetryRater) Weight() float64 {
+	return r.cfg.Rate.PoetryWeight
+}
+
+func (r *PoetryRater) Rate(name *NameInfo, _ *v2.FateData) (float64, string) {
+	if len(r.poetryChar) == 0 {
+		return 70.0, "诗词数据未加载"
+	}
+
+	score := 50.0
+	var notes []string
+
+	hasPoetry1 := r.poetryChar[name.Char1.Char]
+	hasPoetry2 := r.poetryChar[name.Char2.Char]
+
+	if hasPoetry1 {
+		score += 20.0
+		notes = append(notes, name.Char1.Char+"出自诗词")
+	}
+	if hasPoetry2 {
+		score += 20.0
+		notes = append(notes, name.Char2.Char+"出自诗词")
+	}
+
+	if hasPoetry1 && hasPoetry2 {
+		score += 10.0
+		notes = append(notes, "双字皆有诗词出处")
+	}
+
+	if !hasPoetry1 && !hasPoetry2 {
+		score -= 10.0
+		notes = append(notes, "无诗词出处")
+	}
+
+	if score > 100.0 {
+		score = 100.0
+	}
+	if score < 0.0 {
+		score = 0.0
+	}
+
+	var noteStr string
+	if len(notes) > 0 {
+		noteStr = joinNotes(notes)
+	} else {
+		noteStr = "诗词中性"
+	}
+
+	return score, noteStr
+}

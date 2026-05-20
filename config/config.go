@@ -23,10 +23,10 @@ type DatabaseConfig = DBConfig
 
 // RateConfig 评分权重与阈值配置
 type RateConfig struct {
-	// 评分权重（三者之和须为 1.0）
 	WuxingWeight float64 `yaml:"wuxing_weight"`
 	BihuaWeight  float64 `yaml:"bihua_weight"`
 	YinyunWeight float64 `yaml:"yinyun_weight"`
+	PoetryWeight float64 `yaml:"poetry_weight"`
 
 	// 强弱判断阈值
 	StrengthThresholdLow  float64 `yaml:"strength_threshold_low"`
@@ -98,9 +98,10 @@ func DefaultConfig() *Config {
 			Name:   "fate",
 		},
 		Rate: RateConfig{
-			WuxingWeight:          0.4,
-			BihuaWeight:           0.3,
-			YinyunWeight:          0.3,
+			WuxingWeight:          0.35,
+			BihuaWeight:           0.25,
+			YinyunWeight:          0.25,
+			PoetryWeight:          0.15,
 			StrengthThresholdLow:  0.4,
 			StrengthThresholdHigh: 0.6,
 			TongleiWeight:         1.0,
@@ -166,7 +167,7 @@ func ValidateConfig(cfg *Config) error {
 		return errors.New("config is nil")
 	}
 
-	if math.Abs(cfg.Rate.WuxingWeight+cfg.Rate.BihuaWeight+cfg.Rate.YinyunWeight-1.0) > 0.001 {
+	if math.Abs(cfg.Rate.WuxingWeight+cfg.Rate.BihuaWeight+cfg.Rate.YinyunWeight+cfg.Rate.PoetryWeight-1.0) > 0.001 {
 		return errors.New("rate weights sum must be 1.0")
 	}
 
