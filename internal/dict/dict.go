@@ -45,6 +45,7 @@ type UnihanEntry struct {
 	KDefinition string
 	KTotalStrokes string
 	KRSKangXi string
+	KRSUnicode string
 	KTraditionalVariant string
 	KSimplifiedVariant string
 }
@@ -93,6 +94,8 @@ func ParseUnihanIRGSource(path string) (map[rune]*UnihanEntry, error) {
 			entries[runeVal].KTotalStrokes = fieldValue
 		case "kRSKangXi":
 			entries[runeVal].KRSKangXi = fieldValue
+		case "kRSUnicode":
+			entries[runeVal].KRSUnicode = fieldValue
 		case "kTraditionalVariant":
 			entries[runeVal].KTraditionalVariant = fieldValue
 		case "kSimplifiedVariant":
@@ -143,7 +146,17 @@ func UnihanToCharEntries(unihan map[rune]*UnihanEntry) []*CharEntry {
 					entry.KangxiStroke = rs
 					entry.ScienceStroke = rs
 				}
-				entry.Radical = rsParts[0]
+				entry.Radical = RadicalNumberToName(rsParts[0])
+			}
+		} else if u.KRSUnicode != "" {
+			parts := strings.Split(u.KRSUnicode, " ")
+			first := parts[0]
+			rsParts := strings.Split(first, ".")
+			if len(rsParts) >= 2 {
+				entry.Radical = RadicalNumberToName(rsParts[0])
+				if rs, err := strconv.Atoi(rsParts[1]); err == nil {
+					entry.ScienceStroke = rs
+				}
 			}
 		}
 
@@ -167,6 +180,10 @@ func UnihanToCharEntries(unihan map[rune]*UnihanEntry) []*CharEntry {
 					entry.IsSimplified = false
 				}
 			}
+		}
+
+		if u.KDefinition != "" {
+			entry.Meaning = u.KDefinition
 		}
 
 		entries = append(entries, entry)
