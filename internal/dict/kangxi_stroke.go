@@ -18,9 +18,9 @@ var scienceStrokeFixes = map[rune]int{
 }
 
 var kangxiStrokeCorrections = map[rune]struct {
-	OriginalStroke int
+	OriginalStroke  int
 	CorrectedStroke int
-	Reason         string
+	Reason          string
 }{
 	'丁': {2, 2, "一部2画"},
 	'七': {2, 2, "一部2画"},

@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
+	v2 "github.com/babyname/chronos/v2"
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/analysis"
-	v2 "github.com/babyname/chronos/v2"
 )
 
 func TestNameAnalysisOutput(t *testing.T) {

@@ -84,8 +84,8 @@ type FilterOption struct {
 	AvoidPinyin []string // Pinyin to avoid (for better sound)
 
 	// Poetry options
-	PoetryMode    int // 0=off, 1=prefer, 2=only
-	XiYongMethod  string
+	PoetryMode       int // 0=off, 1=prefer, 2=only
+	XiYongMethod     string
 	FilterStrictness string
 }
 

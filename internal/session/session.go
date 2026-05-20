@@ -6,15 +6,15 @@ import (
 	"sort"
 	"sync/atomic"
 
+	v2 "github.com/babyname/chronos/v2"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/analysis"
 	filterpkg "github.com/babyname/fate/internal/filter"
+	"github.com/babyname/fate/internal/log"
 	"github.com/babyname/fate/internal/naming"
 	"github.com/babyname/fate/internal/rating"
 	"github.com/babyname/fate/internal/repository"
 	"github.com/babyname/fate/internal/wuge"
-	"github.com/babyname/fate/internal/log"
-	v2 "github.com/babyname/chronos/v2"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -46,13 +46,13 @@ type Session interface {
 }
 
 type session struct {
-	ctx         context.Context
-	cancel      context.CancelFunc
-	db          *repository.Repository
-	group       errgroup.Group
-	state       int32
-	filter      filterpkg.Filter
-	outputDone  chan struct{}
+	ctx        context.Context
+	cancel     context.CancelFunc
+	db         *repository.Repository
+	group      errgroup.Group
+	state      int32
+	filter     filterpkg.Filter
+	outputDone chan struct{}
 	fateData   *v2.FateData
 
 	chars map[int][]*ent.Character

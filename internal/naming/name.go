@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/babyname/fate/ent"
 	"github.com/babyname/chronos/v2"
+	"github.com/babyname/fate/ent"
 )
 
 // Sex 表示性别类型。
@@ -13,7 +13,7 @@ type Sex int
 
 const (
 	// SexBoy 表示男性。
-	SexBoy  Sex = 1
+	SexBoy Sex = 1
 	// SexGirl 表示女性。
 	SexGirl Sex = 0
 )
