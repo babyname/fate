@@ -9,6 +9,12 @@ import (
 // Character is the predicate function for character builders.
 type Character func(*sql.Selector)
 
+// Poem is the predicate function for poem builders.
+type Poem func(*sql.Selector)
+
+// PoemChar is the predicate function for poemchar builders.
+type PoemChar func(*sql.Selector)
+
 // Version is the predicate function for version builders.
 type Version func(*sql.Selector)
 
