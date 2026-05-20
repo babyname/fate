@@ -11,7 +11,7 @@ import (
 	"github.com/babyname/fate/internal/analysis"
 	"github.com/babyname/fate/internal/database"
 	"github.com/babyname/fate/internal/repository"
-	"github.com/babyname/fate/log"
+	"github.com/babyname/fate/internal/log"
 	v2 "github.com/babyname/chronos/v2"
 
 	"github.com/spf13/cobra"
