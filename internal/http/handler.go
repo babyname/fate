@@ -94,11 +94,13 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filterOpt := fate.NewFilter(fate.FilterOption{
-		WuXingFilter:       true,
-		PoetryMode:         req.PoetryMode,
-		XiYongMethod:       req.XiYongMethod,
-		AvoidCharacters:    req.AvoidChars,
-		RequireCharacters:  req.RequireChars,
+		CharacterFilter:     true,
+		RegularFilter:       true,
+		WuXingFilter:        true,
+		PoetryMode:          req.PoetryMode,
+		XiYongMethod:        req.XiYongMethod,
+		AvoidCharacters:     req.AvoidChars,
+		RequireCharacters:   req.RequireChars,
 		CharacterFilterType: fate.CharacterFilterType(req.FilterType),
 	})
 
@@ -172,8 +174,10 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filterOpt := fate.NewFilter(fate.FilterOption{
-		DaYanFilter:  false,
-		WuXingFilter: true,
+		CharacterFilter: true,
+		RegularFilter:   true,
+		DaYanFilter:     false,
+		WuXingFilter:    true,
 	})
 	sess := h.fate.NewSessionWithFilter(filterOpt)
 	input := &fate.Input{
