@@ -276,6 +276,8 @@ func (s *session) preloadChars(lucky []wuge.WuGeResult) {
 	}
 }
 
+const maxCandidates = 50000
+
 func (s *session) filterCandidates(lucky []wuge.WuGeResult) []naming.FirstName {
 	poetryMode := s.filter.PoetryMode()
 	if poetryMode == 2 {
@@ -307,6 +309,9 @@ func (s *session) filterCandidates(lucky []wuge.WuGeResult) []naming.FirstName {
 					return candidates
 				default:
 					candidates = append(candidates, naming.FirstName{f1s[i1], f2s[i2]})
+					if len(candidates) >= maxCandidates {
+						return candidates
+					}
 				}
 			}
 		}
@@ -356,6 +361,9 @@ func (s *session) filterCandidatesPoetryOnly(lucky []wuge.WuGeResult) []naming.F
 					return candidates
 				default:
 					candidates = append(candidates, naming.FirstName{f1s[i1], f2s[i2]})
+					if len(candidates) >= maxCandidates {
+						return candidates
+					}
 				}
 			}
 		}
