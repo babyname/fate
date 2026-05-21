@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/babyname/fate"
-	"github.com/babyname/fate/internal/analysis"
 )
 
 type Handler struct {
@@ -59,8 +58,8 @@ type generateRequest struct {
 }
 
 type generateResponse struct {
-	TopNames []analysis.NameResult `json:"top_names"`
-	Total    int                   `json:"total"`
+	TopNames []fate.NameResult `json:"top_names"`
+	Total    int               `json:"total"`
 }
 
 func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
@@ -147,7 +146,17 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	born, _ := time.Parse("2006/01/02 15:04", bornStr)
+	born, err := time.Parse("2006/01/02 15:04", bornStr)
+	if err != nil {
+		born, err = time.Parse("2006-01-02 15:04", bornStr)
+	}
+	if err != nil {
+		born, err = time.Parse("2006/01/02", bornStr)
+	}
+	if err != nil {
+		writeError(w, 400, "invalid born date format, use 2006/01/02 15:04 or 2006/01/02")
+		return
+	}
 	sex := fate.SexBoy
 	if sexStr == "girl" {
 		sex = fate.SexGirl

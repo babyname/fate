@@ -11,8 +11,6 @@ import (
 
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/character"
-	"github.com/babyname/fate/ent/poem"
-	"github.com/babyname/fate/ent/poemchar"
 	"github.com/babyname/fate/ent/schema"
 	"github.com/babyname/fate/internal/dict"
 	"github.com/babyname/fate/internal/seeddb"
@@ -187,48 +185,14 @@ func importPoetry(ctx context.Context, client *ent.Client, poetryDir string) err
 	}
 	log.Printf("Loaded %d poems", len(entries))
 
-	poemCount := 0
-	charRefCount := 0
 	uniqueChars := make(map[string]bool)
 
 	for i, e := range entries {
-		poemBuilder := client.Poem.Create().
-			SetTitle(e.Title).
-			SetContent(e.Content).
-			SetType(poemType(e.Type)).
-			SetSource(e.Source)
-		if e.Author != "" {
-			poemBuilder.SetAuthor(e.Author)
-		}
-		if e.Dynasty != "" {
-			poemBuilder.SetDynasty(e.Dynasty)
-		}
-
-		poem, err := poemBuilder.Save(ctx)
-		if err != nil {
-			continue
-		}
-		poemCount++
-
 		refs := dict.ExtractCharRefs(e.Content)
 		for _, ref := range refs {
 			if !unicode.Is(unicode.Han, []rune(ref.Char)[0]) {
 				continue
 			}
-			charBuilder := client.PoemChar.Create().
-				SetPoemID(poem.ID).
-				SetChar(ref.Char).
-				SetPosition(ref.Position)
-			if ref.Sentence != "" {
-				charBuilder.SetSentence(ref.Sentence)
-			}
-			if ref.Context != "" {
-				charBuilder.SetContext(ref.Context)
-			}
-			if _, err := charBuilder.Save(ctx); err != nil {
-				continue
-			}
-			charRefCount++
 			uniqueChars[ref.Char] = true
 		}
 
@@ -237,41 +201,21 @@ func importPoetry(ctx context.Context, client *ent.Client, poetryDir string) err
 		}
 	}
 
-	log.Printf("Imported %d poems, %d char references, %d unique chars with poetry source",
-		poemCount, charRefCount, len(uniqueChars))
+	log.Printf("Found %d unique chars with poetry source from %d poems", len(uniqueChars), len(entries))
 
 	charWithPoetry := 0
 	for ch := range uniqueChars {
-		_, err := client.Character.Update().
+		n, err := client.Character.Update().
 			Where(character.CharEQ(ch)).
-			SetComment(addPoetryTag(ch)).
+			SetHasPoetry(true).
 			Save(ctx)
-		if err == nil {
+		if err == nil && n > 0 {
 			charWithPoetry++
 		}
 	}
-	log.Printf("Updated %d characters with poetry tag", charWithPoetry)
+	log.Printf("Marked %d characters with has_poetry=true", charWithPoetry)
 
 	return nil
-}
-
-func addPoetryTag(ch string) string {
-	return "poetry"
-}
-
-func poemType(t string) poem.Type {
-	switch t {
-	case "ci":
-		return poem.TypeCi
-	case "fu":
-		return poem.TypeFu
-	case "jing":
-		return poem.TypeJing
-	case "other":
-		return poem.TypeOther
-	default:
-		return poem.TypeShi
-	}
 }
 
 func verifyCharacters(ctx context.Context, client *ent.Client) {
@@ -281,8 +225,7 @@ func verifyCharacters(ctx context.Context, client *ent.Client) {
 		if err != nil {
 			log.Printf("  %q: NOT FOUND!", ch)
 		} else {
-			poemCount, _ := client.PoemChar.Query().Where(poemchar.CharEQ(ch)).Count(ctx)
-			log.Printf("  %q: stroke=%d wuxing=%s meaning=%s poetry_refs=%d", ch, c.ScienceStroke, c.WuXing, truncate(c.Meaning, 30), poemCount)
+			log.Printf("  %q: stroke=%d wuxing=%s meaning=%s has_poetry=%v", ch, c.ScienceStroke, c.WuXing, truncate(c.Meaning, 30), c.HasPoetry)
 		}
 	}
 }

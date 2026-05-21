@@ -80,6 +80,9 @@ func (Character) Fields() []ent.Field {
 		field.Bool("nameable").
 			Default(true).
 			Comment("是否可用于起名"),
+		field.Bool("has_poetry").
+			Default(false).
+			Comment("是否有诗词出处"),
 		field.String("meaning").
 			Optional().
 			Comment("字义简释"),
@@ -128,6 +131,7 @@ func (Character) Indexes() []ent.Index {
 		index.Fields("regular"),
 		index.Fields("common_level"),
 		index.Fields("nameable"),
+		index.Fields("has_poetry"),
 		index.Fields("wu_xing", "science_stroke"),
 		index.Fields("wu_xing", "kangxi_stroke"),
 		index.Fields("regular", "nameable"),
