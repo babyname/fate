@@ -381,24 +381,27 @@ func getLastStrokeFromBasic(filter filterpkg.Filter, basic *naming.NameBasic) [2
 }
 
 func strokeGetFromFilterType(ct filterpkg.CharacterFilterType) func(c *ent.Character) int {
-	switch ct {
-	case filterpkg.CharacterFilterTypeChs:
-		return func(c *ent.Character) int {
-			return c.SimplifiedStroke
-		}
-	case filterpkg.CharacterFilterTypeCht:
-		return func(c *ent.Character) int {
-			return c.TraditionalStroke
-		}
-	case filterpkg.CharacterFilterTypeKangxi:
-		return func(c *ent.Character) int {
-			return c.KangxiStroke
-		}
-	case filterpkg.CharacterFilterTypeDefault:
-		fallthrough
-	default:
+	if ct == filterpkg.CharacterFilterTypeDefault {
 		return func(c *ent.Character) int {
 			return c.ScienceStroke
 		}
+	}
+	if ct.HasType(filterpkg.CharacterFilterTypeChs) {
+		return func(c *ent.Character) int {
+			return c.SimplifiedStroke
+		}
+	}
+	if ct.HasType(filterpkg.CharacterFilterTypeCht) {
+		return func(c *ent.Character) int {
+			return c.TraditionalStroke
+		}
+	}
+	if ct.HasType(filterpkg.CharacterFilterTypeKangxi) {
+		return func(c *ent.Character) int {
+			return c.KangxiStroke
+		}
+	}
+	return func(c *ent.Character) int {
+		return c.ScienceStroke
 	}
 }

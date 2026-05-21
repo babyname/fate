@@ -55,6 +55,8 @@ type SessionState = session.SessionState
 type Filter = filterpkg.Filter
 type FilterOption = filterpkg.FilterOption
 type CharacterFilterType = filterpkg.CharacterFilterType
+type StrokeMode = filterpkg.StrokeMode
+type NameStyle = filterpkg.NameStyle
 
 type Sex = naming.Sex
 type Name = naming.Name
@@ -82,10 +84,26 @@ const (
 )
 
 const (
-	CharacterFilterTypeDefault CharacterFilterType = filterpkg.CharacterFilterTypeDefault
-	CharacterFilterTypeChs     CharacterFilterType = filterpkg.CharacterFilterTypeChs
-	CharacterFilterTypeCht     CharacterFilterType = filterpkg.CharacterFilterTypeCht
-	CharacterFilterTypeKangxi  CharacterFilterType = filterpkg.CharacterFilterTypeKangxi
+	CharacterFilterTypeDefault     CharacterFilterType = filterpkg.CharacterFilterTypeDefault
+	CharacterFilterTypeChs         CharacterFilterType = filterpkg.CharacterFilterTypeChs
+	CharacterFilterTypeCht         CharacterFilterType = filterpkg.CharacterFilterTypeCht
+	CharacterFilterTypeKangxi      CharacterFilterType = filterpkg.CharacterFilterTypeKangxi
+	CharacterFilterTypeNameScience CharacterFilterType = filterpkg.CharacterFilterTypeNameScience
+	CharacterFilterTypeChsCht      CharacterFilterType = filterpkg.CharacterFilterTypeChsCht
+	CharacterFilterTypeAll         CharacterFilterType = filterpkg.CharacterFilterTypeAll
+)
+
+const (
+	StrokeModeScience     StrokeMode = filterpkg.StrokeModeScience
+	StrokeModeSimplified  StrokeMode = filterpkg.StrokeModeSimplified
+	StrokeModeTraditional StrokeMode = filterpkg.StrokeModeTraditional
+	StrokeModeKangxi      StrokeMode = filterpkg.StrokeModeKangxi
+)
+
+const (
+	NameStyleSimplified  NameStyle = filterpkg.NameStyleSimplified
+	NameStyleTraditional NameStyle = filterpkg.NameStyleTraditional
+	NameStyleAuto        NameStyle = filterpkg.NameStyleAuto
 )
 
 var _ Fate = (*fateImpl)(nil)
