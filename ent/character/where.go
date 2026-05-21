@@ -143,6 +143,11 @@ func Nameable(v bool) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldNameable, v))
 }
 
+// HasPoetry applies equality check predicate on the "has_poetry" field. It's identical to HasPoetryEQ.
+func HasPoetry(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldHasPoetry, v))
+}
+
 // Meaning applies equality check predicate on the "meaning" field. It's identical to MeaningEQ.
 func Meaning(v string) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldMeaning, v))
@@ -906,6 +911,16 @@ func NameableEQ(v bool) predicate.Character {
 // NameableNEQ applies the NEQ predicate on the "nameable" field.
 func NameableNEQ(v bool) predicate.Character {
 	return predicate.Character(sql.FieldNEQ(FieldNameable, v))
+}
+
+// HasPoetryEQ applies the EQ predicate on the "has_poetry" field.
+func HasPoetryEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldHasPoetry, v))
+}
+
+// HasPoetryNEQ applies the NEQ predicate on the "has_poetry" field.
+func HasPoetryNEQ(v bool) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldHasPoetry, v))
 }
 
 // MeaningEQ applies the EQ predicate on the "meaning" field.
