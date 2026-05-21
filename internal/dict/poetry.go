@@ -213,15 +213,7 @@ func extractContextFromRunes(runes []rune, pos int, radius int) string {
 	return string(runes[start:end])
 }
 
-func LoadPoetryFromDir(dir string) ([]*PoemEntry, error) {
-	return loadPoetryFromDir(dir, false)
-}
-
 func LoadSelectedPoetryFromDir(dir string) ([]*PoemEntry, error) {
-	return loadPoetryFromDir(dir, true)
-}
-
-func loadPoetryFromDir(dir string, selectedOnly bool) ([]*PoemEntry, error) {
 	var allEntries []*PoemEntry
 
 	tangDir := filepath.Join(dir, "全唐诗")
@@ -239,25 +231,6 @@ func loadPoetryFromDir(dir string, selectedOnly bool) ([]*PoemEntry, error) {
 			}
 			allEntries = append(allEntries, TangShiToPoemEntries(ts)...)
 		}
-
-		if !selectedOnly {
-			patterns := []string{
-				filepath.Join(tangDir, "poet.tang.*.json"),
-			}
-			for _, pattern := range patterns {
-				files, err := filepath.Glob(pattern)
-				if err != nil {
-					continue
-				}
-				for _, f := range files {
-					ts, err := LoadTangShi(f)
-					if err != nil {
-						continue
-					}
-					allEntries = append(allEntries, TangShiToPoemEntries(ts)...)
-				}
-			}
-		}
 	}
 
 	ciDir := filepath.Join(dir, "宋词")
@@ -274,25 +247,6 @@ func loadPoetryFromDir(dir string, selectedOnly bool) ([]*PoemEntry, error) {
 				continue
 			}
 			allEntries = append(allEntries, SongCiToPoemEntries(ci)...)
-		}
-
-		if !selectedOnly {
-			patterns := []string{
-				filepath.Join(ciDir, "ci.song.*.json"),
-			}
-			for _, pattern := range patterns {
-				files, err := filepath.Glob(pattern)
-				if err != nil {
-					continue
-				}
-				for _, f := range files {
-					ci, err := LoadSongCi(f)
-					if err != nil {
-						continue
-					}
-					allEntries = append(allEntries, SongCiToPoemEntries(ci)...)
-				}
-			}
 		}
 	}
 
