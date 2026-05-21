@@ -71,6 +71,10 @@ func init() {
 	characterDescNameable := characterFields[19].Descriptor()
 	// character.DefaultNameable holds the default value on creation for the nameable field.
 	character.DefaultNameable = characterDescNameable.Default.(bool)
+	// characterDescHasPoetry is the schema descriptor for has_poetry field.
+	characterDescHasPoetry := characterFields[20].Descriptor()
+	// character.DefaultHasPoetry holds the default value on creation for the has_poetry field.
+	character.DefaultHasPoetry = characterDescHasPoetry.Default.(bool)
 	poemFields := schema.Poem{}.Fields()
 	_ = poemFields
 	// poemDescTitle is the schema descriptor for title field.

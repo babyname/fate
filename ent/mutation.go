@@ -67,6 +67,7 @@ type CharacterMutation struct {
 	addcommon_level                  *int
 	gender_hint                      *string
 	nameable                         *bool
+	has_poetry                       *bool
 	meaning                          *string
 	source                           *string
 	source_confidence                *float64
@@ -1161,6 +1162,42 @@ func (m *CharacterMutation) ResetNameable() {
 	m.nameable = nil
 }
 
+// SetHasPoetry sets the "has_poetry" field.
+func (m *CharacterMutation) SetHasPoetry(b bool) {
+	m.has_poetry = &b
+}
+
+// HasPoetry returns the value of the "has_poetry" field in the mutation.
+func (m *CharacterMutation) HasPoetry() (r bool, exists bool) {
+	v := m.has_poetry
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHasPoetry returns the old "has_poetry" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldHasPoetry(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHasPoetry is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHasPoetry requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHasPoetry: %w", err)
+	}
+	return oldValue.HasPoetry, nil
+}
+
+// ResetHasPoetry resets all changes to the "has_poetry" field.
+func (m *CharacterMutation) ResetHasPoetry() {
+	m.has_poetry = nil
+}
+
 // SetMeaning sets the "meaning" field.
 func (m *CharacterMutation) SetMeaning(s string) {
 	m.meaning = &s
@@ -1598,7 +1635,7 @@ func (m *CharacterMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CharacterMutation) Fields() []string {
-	fields := make([]string, 0, 23)
+	fields := make([]string, 0, 24)
 	if m.char != nil {
 		fields = append(fields, character.FieldChar)
 	}
@@ -1655,6 +1692,9 @@ func (m *CharacterMutation) Fields() []string {
 	}
 	if m.nameable != nil {
 		fields = append(fields, character.FieldNameable)
+	}
+	if m.has_poetry != nil {
+		fields = append(fields, character.FieldHasPoetry)
 	}
 	if m.meaning != nil {
 		fields = append(fields, character.FieldMeaning)
@@ -1714,6 +1754,8 @@ func (m *CharacterMutation) Field(name string) (ent.Value, bool) {
 		return m.GenderHint()
 	case character.FieldNameable:
 		return m.Nameable()
+	case character.FieldHasPoetry:
+		return m.HasPoetry()
 	case character.FieldMeaning:
 		return m.Meaning()
 	case character.FieldSource:
@@ -1769,6 +1811,8 @@ func (m *CharacterMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldGenderHint(ctx)
 	case character.FieldNameable:
 		return m.OldNameable(ctx)
+	case character.FieldHasPoetry:
+		return m.OldHasPoetry(ctx)
 	case character.FieldMeaning:
 		return m.OldMeaning(ctx)
 	case character.FieldSource:
@@ -1918,6 +1962,13 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetNameable(v)
+		return nil
+	case character.FieldHasPoetry:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHasPoetry(v)
 		return nil
 	case character.FieldMeaning:
 		v, ok := value.(string)
@@ -2232,6 +2283,9 @@ func (m *CharacterMutation) ResetField(name string) error {
 		return nil
 	case character.FieldNameable:
 		m.ResetNameable()
+		return nil
+	case character.FieldHasPoetry:
+		m.ResetHasPoetry()
 		return nil
 	case character.FieldMeaning:
 		m.ResetMeaning()
