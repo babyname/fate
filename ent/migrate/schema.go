@@ -31,6 +31,7 @@ var (
 		{Name: "common_level", Type: field.TypeInt, Nullable: true},
 		{Name: "gender_hint", Type: field.TypeString, Nullable: true},
 		{Name: "nameable", Type: field.TypeBool, Default: true},
+		{Name: "has_poetry", Type: field.TypeBool, Default: false},
 		{Name: "meaning", Type: field.TypeString, Nullable: true},
 		{Name: "source", Type: field.TypeString, Nullable: true},
 		{Name: "source_confidence", Type: field.TypeFloat64, Nullable: true},
@@ -46,13 +47,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "character_character_traditional_to_simplified",
-				Columns:    []*schema.Column{CharacterColumns[24]},
+				Columns:    []*schema.Column{CharacterColumns[25]},
 				RefColumns: []*schema.Column{CharacterColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "character_character_standard_to_variant",
-				Columns:    []*schema.Column{CharacterColumns[25]},
+				Columns:    []*schema.Column{CharacterColumns[26]},
 				RefColumns: []*schema.Column{CharacterColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -127,6 +128,11 @@ var (
 				Name:    "character_nameable",
 				Unique:  false,
 				Columns: []*schema.Column{CharacterColumns[19]},
+			},
+			{
+				Name:    "character_has_poetry",
+				Unique:  false,
+				Columns: []*schema.Column{CharacterColumns[20]},
 			},
 			{
 				Name:    "character_wu_xing_science_stroke",

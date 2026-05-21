@@ -45,6 +45,8 @@ const (
 	FieldGenderHint = "gender_hint"
 	// FieldNameable holds the string denoting the nameable field in the database.
 	FieldNameable = "nameable"
+	// FieldHasPoetry holds the string denoting the has_poetry field in the database.
+	FieldHasPoetry = "has_poetry"
 	// FieldMeaning holds the string denoting the meaning field in the database.
 	FieldMeaning = "meaning"
 	// FieldSource holds the string denoting the source field in the database.
@@ -103,6 +105,7 @@ var Columns = []string{
 	FieldCommonLevel,
 	FieldGenderHint,
 	FieldNameable,
+	FieldHasPoetry,
 	FieldMeaning,
 	FieldSource,
 	FieldSourceConfidence,
@@ -160,4 +163,6 @@ var (
 	CommonLevelValidator func(int) error
 	// DefaultNameable holds the default value on creation for the "nameable" field.
 	DefaultNameable bool
+	// DefaultHasPoetry holds the default value on creation for the "has_poetry" field.
+	DefaultHasPoetry bool
 )
