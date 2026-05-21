@@ -269,6 +269,20 @@ func (cc *CharacterCreate) SetNillableNameable(b *bool) *CharacterCreate {
 	return cc
 }
 
+// SetHasPoetry sets the "has_poetry" field.
+func (cc *CharacterCreate) SetHasPoetry(b bool) *CharacterCreate {
+	cc.mutation.SetHasPoetry(b)
+	return cc
+}
+
+// SetNillableHasPoetry sets the "has_poetry" field if the given value is not nil.
+func (cc *CharacterCreate) SetNillableHasPoetry(b *bool) *CharacterCreate {
+	if b != nil {
+		cc.SetHasPoetry(*b)
+	}
+	return cc
+}
+
 // SetMeaning sets the "meaning" field.
 func (cc *CharacterCreate) SetMeaning(s string) *CharacterCreate {
 	cc.mutation.SetMeaning(s)
@@ -462,6 +476,10 @@ func (cc *CharacterCreate) defaults() {
 		v := character.DefaultNameable
 		cc.mutation.SetNameable(v)
 	}
+	if _, ok := cc.mutation.HasPoetry(); !ok {
+		v := character.DefaultHasPoetry
+		cc.mutation.SetHasPoetry(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -524,6 +542,9 @@ func (cc *CharacterCreate) check() error {
 	}
 	if _, ok := cc.mutation.Nameable(); !ok {
 		return &ValidationError{Name: "nameable", err: errors.New(`ent: missing required field "Character.nameable"`)}
+	}
+	if _, ok := cc.mutation.HasPoetry(); !ok {
+		return &ValidationError{Name: "has_poetry", err: errors.New(`ent: missing required field "Character.has_poetry"`)}
 	}
 	return nil
 }
@@ -632,6 +653,10 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Nameable(); ok {
 		_spec.SetField(character.FieldNameable, field.TypeBool, value)
 		_node.Nameable = value
+	}
+	if value, ok := cc.mutation.HasPoetry(); ok {
+		_spec.SetField(character.FieldHasPoetry, field.TypeBool, value)
+		_node.HasPoetry = value
 	}
 	if value, ok := cc.mutation.Meaning(); ok {
 		_spec.SetField(character.FieldMeaning, field.TypeString, value)
