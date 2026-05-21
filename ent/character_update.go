@@ -392,6 +392,20 @@ func (cu *CharacterUpdate) SetNillableNameable(b *bool) *CharacterUpdate {
 	return cu
 }
 
+// SetHasPoetry sets the "has_poetry" field.
+func (cu *CharacterUpdate) SetHasPoetry(b bool) *CharacterUpdate {
+	cu.mutation.SetHasPoetry(b)
+	return cu
+}
+
+// SetNillableHasPoetry sets the "has_poetry" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableHasPoetry(b *bool) *CharacterUpdate {
+	if b != nil {
+		cu.SetHasPoetry(*b)
+	}
+	return cu
+}
+
 // SetMeaning sets the "meaning" field.
 func (cu *CharacterUpdate) SetMeaning(s string) *CharacterUpdate {
 	cu.mutation.SetMeaning(s)
@@ -797,6 +811,9 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.Nameable(); ok {
 		_spec.SetField(character.FieldNameable, field.TypeBool, value)
+	}
+	if value, ok := cu.mutation.HasPoetry(); ok {
+		_spec.SetField(character.FieldHasPoetry, field.TypeBool, value)
 	}
 	if value, ok := cu.mutation.Meaning(); ok {
 		_spec.SetField(character.FieldMeaning, field.TypeString, value)
@@ -1387,6 +1404,20 @@ func (cuo *CharacterUpdateOne) SetNillableNameable(b *bool) *CharacterUpdateOne 
 	return cuo
 }
 
+// SetHasPoetry sets the "has_poetry" field.
+func (cuo *CharacterUpdateOne) SetHasPoetry(b bool) *CharacterUpdateOne {
+	cuo.mutation.SetHasPoetry(b)
+	return cuo
+}
+
+// SetNillableHasPoetry sets the "has_poetry" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableHasPoetry(b *bool) *CharacterUpdateOne {
+	if b != nil {
+		cuo.SetHasPoetry(*b)
+	}
+	return cuo
+}
+
 // SetMeaning sets the "meaning" field.
 func (cuo *CharacterUpdateOne) SetMeaning(s string) *CharacterUpdateOne {
 	cuo.mutation.SetMeaning(s)
@@ -1822,6 +1853,9 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 	}
 	if value, ok := cuo.mutation.Nameable(); ok {
 		_spec.SetField(character.FieldNameable, field.TypeBool, value)
+	}
+	if value, ok := cuo.mutation.HasPoetry(); ok {
+		_spec.SetField(character.FieldHasPoetry, field.TypeBool, value)
 	}
 	if value, ok := cuo.mutation.Meaning(); ok {
 		_spec.SetField(character.FieldMeaning, field.TypeString, value)

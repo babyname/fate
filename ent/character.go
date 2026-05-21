@@ -54,6 +54,8 @@ type Character struct {
 	GenderHint string `json:"gender_hint,omitempty"`
 	// 是否可用于起名
 	Nameable bool `json:"nameable,omitempty"`
+	// 是否有诗词出处
+	HasPoetry bool `json:"has_poetry,omitempty"`
 	// 字义简释
 	Meaning string `json:"meaning,omitempty"`
 	// 数据来源标识，如unihan/kangxi/custom
@@ -135,7 +137,7 @@ func (*Character) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case character.FieldPinyin:
 			values[i] = new([]byte)
-		case character.FieldIsSimplified, character.FieldIsTraditional, character.FieldIsKangxi, character.FieldIsVariant, character.FieldIsAncient, character.FieldRegular, character.FieldNameable:
+		case character.FieldIsSimplified, character.FieldIsTraditional, character.FieldIsKangxi, character.FieldIsVariant, character.FieldIsAncient, character.FieldRegular, character.FieldNameable, character.FieldHasPoetry:
 			values[i] = new(sql.NullBool)
 		case character.FieldSourceConfidence:
 			values[i] = new(sql.NullFloat64)
@@ -284,6 +286,12 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Nameable = value.Bool
 			}
+		case character.FieldHasPoetry:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field has_poetry", values[i])
+			} else if value.Valid {
+				c.HasPoetry = value.Bool
+			}
 		case character.FieldMeaning:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field meaning", values[i])
@@ -426,6 +434,9 @@ func (c *Character) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("nameable=")
 	builder.WriteString(fmt.Sprintf("%v", c.Nameable))
+	builder.WriteString(", ")
+	builder.WriteString("has_poetry=")
+	builder.WriteString(fmt.Sprintf("%v", c.HasPoetry))
 	builder.WriteString(", ")
 	builder.WriteString("meaning=")
 	builder.WriteString(c.Meaning)
