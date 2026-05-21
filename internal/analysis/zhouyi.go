@@ -6,26 +6,7 @@ import (
 	"github.com/babyname/yi"
 )
 
-// ZhouYiResult 表示周易卦象计算的结果
-type ZhouYiResult struct {
-	BenGuaName     string `json:"ben_gua_name"`
-	BenGuaDesc     string `json:"ben_gua_desc"`
-	BenGuaJiXiong  string `json:"ben_gua_ji_xiong"`
-	BianGuaName    string `json:"bian_gua_name"`
-	DongYaoDesc    string `json:"dong_yao_desc"`
-	DongYaoJiXiong string `json:"dong_yao_ji_xiong"`
-	DaXiang        string `json:"da_xiang"`
-	YunShi         string `json:"yun_shi"`
-	ShiYe          string `json:"shi_ye"`
-	JingShang      string `json:"jing_shang"`
-	QiuMing        string `json:"qiu_ming"`
-	HunLian        string `json:"hun_lian"`
-	JueCe          string `json:"jue_ce"`
-	Score          int    `json:"score"`
-}
-
-// CalcZhouYi 根据姓名笔画数计算周易卦象结果
-func CalcZhouYi(l1, l2, f1, f2 int) *ZhouYiResult {
+func CalcZhouYi(l1, l2, f1, f2 int) *ZhouYiBasic {
 	shang := (l1 + l2 + f1) % 8
 	if shang == 0 {
 		shang = 8
@@ -44,7 +25,7 @@ func CalcZhouYi(l1, l2, f1, f2 int) *ZhouYiResult {
 		return nil
 	}
 
-	result := &ZhouYiResult{}
+	result := &ZhouYiBasic{}
 
 	benGua := y.GetGua(yi.Ben)
 	bianGua := y.GetGua(yi.Bian)
@@ -77,10 +58,6 @@ func CalcZhouYi(l1, l2, f1, f2 int) *ZhouYiResult {
 		}
 	}
 
-	if result.YunShi == "" && benGua != nil {
-		result.YunShi = fmt.Sprintf("本卦%s（%s），变卦%s", benGua.Ming, benGua.JiXiong, result.BianGuaName)
-	}
-
 	result.Score = calcZhouYiScore(result)
 
 	return result
@@ -93,7 +70,7 @@ func getYaoJiXiong(gx *yi.Gua, pos int) string {
 	return gx.Yaos[pos].JiXiong
 }
 
-func calcZhouYiScore(r *ZhouYiResult) int {
+func calcZhouYiScore(r *ZhouYiBasic) int {
 	score := 70
 	switch r.BenGuaJiXiong {
 	case "吉":

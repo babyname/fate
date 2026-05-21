@@ -215,21 +215,17 @@ func CollectTopNames(names []NameSource, surname string, l1, l2 int, fateData *v
 	return result
 }
 
-func buildBaziSection(fateData *v2.FateData) *BaziSection {
+func buildBaziSection(fateData *v2.FateData) *BaziBasic {
 	if fateData == nil || fateData.Bazi == nil {
 		return nil
 	}
-	bs := &BaziSection{
+	return &BaziBasic{
 		Sizhu:         fateData.Bazi.Sizhu,
 		Wuxing:        fateData.Bazi.Wuxing,
 		Nayin:         fateData.Bazi.Nayin,
 		Zodiac:        fateData.Bazi.Zodiac,
 		Constellation: fateData.Bazi.Constellation,
 	}
-	if bs.Constellation != "" {
-		bs.ConstellationDetail = nil
-	}
-	return bs
 }
 
 func buildWuXingSection(fateData *v2.FateData) *WuXingSection {
