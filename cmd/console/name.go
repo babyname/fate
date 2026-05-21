@@ -263,18 +263,6 @@ func printNameDetail(nr analysis.NameResult) {
 		if nr.ZhouYi.DaXiang != "" {
 			fmt.Printf("  大象: %s\n", nr.ZhouYi.DaXiang)
 		}
-		if nr.ZhouYi.YunShi != "" {
-			fmt.Printf("  运势: %s\n", nr.ZhouYi.YunShi)
-		}
-		if nr.ZhouYi.ShiYe != "" {
-			fmt.Printf("  事业: %s\n", nr.ZhouYi.ShiYe)
-		}
-		if nr.ZhouYi.HunLian != "" {
-			fmt.Printf("  婚恋: %s\n", nr.ZhouYi.HunLian)
-		}
-		if nr.ZhouYi.JueCe != "" {
-			fmt.Printf("  决策: %s\n", nr.ZhouYi.JueCe)
-		}
 		fmt.Println()
 	}
 	if nr.Bazi != nil {
@@ -283,14 +271,6 @@ func printNameDetail(nr analysis.NameResult) {
 		fmt.Printf("  五行: %s\n", strings.Join(nr.Bazi.Wuxing[:], " "))
 		fmt.Printf("  纳音: %s\n", strings.Join(nr.Bazi.Nayin[:], " "))
 		fmt.Printf("  生肖: %s  星座: %s\n", nr.Bazi.Zodiac, nr.Bazi.Constellation)
-		if nr.Bazi.ConstellationDetail != nil {
-			cd := nr.Bazi.ConstellationDetail
-			fmt.Printf("  星座详情: 守护%s 性格%s 幸运色%s 幸运数字%s\n",
-				cd.Element, cd.Trait, cd.LuckyColor, cd.LuckyNumber)
-			if cd.Description != "" {
-				fmt.Printf("  起名建议: %s\n", cd.Description)
-			}
-		}
 		fmt.Println()
 	}
 	if nr.WuXing != nil {
