@@ -388,10 +388,16 @@ func createDisplayNameFunc(style NameStyle) func(*ent.Character) string {
 	switch style {
 	case NameStyleTraditional:
 		return func(c *ent.Character) string {
+			if len(c.Edges.SimplifiedOf) > 0 && c.Edges.SimplifiedOf[0].Char != "" {
+				return c.Edges.SimplifiedOf[0].Char
+			}
 			return c.Char
 		}
 	case NameStyleSimplified:
 		return func(c *ent.Character) string {
+			if c.Edges.TraditionalToSimplified != nil && c.Edges.TraditionalToSimplified.Char != "" {
+				return c.Edges.TraditionalToSimplified.Char
+			}
 			return c.Char
 		}
 	case NameStyleAuto:
