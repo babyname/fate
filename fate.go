@@ -2,6 +2,7 @@ package fate
 
 import (
 	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/internal/analysis"
 	"github.com/babyname/fate/internal/database"
 	filterpkg "github.com/babyname/fate/internal/filter"
 	"github.com/babyname/fate/internal/naming"
@@ -64,6 +65,15 @@ type NameBasic = naming.NameBasic
 type FirstName = naming.FirstName
 
 type ScoredName = session.ScoredName
+
+type NameResult = analysis.NameResult
+type ZhouYiBasic = analysis.ZhouYiBasic
+type BaziBasic = analysis.BaziBasic
+type WuXingSection = analysis.WuXingSection
+type CharInfo = analysis.CharInfo
+type GeItem = analysis.GeItem
+type WuGeResult = analysis.WuGeResult
+type ScoreDetail = analysis.ScoreDetail
 
 const (
 	SexBoy  Sex = naming.SexBoy
