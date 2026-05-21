@@ -9,7 +9,6 @@ import (
 
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/character"
-	"github.com/babyname/fate/ent/poemchar"
 )
 
 type Repository struct {
@@ -114,19 +113,12 @@ func New(client *ent.Client) *Repository {
 }
 
 func (m *Repository) QueryPoetryChars(ctx context.Context) ([]string, error) {
-	chars, err := m.PoemChar.Query().
-		Select(poemchar.FieldChar).
+	chars, err := m.Character.Query().
+		Where(character.HasPoetryEQ(true)).
+		Select(character.FieldChar).
 		Strings(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("query poetry chars: %w", err)
 	}
-	seen := make(map[string]bool)
-	var unique []string
-	for _, ch := range chars {
-		if !seen[ch] {
-			seen[ch] = true
-			unique = append(unique, ch)
-		}
-	}
-	return unique, nil
+	return chars, nil
 }
