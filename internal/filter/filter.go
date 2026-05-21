@@ -7,6 +7,7 @@ import (
 
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/ent/predicate"
 	"github.com/babyname/fate/internal/wuge"
 	"github.com/babyname/fate/internal/wuxing"
 )
@@ -62,7 +63,7 @@ type filter struct {
 	checkSkipSexFilter         func(lucky *wuge.WuGeResult) bool
 	checkSkipDaYanFilter       func(lucky *wuge.WuGeResult) bool
 	checkSkipWuXingFilter      func(ge int, ge2 int, ge3 int) bool
-	checkSkipStrokeNumberScope func(stroke []int) bool
+	checkSkipStrokeNumberScope func(strokes []int) bool
 	checkCharacter             func(c *ent.Character) bool
 	checkGenderFilter          func(c *ent.Character) bool
 	getDisplayName             func(c *ent.Character) string
@@ -123,18 +124,14 @@ func (f *filter) GetCharacterStroke(c *ent.Character) int {
 	case StrokeModeScience:
 		return c.ScienceStroke
 	default:
-		switch f.characterFilterType {
-		case CharacterFilterTypeChs:
+		if f.characterFilterType.HasType(CharacterFilterTypeChs) {
 			return c.SimplifiedStroke
-		case CharacterFilterTypeCht:
+		} else if f.characterFilterType.HasType(CharacterFilterTypeCht) {
 			return c.TraditionalStroke
-		case CharacterFilterTypeKangxi:
+		} else if f.characterFilterType.HasType(CharacterFilterTypeKangxi) {
 			return c.KangxiStroke
-		case CharacterFilterTypeDefault:
-			fallthrough
-		default:
-			return c.ScienceStroke
 		}
+		return c.ScienceStroke
 	}
 }
 
@@ -182,10 +179,7 @@ func (f *filter) CheckGenderFilter(c *ent.Character) bool {
 }
 
 // GetDisplayName returns the character string formatted according to the
-// active NameStyle. For NameStyleSimplified it returns the character as-is
-// (characters are stored in standard form). For NameStyleTraditional it
-// returns the character as-is; proper simplified/traditional conversion
-// requires edge traversal at a higher level.
+// active NameStyle.
 func (f *filter) GetDisplayName(c *ent.Character) string {
 	return f.getDisplayName(c)
 }
@@ -204,7 +198,7 @@ func newFilter() *filter {
 	return &filter{
 		characterFilterType: CharacterFilterTypeDefault,
 		strokeMode:          StrokeModeScience,
-		nameStyle:           NameStyleSimplified,
+		nameStyle:           NameStyleAuto,
 		genderFilter:        "",
 		checkSkipSexFilter: func(_ *wuge.WuGeResult) bool {
 			return false
@@ -266,22 +260,7 @@ func NewFilter(fo FilterOption) Filter {
 
 	if fo.CharacterFilter {
 		f.characterFilterType = fo.CharacterFilterType
-		switch fo.CharacterFilterType {
-		case CharacterFilterTypeChs:
-			f.queryCharacterFilter = characterTypeFilterCHS(fo.MinStroke, fo.MaxStroke)
-			f.queryStrokeFilter = strokeFilterCHS
-		case CharacterFilterTypeCht:
-			f.queryCharacterFilter = characterTypeFilterCHT(fo.MinStroke, fo.MaxStroke)
-			f.queryStrokeFilter = strokeFilterCHT
-		case CharacterFilterTypeKangxi:
-			f.queryCharacterFilter = characterTypeFilterKX(fo.MinStroke, fo.MaxStroke)
-			f.queryStrokeFilter = strokeFilterKX
-		case CharacterFilterTypeDefault:
-			fallthrough
-		default:
-			f.queryCharacterFilter = characterTypeFilterDefault(fo.MinStroke, fo.MaxStroke)
-			f.queryStrokeFilter = strokeFilterDefault
-		}
+		f.queryCharacterFilter, f.queryStrokeFilter = createCharacterFilter(fo)
 	}
 
 	if fo.MinStroke != 0 || fo.MaxStroke != 0 {
@@ -319,25 +298,114 @@ func NewFilter(fo FilterOption) Filter {
 		}
 	}
 
-	f.getDisplayName = func(c *ent.Character) string {
-		switch f.nameStyle {
-		case NameStyleTraditional:
-			if c.IsTraditional {
-				return c.Char
+	f.getDisplayName = createDisplayNameFunc(f.nameStyle)
+
+	originalCheck := f.checkCharacter
+	f.checkCharacter = createCharacterCheckFunc(fo, originalCheck)
+
+	originalQuery := f.queryCharacterFilter
+	f.queryCharacterFilter = createEnhancedQueryFilter(fo, originalQuery)
+
+	return f
+}
+
+// createCharacterFilter 根据配置创建字符筛选函数
+func createCharacterFilter(fo FilterOption) (
+	queryFilter func(query *ent.CharacterQuery) *ent.CharacterQuery,
+	strokeFilter func(stroke int) func(query *ent.CharacterQuery) *ent.CharacterQuery,
+) {
+	filterType := fo.CharacterFilterType
+
+	if filterType == CharacterFilterTypeDefault {
+		return characterTypeFilterDefault(fo.MinStroke, fo.MaxStroke), strokeFilterDefault
+	}
+
+	var strokeFunc func(stroke int) func(*ent.CharacterQuery) *ent.CharacterQuery
+
+	typeConditions := []predicate.Character{}
+	if filterType.HasType(CharacterFilterTypeChs) {
+		typeConditions = append(typeConditions, character.IsSimplifiedEQ(true))
+	}
+	if filterType.HasType(CharacterFilterTypeCht) {
+		typeConditions = append(typeConditions, character.IsTraditionalEQ(true))
+	}
+	if filterType.HasType(CharacterFilterTypeKangxi) {
+		typeConditions = append(typeConditions, character.IsKangxiEQ(true))
+	}
+	if filterType.HasType(CharacterFilterTypeNameScience) {
+		typeConditions = append(typeConditions, character.NameableEQ(true))
+	}
+
+	switch {
+	case filterType.HasType(CharacterFilterTypeChs):
+		strokeFunc = strokeFilterCHS
+	case filterType.HasType(CharacterFilterTypeCht):
+		strokeFunc = strokeFilterCHT
+	case filterType.HasType(CharacterFilterTypeKangxi):
+		strokeFunc = strokeFilterKX
+	default:
+		strokeFunc = strokeFilterDefault
+	}
+
+	queryFilter = func(query *ent.CharacterQuery) *ent.CharacterQuery {
+		if len(typeConditions) == 1 {
+			query = query.Where(typeConditions[0])
+		} else if len(typeConditions) > 1 {
+			query = query.Where(character.Or(typeConditions...))
+		}
+
+		if fo.MinStroke > 0 || fo.MaxStroke > 0 {
+			switch {
+			case filterType.HasType(CharacterFilterTypeChs):
+				query = addStrokeRange(query, character.SimplifiedStrokeGTE, character.SimplifiedStrokeLTE, fo.MinStroke, fo.MaxStroke)
+			case filterType.HasType(CharacterFilterTypeCht):
+				query = addStrokeRange(query, character.TraditionalStrokeGTE, character.TraditionalStrokeLTE, fo.MinStroke, fo.MaxStroke)
+			case filterType.HasType(CharacterFilterTypeKangxi):
+				query = addStrokeRange(query, character.KangxiStrokeGTE, character.KangxiStrokeLTE, fo.MinStroke, fo.MaxStroke)
+			default:
+				query = addStrokeRange(query, character.ScienceStrokeGTE, character.ScienceStrokeLTE, fo.MinStroke, fo.MaxStroke)
 			}
+		}
+
+		return query
+	}
+
+	return queryFilter, strokeFunc
+}
+
+func addStrokeRange(query *ent.CharacterQuery, gteFn func(int) predicate.Character, lteFn func(int) predicate.Character, min, max int) *ent.CharacterQuery {
+	if min > 0 {
+		query = query.Where(gteFn(min))
+	}
+	if max > 0 {
+		query = query.Where(lteFn(max))
+	}
+	return query
+}
+
+// createDisplayNameFunc 创建显示名称函数
+func createDisplayNameFunc(style NameStyle) func(*ent.Character) string {
+	switch style {
+	case NameStyleTraditional:
+		return func(c *ent.Character) string {
 			return c.Char
-		case NameStyleSimplified:
-			fallthrough
-		default:
-			if c.IsSimplified {
-				return c.Char
-			}
+		}
+	case NameStyleSimplified:
+		return func(c *ent.Character) string {
+			return c.Char
+		}
+	case NameStyleAuto:
+		fallthrough
+	default:
+		return func(c *ent.Character) string {
 			return c.Char
 		}
 	}
+}
 
-	originalCheck := f.checkCharacter
-	f.checkCharacter = func(c *ent.Character) bool {
+// createCharacterCheckFunc 创建字符检查函数
+func createCharacterCheckFunc(fo FilterOption, originalCheck func(*ent.Character) bool) func(*ent.Character) bool {
+	return func(c *ent.Character) bool {
 		if !originalCheck(c) {
 			return false
 		}
@@ -414,9 +482,11 @@ func NewFilter(fo FilterOption) Filter {
 
 		return true
 	}
+}
 
-	originalQuery := f.queryCharacterFilter
-	f.queryCharacterFilter = func(query *ent.CharacterQuery) *ent.CharacterQuery {
+// createEnhancedQueryFilter 创建增强的查询过滤函数
+func createEnhancedQueryFilter(fo FilterOption, originalQuery func(*ent.CharacterQuery) *ent.CharacterQuery) func(*ent.CharacterQuery) *ent.CharacterQuery {
+	return func(query *ent.CharacterQuery) *ent.CharacterQuery {
 		q := originalQuery(query)
 
 		if fo.CommonLevelFilter {
@@ -449,8 +519,6 @@ func NewFilter(fo FilterOption) Filter {
 
 		return q
 	}
-
-	return f
 }
 
 // characterTypeFilterDefault returns a query filter that restricts characters
@@ -463,9 +531,9 @@ func characterTypeFilterDefault(minStroke, maxStroke int) func(*ent.CharacterQue
 
 // strokeFilterDefault returns a query filter that matches characters with the
 // given ScienceStroke value.
-func strokeFilterDefault(s int) func(*ent.CharacterQuery) *ent.CharacterQuery {
+func strokeFilterDefault(stroke int) func(*ent.CharacterQuery) *ent.CharacterQuery {
 	return func(query *ent.CharacterQuery) *ent.CharacterQuery {
-		return query.Where(character.ScienceStrokeEQ(s))
+		return query.Where(character.ScienceStrokeEQ(stroke))
 	}
 }
 
@@ -479,9 +547,9 @@ func characterTypeFilterCHS(minStroke, maxStroke int) func(*ent.CharacterQuery) 
 
 // strokeFilterCHS returns a query filter that matches characters with the
 // given SimplifiedStroke value.
-func strokeFilterCHS(s int) func(*ent.CharacterQuery) *ent.CharacterQuery {
+func strokeFilterCHS(stroke int) func(*ent.CharacterQuery) *ent.CharacterQuery {
 	return func(query *ent.CharacterQuery) *ent.CharacterQuery {
-		return query.Where(character.SimplifiedStrokeEQ(s))
+		return query.Where(character.SimplifiedStrokeEQ(stroke))
 	}
 }
 
@@ -495,9 +563,9 @@ func characterTypeFilterCHT(minStroke, maxStroke int) func(*ent.CharacterQuery) 
 
 // strokeFilterCHT returns a query filter that matches characters with the
 // given TraditionalStroke value.
-func strokeFilterCHT(s int) func(*ent.CharacterQuery) *ent.CharacterQuery {
+func strokeFilterCHT(stroke int) func(*ent.CharacterQuery) *ent.CharacterQuery {
 	return func(query *ent.CharacterQuery) *ent.CharacterQuery {
-		return query.Where(character.TraditionalStrokeEQ(s))
+		return query.Where(character.TraditionalStrokeEQ(stroke))
 	}
 }
 
@@ -511,9 +579,9 @@ func characterTypeFilterKX(minStroke, maxStroke int) func(*ent.CharacterQuery) *
 
 // strokeFilterKX returns a query filter that matches characters with the
 // given KangxiStroke value.
-func strokeFilterKX(s int) func(*ent.CharacterQuery) *ent.CharacterQuery {
+func strokeFilterKX(stroke int) func(*ent.CharacterQuery) *ent.CharacterQuery {
 	return func(query *ent.CharacterQuery) *ent.CharacterQuery {
-		return query.Where(character.KangxiStrokeEQ(s))
+		return query.Where(character.KangxiStrokeEQ(stroke))
 	}
 }
 
