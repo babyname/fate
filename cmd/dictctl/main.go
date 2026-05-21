@@ -596,7 +596,7 @@ func runImportPoetry(args []string) {
 	}
 
 	poetryDir := args[0]
-	entries, err := dict.LoadPoetryFromDir(poetryDir)
+	entries, err := dict.LoadSelectedPoetryFromDir(poetryDir)
 	if err != nil {
 		fmt.Printf("Error loading poetry: %v\n", err)
 		os.Exit(1)
