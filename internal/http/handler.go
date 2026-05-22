@@ -2,25 +2,63 @@ package http
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/babyname/fate"
+	"github.com/babyname/fate/internal/analysis"
+	"github.com/babyname/fate/internal/session"
 )
 
 type Handler struct {
-	fate fate.Fate
-	mux  *http.ServeMux
+	fate   fate.Fate
+	mux    *http.ServeMux
+	store  *taskStore
+}
+
+type taskEntry struct {
+	session fate.Session
+	input   *fate.Input
+	created time.Time
+}
+
+type taskStore struct {
+	mu     sync.RWMutex
+	tasks  map[string]*taskEntry
+}
+
+func newTaskStore() *taskStore {
+	return &taskStore{
+		tasks: make(map[string]*taskEntry),
+	}
+}
+
+func (s *taskStore) Set(id string, entry *taskEntry) {
+	s.mu.Lock()
+	s.tasks[id] = entry
+	s.mu.Unlock()
+}
+
+func (s *taskStore) Get(id string) (*taskEntry, bool) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	e, ok := s.tasks[id]
+	return e, ok
 }
 
 func NewHandler(f fate.Fate) *Handler {
 	h := &Handler{
-		fate: f,
-		mux:  http.NewServeMux(),
+		fate:  f,
+		mux:   http.NewServeMux(),
+		store: newTaskStore(),
 	}
 	h.mux.HandleFunc("GET /health", h.handleHealth)
 	h.mux.HandleFunc("POST /api/generate", h.handleGenerate)
-	h.mux.HandleFunc("GET /api/names", h.handleNames)
+	h.mux.HandleFunc("GET /api/generate/status", h.handleStatus)
+	h.mux.HandleFunc("GET /api/generate/result", h.handleResult)
+	h.mux.HandleFunc("GET /api/generate/explore", h.handleExplore)
 	h.mux.HandleFunc("GET /api/name-detail", h.handleNameDetail)
 	return h
 }
@@ -55,11 +93,6 @@ type generateRequest struct {
 	AvoidChars   []string `json:"avoid_chars"`
 	RequireChars []string `json:"require_chars"`
 	FilterType   uint     `json:"filter_type"`
-}
-
-type generateResponse struct {
-	TopNames []fate.NameResult `json:"top_names"`
-	Total    int               `json:"total"`
 }
 
 func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
@@ -115,91 +148,222 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 		writeError(w, 500, "failed to start: "+err.Error())
 		return
 	}
-	sess.Wait()
 
-	output := input.Output()
-	topNames := output.TopNames()
-	allNames := output.AllNames()
+	taskID := fmt.Sprintf("%d", time.Now().UnixNano())
+	h.store.Set(taskID, &taskEntry{
+		session: sess,
+		input:   input,
+		created: time.Now(),
+	})
 
-	writeJSON(w, 200, generateResponse{
-		TopNames: topNames,
-		Total:    len(allNames),
+	writeJSON(w, 200, map[string]any{
+		"task_id": taskID,
+		"state":   "computing",
 	})
 }
 
-func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleStatus(w http.ResponseWriter, r *http.Request) {
 	taskID := r.URL.Query().Get("task_id")
 	if taskID == "" {
 		writeError(w, 400, "task_id is required")
 		return
 	}
-	writeError(w, 404, "task not found (stateless server)")
-}
 
-func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
-	surname := r.URL.Query().Get("surname")
-	char1 := r.URL.Query().Get("char1")
-	char2 := r.URL.Query().Get("char2")
-	bornStr := r.URL.Query().Get("born")
-	sexStr := r.URL.Query().Get("sex")
-
-	if surname == "" || char1 == "" || char2 == "" {
-		writeError(w, 400, "surname, char1, char2 are required")
+	entry, ok := h.store.Get(taskID)
+	if !ok {
+		writeError(w, 404, "task not found")
 		return
 	}
 
-	born, err := time.Parse("2006/01/02 15:04", bornStr)
-	if err != nil {
-		born, err = time.Parse("2006-01-02 15:04", bornStr)
-	}
-	if err != nil {
-		born, err = time.Parse("2006/01/02", bornStr)
-	}
-	if err != nil {
-		writeError(w, 400, "invalid born date format, use 2006/01/02 15:04 or 2006/01/02")
-		return
-	}
-	sex := fate.SexBoy
-	if sexStr == "girl" {
-		sex = fate.SexGirl
-	}
-
-	l := [2]string{}
-	runes := []rune(surname)
-	if len(runes) >= 1 {
-		l[0] = string(runes[0])
-	}
-	if len(runes) >= 2 {
-		l[1] = string(runes[1])
+	state := entry.session.State()
+	stateStr := ""
+	switch state {
+	case fate.SessionStateGenerating:
+		stateStr = "computing"
+	case fate.SessionStateFinish:
+		stateStr = "done"
+	case fate.SessionStateFailed:
+		stateStr = "failed"
+	case fate.SessionStateCanceled:
+		stateStr = "canceled"
+	default:
+		stateStr = "waiting"
 	}
 
-	filterOpt := fate.NewFilter(fate.FilterOption{
-		CharacterFilter: true,
-		RegularFilter:   true,
-		DaYanFilter:     false,
-		WuXingFilter:    true,
-	})
-	sess := h.fate.NewSessionWithFilter(filterOpt)
-	input := &fate.Input{
-		Last: l,
-		Born: born,
-		Sex:  sex,
+	resp := map[string]any{
+		"task_id": taskID,
+		"state":   stateStr,
 	}
-	if err := sess.Start(input); err != nil {
-		writeError(w, 500, "failed to start session: "+err.Error())
-		return
-	}
-	sess.Wait()
 
-	output := input.Output()
-	topNames := output.TopNames()
-
-	for _, nr := range topNames {
-		if nr.Char1.Char == char1 && nr.Char2.Char == char2 {
-			writeJSON(w, 200, map[string]any{"name_result": nr})
-			return
+	if state == fate.SessionStateFinish {
+		output := entry.input.Output()
+		table := output.ExcellentTable()
+		if table != nil {
+			resp["total"] = table.Len()
 		}
 	}
 
-	writeError(w, 404, "name not found in results")
+	if state == fate.SessionStateFailed {
+		if err := entry.session.Err(); err != nil {
+			resp["error"] = err.Error()
+		}
+	}
+
+	writeJSON(w, 200, resp)
+}
+
+func (h *Handler) handleResult(w http.ResponseWriter, r *http.Request) {
+	taskID := r.URL.Query().Get("task_id")
+	if taskID == "" {
+		writeError(w, 400, "task_id is required")
+		return
+	}
+
+	entry, ok := h.store.Get(taskID)
+	if !ok {
+		writeError(w, 404, "task not found")
+		return
+	}
+
+	if entry.session.State() != fate.SessionStateFinish {
+		writeError(w, 409, "task not ready")
+		return
+	}
+
+	output := entry.input.Output()
+	topNames := output.TopNames()
+	table := output.ExcellentTable()
+
+	top3 := make([]fate.NameResult, 0, 3)
+	for i := range topNames {
+		if i >= 3 {
+			break
+		}
+		top3 = append(top3, topNames[i])
+	}
+
+	top10Entries := make([]fate.ExcellentEntry, 0, 10)
+	if table != nil {
+		top10Entries = table.TopN(10)
+	}
+
+	writeJSON(w, 200, map[string]any{
+		"task_id":   taskID,
+		"top_names": topNames,
+		"top3":      top3,
+		"top10":     top10Entries,
+		"total":     output.Total(),
+	})
+}
+
+func (h *Handler) handleExplore(w http.ResponseWriter, r *http.Request) {
+	taskID := r.URL.Query().Get("task_id")
+	if taskID == "" {
+		writeError(w, 400, "task_id is required")
+		return
+	}
+
+	entry, ok := h.store.Get(taskID)
+	if !ok {
+		writeError(w, 404, "task not found")
+		return
+	}
+
+	if entry.session.State() != fate.SessionStateFinish {
+		writeError(w, 409, "task not ready")
+		return
+	}
+
+	output := entry.input.Output()
+	table := output.ExcellentTable()
+	if table == nil {
+		writeError(w, 500, "excellent table not available")
+		return
+	}
+
+	count := 10
+	if c := r.URL.Query().Get("count"); c != "" {
+		fmt.Sscanf(c, "%d", &count)
+		if count <= 0 || count > 20 {
+			count = 10
+		}
+	}
+
+	hasPoetry := r.URL.Query().Get("has_poetry")
+	wuxing := r.URL.Query().Get("wuxing")
+
+	var filter func(session.ExcellentEntry) bool
+	if hasPoetry == "true" || wuxing != "" {
+		filter = func(e session.ExcellentEntry) bool {
+			if hasPoetry == "true" && !e.HasPoetry {
+				return false
+			}
+			if wuxing != "" && e.WuXing1 != wuxing && e.WuXing2 != wuxing {
+				return false
+			}
+			return true
+		}
+	}
+
+	names := table.Explore(count, filter)
+
+	writeJSON(w, 200, map[string]any{
+		"task_id":     taskID,
+		"names":       names,
+		"shown_count": table.ShownCount(),
+		"total":       table.Len(),
+	})
+}
+
+func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
+	taskID := r.URL.Query().Get("task_id")
+	char1 := r.URL.Query().Get("char1")
+	char2 := r.URL.Query().Get("char2")
+
+	if char1 == "" || char2 == "" {
+		writeError(w, 400, "char1, char2 are required")
+		return
+	}
+
+	if taskID != "" {
+		entry, ok := h.store.Get(taskID)
+		if ok && entry.session.State() == fate.SessionStateFinish {
+			output := entry.input.Output()
+			topNames := output.TopNames()
+			for i := range topNames {
+				if topNames[i].Char1.Char == char1 && topNames[i].Char2.Char == char2 {
+					writeJSON(w, 200, map[string]any{"name_result": topNames[i]})
+					return
+				}
+			}
+
+			charMap := output.CharMap()
+			table := output.ExcellentTable()
+			if charMap != nil && table != nil {
+				c1 := charMap[char1]
+				c2 := charMap[char2]
+				if c1 != nil && c2 != nil {
+					basic := output.Basic()
+					surname := ""
+					l1, l2 := 0, 0
+					if basic.LastName[0] != nil {
+						surname = basic.LastName[0].Char
+						l1 = basic.LastName[0].ScienceStroke
+					}
+					if basic.LastName[1] != nil {
+						surname += basic.LastName[1].Char
+						l2 = basic.LastName[1].ScienceStroke
+					}
+					fateData := output.FateData()
+					if fateData != nil {
+						nr := analysis.BuildNameResult(0, surname, c1, c2, l1, l2, fateData)
+						writeJSON(w, 200, map[string]any{"name_result": nr})
+						return
+					}
+				}
+			}
+		}
+	}
+
+	writeError(w, 404, "name not found")
 }

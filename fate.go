@@ -65,6 +65,8 @@ type NameBasic = naming.NameBasic
 type FirstName = naming.FirstName
 
 type ScoredName = session.ScoredName
+type ExcellentEntry = session.ExcellentEntry
+type ExcellentTable = session.ExcellentTable
 
 type NameResult = analysis.NameResult
 type ZhouYiBasic = analysis.ZhouYiBasic
