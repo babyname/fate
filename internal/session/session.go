@@ -1,9 +1,7 @@
-// Package session 提供命名会话管理，负责控制命名生成的生命周期和并发调度。
 package session
 
 import (
 	"context"
-	"sort"
 	"sync/atomic"
 
 	v2 "github.com/babyname/chronos/v2"
@@ -18,50 +16,39 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// SessionState 表示会话的运行状态。
-//
-//nolint:revive // stutter name is intentional: SessionState is clearer than State in a session package
 type SessionState int32
 
 const (
-	// SessionStateWaiting 会话等待启动。
-	SessionStateWaiting SessionState = iota
-	// SessionStateGenerating 会话正在生成名字。
+	SessionStateWaiting    SessionState = iota
 	SessionStateGenerating
-	// SessionStateFinish 会话已完成生成。
 	SessionStateFinish
-	// SessionStateCanceled 会话已被取消。
 	SessionStateCanceled
-	// SessionStateFailed 会话生成失败。
 	SessionStateFailed
 )
 
-// Session 定义命名会话的接口，提供启动、停止和等待等操作。
 type Session interface {
 	Context() context.Context
 	Start(input *Input) error
 	Stop() error
 	Err() error
 	Wait()
+	State() SessionState
 }
 
 type session struct {
-	ctx        context.Context
-	cancel     context.CancelFunc
-	db         *repository.Repository
-	group      errgroup.Group
-	state      int32
-	filter     filterpkg.Filter
-	outputDone chan struct{}
-	fateData   *v2.FateData
+	ctx      context.Context
+	cancel   context.CancelFunc
+	db       *repository.Repository
+	group    errgroup.Group
+	state    int32
+	filter   filterpkg.Filter
+	fateData *v2.FateData
 
 	chars map[int][]*ent.Character
 
-	name   chan naming.FirstName
 	output *Output
 }
 
-// NewSession 创建一个新的命名会话。
 func NewSession(db *repository.Repository, f filterpkg.Filter) Session {
 	return &session{
 		db:     db,
@@ -84,7 +71,6 @@ func (s *session) Start(input *Input) error {
 		return nil
 	}
 	s.ctx, s.cancel = context.WithCancel(context.Background())
-	s.name = make(chan naming.FirstName, 1024)
 
 	var err error
 	s.output = input.Output()
@@ -115,39 +101,7 @@ func (s *session) Start(input *Input) error {
 	s.SetState(SessionStateGenerating)
 
 	s.group.Go(s.generate)
-	outputDone := make(chan struct{})
-	go func() {
-		s.startOutput()
-		close(outputDone)
-	}()
-	s.outputDone = outputDone
 	return nil
-}
-
-func (s *session) startOutput() {
-	put := NewPutFilter()
-	defer s.output.SetCacheFilter(put)
-	for {
-		select {
-		case name, ok := <-s.name:
-			if !ok {
-				return
-			}
-			put.Put(name)
-		case <-s.Context().Done():
-			for {
-				select {
-				case name, ok := <-s.name:
-					if !ok {
-						return
-					}
-					put.Put(name)
-				default:
-					return
-				}
-			}
-		}
-	}
 }
 
 func (s *session) Err() error {
@@ -168,13 +122,10 @@ func (s *session) Context() context.Context {
 }
 
 func (s *session) Wait() {
-	if s.outputDone != nil {
-		<-s.outputDone
-	}
+	s.group.Wait()
 }
 
 func (s *session) generate() error {
-	defer close(s.name)
 	defer s.close()
 
 	basic := s.output.Basic()
@@ -183,34 +134,27 @@ func (s *session) generate() error {
 
 	s.preloadChars(lucky)
 
-	type scoredEntry struct {
-		name  naming.FirstName
-		score float64
-		grade string
-	}
+	poetrySet := s.queryPoetrySet()
 
-	candidates := s.filterCandidates(lucky)
-	if len(candidates) == 0 && s.filter.FilterStrictness() != "relaxed" {
+	table := NewExcellentTable()
+	rater := rating.NewRaterWithStrokes(s.fateData, strokes[0], strokes[1])
+
+	s.scoreAllCandidates(lucky, rater, table, poetrySet)
+
+	if table.HeapLen() == 0 && s.filter.FilterStrictness() != "relaxed" {
 		s.filter.SetFilterStrictness("moderate")
 		s.preloadChars(lucky)
-		candidates = s.filterCandidates(lucky)
+		s.scoreAllCandidates(lucky, rater, table, poetrySet)
 	}
-	if len(candidates) == 0 && s.filter.FilterStrictness() != "relaxed" {
+	if table.HeapLen() == 0 && s.filter.FilterStrictness() != "relaxed" {
 		s.filter.SetFilterStrictness("relaxed")
 		s.preloadChars(lucky)
-		candidates = s.filterCandidates(lucky)
+		s.scoreAllCandidates(lucky, rater, table, poetrySet)
 	}
 
-	rater := rating.NewRaterWithStrokes(s.fateData, strokes[0], strokes[1])
-	scored := make([]scoredEntry, 0, len(candidates))
-	for _, fn := range candidates {
-		nr := rater.RateName("", fn[0], fn[1])
-		scored = append(scored, scoredEntry{name: fn, score: nr.TotalScore, grade: nr.Grade})
-	}
+	table.Finalize()
 
-	sort.Slice(scored, func(i, j int) bool {
-		return scored[i].score > scored[j].score
-	})
+	charMap := s.buildCharMap()
 
 	surname := ""
 	if basic.LastName[0] != nil {
@@ -219,36 +163,104 @@ func (s *session) generate() error {
 	if basic.LastName[1] != nil && basic.LastName[1].Char != "" {
 		surname += basic.LastName[1].Char
 	}
-	l1 := strokes[0]
-	l2 := strokes[1]
 
-	topN := 10
-	if topN > len(scored) {
-		topN = len(scored)
-	}
-
-	topResults := make([]analysis.NameResult, 0, topN)
-	for i := 0; i < topN; i++ {
-		nr := analysis.BuildNameResult(i+1, surname, scored[i].name[0], scored[i].name[1], l1, l2, s.fateData)
+	topEntries := table.TopN(10)
+	topResults := make([]analysis.NameResult, 0, len(topEntries))
+	for i, e := range topEntries {
+		c1 := charMap[e.Char1]
+		c2 := charMap[e.Char2]
+		if c1 == nil || c2 == nil {
+			continue
+		}
+		nr := analysis.BuildNameResult(i+1, surname, c1, c2, strokes[0], strokes[1], s.fateData)
 		topResults = append(topResults, nr)
 	}
 
-	allScored := make([]ScoredName, 0, len(scored))
-	for _, se := range scored {
-		allScored = append(allScored, ScoredName{Name: se.name, Score: se.score, Grade: se.grade})
-	}
 	s.output.SetTopNames(topResults)
-	s.output.SetAllNames(allScored)
-
-	for _, se := range scored {
-		select {
-		case s.name <- se.name:
-		default:
-		}
-	}
+	s.output.SetExcellentTable(table)
+	s.output.SetCharMap(charMap)
 
 	s.SetState(SessionStateFinish)
 	return nil
+}
+
+func (s *session) scoreAllCandidates(lucky []wuge.WuGeResult, rater *rating.Rater, table *ExcellentTable, poetrySet map[string]bool) {
+	poetryMode := s.filter.PoetryMode()
+
+	for i := range lucky {
+		tmp := &lucky[i]
+		if s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) {
+			continue
+		}
+		if s.filter.CheckSkipSexFilter(tmp) {
+			continue
+		}
+		if s.filter.CheckSkipDaYanFilter(tmp) {
+			continue
+		}
+		if s.filter.CheckSkipWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
+			continue
+		}
+
+		f1s := s.chars[tmp.FirstStroke1]
+		f2s := s.chars[tmp.FirstStroke2]
+
+		for i1 := range f1s {
+			c1 := f1s[i1]
+			if poetryMode == 2 && !poetrySet[c1.Char] {
+				continue
+			}
+			for i2 := range f2s {
+				select {
+				case <-s.Context().Done():
+					return
+				default:
+				}
+
+				c2 := f2s[i2]
+				if poetryMode == 2 && !poetrySet[c2.Char] {
+					continue
+				}
+
+				nr := rater.RateName("", c1, c2)
+
+				hasPoetry := poetrySet[c1.Char] || poetrySet[c2.Char]
+
+				table.TryPush(ExcellentEntry{
+					Char1:     c1.Char,
+					Char2:     c2.Char,
+					Score:     nr.TotalScore,
+					Grade:     nr.Grade,
+					WuXing1:   c1.WuXing,
+					WuXing2:   c2.WuXing,
+					HasPoetry: hasPoetry,
+				})
+			}
+		}
+	}
+}
+
+func (s *session) queryPoetrySet() map[string]bool {
+	poetrySet := make(map[string]bool)
+	chars, err := s.db.QueryPoetryChars(s.Context())
+	if err == nil {
+		for _, ch := range chars {
+			poetrySet[ch] = true
+		}
+	}
+	return poetrySet
+}
+
+func (s *session) buildCharMap() map[string]*ent.Character {
+	charMap := make(map[string]*ent.Character)
+	for _, chars := range s.chars {
+		for _, c := range chars {
+			if _, ok := charMap[c.Char]; !ok {
+				charMap[c.Char] = c
+			}
+		}
+	}
+	return charMap
 }
 
 func (s *session) preloadChars(lucky []wuge.WuGeResult) {
@@ -274,101 +286,6 @@ func (s *session) preloadChars(lucky []wuge.WuGeResult) {
 			s.chars[stroke] = cs
 		}
 	}
-}
-
-const maxCandidates = 50000
-
-func (s *session) filterCandidates(lucky []wuge.WuGeResult) []naming.FirstName {
-	poetryMode := s.filter.PoetryMode()
-	if poetryMode == 2 {
-		return s.filterCandidatesPoetryOnly(lucky)
-	}
-	var candidates []naming.FirstName
-	for i := range lucky {
-		tmp := &lucky[i]
-		if s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) {
-			continue
-		}
-		if s.filter.CheckSkipSexFilter(tmp) {
-			continue
-		}
-		if s.filter.CheckSkipDaYanFilter(tmp) {
-			continue
-		}
-		if s.filter.CheckSkipWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
-			continue
-		}
-
-		f1s := s.chars[tmp.FirstStroke1]
-		f2s := s.chars[tmp.FirstStroke2]
-
-		for i1 := range f1s {
-			for i2 := range f2s {
-				select {
-				case <-s.Context().Done():
-					return candidates
-				default:
-					candidates = append(candidates, naming.FirstName{f1s[i1], f2s[i2]})
-					if len(candidates) >= maxCandidates {
-						return candidates
-					}
-				}
-			}
-		}
-	}
-	return candidates
-}
-
-func (s *session) filterCandidatesPoetryOnly(lucky []wuge.WuGeResult) []naming.FirstName {
-	poetryChars, err := s.db.QueryPoetryChars(s.Context())
-	if err != nil || len(poetryChars) == 0 {
-		return nil
-	}
-	poetrySet := make(map[string]bool, len(poetryChars))
-	for _, ch := range poetryChars {
-		poetrySet[ch] = true
-	}
-
-	var candidates []naming.FirstName
-	for i := range lucky {
-		tmp := &lucky[i]
-		if s.filter.CheckSkipStrokeNumberScope(tmp.FirstStroke1, tmp.FirstStroke2) {
-			continue
-		}
-		if s.filter.CheckSkipSexFilter(tmp) {
-			continue
-		}
-		if s.filter.CheckSkipDaYanFilter(tmp) {
-			continue
-		}
-		if s.filter.CheckSkipWuXingFilter(tmp.TianGe, tmp.RenGe, tmp.DiGe) {
-			continue
-		}
-
-		f1s := s.chars[tmp.FirstStroke1]
-		f2s := s.chars[tmp.FirstStroke2]
-
-		for i1 := range f1s {
-			if !poetrySet[f1s[i1].Char] {
-				continue
-			}
-			for i2 := range f2s {
-				if !poetrySet[f2s[i2].Char] {
-					continue
-				}
-				select {
-				case <-s.Context().Done():
-					return candidates
-				default:
-					candidates = append(candidates, naming.FirstName{f1s[i1], f2s[i2]})
-					if len(candidates) >= maxCandidates {
-						return candidates
-					}
-				}
-			}
-		}
-	}
-	return candidates
 }
 
 func (s *session) close() {
