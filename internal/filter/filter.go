@@ -286,7 +286,15 @@ func NewFilter(fo FilterOption) Filter {
 	}
 
 	if fo.RegularFilter {
-		f.queryRegularFilter = regularFilter
+		baseFilter := regularFilter
+		if len(fo.AvoidCharacters) > 0 {
+			avoid := fo.AvoidCharacters
+			f.queryRegularFilter = func(query *ent.CharacterQuery) *ent.CharacterQuery {
+				return baseFilter(query).Where(character.CharNotIn(avoid...))
+			}
+		} else {
+			f.queryRegularFilter = baseFilter
+		}
 	}
 
 	if fo.GenderFilter != "" {
