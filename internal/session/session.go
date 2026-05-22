@@ -135,6 +135,7 @@ func (s *session) generate() error {
 	s.preloadChars(lucky)
 
 	poetrySet := s.queryPoetrySet()
+	log.Info("poetry set loaded", "count", len(poetrySet))
 
 	table := NewExcellentTable()
 	rater := rating.NewRaterWithStrokes(s.fateData, strokes[0], strokes[1])
@@ -238,12 +239,16 @@ func (s *session) scoreAllCandidates(lucky []wuge.WuGeResult, rater *rating.Rate
 			}
 		}
 	}
+	log.Info("score candidates done", "heap_size", table.HeapLen())
 }
 
 func (s *session) queryPoetrySet() map[string]bool {
 	poetrySet := make(map[string]bool)
 	chars, err := s.db.QueryPoetryChars(s.Context())
-	if err == nil {
+	if err != nil {
+		log.Error("query poetry chars failed", err)
+	} else {
+		log.Info("query poetry chars", "count", len(chars))
 		for _, ch := range chars {
 			poetrySet[ch] = true
 		}
