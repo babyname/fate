@@ -119,6 +119,7 @@ func main() {
         RegularFilter:       true,
         DaYanFilter:         true,
         WuXingFilter:        true,
+        AvoidCharacters:     []string{"病", "死", "穷"},
     })
 
     s := f.NewSessionWithFilter(filter)
@@ -137,10 +138,25 @@ func main() {
     s.Wait()
 
     output := input.Output()
-    fmt.Printf("共生成 %d 个名字\n", output.Total())
 
+    // Top 10 names with full analysis
     for _, nr := range output.TopNames() {
-        fmt.Printf("  %s - 评分: %.1f\n", nr.FullName, nr.Score)
+        fmt.Printf("  %s - 评分: %.1f (%s)\n", nr.FullName, nr.Score, nr.Grade)
+    }
+
+    // ExcellentTable: access the full top-10000 scored names
+    table := output.GetExcellentTable()
+    entries := table.TopN(10)
+    for _, e := range entries {
+        fmt.Printf("  %s%s - %.1f has_poetry=%v\n", e.Char1, e.Char2, e.Score, e.HasPoetry)
+    }
+
+    // Explore: random sampling with dedup and filter
+    explored := table.Explore(10, func(e fate.ExcellentEntry) bool {
+        return e.HasPoetry
+    })
+    for _, e := range explored {
+        fmt.Printf("  %s%s - %.1f\n", e.Char1, e.Char2, e.Score)
     }
 }
 ```
@@ -152,10 +168,25 @@ func main() {
 | `fate.New(cfg)` | 创建 Fate 实例 |
 | `fate.NewSessionWithFilter(filter)` | 创建带筛选条件的会话 |
 | `fate.NewFilter(option)` | 根据选项创建筛选器 |
-| `fate.FilterOption{}` | 筛选选项（笔画范围/五行/大衍/性别等） |
+| `fate.FilterOption{}` | 筛选选项（笔画范围/五行/大衍/性别/AvoidCharacters等） |
 | `fate.Input{}` | 输入参数（姓氏/生日/性别） |
-| `fate.Output` | 输出结果（TopNames/AllNames/Total） |
+| `fate.Output` | 输出结果（TopNames/ExcellentTable/CharMap） |
 | `fate.Session` | 会话接口（Start/Stop/Wait） |
+| `fate.ExcellentTable` | 流式 Top-N 数据结构（TryPush/Finalize/TopN/Explore） |
+| `fate.ExcellentEntry` | 名字条目（Char1/Char2/Score/Grade/HasPoetry） |
+
+**ExcellentTable 用法：**
+
+| 方法 | 说明 |
+|------|------|
+| `TryPush(entry)` | 流式写入，min-heap 自动维护 Top-N |
+| `Finalize()` | 排序+构建索引，EE 完成后必须调用 |
+| `TopN(n)` | 取前 N 个最高分名字 |
+| `Explore(count, filter)` | 随机取 N 个，支持过滤+去重（shownSet 最多 100） |
+| `MarkShown(char1, char2)` | 标记已展示，避免重复 |
+| `FindEntry(char1, char2)` | 按字查找条目 |
+| `Entries(offset, limit)` | 分页查询 |
+| `HeapLen()` | 当前堆中元素数量 |
 
 ---
 
