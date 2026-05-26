@@ -21,6 +21,10 @@ github.com/go-sql-driver/mysql v1.7.0 h1:ueSltNNllEqE3qcWBTD0iQd3IpL/6U+mJxLkazJ
 github.com/go-sql-driver/mysql v1.7.0/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
 github.com/go-test/deep v1.0.3 h1:ZrJSEWsXzPOxaZnFteGEfooLba+ju3FYIbOrS+rQd68=
 github.com/go-test/deep v1.0.3/go.mod h1:wGDj63lr65AM2AQyKZd/NYHGb0R+1RLqB8NKt3aSFNA=
+github.com/godcong/chronos/v2 v2.0.7 h1:mSDVRHKngH+VlyVvOpTHWvrYZ8XpLynE6NhlTd3yf2w=
+github.com/godcong/chronos/v2 v2.0.7/go.mod h1:ZCQIOSWzy/y2MyUmdy8IwpGC4a3VGFQhJv05tCnj8E8=
+github.com/godcong/yi v1.6.0 h1:qTwx7fAnJaNqeUiwGAZhEcTRhVWeojvSEGXkR8Pf4aE=
+github.com/godcong/yi v1.6.0/go.mod h1:h+RXK2vDxk6onvdYDMMEH4nmlknMqZ8dCtZv1KKkrkg=
 github.com/golang/protobuf v1.3.1/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/protobuf v1.3.4/go.mod h1:vzj43D7+SQXF/4pzW/hwtAqwc6iTitCiVSaWz5lYuqw=
 github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
