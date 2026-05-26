@@ -2,20 +2,15 @@ module github.com/babyname/fate
 
 require (
 	entgo.io/ent v0.11.9
-	github.com/babyname/chronos/v2 v2.0.7
-	github.com/babyname/yi v1.0.2
 	github.com/go-sql-driver/mysql v1.7.0
+	github.com/godcong/chronos/v2 v2.0.7
+	github.com/godcong/yi v1.0.2
 	github.com/spf13/cobra v1.6.1
 	github.com/sqlite3ent/sqlite3 v1.50.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.20.0
 	golang.org/x/text v0.37.0
 	gopkg.in/yaml.v3 v3.0.1
-)
-
-replace (
-	github.com/babyname/chronos/v2 => ../chronos
-	github.com/babyname/yi => ../yi
 )
 
 require (
@@ -32,6 +27,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
+	github.com/rakyll/statik v0.1.6 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect

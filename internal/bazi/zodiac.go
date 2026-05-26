@@ -6,7 +6,7 @@ import (
 
 	"github.com/babyname/fate/ent"
 
-	v2 "github.com/babyname/chronos/v2"
+	v2 "github.com/godcong/chronos/v2"
 )
 
 // 十二生肖常量

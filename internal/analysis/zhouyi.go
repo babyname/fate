@@ -3,7 +3,7 @@ package analysis
 import (
 	"fmt"
 
-	"github.com/babyname/yi"
+	"github.com/godcong/yi"
 )
 
 func CalcZhouYi(l1, l2, f1, f2 int) *ZhouYiBasic {
