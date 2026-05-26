@@ -81,26 +81,26 @@ type ZhouYiBasic struct {
 }
 
 type BaziBasic struct {
-	Sizhu         [4]string `json:"sizhu"`
-	Wuxing        [4]string `json:"wuxing"`
-	Nayin         [4]string `json:"nayin"`
+	FourPillars   [4]string `json:"four_pillars"`
+	FiveElements  [4]string `json:"five_elements"`
+	NaYin         [4]string `json:"na_yin"`
 	Zodiac        string    `json:"zodiac"`
 	Constellation string    `json:"constellation"`
 }
 
 type WuXingSection struct {
-	DayGan     string   `json:"day_gan"`
-	DayWuxing  string   `json:"day_wuxing"`
-	QiangRuo   string   `json:"qiang_ruo"`
-	XiWuxing   []string `json:"xi_wuxing"`
-	YongWuxing string   `json:"yong_wuxing"`
-	JiWuxing   []string `json:"ji_wuxing"`
-	ChouWuxing []string `json:"chou_wuxing"`
-	XianWuxing []string `json:"xian_wuxing"`
-	Method     string   `json:"method"`
-	MethodName string   `json:"method_name"`
-	GeJuName   string   `json:"geju_name"`
-	Analysis   string   `json:"analysis"`
+	DayGan            string   `json:"day_gan"`
+	DayWuxing         string   `json:"day_wuxing"`
+	Strength          string   `json:"strength"`
+	FavorableElements []string `json:"favorable_elements"`
+	UsefulElement     string   `json:"useful_element"`
+	UnfavorableElements []string `json:"unfavorable_elements"`
+	HostileElements   []string `json:"hostile_elements"`
+	IdleElements      []string `json:"idle_elements"`
+	Method            string   `json:"method"`
+	MethodName        string   `json:"method_name"`
+	GeJuName          string   `json:"geju_name"`
+	Analysis          string   `json:"analysis"`
 }
 
 type NameSource struct {

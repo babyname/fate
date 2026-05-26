@@ -263,25 +263,25 @@ func printNameDetail(nr analysis.NameResult) {
 	}
 	if nr.Bazi != nil {
 		fmt.Println("  【八字分析】")
-		fmt.Printf("  四柱: %s\n", strings.Join(nr.Bazi.Sizhu[:], " "))
-		fmt.Printf("  五行: %s\n", strings.Join(nr.Bazi.Wuxing[:], " "))
-		fmt.Printf("  纳音: %s\n", strings.Join(nr.Bazi.Nayin[:], " "))
+		fmt.Printf("  四柱: %s\n", strings.Join(nr.Bazi.FourPillars[:], " "))
+		fmt.Printf("  五行: %s\n", strings.Join(nr.Bazi.FiveElements[:], " "))
+		fmt.Printf("  纳音: %s\n", strings.Join(nr.Bazi.NaYin[:], " "))
 		fmt.Printf("  生肖: %s  星座: %s\n", nr.Bazi.Zodiac, nr.Bazi.Constellation)
 		fmt.Println()
 	}
 	if nr.WuXing != nil {
 		fmt.Println("  【五行喜用神】")
-		fmt.Printf("  日主: %s(%s)  八字强弱: %s\n", nr.WuXing.DayGan, nr.WuXing.DayWuxing, nr.WuXing.QiangRuo)
-		fmt.Printf("  喜用神: %s\n", strings.Join(nr.WuXing.XiWuxing, "、"))
-		fmt.Printf("  忌神: %s\n", strings.Join(nr.WuXing.JiWuxing, "、"))
-		if nr.WuXing.YongWuxing != "" {
-			fmt.Printf("  用神: %s\n", nr.WuXing.YongWuxing)
+		fmt.Printf("  日主: %s(%s)  八字强弱: %s\n", nr.WuXing.DayGan, nr.WuXing.DayWuxing, nr.WuXing.Strength)
+		fmt.Printf("  喜用神: %s\n", strings.Join(nr.WuXing.FavorableElements, "、"))
+		fmt.Printf("  忌神: %s\n", strings.Join(nr.WuXing.UnfavorableElements, "、"))
+		if nr.WuXing.UsefulElement != "" {
+			fmt.Printf("  用神: %s\n", nr.WuXing.UsefulElement)
 		}
-		if len(nr.WuXing.ChouWuxing) > 0 {
-			fmt.Printf("  仇神: %s\n", strings.Join(nr.WuXing.ChouWuxing, "、"))
+		if len(nr.WuXing.HostileElements) > 0 {
+			fmt.Printf("  仇神: %s\n", strings.Join(nr.WuXing.HostileElements, "、"))
 		}
-		if len(nr.WuXing.XianWuxing) > 0 {
-			fmt.Printf("  闲神: %s\n", strings.Join(nr.WuXing.XianWuxing, "、"))
+		if len(nr.WuXing.IdleElements) > 0 {
+			fmt.Printf("  闲神: %s\n", strings.Join(nr.WuXing.IdleElements, "、"))
 		}
 		fmt.Printf("  算法: %s\n", nr.WuXing.MethodName)
 		if nr.WuXing.Analysis != "" {

@@ -15,7 +15,7 @@ require (
 
 require (
 	ariga.io/atlas v0.9.1 // indirect
-	github.com/6tail/lunar-go v1.3.0 // indirect
+	github.com/6tail/lunar-go v1.4.6 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -40,3 +40,5 @@ require (
 )
 
 go 1.25.0
+
+replace github.com/godcong/chronos/v2 => ../chronos

@@ -64,7 +64,7 @@ func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int
 	isXiYong1 := false
 	isXiYong2 := false
 	if fateData != nil && fateData.WuxingXiji != nil {
-		for _, wx := range fateData.WuxingXiji.XiWuxing {
+		for _, wx := range fateData.WuxingXiji.FavorableElements {
 			if c1.WuXing == wx {
 				isXiYong1 = true
 			}
@@ -220,9 +220,9 @@ func buildBaziSection(fateData *v2.FateData) *BaziBasic {
 		return nil
 	}
 	return &BaziBasic{
-		Sizhu:         fateData.Bazi.Sizhu,
-		Wuxing:        fateData.Bazi.Wuxing,
-		Nayin:         fateData.Bazi.Nayin,
+		FourPillars:   fateData.Bazi.FourPillars,
+		FiveElements:  fateData.Bazi.FiveElements,
+		NaYin:         fateData.Bazi.NaYin,
 		Zodiac:        fateData.Bazi.Zodiac,
 		Constellation: fateData.Bazi.Constellation,
 	}
@@ -233,17 +233,17 @@ func buildWuXingSection(fateData *v2.FateData) *WuXingSection {
 		return nil
 	}
 	ws := &WuXingSection{
-		DayGan:     fateData.WuxingXiji.DayGan,
-		DayWuxing:  fateData.WuxingXiji.DayWuxing,
-		QiangRuo:   fateData.WuxingXiji.QiangRuo,
-		XiWuxing:   fateData.WuxingXiji.XiWuxing,
-		YongWuxing: fateData.WuxingXiji.YongWuxing,
-		JiWuxing:   fateData.WuxingXiji.JiWuxing,
-		ChouWuxing: fateData.WuxingXiji.ChouWuxing,
-		XianWuxing: fateData.WuxingXiji.XianWuxing,
-		Method:     fateData.WuxingXiji.MethodName,
-		MethodName: fateData.WuxingXiji.MethodName,
-		Analysis:   fateData.WuxingXiji.Analysis,
+		DayGan:            fateData.WuxingXiji.DayGan,
+		DayWuxing:         fateData.WuxingXiji.DayWuxing,
+		Strength:          fateData.WuxingXiji.Strength,
+		FavorableElements: fateData.WuxingXiji.FavorableElements,
+		UsefulElement:     fateData.WuxingXiji.UsefulElement,
+		UnfavorableElements: fateData.WuxingXiji.UnfavorableElements,
+		HostileElements:   fateData.WuxingXiji.HostileElements,
+		IdleElements:      fateData.WuxingXiji.IdleElements,
+		Method:            fateData.WuxingXiji.MethodName,
+		MethodName:        fateData.WuxingXiji.MethodName,
+		Analysis:          fateData.WuxingXiji.Analysis,
 	}
 	if fateData.WuxingXiji.GeJu != nil {
 		ws.GeJuName = fateData.WuxingXiji.GeJu.Name
