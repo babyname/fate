@@ -4,18 +4,13 @@ require (
 	entgo.io/ent v0.11.9
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/godcong/chronos/v2 v2.0.7
-	github.com/godcong/yi v1.0.2
+	github.com/godcong/yi v1.6.0
 	github.com/spf13/cobra v1.6.1
 	github.com/sqlite3ent/sqlite3 v1.50.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.20.0
 	golang.org/x/text v0.37.0
 	gopkg.in/yaml.v3 v3.0.1
-)
-
-replace (
-	github.com/godcong/chronos/v2 => ../chronos
-	github.com/godcong/yi => ../yi
 )
 
 require (
