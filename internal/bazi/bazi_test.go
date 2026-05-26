@@ -4,7 +4,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/babyname/chronos/v2"
+	"github.com/godcong/chronos/v2"
 	"github.com/babyname/fate/internal/bazi"
 )
 

@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	v2 "github.com/babyname/chronos/v2"
+	v2 "github.com/godcong/chronos/v2"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/analysis"
 	"github.com/babyname/fate/internal/naming"
