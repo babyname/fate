@@ -1,6 +1,6 @@
 package bazi
 
-import v2 "github.com/babyname/chronos/v2"
+import v2 "github.com/godcong/chronos/v2"
 
 // NaYin 表示纳音五行，基于日历计算干支对应的纳音属性。
 type NaYin struct {
