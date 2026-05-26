@@ -66,10 +66,10 @@ func TestNameAnalysisOutput(t *testing.T) {
 	}
 
 	var nameSources []analysis.NameSource
-	for name, ok := output.NextName(); ok; name, ok = output.NextName() {
+	for _, sn := range output.AllNames() {
 		nameSources = append(nameSources, analysis.NameSource{
-			C1: name.FirstName[0],
-			C2: name.FirstName[1],
+			C1: sn.Name[0],
+			C2: sn.Name[1],
 		})
 	}
 
