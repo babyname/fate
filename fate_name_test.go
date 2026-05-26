@@ -171,10 +171,10 @@ func TestNameGenerationE2E(t *testing.T) {
 	}
 
 	count := 0
-	for name, ok := output.NextName(); ok; name, ok = output.NextName() {
+	for _, sn := range output.AllNames() {
 		count++
 		if count <= 10 {
-			t.Logf("  Name: %s (Strokes: %s)", name.String(), name.Strokes())
+			t.Logf("  Name: %s%s (Score: %.1f)", sn.Name[0].Char, sn.Name[1].Char, sn.Score)
 		}
 	}
 	t.Logf("Iterated %d names", count)
