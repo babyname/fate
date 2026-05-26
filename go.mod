@@ -13,6 +13,11 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
+replace (
+	github.com/godcong/chronos/v2 => ../chronos
+	github.com/godcong/yi => ../yi
+)
+
 require (
 	ariga.io/atlas v0.9.1 // indirect
 	github.com/6tail/lunar-go v1.3.0 // indirect
@@ -27,7 +32,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
-	github.com/rakyll/statik v0.1.6 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
