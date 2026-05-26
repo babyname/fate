@@ -37,7 +37,7 @@ func (r *WuxingRater) Rate(name *NameInfo, fateData *v2.FateData) (float64, stri
 	wuxing1 := name.Char1.WuXing
 	wuxing2 := name.Char2.WuXing
 
-	for _, xi := range fateData.WuxingXiji.XiWuxing {
+	for _, xi := range fateData.WuxingXiji.FavorableElements {
 		if wuxing1 == xi {
 			score += 20.0
 			notes = append(notes, name.Char1.Char+"("+wuxing1+")符合喜用五行")
@@ -48,7 +48,7 @@ func (r *WuxingRater) Rate(name *NameInfo, fateData *v2.FateData) (float64, stri
 		}
 	}
 
-	for _, ji := range fateData.WuxingXiji.JiWuxing {
+	for _, ji := range fateData.WuxingXiji.UnfavorableElements {
 		if wuxing1 == ji {
 			score -= 15.0
 			notes = append(notes, name.Char1.Char+"("+wuxing1+")为忌神五行")

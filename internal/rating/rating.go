@@ -157,8 +157,8 @@ func (r *Rater) rateWuXing(rating *NameRating, c1, c2 *ent.Character) {
 		return
 	}
 
-	xiWuxing := r.fateData.WuxingXiji.XiWuxing
-	jiWuxing := r.fateData.WuxingXiji.JiWuxing
+	xiWuxing := r.fateData.WuxingXiji.FavorableElements
+	jiWuxing := r.fateData.WuxingXiji.UnfavorableElements
 
 	score := 70.0 // 提高五行基础分
 	var details []string
@@ -419,7 +419,7 @@ func (r *Rater) generateInterpret(surname string, c1, c2 *ent.Character, rating 
 
 	if r.fateData != nil && r.fateData.WuxingXiji != nil {
 		parts = append(parts, fmt.Sprintf("日主%s五行属%s，", r.fateData.WuxingXiji.DayGan, r.fateData.WuxingXiji.DayWuxing))
-		switch r.fateData.WuxingXiji.QiangRuo {
+		switch r.fateData.WuxingXiji.Strength {
 		case "强":
 			parts = append(parts, "八字偏强，")
 		case "弱":
@@ -427,7 +427,7 @@ func (r *Rater) generateInterpret(surname string, c1, c2 *ent.Character, rating 
 		default:
 			parts = append(parts, "八字中和，")
 		}
-		parts = append(parts, fmt.Sprintf("喜用%s。", strings.Join(r.fateData.WuxingXiji.XiWuxing, "、")))
+		parts = append(parts, fmt.Sprintf("喜用%s。", strings.Join(r.fateData.WuxingXiji.FavorableElements, "、")))
 	}
 
 	wx1 := c1.WuXing
@@ -435,7 +435,7 @@ func (r *Rater) generateInterpret(surname string, c1, c2 *ent.Character, rating 
 	if wx1 != "" && wx2 != "" {
 		parts = append(parts, fmt.Sprintf("名字五行组合：%s%s", wx1, wx2))
 		if r.fateData != nil && r.fateData.WuxingXiji != nil {
-			if contains(r.fateData.WuxingXiji.XiWuxing, wx1) || contains(r.fateData.WuxingXiji.XiWuxing, wx2) {
+			if contains(r.fateData.WuxingXiji.FavorableElements, wx1) || contains(r.fateData.WuxingXiji.FavorableElements, wx2) {
 				parts = append(parts, "与八字喜用神相合。")
 			}
 		}
