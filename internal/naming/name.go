@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/babyname/chronos/v2"
+	"github.com/godcong/chronos/v2"
 	"github.com/babyname/fate/ent"
 )
 

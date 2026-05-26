@@ -1,7 +1,7 @@
 package zhouyi
 
 import (
-	"github.com/babyname/yi"
+	"github.com/godcong/yi"
 )
 
 // QiGua 根据下卦和上卦数起卦。

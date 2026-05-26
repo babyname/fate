@@ -1,7 +1,7 @@
 package naming
 
 import (
-	v2 "github.com/babyname/chronos/v2"
+	v2 "github.com/godcong/chronos/v2"
 	"github.com/babyname/fate/config"
 )
 
