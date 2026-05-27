@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	v2 "github.com/godcong/chronos/v2"
+	"github.com/babyname/fate/internal/chronosfate"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/analysis"
 	"github.com/babyname/fate/internal/naming"
@@ -35,7 +35,7 @@ type ScoredName struct {
 
 type Output struct {
 	basic          *naming.NameBasic
-	fateData       *v2.FateData
+	fateData       *chronosfate.FateData
 	topNames       []analysis.NameResult
 	excellentTable *ExcellentTable
 	charMap        map[string]*ent.Character
@@ -50,11 +50,11 @@ func (o *Output) SetLastName(ln [2]*ent.Character) {
 	o.basic.LastName = ln
 }
 
-func (o *Output) SetFateData(fd *v2.FateData) {
+func (o *Output) SetFateData(fd *chronosfate.FateData) {
 	o.fateData = fd
 }
 
-func (o *Output) FateData() *v2.FateData {
+func (o *Output) FateData() *chronosfate.FateData {
 	return o.fateData
 }
 

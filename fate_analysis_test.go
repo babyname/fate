@@ -5,6 +5,7 @@ import (
 	"time"
 
 	v2 "github.com/godcong/chronos/v2"
+	"github.com/babyname/fate/internal/chronosfate"
 	"github.com/babyname/fate/config"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/analysis"
@@ -52,10 +53,10 @@ func TestNameAnalysisOutput(t *testing.T) {
 	total := output.Total()
 	t.Logf("共生成 %d 个名字, 耗时 %v", total, elapsed)
 
-	fateData, _ := v2.GetFateData(&v2.FateInput{
-		BirthDate: born,
-		Gender:    1,
-		Surname:   "张",
+	fateData, _ := chronosfate.GetFateData(chronosfate.FateInput{
+		Calendar:     v2.NewSolarCalendar(born),
+		Gender:       1,
+		XiYongMethod: chronosfate.XiYongMethodBalance,
 	})
 
 	lastName := output.Basic().LastName
