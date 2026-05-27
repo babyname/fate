@@ -89,18 +89,14 @@ type BaziBasic struct {
 }
 
 type WuXingSection struct {
-	DayGan            string   `json:"day_gan"`
-	DayWuxing         string   `json:"day_wuxing"`
-	Strength          string   `json:"strength"`
-	FavorableElements []string `json:"favorable_elements"`
-	UsefulElement     string   `json:"useful_element"`
-	UnfavorableElements []string `json:"unfavorable_elements"`
-	HostileElements   []string `json:"hostile_elements"`
-	IdleElements      []string `json:"idle_elements"`
-	Method            string   `json:"method"`
-	MethodName        string   `json:"method_name"`
-	GeJuName          string   `json:"geju_name"`
-	Analysis          string   `json:"analysis"`
+	Xi          string `json:"xi"`
+	Ji          string `json:"ji"`
+	RiZhuQiangRuo string `json:"ri_zhu_qiang_ruo"`
+	TiaoHouShen string `json:"tiao_hou_shen"`
+	YongShen    string `json:"yong_shen"`
+	ChouShen    string `json:"chou_shen"`
+	GeJuName    string `json:"geju_name"`
+	Analysis    string `json:"analysis"`
 }
 
 type NameSource struct {

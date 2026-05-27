@@ -1,33 +1,28 @@
 package naming
 
 import (
-	v2 "github.com/godcong/chronos/v2"
+	"github.com/babyname/fate/internal/chronosfate"
 	"github.com/babyname/fate/config"
 )
 
-// WuxingRater 五行评分器，根据八字喜忌五行对名字进行评分。
 type WuxingRater struct {
 	cfg *config.Config
 }
 
-// NewWuxingRater 创建一个新的五行评分器。
 func NewWuxingRater(cfg *config.Config) *WuxingRater {
 	return &WuxingRater{cfg: cfg}
 }
 
-// Name 返回评分器名称。
 func (r *WuxingRater) Name() string {
 	return "wuxing"
 }
 
-// Weight 返回评分器权重。
 func (r *WuxingRater) Weight() float64 {
 	return r.cfg.Rate.WuxingWeight
 }
 
-// Rate 对姓名进行五行维度评分。
-func (r *WuxingRater) Rate(name *NameInfo, fateData *v2.FateData) (float64, string) {
-	if fateData == nil || fateData.WuxingXiji == nil {
+func (r *WuxingRater) Rate(name *NameInfo, fateData *chronosfate.FateData) (float64, string) {
+	if fateData == nil {
 		return 60.0, "缺少八字信息"
 	}
 
@@ -37,26 +32,25 @@ func (r *WuxingRater) Rate(name *NameInfo, fateData *v2.FateData) (float64, stri
 	wuxing1 := name.Char1.WuXing
 	wuxing2 := name.Char2.WuXing
 
-	for _, xi := range fateData.WuxingXiji.FavorableElements {
-		if wuxing1 == xi {
-			score += 20.0
-			notes = append(notes, name.Char1.Char+"("+wuxing1+")符合喜用五行")
-		}
-		if wuxing2 == xi {
-			score += 20.0
-			notes = append(notes, name.Char2.Char+"("+wuxing2+")符合喜用五行")
-		}
+	xi := fateData.WuxingXijiInfo.Xi
+	ji := fateData.WuxingXijiInfo.Ji
+
+	if wuxing1 == xi {
+		score += 20.0
+		notes = append(notes, name.Char1.Char+"("+wuxing1+")符合喜用五行")
+	}
+	if wuxing2 == xi {
+		score += 20.0
+		notes = append(notes, name.Char2.Char+"("+wuxing2+")符合喜用五行")
 	}
 
-	for _, ji := range fateData.WuxingXiji.UnfavorableElements {
-		if wuxing1 == ji {
-			score -= 15.0
-			notes = append(notes, name.Char1.Char+"("+wuxing1+")为忌神五行")
-		}
-		if wuxing2 == ji {
-			score -= 15.0
-			notes = append(notes, name.Char2.Char+"("+wuxing2+")为忌神五行")
-		}
+	if wuxing1 == ji {
+		score -= 15.0
+		notes = append(notes, name.Char1.Char+"("+wuxing1+")为忌神五行")
+	}
+	if wuxing2 == ji {
+		score -= 15.0
+		notes = append(notes, name.Char2.Char+"("+wuxing2+")为忌神五行")
 	}
 
 	if isWuXingSheng(wuxing1, wuxing2) {
@@ -75,34 +69,29 @@ func (r *WuxingRater) Rate(name *NameInfo, fateData *v2.FateData) (float64, stri
 	if len(notes) > 0 {
 		noteStr = joinNotes(notes)
 	} else {
-		noteStr = "五行中性"
+		noteStr = "五行中和"
 	}
 
 	return score, noteStr
 }
 
-// BihuaRater 笔画评分器，根据康熙笔画对名字进行评分。
 type BihuaRater struct {
 	cfg *config.Config
 }
 
-// NewBihuaRater 创建一个新的笔画评分器。
 func NewBihuaRater(cfg *config.Config) *BihuaRater {
 	return &BihuaRater{cfg: cfg}
 }
 
-// Name 返回评分器名称。
 func (r *BihuaRater) Name() string {
 	return "bihua"
 }
 
-// Weight 返回评分器权重。
 func (r *BihuaRater) Weight() float64 {
 	return r.cfg.Rate.BihuaWeight
 }
 
-// Rate 对姓名进行笔画维度评分。
-func (r *BihuaRater) Rate(name *NameInfo, _ *v2.FateData) (float64, string) {
+func (r *BihuaRater) Rate(name *NameInfo, _ *chronosfate.FateData) (float64, string) {
 	score := 70.0
 	var notes []string
 
@@ -122,7 +111,7 @@ func (r *BihuaRater) Rate(name *NameInfo, _ *v2.FateData) (float64, string) {
 		notes = append(notes, name.Char2.Char+"笔画偏多/偏少")
 	}
 
-	diff := abs(stroke1 - stroke2)
+	diff := abs(stroke1-stroke2)
 	if diff <= 5 {
 		score += 10.0
 		notes = append(notes, "笔画搭配匀称")
@@ -155,28 +144,23 @@ func (r *BihuaRater) Rate(name *NameInfo, _ *v2.FateData) (float64, string) {
 	return score, noteStr
 }
 
-// YinyunRater 音韵评分器，根据拼音声调声母韵母对名字进行评分。
 type YinyunRater struct {
 	cfg *config.Config
 }
 
-// NewYinyunRater 创建一个新的音韵评分器。
 func NewYinyunRater(cfg *config.Config) *YinyunRater {
 	return &YinyunRater{cfg: cfg}
 }
 
-// Name 返回评分器名称。
 func (r *YinyunRater) Name() string {
 	return "yinyun"
 }
 
-// Weight 返回评分器权重。
 func (r *YinyunRater) Weight() float64 {
 	return r.cfg.Rate.YinyunWeight
 }
 
-// Rate 对姓名进行音韵维度评分。
-func (r *YinyunRater) Rate(name *NameInfo, _ *v2.FateData) (float64, string) {
+func (r *YinyunRater) Rate(name *NameInfo, _ *chronosfate.FateData) (float64, string) {
 	score := 70.0
 	var notes []string
 
@@ -228,7 +212,7 @@ func (r *YinyunRater) Rate(name *NameInfo, _ *v2.FateData) (float64, string) {
 	if len(notes) > 0 {
 		noteStr = joinNotes(notes)
 	} else {
-		noteStr = "音律中性"
+		noteStr = "音律中和"
 	}
 
 	return score, noteStr
@@ -236,13 +220,8 @@ func (r *YinyunRater) Rate(name *NameInfo, _ *v2.FateData) (float64, string) {
 
 func isWuXingSheng(wx1, wx2 string) bool {
 	sheng := map[string]string{
-		"木": "火",
-		"火": "土",
-		"土": "金",
-		"金": "水",
-		"水": "木",
+		"木": "火", "火": "土", "土": "金", "金": "水", "水": "木",
 	}
-
 	if next, ok := sheng[wx1]; ok {
 		return next == wx2
 	}
@@ -333,7 +312,7 @@ func (r *PoetryRater) Weight() float64 {
 	return r.cfg.Rate.PoetryWeight
 }
 
-func (r *PoetryRater) Rate(name *NameInfo, _ *v2.FateData) (float64, string) {
+func (r *PoetryRater) Rate(name *NameInfo, _ *chronosfate.FateData) (float64, string) {
 	if len(r.poetryChar) == 0 {
 		return 70.0, "诗词数据未加载"
 	}
@@ -374,7 +353,7 @@ func (r *PoetryRater) Rate(name *NameInfo, _ *v2.FateData) (float64, string) {
 	if len(notes) > 0 {
 		noteStr = joinNotes(notes)
 	} else {
-		noteStr = "诗词中性"
+		noteStr = "诗词中和"
 	}
 
 	return score, noteStr

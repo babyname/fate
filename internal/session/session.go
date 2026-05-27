@@ -5,6 +5,7 @@ import (
 	"sync/atomic"
 
 	v2 "github.com/godcong/chronos/v2"
+	"github.com/babyname/fate/internal/chronosfate"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/analysis"
 	filterpkg "github.com/babyname/fate/internal/filter"
@@ -42,7 +43,7 @@ type session struct {
 	group    errgroup.Group
 	state    int32
 	filter   filterpkg.Filter
-	fateData *v2.FateData
+	fateData *chronosfate.FateData
 
 	chars map[int][]*ent.Character
 
@@ -80,15 +81,14 @@ func (s *session) Start(input *Input) error {
 	}
 	s.output.SetLastName(ln)
 
-	method := v2.XiYongMethodBalance
+	method := chronosfate.XiYongMethodBalance
 	if s.filter.XiYongMethod() == "geju" {
-		method = v2.XiYongMethodGeJu
+		method = chronosfate.XiYongMethodGeJu
 	}
-	fateData, err := v2.GetFateData(&v2.FateInput{
-		BirthDate: input.Born,
-		Gender:    int(input.Sex),
-		Surname:   input.Last[0],
-		Method:    method,
+	fateData, err := chronosfate.GetFateData(chronosfate.FateInput{
+		Calendar:     v2.NewSolarCalendar(input.Born),
+		Gender:       int(input.Sex),
+		XiYongMethod: method,
 	})
 	if err != nil {
 		log.Error("get fate data", err)

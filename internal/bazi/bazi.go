@@ -115,7 +115,6 @@ type BaZi struct {
 	baZi   v2.EightChar
 	wuXing [4]string
 	xiyong *XiYong
-	bridge *v2.Bridge
 }
 
 // NewBazi 根据日历创建八字命盘实例。
@@ -123,28 +122,17 @@ func NewBazi(calendar v2.Calendar) *BaZi {
 	ec := calendar.Lunar().GetEightChar()
 	return &BaZi{
 		baZi:   ec,
-		wuXing: ec.GetWuXing(),
-	}
-}
-
-// NewBaziFromBridge 根据桥接对象创建八字命盘实例。
-func NewBaziFromBridge(bridge *v2.Bridge) *BaZi {
-	ec := bridge.EightChar()
-	return &BaZi{
-		baZi:   ec,
-		wuXing: ec.GetWuXing(),
-		bridge: bridge,
+		wuXing: ec.FiveElements(),
 	}
 }
 
 func (z *BaZi) String() string {
-	siZhu := z.baZi.GetSiZhu()
+	siZhu := z.baZi.FourPillars()
 	return siZhu[0] + siZhu[1] + siZhu[2] + siZhu[3]
 }
 
-// RiZhu 返回日柱的天干地支字符串。
 func (z *BaZi) RiZhu() string {
-	return z.baZi.GetSiZhu()[3]
+	return z.baZi.FourPillars()[3]
 }
 
 func (z *BaZi) calcXiYong() {
@@ -166,8 +154,8 @@ func (z *BaZi) XiYongShen() string {
 }
 
 func (z *BaZi) point() *BaZi {
-	di := diIndex[z.baZi.GetSiZhu()[2]]
-	for idx, v := range z.baZi.GetSiZhu() {
+	di := diIndex[z.baZi.FourPillars()[2]]
+	for idx, v := range z.baZi.FourPillars() {
 		if idx%2 == 0 {
 			z.xiyong.AddFen(WuXingTianGan(v), tiangan[di][tianIndex[v]])
 		} else {
