@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sort"
 
-	v2 "github.com/godcong/chronos/v2"
+	"github.com/babyname/fate/internal/chronosfate"
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/internal/rating"
 	"github.com/babyname/fate/internal/wuge"
@@ -15,7 +15,7 @@ import (
 // BuildNameResult builds a single NameResult from the given character data and fate information.
 // It calculates wuge (five strokes), sancai (three talents), luck analysis, zhouyi hexagram,
 // and the overall name rating score.
-func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int, fateData *v2.FateData) NameResult {
+func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int, fateData *chronosfate.FateData) NameResult {
 	f1 := c1.ScienceStroke
 	f2 := c2.ScienceStroke
 
@@ -63,14 +63,12 @@ func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int
 
 	isXiYong1 := false
 	isXiYong2 := false
-	if fateData != nil && fateData.WuxingXiji != nil {
-		for _, wx := range fateData.WuxingXiji.FavorableElements {
-			if c1.WuXing == wx {
-				isXiYong1 = true
-			}
-			if c2.WuXing == wx {
-				isXiYong2 = true
-			}
+	if fateData != nil {
+		if c1.WuXing == fateData.WuxingXijiInfo.Xi {
+			isXiYong1 = true
+		}
+		if c2.WuXing == fateData.WuxingXijiInfo.Xi {
+			isXiYong2 = true
 		}
 	}
 
@@ -186,7 +184,7 @@ func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int
 
 // CollectTopNames collects name results from the given sources, optionally filters them,
 // sorts by score in descending order, and returns the top N results with ranks assigned.
-func CollectTopNames(names []NameSource, surname string, l1, l2 int, fateData *v2.FateData, topN int, filterFunc func(c1, c2 *ent.Character) bool) []NameResult {
+func CollectTopNames(names []NameSource, surname string, l1, l2 int, fateData *chronosfate.FateData, topN int, filterFunc func(c1, c2 *ent.Character) bool) []NameResult {
 	var all []NameResult
 	for _, nm := range names {
 		c1 := nm.C1
@@ -215,38 +213,34 @@ func CollectTopNames(names []NameSource, surname string, l1, l2 int, fateData *v
 	return result
 }
 
-func buildBaziSection(fateData *v2.FateData) *BaziBasic {
-	if fateData == nil || fateData.Bazi == nil {
+func buildBaziSection(fateData *chronosfate.FateData) *BaziBasic {
+	if fateData == nil {
 		return nil
 	}
 	return &BaziBasic{
-		FourPillars:   fateData.Bazi.FourPillars,
-		FiveElements:  fateData.Bazi.FiveElements,
-		NaYin:         fateData.Bazi.NaYin,
-		Zodiac:        fateData.Bazi.Zodiac,
-		Constellation: fateData.Bazi.Constellation,
+		FourPillars:   fateData.BaziInfo.SiZhu,
+		FiveElements:  fateData.BaziInfo.WuXing,
+		NaYin:         fateData.BaziInfo.NaYin,
+		Zodiac:        fateData.BaziInfo.Zodiac,
+		Constellation: fateData.BaziInfo.Constellation,
 	}
 }
 
-func buildWuXingSection(fateData *v2.FateData) *WuXingSection {
-	if fateData == nil || fateData.WuxingXiji == nil {
+func buildWuXingSection(fateData *chronosfate.FateData) *WuXingSection {
+	if fateData == nil {
 		return nil
 	}
 	ws := &WuXingSection{
-		DayGan:            fateData.WuxingXiji.DayGan,
-		DayWuxing:         fateData.WuxingXiji.DayWuxing,
-		Strength:          fateData.WuxingXiji.Strength,
-		FavorableElements: fateData.WuxingXiji.FavorableElements,
-		UsefulElement:     fateData.WuxingXiji.UsefulElement,
-		UnfavorableElements: fateData.WuxingXiji.UnfavorableElements,
-		HostileElements:   fateData.WuxingXiji.HostileElements,
-		IdleElements:      fateData.WuxingXiji.IdleElements,
-		Method:            fateData.WuxingXiji.MethodName,
-		MethodName:        fateData.WuxingXiji.MethodName,
-		Analysis:          fateData.WuxingXiji.Analysis,
+		Xi:            fateData.WuxingXijiInfo.Xi,
+		Ji:            fateData.WuxingXijiInfo.Ji,
+		RiZhuQiangRuo: fateData.WuxingXijiInfo.RiZhuQiangRuo,
+		TiaoHouShen:   fateData.WuxingXijiInfo.TiaoHouShen,
+		YongShen:      fateData.XiYongJiChou.Yong,
+		ChouShen:      fateData.XiYongJiChou.Chou,
 	}
-	if fateData.WuxingXiji.GeJu != nil {
-		ws.GeJuName = fateData.WuxingXiji.GeJu.Name
+	if fateData.GeJuInfo != nil {
+		ws.GeJuName = fateData.GeJuInfo.Name
+		ws.Analysis = fateData.GeJuInfo.Analysis
 	}
 	return ws
 }
