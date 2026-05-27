@@ -9,6 +9,7 @@ import (
 	"time"
 
 	v2 "github.com/godcong/chronos/v2"
+	"github.com/babyname/fate/internal/chronosfate"
 	"github.com/babyname/fate"
 	"github.com/babyname/fate/internal/analysis"
 	"github.com/babyname/fate/internal/database"
@@ -152,10 +153,10 @@ func cmdNameDetail() *cobra.Command {
 				return
 			}
 
-			fateData, err := v2.GetFateData(&v2.FateInput{
-				BirthDate: b,
-				Gender:    sx,
-				Surname:   l[0],
+			fateData, err := chronosfate.GetFateData(chronosfate.FateInput{
+				Calendar:     v2.NewSolarCalendar(b),
+				Gender:       sx,
+				XiYongMethod: chronosfate.XiYongMethodBalance,
 			})
 			if err != nil {
 				fmt.Println("获取八字信息失败", err)
@@ -271,19 +272,21 @@ func printNameDetail(nr analysis.NameResult) {
 	}
 	if nr.WuXing != nil {
 		fmt.Println("  【五行喜用神】")
-		fmt.Printf("  日主: %s(%s)  八字强弱: %s\n", nr.WuXing.DayGan, nr.WuXing.DayWuxing, nr.WuXing.Strength)
-		fmt.Printf("  喜用神: %s\n", strings.Join(nr.WuXing.FavorableElements, "、"))
-		fmt.Printf("  忌神: %s\n", strings.Join(nr.WuXing.UnfavorableElements, "、"))
-		if nr.WuXing.UsefulElement != "" {
-			fmt.Printf("  用神: %s\n", nr.WuXing.UsefulElement)
+		fmt.Printf("  八字强弱: %s\n", nr.WuXing.RiZhuQiangRuo)
+		fmt.Printf("  喜神: %s\n", nr.WuXing.Xi)
+		fmt.Printf("  忌神: %s\n", nr.WuXing.Ji)
+		if nr.WuXing.YongShen != "" {
+			fmt.Printf("  用神: %s\n", nr.WuXing.YongShen)
 		}
-		if len(nr.WuXing.HostileElements) > 0 {
-			fmt.Printf("  仇神: %s\n", strings.Join(nr.WuXing.HostileElements, "、"))
+		if nr.WuXing.ChouShen != "" {
+			fmt.Printf("  仇神: %s\n", nr.WuXing.ChouShen)
 		}
-		if len(nr.WuXing.IdleElements) > 0 {
-			fmt.Printf("  闲神: %s\n", strings.Join(nr.WuXing.IdleElements, "、"))
+		if nr.WuXing.TiaoHouShen != "" {
+			fmt.Printf("  调候神: %s\n", nr.WuXing.TiaoHouShen)
 		}
-		fmt.Printf("  算法: %s\n", nr.WuXing.MethodName)
+		if nr.WuXing.GeJuName != "" {
+			fmt.Printf("  格局: %s\n", nr.WuXing.GeJuName)
+		}
 		if nr.WuXing.Analysis != "" {
 			fmt.Printf("  分析: %s\n", nr.WuXing.Analysis)
 		}
