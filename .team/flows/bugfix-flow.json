@@ -1,0 +1,792 @@
+{
+  "components": {
+    "roles": [
+      {
+        "capabilities": [
+          "classify",
+          "dispatch",
+          "assess"
+        ],
+        "description": "Classify and dispatch bug reports",
+        "id": "triage",
+        "name": "Triage Agent",
+        "prompt_directives": [
+          "Dispatch tasks to sub-agents, never execute directly",
+          "Classify all user input before action: Feature/Bug/Change/Analysis/Batch",
+          "Read .team/project.md for project constraints before dispatch",
+          "Use flow task create/show for all task state management",
+          "Report deliverables and handoff to next role on completion"
+        ]
+      },
+      {
+        "capabilities": [
+          "investigate",
+          "implement",
+          "test",
+          "debug"
+        ],
+        "description": "Investigate root cause, implement bug fix, add regression tests",
+        "id": "dev",
+        "name": "Developer",
+        "prompt_directives": [
+          "Read SCOPE.md before starting implementation",
+          "Surgical changes only: never modify files outside task scope",
+          "Run tests before marking phase complete",
+          "No Chinese comments or commit messages",
+          "Never delete files unless explicitly asked",
+          "Output Guard 5-step self-check mandatory before completion gate"
+        ]
+      },
+      {
+        "capabilities": [
+          "verify",
+          "test",
+          "validate"
+        ],
+        "description": "Verify bug fix, run regression tests, validate completeness",
+        "id": "qa",
+        "name": "QA Engineer",
+        "prompt_directives": [
+          "Verify implementation matches SPEC.md and AC.md",
+          "Run full regression tests, not just new tests",
+          "Check front-back interface consistency (paths, params, response)",
+          "For bugfixes: data flow trace + real scenario verification required",
+          "Output Guard self-check before marking review complete"
+        ]
+      }
+    ],
+    "rules": [
+      {
+        "description": "Triage must dispatch tasks to sub-agents, never execute code modifications directly",
+        "enforcement": "hard",
+        "id": "d1a",
+        "instruction": "Triage 必须分发任务给子智能体，禁止自己执行代码修改",
+        "name": "Dispatch Guard",
+        "source": "builtin",
+        "type": "process_constraint"
+      },
+      {
+        "description": "5-step self-assessment before completion gate: deliverable exists, content non-empty, spec compliance, no placeholders, path correctness",
+        "enforcement": "hard",
+        "id": "d2b",
+        "instruction": "完成前必须执行5步自检：产出物存在→内容非空→符合规范→无占位符→路径正确",
+        "name": "Output Guard Protocol",
+        "source": "framework",
+        "type": "process_constraint"
+      },
+      {
+        "description": "Every bug fix must include regression tests; change impact analysis required before code modification",
+        "enforcement": "hard",
+        "id": "d3c",
+        "instruction": "修改代码前必须执行变更影响分析；任何回归测试失败必须立即停止",
+        "name": "Regression Prevention",
+        "source": "builtin",
+        "type": "quality_constraint"
+      },
+      {
+        "description": "Each fix iteration stores docs in R{N} subdirectory; max 3 iterations before escalation",
+        "enforcement": "hard",
+        "id": "r-iteration-rule",
+        "name": "R-Iteration Isolation",
+        "source": "builtin",
+        "type": "process_constraint"
+      },
+      {
+        "description": "No Chinese comments or commit messages; TDD approach (test first); code must compile",
+        "enforcement": "hard",
+        "id": "d5f",
+        "instruction": "禁止中文注释和提交信息；先写测试再实现；代码必须可编译",
+        "name": "Development Standards",
+        "source": "builtin",
+        "type": "behavioral_constraint"
+      },
+      {
+        "description": "All unit tests must pass; test coverage report required; bug fixes must include regression tests",
+        "enforcement": "hard",
+        "id": "d6g",
+        "instruction": "所有单元测试必须通过；必须有测试覆盖率报告；Bug 修复必须加回归测试",
+        "name": "Test Standards",
+        "source": "builtin",
+        "type": "quality_constraint"
+      },
+      {
+        "description": "Review must check architecture compliance and fix correctness; SCOPE.md must be generated on completion",
+        "enforcement": "hard",
+        "id": "d7h",
+        "instruction": "Review 必须检查架构合规性；完成时必须生成 SCOPE.md",
+        "name": "Review Standards",
+        "source": "builtin",
+        "type": "quality_constraint"
+      },
+      {
+        "description": "Never delete files; never use PowerShell Set-Content/Out-File; never skip toolchain gate",
+        "enforcement": "hard",
+        "id": "d4e",
+        "instruction": "禁止删除文件；禁止用 PowerShell Set-Content/Out-File；禁止跳过工具链门",
+        "name": "Hard Constraints",
+        "source": "builtin",
+        "type": "behavioral_constraint"
+      },
+      {
+        "description": "Before any action, verify assumptions: what assumptions am I acting on? What's the worst case if wrong? What should I clarify first?",
+        "enforcement": "hard",
+        "id": "qg1",
+        "instruction": "行动前验证假设：我在基于什么假设？错了最坏情况？应先澄清什么？",
+        "name": "QG-1: Think Before Coding",
+        "trigger": "pre_action"
+      },
+      {
+        "description": "Can this be solved with less code? Am I adding unrequested features? Is this over-engineered?",
+        "enforcement": "hard",
+        "id": "qg2",
+        "instruction": "能用更少代码解决吗？在加未要求的功能吗？过度设计了吗？",
+        "name": "QG-2: Simplicity First",
+        "trigger": "pre_output"
+      },
+      {
+        "description": "Only modify code within task scope. Never optimize or refactor adjacent code. Clean up orphan code from own changes.",
+        "enforcement": "hard",
+        "id": "qg3",
+        "instruction": "只改任务范围内的代码；不优化/重构相邻代码；清理自己产生的孤立代码",
+        "name": "QG-3: Surgical Changes",
+        "trigger": "code_change"
+      },
+      {
+        "description": "Define success criteria before executing. Each step must have concrete verification criteria. Never use vague 'completed' descriptions.",
+        "enforcement": "hard",
+        "id": "qg4",
+        "instruction": "执行前定义成功标准；每步有具体验证标准；不用模糊的'完成'描述",
+        "name": "QG-4: Goal-Driven Execution",
+        "trigger": "task_start"
+      }
+    ],
+    "skills": [],
+    "tools": [
+      {
+        "commands": [
+          "create",
+          "update",
+          "close",
+          "show",
+          "list",
+          "ready",
+          "append",
+          "dep"
+        ],
+        "id": "task",
+        "name": "Task CLI",
+        "type": "cli"
+      },
+      {
+        "id": "search",
+        "name": "Code Search",
+        "type": "builtin"
+      },
+      {
+        "id": "file-ops",
+        "name": "File Operations",
+        "type": "builtin"
+      }
+    ]
+  },
+  "config": {
+    "auto_dispatch": true,
+    "parallel_limit": 2,
+    "task_type": "bug",
+    "timeout_minutes": 240
+  },
+  "edges": [
+    {
+      "from": "phase-triage",
+      "id": "e-triage-gate",
+      "to": "gate-entry"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "gate.passed"
+        }
+      ],
+      "from": "gate-entry",
+      "id": "e-gate-investigate",
+      "to": "phase-investigate",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "!gate.passed"
+        }
+      ],
+      "from": "gate-entry",
+      "id": "e-gate-reject",
+      "to": "terminal-reject",
+      "type": "conditional"
+    },
+    {
+      "from": "phase-investigate",
+      "id": "e-investigate-fix",
+      "to": "phase-fix"
+    },
+    {
+      "from": "phase-fix",
+      "id": "e-fix-gate",
+      "to": "gate-quality"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "gate.passed"
+        }
+      ],
+      "from": "gate-quality",
+      "id": "e-gate-verify",
+      "to": "branch-r-iteration",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "!gate.passed"
+        }
+      ],
+      "from": "gate-quality",
+      "id": "e-gate-fix-retry",
+      "to": "phase-fix",
+      "type": "conditional"
+    },
+    {
+      "from": "branch-r-iteration",
+      "id": "e-branch-verify",
+      "to": "phase-verify"
+    },
+    {
+      "from": "branch-r-iteration",
+      "id": "e-branch-fix",
+      "to": "phase-fix"
+    },
+    {
+      "from": "branch-r-iteration",
+      "id": "e-branch-failed",
+      "to": "terminal-failed"
+    },
+    {
+      "from": "phase-verify",
+      "id": "e-verify-completion",
+      "to": "gate-completion"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "gate.passed"
+        }
+      ],
+      "from": "gate-completion",
+      "id": "e-completion-success",
+      "to": "terminal-success",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "!gate.passed"
+        }
+      ],
+      "from": "gate-completion",
+      "id": "e-completion-verify",
+      "to": "phase-verify",
+      "type": "conditional"
+    }
+  ],
+  "metadata": {
+    "author": "team-flow",
+    "description": "Bug fix flow with R-iteration: Triage → Gate → Investigate → Fix(R0..Rn) → Quality Gate → Verify → Completion Gate → Terminal",
+    "name": "bugfix-flow",
+    "tags": [
+      "bug",
+      "bugfix",
+      "software"
+    ]
+  },
+  "nodes": [
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/triage.md",
+            "ref": "triage",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "triage",
+            "source": "builtin"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d1a",
+            "source": "builtin"
+          }
+        ]
+      },
+      "config": {
+        "auto_dispatch": true,
+        "role": "Triage"
+      },
+      "description": "Classify and validate the bug report",
+      "docs": [
+        {
+          "description": "Bug triage record with severity assessment, priority, and dispatch decision",
+          "format": "markdown",
+          "name": "TRIAGE.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/TRIAGE.md",
+          "required": true
+        }
+      ],
+      "id": "phase-triage",
+      "name": "Bug Triage",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "ready"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "config": {
+        "conditions": [
+          {
+            "type": "task_exists"
+          },
+          {
+            "expected": "bug",
+            "type": "type_matches"
+          }
+        ],
+        "on_fail": "terminal-reject",
+        "on_pass": "phase-investigate"
+      },
+      "description": "Validate bug report has sufficient information and type matches",
+      "id": "gate-entry",
+      "name": "Entry Gate",
+      "type": "gate"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/dev.md",
+            "ref": "dev",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "dev",
+            "source": "builtin"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d5f",
+            "source": "builtin"
+          },
+          {
+            "ref": "d2b",
+            "source": "framework"
+          }
+        ],
+        "tools": [
+          {
+            "commands": [
+              "show",
+              "update",
+              "append"
+            ],
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          }
+        ]
+      },
+      "config": {
+        "auto_dispatch": true,
+        "deliverables": [
+          "RCA.md"
+        ],
+        "role": "Dev"
+      },
+      "description": "Investigate the bug, identify root cause, and produce RCA document",
+      "docs": [
+        {
+          "content_rules": [
+            "Must contain: phenomenon, root_cause, impact, prevention",
+            "Data flow trace required for API/permission/state bugs",
+            "Real scenario verification required (not mock-only)"
+          ],
+          "description": "Root cause analysis document detailing bug origin, affected components, and reproduction steps",
+          "format": "markdown",
+          "name": "RCA.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/R0/RCA.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/bug-test-template.md"
+        }
+      ],
+      "id": "phase-investigate",
+      "name": "Root Cause Investigation",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "analyze"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/dev.md",
+            "ref": "dev",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "dev",
+            "source": "builtin"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d5f",
+            "source": "builtin"
+          },
+          {
+            "ref": "d3c",
+            "source": "builtin"
+          },
+          {
+            "ref": "r-iteration-rule",
+            "source": "builtin"
+          },
+          {
+            "ref": "d4e",
+            "source": "builtin"
+          }
+        ],
+        "tools": [
+          {
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          },
+          {
+            "ref": "file-ops"
+          }
+        ]
+      },
+      "config": {
+        "auto_dispatch": true,
+        "deliverables": [
+          "code",
+          "regression_tests"
+        ],
+        "role": "Dev"
+      },
+      "description": "Implement the bug fix and add regression tests (R-iteration, docs stored in R{N} subdirectory)",
+      "docs": [
+        {
+          "description": "Bug fix implementation notes: fix approach, code changes, regression test additions",
+          "format": "markdown",
+          "name": "FIX.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/{iteration}/FIX.md",
+          "required": true
+        },
+        {
+          "content_rules": [
+            "Must contain: changed files, added files, deleted files, risk assessment"
+          ],
+          "description": "Change scope document: what was fixed, what changed, known side effects",
+          "format": "markdown",
+          "name": "SCOPE.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/{iteration}/SCOPE.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/scope-template.md"
+        }
+      ],
+      "id": "phase-fix",
+      "name": "Bug Fix",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "implement"
+        },
+        {
+          "action": "set_variable",
+          "name": "iteration",
+          "value": "{iteration}"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "config": {
+        "auto_retry": {
+          "delay_minutes": 5,
+          "max_attempts": 3
+        },
+        "conditions": [
+          {
+            "threshold": "100%",
+            "type": "tests_pass"
+          },
+          {
+            "threshold": "0 errors",
+            "type": "lint_pass"
+          },
+          {
+            "type": "no_regressions"
+          },
+          {
+            "check": "Regression tests added for the fix",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "RCA.md contains: phenomenon, root_cause, impact, prevention",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "TEST_CASE.md contains: reproduce steps, expected result, verification result",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "Bug reproduce test passed (show test output)",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "No Chinese comments in code",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "Data flow tracing included in RCA (for API/auth/state/interaction bugs)",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "Real scenario verification passed (not just mock tests)",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "Full chain verified (not just breakpoint fix)",
+            "required": true,
+            "type": "custom"
+          }
+        ],
+        "on_fail": "phase-fix",
+        "on_pass": "branch-r-iteration"
+      },
+      "description": "Verify fix passes all tests, no regressions introduced, and regression tests exist",
+      "id": "gate-quality",
+      "name": "Quality Gate",
+      "type": "gate"
+    },
+    {
+      "config": {
+        "conditions": [
+          {
+            "goto": "phase-fix",
+            "target": "phase-fix",
+            "when": "iteration_count < 3 && qa_result == 'failed'"
+          },
+          {
+            "goto": "terminal-failed",
+            "target": "terminal-failed",
+            "when": "iteration_count >= 3 && qa_result == 'failed'"
+          },
+          {
+            "default": "phase-verify",
+            "target": "phase-verify"
+          }
+        ]
+      },
+      "description": "Check if QA verification passed or needs another fix iteration",
+      "id": "branch-r-iteration",
+      "name": "R-Iteration Decision",
+      "type": "branch"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/qa-engineer.md",
+            "ref": "qa",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "qa",
+            "source": "builtin"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d6g",
+            "source": "builtin"
+          },
+          {
+            "ref": "d3c",
+            "source": "builtin"
+          }
+        ]
+      },
+      "config": {
+        "auto_dispatch": true,
+        "deliverables": [
+          "TEST_CASE.md"
+        ],
+        "role": "QA"
+      },
+      "description": "Verify the bug is fixed and produce test case documentation",
+      "docs": [
+        {
+          "content_rules": [
+            "Must contain: reproduction steps, expected result, actual result",
+            "Regression test cases required for bugfixes"
+          ],
+          "description": "Test case document for the bug fix including reproduction steps and verification results",
+          "format": "markdown",
+          "name": "TEST_CASE.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/{iteration}/TEST_CASE.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/bug-test-template.md"
+        }
+      ],
+      "id": "phase-verify",
+      "name": "Fix Verification",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "verify"
+        }
+      ],
+      "on_exit": [
+        {
+          "action": "custom",
+          "message": "Verify Output Guard 5-step protocol completed",
+          "name": "output-guard-check"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "config": {
+        "conditions": [
+          {
+            "deliverables": [
+              "RCA.md",
+              "FIX.md",
+              "SCOPE.md",
+              "TEST_CASE.md"
+            ],
+            "type": "deliverables_complete"
+          },
+          {
+            "threshold": "100%",
+            "type": "tests_pass"
+          },
+          {
+            "type": "no_regressions"
+          },
+          {
+            "check": "Output Guard Summary all passed",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "User confirmation received",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "AC Compliance Matrix no failures",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "SCOPE.md generated",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "API changes: frontend-backend interface/path/param/response match checked",
+            "required": true,
+            "type": "custom"
+          }
+        ],
+        "on_fail": "phase-verify",
+        "on_pass": "terminal-success"
+      },
+      "description": "Final gate verifying all deliverables exist, Output Guard passed, and user confirmation received",
+      "id": "gate-completion",
+      "name": "Completion Gate",
+      "type": "gate"
+    },
+    {
+      "config": {
+        "message": "Bug fix flow completed successfully",
+        "status": "success"
+      },
+      "description": "Bug fix completed and verified successfully",
+      "id": "terminal-success",
+      "name": "Bug Fixed",
+      "on_exit": [
+        {
+          "action": "custom",
+          "message": "Generate handoff document at session end",
+          "name": "handoff-doc"
+        }
+      ],
+      "type": "terminal"
+    },
+    {
+      "config": {
+        "message": "Bug report does not meet minimum information requirements",
+        "status": "rejected"
+      },
+      "description": "Bug report rejected at entry gate",
+      "id": "terminal-reject",
+      "name": "Rejected",
+      "type": "terminal"
+    },
+    {
+      "config": {
+        "message": "Bug fix failed after 3 R-iterations, needs human escalation",
+        "status": "failed"
+      },
+      "description": "Bug fix failed after maximum R-iterations, requires escalation",
+      "id": "terminal-failed",
+      "name": "Max Iterations Reached",
+      "type": "terminal"
+    }
+  ],
+  "variables": {
+    "DOCS_INTERNAL": "",
+    "TEAM_PATH": "",
+    "iteration": "R0",
+    "task_id": ""
+  },
+  "version": "v3"
+}

@@ -1,0 +1,1221 @@
+{
+  "components": {
+    "roles": [],
+    "rules": [],
+    "skills": [
+      {
+        "description": "Design RESTful/gRPC API contracts with consistent naming and error handling",
+        "id": "api-design",
+        "name": "API Design",
+        "path": "{TEAM_PATH}/skills/api-design/SKILL.md",
+        "source": "builtin",
+        "trigger": "manual"
+      },
+      {
+        "description": "Protocol Buffer schema design and code generation",
+        "id": "protobuf",
+        "name": "Protobuf",
+        "path": "{TEAM_PATH}/skills/protobuf/SKILL.md",
+        "source": "builtin",
+        "trigger": "manual"
+      }
+    ],
+    "tools": [
+      {
+        "commands": [
+          "create",
+          "update",
+          "close",
+          "show",
+          "list",
+          "ready",
+          "append",
+          "dep"
+        ],
+        "id": "task",
+        "name": "Task CLI",
+        "type": "cli"
+      },
+      {
+        "id": "search",
+        "name": "Code Search",
+        "type": "builtin"
+      },
+      {
+        "id": "file-ops",
+        "name": "File Operations",
+        "type": "builtin"
+      }
+    ]
+  },
+  "config": {
+    "auto_dispatch": true,
+    "parallel_limit": 3,
+    "task_type": "development",
+    "timeout_minutes": 480
+  },
+  "edges": [
+    {
+      "from": "tri3",
+      "id": "e-tri3-ent7",
+      "to": "ent7"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "task_type=feature"
+        }
+      ],
+      "from": "ent7",
+      "id": "e-ent7-fa01",
+      "to": "fa01",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "task_type=bug"
+        }
+      ],
+      "from": "ent7",
+      "id": "e-ent7-bi01",
+      "to": "bi01",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "task_type=hotfix"
+        }
+      ],
+      "from": "ent7",
+      "id": "e-ent7-hi01",
+      "to": "hi01",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "task_type=analysis"
+        }
+      ],
+      "from": "ent7",
+      "id": "e-ent7-ai01",
+      "to": "ai01",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "task_type=change"
+        }
+      ],
+      "from": "ent7",
+      "id": "e-ent7-cp01",
+      "to": "cp01",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "!gate.passed"
+        }
+      ],
+      "from": "ent7",
+      "id": "e-ent7-rej8",
+      "to": "rej8",
+      "type": "conditional"
+    },
+    {
+      "from": "fa01",
+      "id": "e-fa01-fd02",
+      "to": "fd02"
+    },
+    {
+      "from": "fd02",
+      "id": "e-fd02-fi03",
+      "to": "fi03"
+    },
+    {
+      "from": "fi03",
+      "id": "e-fi03-qua9",
+      "to": "qua9"
+    },
+    {
+      "from": "bi01",
+      "id": "e-bi01-bf02",
+      "to": "bf02"
+    },
+    {
+      "from": "bf02",
+      "id": "e-bf02-qua9",
+      "to": "qua9"
+    },
+    {
+      "from": "hi01",
+      "id": "e-hi01-ver4",
+      "to": "ver4"
+    },
+    {
+      "from": "ai01",
+      "id": "e-ai01-ar02",
+      "to": "ar02"
+    },
+    {
+      "from": "ar02",
+      "id": "e-ar02-suc0",
+      "to": "suc0"
+    },
+    {
+      "from": "cp01",
+      "id": "e-cp01-ce02",
+      "to": "ce02"
+    },
+    {
+      "from": "ce02",
+      "id": "e-ce02-qua9",
+      "to": "qua9"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "gate.passed"
+        }
+      ],
+      "from": "qua9",
+      "id": "e-qua9-ver4",
+      "to": "ver4",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "!gate.passed AND task_type=feature"
+        }
+      ],
+      "from": "qua9",
+      "id": "e-qua9-fi03",
+      "to": "fi03",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "!gate.passed AND task_type=bug"
+        }
+      ],
+      "from": "qua9",
+      "id": "e-qua9-bf02",
+      "to": "bf02",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "!gate.passed AND task_type=change"
+        }
+      ],
+      "from": "qua9",
+      "id": "e-qua9-ce02",
+      "to": "ce02",
+      "type": "conditional"
+    },
+    {
+      "from": "ver4",
+      "id": "e-ver4-rev6",
+      "to": "rev6"
+    },
+    {
+      "from": "rev6",
+      "id": "e-rev6-suc0",
+      "to": "suc0"
+    }
+  ],
+  "metadata": {
+    "author": "team-flow",
+    "description": "Software development main flow: Triage → Branch by task_type → Feature/Bugfix/Hotfix/Analysis/Change → Terminal",
+    "name": "dev-flow",
+    "tags": [
+      "development",
+      "main-flow",
+      "software"
+    ]
+  },
+  "nodes": [
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/triage.md",
+            "ref": "triage",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "triage",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d1a",
+            "source": "builtin"
+          }
+        ],
+        "tools": [
+          {
+            "commands": [
+              "show",
+              "update",
+              "append"
+            ],
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          }
+        ]
+      },
+      "config": {
+        "role": "Triage"
+      },
+      "description": "Classify incoming task by type and dispatch to the appropriate branch",
+      "docs": [
+        {
+          "description": "Triage classification record with task type, priority, scope assessment, and dispatch decision",
+          "format": "markdown",
+          "name": "TRIAGE.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/TRIAGE.md",
+          "required": true
+        }
+      ],
+      "id": "tri3",
+      "name": "Task Triage",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "ready"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "config": {
+        "conditions": [
+          {
+            "check": "Verify a beads task exists for this request",
+            "required": true,
+            "type": "task_exists"
+          },
+          {
+            "check": "Task description contains enough detail to proceed",
+            "required": true,
+            "threshold": "minimal",
+            "type": "context_sufficient"
+          },
+          {
+            "check": "Task type can be determined from context",
+            "required": false,
+            "type": "type_identified"
+          }
+        ]
+      },
+      "description": "Validate task has sufficient context and matches a known task type",
+      "id": "ent7",
+      "name": "Entry Gate",
+      "type": "gate"
+    },
+    {
+      "components": {
+        "constraints": [
+          {
+            "allowed_paths": [
+              "{DOCS_INTERNAL}/{task_id}/"
+            ],
+            "type": "file_write"
+          }
+        ],
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/tech-lead.md",
+            "ref": "tech-lead",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "tech-lead",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d8j",
+            "source": "builtin"
+          },
+          {
+            "ref": "d2b",
+            "source": "framework"
+          }
+        ],
+        "skills": [
+          {
+            "ref": "api-design",
+            "source": "builtin"
+          }
+        ],
+        "tools": [
+          {
+            "commands": [
+              "show",
+              "update",
+              "append"
+            ],
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          }
+        ]
+      },
+      "config": {
+        "role": "TechLead"
+      },
+      "description": "Analyze feature requirements and produce specification with acceptance criteria",
+      "docs": [
+        {
+          "content_rules": [
+            "Must contain: overview, requirements, constraints, dependencies"
+          ],
+          "description": "Feature specification: requirements, scope, constraints, data models, API contracts",
+          "format": "markdown",
+          "name": "SPEC.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/SPEC.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/prd-template.md"
+        },
+        {
+          "content_rules": [
+            "Must contain: acceptance criteria as testable assertions",
+            "Each criterion must be verifiable (pass/fail)"
+          ],
+          "description": "Acceptance criteria: measurable conditions for feature completion with Given-When-Then format",
+          "format": "markdown",
+          "name": "AC.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/AC.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/prd-template.md"
+        }
+      ],
+      "id": "fa01",
+      "name": "Requirements Analysis",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "analyze"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "constraints": [
+          {
+            "allowed_paths": [
+              "{DOCS_INTERNAL}/{task_id}/"
+            ],
+            "type": "file_write"
+          }
+        ],
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/tech-lead.md",
+            "ref": "tech-lead",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "tech-lead",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d9k",
+            "source": "builtin"
+          }
+        ],
+        "skills": [
+          {
+            "ref": "protobuf",
+            "source": "builtin"
+          },
+          {
+            "ref": "api-design",
+            "source": "builtin"
+          }
+        ]
+      },
+      "config": {
+        "role": "TechLead"
+      },
+      "description": "Design data models, state machines, and API contracts based on requirements",
+      "docs": [
+        {
+          "description": "Data model design: entity relationships, schema definitions, index strategy",
+          "format": "markdown",
+          "name": "R1_DATA_MODEL.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/R1_DATA_MODEL.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/architecture-template.md"
+        },
+        {
+          "description": "State machine design: transitions, events, lifecycle, error states",
+          "format": "markdown",
+          "name": "R2_STATE_MACHINE.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/R2_STATE_MACHINE.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/architecture-template.md"
+        },
+        {
+          "description": "API contract: endpoints, request/response schemas, error codes, versioning",
+          "format": "markdown",
+          "name": "R3_API_CONTRACT.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/R3_API_CONTRACT.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/api-issue-template.md"
+        }
+      ],
+      "id": "fd02",
+      "name": "Technical Design",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "design"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "constraints": [
+          {
+            "allowed_paths": [
+              "{workspace}/"
+            ],
+            "type": "file_write"
+          },
+          {
+            "forbidden": [
+              "shell-exec"
+            ],
+            "type": "tool_restriction"
+          }
+        ],
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/dev.md",
+            "ref": "dev",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "dev",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d5f",
+            "source": "builtin"
+          },
+          {
+            "ref": "d3c",
+            "source": "builtin"
+          },
+          {
+            "ref": "d0l",
+            "source": "builtin"
+          }
+        ],
+        "tools": [
+          {
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          },
+          {
+            "ref": "file-write"
+          }
+        ]
+      },
+      "config": {
+        "role": "Dev"
+      },
+      "description": "Implement the feature code and unit tests following the technical design",
+      "docs": [
+        {
+          "description": "Implementation notes: key code changes, architectural decisions, test coverage summary",
+          "format": "markdown",
+          "name": "IMPL.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/IMPL.md",
+          "required": true
+        }
+      ],
+      "id": "fi03",
+      "name": "Implementation",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "implement"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/dev.md",
+            "ref": "dev",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "dev",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d5f",
+            "source": "builtin"
+          },
+          {
+            "ref": "d2b",
+            "source": "framework"
+          }
+        ],
+        "tools": [
+          {
+            "commands": [
+              "show",
+              "update",
+              "append"
+            ],
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          }
+        ]
+      },
+      "config": {
+        "role": "Dev"
+      },
+      "description": "Investigate the bug, identify root cause, and produce RCA document",
+      "docs": [
+        {
+          "content_rules": [
+            "Must contain: phenomenon, root_cause, impact, prevention",
+            "Data flow trace required for API/permission/state bugs",
+            "Real scenario verification required (not mock-only)"
+          ],
+          "description": "Root cause analysis: bug origin, affected components, reproduction steps, severity assessment",
+          "format": "markdown",
+          "name": "RCA.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/RCA.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/bug-test-template.md"
+        }
+      ],
+      "id": "bi01",
+      "name": "Root Cause Investigation",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "analyze"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "constraints": [
+          {
+            "allowed_paths": [
+              "{workspace}/"
+            ],
+            "type": "file_write"
+          }
+        ],
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/dev.md",
+            "ref": "dev",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "dev",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d5f",
+            "source": "builtin"
+          },
+          {
+            "ref": "d3c",
+            "source": "builtin"
+          }
+        ],
+        "tools": [
+          {
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          },
+          {
+            "ref": "file-write"
+          }
+        ]
+      },
+      "config": {
+        "role": "Dev"
+      },
+      "description": "Implement the bug fix and add regression tests",
+      "docs": [
+        {
+          "description": "Bug fix notes: fix approach, code changes, regression test additions, verification steps",
+          "format": "markdown",
+          "name": "FIX.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/FIX.md",
+          "required": true
+        }
+      ],
+      "id": "bf02",
+      "name": "Bug Fix",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "implement"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "constraints": [
+          {
+            "allowed_paths": [
+              "{workspace}/"
+            ],
+            "type": "file_write"
+          },
+          {
+            "minutes": 60,
+            "type": "timeout"
+          }
+        ],
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/dev.md",
+            "ref": "dev",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "dev",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d5f",
+            "source": "builtin"
+          },
+          {
+            "ref": "d3c",
+            "source": "builtin"
+          }
+        ],
+        "tools": [
+          {
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          },
+          {
+            "ref": "file-write"
+          }
+        ]
+      },
+      "config": {
+        "role": "Dev"
+      },
+      "description": "Implement the emergency hotfix with minimal scope",
+      "docs": [
+        {
+          "content_rules": [
+            "Must contain: phenomenon, root_cause, impact, prevention",
+            "Data flow trace required for API/permission/state bugs",
+            "Real scenario verification required (not mock-only)"
+          ],
+          "description": "Emergency RCA: incident timeline, root cause, fix description, post-incident actions",
+          "format": "markdown",
+          "name": "RCA.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/RCA.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/bug-test-template.md"
+        }
+      ],
+      "id": "hi01",
+      "name": "Emergency Fix",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "implement"
+        }
+      ],
+      "on_error": {
+        "on_error": [
+          {
+            "action": "notify",
+            "channel": "emergency",
+            "message": "Hotfix implementation failed - escalation required"
+          }
+        ],
+        "strategy": "fail"
+      },
+      "type": "phase"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/analysis.md",
+            "ref": "analysis",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "analysis",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d2b",
+            "source": "framework"
+          }
+        ],
+        "tools": [
+          {
+            "commands": [
+              "show",
+              "update",
+              "append"
+            ],
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          }
+        ]
+      },
+      "config": {
+        "role": "Analysis"
+      },
+      "description": "Perform technical analysis and gather findings",
+      "docs": [
+        {
+          "description": "Analysis findings: investigation results, evidence, patterns, technical insights",
+          "format": "markdown",
+          "name": "FINDINGS.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/FINDINGS.md",
+          "required": true
+        }
+      ],
+      "id": "ai01",
+      "name": "Deep Analysis",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "analyze"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/analysis.md",
+            "ref": "analysis",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "analysis",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d2b",
+            "source": "framework"
+          }
+        ]
+      },
+      "config": {
+        "role": "Analysis"
+      },
+      "description": "Compile analysis results into a structured report with conclusions",
+      "docs": [
+        {
+          "description": "Final analysis report: conclusions, recommendations, action items, risk assessment",
+          "format": "markdown",
+          "name": "REPORT.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/REPORT.md",
+          "required": true
+        }
+      ],
+      "id": "ar02",
+      "name": "Analysis Report",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "review"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "constraints": [
+          {
+            "allowed_paths": [
+              "{DOCS_INTERNAL}/{task_id}/"
+            ],
+            "type": "file_write"
+          }
+        ],
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/tech-lead.md",
+            "ref": "tech-lead",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "tech-lead",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d9k",
+            "source": "builtin"
+          },
+          {
+            "ref": "d2b",
+            "source": "framework"
+          }
+        ],
+        "tools": [
+          {
+            "commands": [
+              "show",
+              "update",
+              "append"
+            ],
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          }
+        ]
+      },
+      "config": {
+        "role": "TechLead"
+      },
+      "description": "Plan the change scope, impact analysis, and migration strategy",
+      "docs": [
+        {
+          "content_rules": [
+            "Must contain: changed files, added files, deleted files, risk assessment"
+          ],
+          "description": "Change scope: what will be modified, added, or removed, with dependency map",
+          "format": "markdown",
+          "name": "SCOPE.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/SCOPE.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/scope-template.md"
+        },
+        {
+          "description": "Impact analysis: affected components, dependencies, migration steps, rollback plan",
+          "format": "markdown",
+          "name": "IMPACT.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/IMPACT.md",
+          "required": true
+        }
+      ],
+      "id": "cp01",
+      "name": "Change Planning",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "analyze"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "constraints": [
+          {
+            "allowed_paths": [
+              "{workspace}/"
+            ],
+            "type": "file_write"
+          }
+        ],
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/dev.md",
+            "ref": "dev",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "dev",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d5f",
+            "source": "builtin"
+          },
+          {
+            "ref": "d3c",
+            "source": "builtin"
+          }
+        ],
+        "tools": [
+          {
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          },
+          {
+            "ref": "file-write"
+          }
+        ]
+      },
+      "config": {
+        "role": "Dev"
+      },
+      "description": "Execute the planned changes and update tests",
+      "docs": [
+        {
+          "description": "Change execution notes: modifications made, files affected, test updates, verification steps",
+          "format": "markdown",
+          "name": "EXEC.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/EXEC.md",
+          "required": true
+        }
+      ],
+      "id": "ce02",
+      "name": "Change Execution",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "implement"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "config": {
+        "auto_retry": {
+          "delay_minutes": 5,
+          "max_attempts": 2
+        },
+        "conditions": [
+          {
+            "check": "All unit and integration tests pass",
+            "required": true,
+            "threshold": "100%",
+            "type": "tests_pass"
+          },
+          {
+            "check": "No lint errors in changed files",
+            "required": true,
+            "threshold": "0 errors",
+            "type": "lint_pass"
+          },
+          {
+            "check": "No regressions in existing functionality",
+            "required": false,
+            "type": "no_regressions"
+          }
+        ]
+      },
+      "description": "Verify code quality: tests pass, lint clean, no regressions",
+      "id": "qua9",
+      "name": "Quality Gate",
+      "type": "gate"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/qa-engineer.md",
+            "ref": "qa",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "qa",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d6g",
+            "source": "builtin"
+          }
+        ]
+      },
+      "config": {
+        "role": "QA"
+      },
+      "description": "Run full integration and E2E tests, verify completeness",
+      "docs": [
+        {
+          "description": "Test coverage report: unit, integration, and E2E test results with coverage metrics",
+          "format": "markdown",
+          "name": "TEST_COVERAGE.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/TEST_COVERAGE.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/feature-test-template.md"
+        }
+      ],
+      "id": "ver4",
+      "name": "Integration Verification",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "verify"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/tech-lead.md",
+            "ref": "tech-lead",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "tech-lead",
+            "source": "team"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d7h",
+            "source": "builtin"
+          }
+        ]
+      },
+      "config": {
+        "role": "TechLead"
+      },
+      "description": "Review code quality, architecture compliance, and produce completion scope",
+      "docs": [
+        {
+          "content_rules": [
+            "Must contain: changed files, added files, deleted files, risk assessment"
+          ],
+          "description": "Completion scope: what was implemented, changed, known issues, and verification notes",
+          "format": "markdown",
+          "name": "SCOPE.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/SCOPE.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/scope-template.md"
+        }
+      ],
+      "id": "rev6",
+      "name": "Code Review",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "review"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "config": {
+        "message": "Task completed successfully",
+        "status": "success"
+      },
+      "description": "Task completed successfully",
+      "id": "suc0",
+      "name": "Completed",
+      "type": "terminal"
+    },
+    {
+      "config": {
+        "message": "Task does not meet minimum requirements",
+        "status": "rejected"
+      },
+      "description": "Task rejected at entry gate",
+      "id": "rej8",
+      "name": "Rejected",
+      "type": "terminal"
+    },
+    {
+      "config": {
+        "message": "Task failed - manual intervention required",
+        "status": "failed"
+      },
+      "description": "Task failed and requires manual escalation",
+      "id": "fai3",
+      "name": "Failed",
+      "type": "terminal"
+    }
+  ],
+  "variables": {
+    "DOCS_INTERNAL": "",
+    "SKILL_PATH": "",
+    "TEAM_PATH": "",
+    "domain": "development",
+    "task_id": "",
+    "workspace": ""
+  },
+  "version": "v3"
+}

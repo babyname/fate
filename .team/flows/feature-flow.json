@@ -1,0 +1,940 @@
+{
+  "components": {
+    "roles": [
+      {
+        "capabilities": [
+          "classify",
+          "dispatch",
+          "assess"
+        ],
+        "description": "Classify and dispatch incoming tasks to appropriate flows",
+        "id": "triage",
+        "name": "Triage Agent",
+        "prompt_directives": [
+          "Dispatch tasks to sub-agents, never execute directly",
+          "Classify all user input before action: Feature/Bug/Change/Analysis/Batch",
+          "Read .team/project.md for project constraints before dispatch",
+          "Use flow task create/show for all task state management",
+          "Report deliverables and handoff to next role on completion"
+        ]
+      },
+      {
+        "capabilities": [
+          "analyze",
+          "design",
+          "review",
+          "architect"
+        ],
+        "description": "Analyze requirements, design architecture, review code",
+        "id": "tech-lead",
+        "name": "Tech Lead",
+        "prompt_directives": [
+          "Design before implement: SPEC.md + AC.md + Data Model mandatory",
+          "Ensure R0 Navigation Matrix covers all entry points",
+          "Review all API contracts for consistency",
+          "Verify design satisfies all acceptance criteria",
+          "Output Guard self-check before marking phase complete"
+        ]
+      },
+      {
+        "capabilities": [
+          "implement",
+          "test",
+          "debug"
+        ],
+        "description": "Implement features, write code and unit tests",
+        "id": "dev",
+        "name": "Developer",
+        "prompt_directives": [
+          "Read SCOPE.md before starting implementation",
+          "Surgical changes only: never modify files outside task scope",
+          "Run tests before marking phase complete",
+          "No Chinese comments or commit messages",
+          "Never delete files unless explicitly asked",
+          "Output Guard 5-step self-check mandatory before completion gate"
+        ]
+      },
+      {
+        "capabilities": [
+          "verify",
+          "test",
+          "validate"
+        ],
+        "description": "Verify implementations, run integration and E2E tests",
+        "id": "qa",
+        "name": "QA Engineer",
+        "prompt_directives": [
+          "Verify implementation matches SPEC.md and AC.md",
+          "Run full regression tests, not just new tests",
+          "Check front-back interface consistency (paths, params, response)",
+          "For bugfixes: data flow trace + real scenario verification required",
+          "Output Guard self-check before marking review complete"
+        ]
+      }
+    ],
+    "rules": [
+      {
+        "description": "Triage must dispatch tasks to sub-agents, never execute code modifications directly",
+        "enforcement": "hard",
+        "id": "d1a",
+        "instruction": "Triage 必须分发任务给子智能体，禁止自己执行代码修改",
+        "name": "Dispatch Guard",
+        "source": "builtin",
+        "type": "process_constraint"
+      },
+      {
+        "description": "5-step self-assessment before completion gate: deliverable exists, content non-empty, spec compliance, no placeholders, path correctness",
+        "enforcement": "hard",
+        "id": "d2b",
+        "instruction": "完成前必须执行5步自检：产出物存在→内容非空→符合规范→无占位符→路径正确",
+        "name": "Output Guard Protocol",
+        "source": "framework",
+        "type": "process_constraint"
+      },
+      {
+        "description": "Change impact analysis required before code modification; any regression test failure must halt immediately",
+        "enforcement": "hard",
+        "id": "d3c",
+        "instruction": "修改代码前必须执行变更影响分析；任何回归测试失败必须立即停止",
+        "name": "Regression Prevention",
+        "source": "builtin",
+        "type": "quality_constraint"
+      },
+      {
+        "description": "SPEC must include scope, constraints, and measurable acceptance criteria; AC must be verifiable (pass/fail)",
+        "enforcement": "hard",
+        "id": "d8j",
+        "instruction": "SPEC 必须包含范围、约束和可度量的验收标准；AC 必须可验证（pass/fail）",
+        "name": "Requirements Standards",
+        "source": "builtin",
+        "type": "output_constraint"
+      },
+      {
+        "description": "Design artifacts must follow R1-R3 format; R0 navigation matrix must cover all entry points",
+        "enforcement": "hard",
+        "id": "d9k",
+        "instruction": "设计产出物必须遵循 R1-R3 格式；R0 导航矩阵覆盖所有入口",
+        "name": "Architecture Standards",
+        "source": "builtin",
+        "type": "output_constraint"
+      },
+      {
+        "description": "No Chinese comments or commit messages; TDD approach (test first); code must compile",
+        "enforcement": "hard",
+        "id": "d5f",
+        "instruction": "禁止中文注释和提交信息；先写测试再实现；代码必须可编译",
+        "name": "Development Standards",
+        "source": "builtin",
+        "type": "behavioral_constraint"
+      },
+      {
+        "description": "All unit tests must pass; test coverage report required; bug fixes must include regression tests",
+        "enforcement": "hard",
+        "id": "d6g",
+        "instruction": "所有单元测试必须通过；必须有测试覆盖率报告；Bug 修复必须加回归测试",
+        "name": "Test Standards",
+        "source": "builtin",
+        "type": "quality_constraint"
+      },
+      {
+        "description": "Never delete files; never use PowerShell Set-Content/Out-File; never skip toolchain gate",
+        "enforcement": "hard",
+        "id": "d4e",
+        "instruction": "禁止删除文件；禁止用 PowerShell Set-Content/Out-File；禁止跳过工具链门",
+        "name": "Hard Constraints",
+        "source": "builtin",
+        "type": "behavioral_constraint"
+      },
+      {
+        "description": "Review must check architecture compliance; SCOPE.md must be generated on completion",
+        "enforcement": "hard",
+        "id": "d7h",
+        "instruction": "Review 必须检查架构合规性；完成时必须生成 SCOPE.md",
+        "name": "Review Standards",
+        "source": "builtin",
+        "type": "quality_constraint"
+      },
+      {
+        "description": "Before any action, verify assumptions: what assumptions am I acting on? What's the worst case if wrong? What should I clarify first?",
+        "enforcement": "hard",
+        "id": "qg1",
+        "instruction": "行动前验证假设：我在基于什么假设？错了最坏情况？应先澄清什么？",
+        "name": "QG-1: Think Before Coding",
+        "trigger": "pre_action"
+      },
+      {
+        "description": "Can this be solved with less code? Am I adding unrequested features? Is this over-engineered?",
+        "enforcement": "hard",
+        "id": "qg2",
+        "instruction": "能用更少代码解决吗？在加未要求的功能吗？过度设计了吗？",
+        "name": "QG-2: Simplicity First",
+        "trigger": "pre_output"
+      },
+      {
+        "description": "Only modify code within task scope. Never optimize or refactor adjacent code. Clean up orphan code from own changes.",
+        "enforcement": "hard",
+        "id": "qg3",
+        "instruction": "只改任务范围内的代码；不优化/重构相邻代码；清理自己产生的孤立代码",
+        "name": "QG-3: Surgical Changes",
+        "trigger": "code_change"
+      },
+      {
+        "description": "Define success criteria before executing. Each step must have concrete verification criteria. Never use vague 'completed' descriptions.",
+        "enforcement": "hard",
+        "id": "qg4",
+        "instruction": "执行前定义成功标准；每步有具体验证标准；不用模糊的'完成'描述",
+        "name": "QG-4: Goal-Driven Execution",
+        "trigger": "task_start"
+      }
+    ],
+    "skills": [
+      {
+        "description": "Design RESTful/gRPC API contracts with consistent naming and error handling",
+        "id": "api-design",
+        "name": "API Design",
+        "path": "{TEAM_PATH}/skills/api-design/SKILL.md",
+        "source": "builtin",
+        "trigger": "manual"
+      },
+      {
+        "description": "Protocol Buffer schema design and code generation",
+        "id": "protobuf",
+        "name": "Protobuf",
+        "path": "{TEAM_PATH}/skills/protobuf/SKILL.md",
+        "source": "builtin",
+        "trigger": "manual"
+      }
+    ],
+    "tools": [
+      {
+        "commands": [
+          "create",
+          "update",
+          "close",
+          "show",
+          "list",
+          "ready",
+          "append",
+          "dep"
+        ],
+        "id": "task",
+        "name": "Task CLI",
+        "type": "cli"
+      },
+      {
+        "id": "search",
+        "name": "Code Search",
+        "type": "builtin"
+      },
+      {
+        "id": "file-ops",
+        "name": "File Operations",
+        "type": "builtin"
+      }
+    ]
+  },
+  "config": {
+    "auto_dispatch": true,
+    "parallel_limit": 3,
+    "task_type": "feature",
+    "timeout_minutes": 480
+  },
+  "edges": [
+    {
+      "from": "phase-triage",
+      "id": "e-triage-gate",
+      "to": "gate-entry"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "gate.passed"
+        }
+      ],
+      "from": "gate-entry",
+      "id": "e-gate-analyze",
+      "to": "phase-analyze",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "!gate.passed"
+        }
+      ],
+      "from": "gate-entry",
+      "id": "e-gate-reject",
+      "to": "terminal-reject",
+      "type": "conditional"
+    },
+    {
+      "from": "phase-analyze",
+      "id": "e-analyze-design",
+      "to": "phase-design"
+    },
+    {
+      "from": "phase-design",
+      "id": "e-design-implement",
+      "to": "phase-implement"
+    },
+    {
+      "from": "phase-implement",
+      "id": "e-implement-gate",
+      "to": "gate-quality"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "gate.passed"
+        }
+      ],
+      "from": "gate-quality",
+      "id": "e-gate-verify",
+      "to": "phase-verify",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "!gate.passed"
+        }
+      ],
+      "from": "gate-quality",
+      "id": "e-gate-implement",
+      "to": "phase-implement",
+      "type": "conditional"
+    },
+    {
+      "from": "phase-verify",
+      "id": "e-verify-review",
+      "to": "phase-review"
+    },
+    {
+      "from": "phase-review",
+      "id": "e-review-completion",
+      "to": "gate-completion"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "gate.passed"
+        }
+      ],
+      "from": "gate-completion",
+      "id": "e-completion-success",
+      "to": "terminal-success",
+      "type": "conditional"
+    },
+    {
+      "conditions": [
+        {
+          "expression": "!gate.passed"
+        }
+      ],
+      "from": "gate-completion",
+      "id": "e-completion-review",
+      "to": "phase-review",
+      "type": "conditional"
+    }
+  ],
+  "metadata": {
+    "author": "team-flow",
+    "description": "Standard feature development flow: Triage → Gate → Analyze → Design → Implement → Gate → Verify → Review → Terminal",
+    "name": "feature-flow",
+    "tags": [
+      "feature",
+      "default",
+      "software"
+    ]
+  },
+  "nodes": [
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/triage.md",
+            "ref": "triage",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "triage",
+            "source": "builtin"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d1a",
+            "source": "builtin"
+          }
+        ]
+      },
+      "config": {
+        "auto_dispatch": true,
+        "role": "Triage"
+      },
+      "description": "Classify and dispatch the incoming task to the appropriate flow",
+      "docs": [
+        {
+          "description": "Triage classification record with task type, priority, and dispatch decision",
+          "format": "markdown",
+          "name": "TRIAGE.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/TRIAGE.md",
+          "required": true
+        }
+      ],
+      "id": "phase-triage",
+      "name": "Task Triage",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "ready"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "config": {
+        "conditions": [
+          {
+            "type": "task_exists"
+          },
+          {
+            "expected": "feature",
+            "type": "type_matches"
+          }
+        ],
+        "on_fail": "terminal-reject",
+        "on_pass": "phase-analyze"
+      },
+      "description": "Validate task exists and type matches feature",
+      "id": "gate-entry",
+      "name": "Entry Gate",
+      "type": "gate"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/tech-lead.md",
+            "ref": "tech-lead",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "tech-lead",
+            "source": "builtin"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d8j",
+            "source": "builtin"
+          },
+          {
+            "ref": "d2b",
+            "source": "framework"
+          }
+        ],
+        "skills": [
+          {
+            "ref": "api-design"
+          }
+        ],
+        "tools": [
+          {
+            "commands": [
+              "show",
+              "update",
+              "append"
+            ],
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          }
+        ]
+      },
+      "config": {
+        "auto_dispatch": true,
+        "deliverables": [
+          "SPEC.md",
+          "AC.md"
+        ],
+        "role": "TechLead"
+      },
+      "description": "Analyze requirements and produce SPEC and acceptance criteria",
+      "docs": [
+        {
+          "content_rules": [
+            "Must contain: overview, requirements, constraints, dependencies"
+          ],
+          "description": "Feature specification document detailing requirements, scope, and constraints",
+          "format": "markdown",
+          "name": "SPEC.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/SPEC.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/prd-template.md"
+        },
+        {
+          "content_rules": [
+            "Must contain: acceptance criteria as testable assertions",
+            "Each criterion must be verifiable (pass/fail)"
+          ],
+          "description": "Acceptance criteria with measurable conditions for feature completion",
+          "format": "markdown",
+          "name": "AC.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/AC.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/prd-template.md"
+        }
+      ],
+      "gates": [
+        {
+          "on_fail": "phase-analyze",
+          "required": [
+            "SPEC.md",
+            "AC.md"
+          ],
+          "type": "deliverable_check"
+        }
+      ],
+      "id": "phase-analyze",
+      "name": "Requirements Analysis",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "analyze"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/tech-lead.md",
+            "ref": "tech-lead",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "tech-lead",
+            "source": "builtin"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d9k",
+            "source": "builtin"
+          }
+        ],
+        "skills": [
+          {
+            "ref": "protobuf"
+          },
+          {
+            "ref": "api-design"
+          }
+        ]
+      },
+      "config": {
+        "auto_dispatch": true,
+        "deliverables": [
+          "R1_DATA_MODEL.md",
+          "R2_STATE_MACHINE.md",
+          "R3_API_CONTRACT.md"
+        ],
+        "role": "TechLead"
+      },
+      "description": "Design data models, state machines, and API contracts",
+      "docs": [
+        {
+          "description": "Data model design including entity relationships and schema definitions",
+          "format": "markdown",
+          "name": "R1_DATA_MODEL.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/R1_DATA_MODEL.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/architecture-template.md"
+        },
+        {
+          "description": "State machine design defining transitions, events, and lifecycle",
+          "format": "markdown",
+          "name": "R2_STATE_MACHINE.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/R2_STATE_MACHINE.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/architecture-template.md"
+        },
+        {
+          "description": "API contract definitions including endpoints, request/response schemas",
+          "format": "markdown",
+          "name": "R3_API_CONTRACT.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/R3_API_CONTRACT.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/api-issue-template.md"
+        }
+      ],
+      "id": "phase-design",
+      "name": "Technical Design",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "design"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/dev.md",
+            "ref": "dev",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "dev",
+            "source": "builtin"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d5f",
+            "source": "builtin"
+          },
+          {
+            "ref": "d3c",
+            "source": "builtin"
+          },
+          {
+            "ref": "d4e",
+            "source": "builtin"
+          }
+        ],
+        "tools": [
+          {
+            "ref": "task"
+          },
+          {
+            "ref": "search"
+          },
+          {
+            "ref": "file-ops"
+          }
+        ]
+      },
+      "config": {
+        "auto_dispatch": true,
+        "deliverables": [
+          "code",
+          "unit_tests"
+        ],
+        "role": "Dev"
+      },
+      "description": "Implement the feature code and unit tests",
+      "docs": [
+        {
+          "description": "Implementation notes documenting key code changes, architectural decisions, and test coverage",
+          "format": "markdown",
+          "name": "IMPL.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/IMPL.md",
+          "required": true
+        }
+      ],
+      "id": "phase-implement",
+      "name": "Implementation",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "implement"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "config": {
+        "auto_retry": {
+          "delay_minutes": 5,
+          "max_attempts": 2
+        },
+        "conditions": [
+          {
+            "threshold": "100%",
+            "type": "tests_pass"
+          },
+          {
+            "threshold": "0 errors",
+            "type": "lint_pass"
+          },
+          {
+            "type": "no_regressions"
+          }
+        ],
+        "on_fail": "phase-implement",
+        "on_pass": "phase-verify"
+      },
+      "description": "Verify tests pass, lint is clean, and no regressions exist",
+      "id": "gate-quality",
+      "name": "Quality Gate",
+      "type": "gate"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/qa-engineer.md",
+            "ref": "qa",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "qa",
+            "source": "builtin"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d6g",
+            "source": "builtin"
+          }
+        ]
+      },
+      "config": {
+        "auto_dispatch": true,
+        "deliverables": [
+          "TEST_COVERAGE.md"
+        ],
+        "role": "QA"
+      },
+      "description": "Run full integration and E2E tests, verify feature completeness",
+      "docs": [
+        {
+          "description": "Test coverage report including unit, integration, and E2E test results",
+          "format": "markdown",
+          "name": "TEST_COVERAGE.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/TEST_COVERAGE.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/feature-test-template.md"
+        }
+      ],
+      "id": "phase-verify",
+      "name": "Integration Verification",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "verify"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "components": {
+        "prompts": [
+          {
+            "path": "{TEAM_PATH}/prompts/tech-lead.md",
+            "ref": "tech-lead",
+            "source": "file"
+          }
+        ],
+        "roles": [
+          {
+            "ref": "tech-lead",
+            "source": "builtin"
+          }
+        ],
+        "rules": [
+          {
+            "ref": "d7h",
+            "source": "builtin"
+          },
+          {
+            "ref": "d2b",
+            "source": "framework"
+          }
+        ]
+      },
+      "config": {
+        "auto_dispatch": true,
+        "deliverables": [
+          "SCOPE.md"
+        ],
+        "role": "TechLead"
+      },
+      "description": "Review code quality, architecture compliance, and produce SCOPE.md",
+      "docs": [
+        {
+          "content_rules": [
+            "Must contain: changed files, added files, deleted files, risk assessment"
+          ],
+          "description": "Completion scope document summarizing what was implemented, changed, and any known issues",
+          "format": "markdown",
+          "name": "SCOPE.md",
+          "path": "{DOCS_INTERNAL}/{task_id}/SCOPE.md",
+          "required": true,
+          "template": "{TEAM_PATH}/templates/scope-template.md"
+        }
+      ],
+      "id": "phase-review",
+      "name": "Code Review",
+      "on_enter": [
+        {
+          "action": "update_task_phase",
+          "phase": "review"
+        }
+      ],
+      "on_exit": [
+        {
+          "action": "custom",
+          "message": "Verify Output Guard 5-step protocol completed",
+          "name": "output-guard-check"
+        }
+      ],
+      "type": "phase"
+    },
+    {
+      "config": {
+        "conditions": [
+          {
+            "deliverables": [
+              "SPEC.md",
+              "AC.md",
+              "R1_DATA_MODEL.md",
+              "R2_STATE_MACHINE.md",
+              "R3_API_CONTRACT.md",
+              "IMPL.md",
+              "TEST_COVERAGE.md",
+              "SCOPE.md"
+            ],
+            "type": "deliverables_complete"
+          },
+          {
+            "threshold": "100%",
+            "type": "tests_pass"
+          },
+          {
+            "threshold": "0 errors",
+            "type": "lint_pass"
+          },
+          {
+            "type": "no_regressions"
+          },
+          {
+            "check": "Output Guard Summary all passed",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "User confirmation received",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "AC Compliance Matrix no failures",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "R0_NAVIGATION_MATRIX.md exists and all entries implemented",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "SPEC.md and AC.md exist and non-empty",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "R1_DATA_MODEL.md exists and non-empty",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "R3_API_CONTRACT.md exists and non-empty",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "Frontend-backend API paths 100% match",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "Frontend-backend param names 100% match",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "Frontend-backend response types 100% match",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "All Proto APIs have handler registrations",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "No Chinese comments in code",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "SCOPE.md generated",
+            "required": true,
+            "type": "custom"
+          },
+          {
+            "check": "TEST_COVERAGE.md exists",
+            "required": true,
+            "type": "custom"
+          }
+        ],
+        "on_fail": "phase-review",
+        "on_pass": "terminal-success"
+      },
+      "description": "Final gate verifying all deliverables exist, Output Guard passed, and user confirmation received before closing",
+      "id": "gate-completion",
+      "name": "Completion Gate",
+      "type": "gate"
+    },
+    {
+      "config": {
+        "message": "Feature development flow completed successfully",
+        "status": "success"
+      },
+      "description": "Feature development completed successfully",
+      "id": "terminal-success",
+      "name": "Completed",
+      "on_exit": [
+        {
+          "action": "custom",
+          "message": "Generate handoff document at session end",
+          "name": "handoff-doc"
+        }
+      ],
+      "type": "terminal"
+    },
+    {
+      "config": {
+        "message": "Task does not match feature type requirements",
+        "status": "rejected"
+      },
+      "description": "Task rejected at entry gate",
+      "id": "terminal-reject",
+      "name": "Rejected",
+      "type": "terminal"
+    }
+  ],
+  "variables": {
+    "DOCS_INTERNAL": "",
+    "TEAM_PATH": "",
+    "task_id": ""
+  },
+  "version": "v3"
+}

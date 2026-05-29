@@ -3,7 +3,9 @@ package http
 import (
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -13,9 +15,11 @@ import (
 )
 
 type Handler struct {
-	fate   fate.Fate
-	mux    *http.ServeMux
-	store  *taskStore
+	fate      fate.Fate
+	mux       *http.ServeMux
+	store     *taskStore
+	staticFS  fs.FS
+	fileServer http.Handler
 }
 
 type taskEntry struct {
@@ -48,23 +52,73 @@ func (s *taskStore) Get(id string) (*taskEntry, bool) {
 	return e, ok
 }
 
-func NewHandler(f fate.Fate) *Handler {
+func NewHandler(f fate.Fate, staticFS fs.FS) *Handler {
 	h := &Handler{
-		fate:  f,
-		mux:   http.NewServeMux(),
-		store: newTaskStore(),
+		fate:       f,
+		mux:        http.NewServeMux(),
+		store:      newTaskStore(),
+		staticFS:   staticFS,
+		fileServer: nil,
 	}
+
+	if staticFS != nil {
+		h.fileServer = http.FileServerFS(staticFS)
+	}
+
 	h.mux.HandleFunc("GET /health", h.handleHealth)
 	h.mux.HandleFunc("POST /api/generate", h.handleGenerate)
 	h.mux.HandleFunc("GET /api/generate/status", h.handleStatus)
 	h.mux.HandleFunc("GET /api/generate/result", h.handleResult)
 	h.mux.HandleFunc("GET /api/generate/explore", h.handleExplore)
 	h.mux.HandleFunc("GET /api/name-detail", h.handleNameDetail)
+	h.mux.HandleFunc("/{path...}", h.handleDefault)
+
 	return h
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.mux.ServeHTTP(w, r)
+}
+
+func (h *Handler) handleDefault(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.NotFound(w, r)
+		return
+	}
+
+	path := r.URL.Path
+
+	if strings.HasPrefix(path, "/api/") {
+		http.NotFound(w, r)
+		return
+	}
+
+	if h.fileServer != nil {
+		if path != "/" {
+			if _, err := fs.Stat(h.staticFS, strings.TrimPrefix(path, "/")); err == nil {
+				h.fileServer.ServeHTTP(w, r)
+				return
+			}
+		}
+
+		f, err := h.staticFS.Open("index.html")
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		defer f.Close()
+
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		stat, _ := f.Stat()
+		if stat != nil {
+			buf := make([]byte, stat.Size())
+			f.Read(buf)
+			w.Write(buf)
+			return
+		}
+	}
+
+	http.NotFound(w, r)
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {

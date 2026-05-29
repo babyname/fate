@@ -1,0 +1,18 @@
+name: fate
+version: v3
+default_flow: dev-flow
+paths:
+    docs_internal: _docs/fate/
+    docs_external: docs/
+toolchain:
+    backend:
+        language: go
+        pipeline: go test ./... | go build -o bin/app
+        working_dir: .
+    frontend:
+        language: typescript
+        pipeline: bun run test | bun run build
+        working_dir: web
+flows:
+    - id: dev-flow
+      source: preset

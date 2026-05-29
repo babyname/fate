@@ -1,0 +1,6 @@
+- fate is an open-source naming engine
+- No payment/VIP system
+- Frontend is dark celestial technical style (glass-card, blue-purple gradient)
+- Backend serves on port 9090
+- Frontend dev server on port 3001
+- qiming depends on fate, but they are managed independently
