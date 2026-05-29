@@ -17,8 +17,18 @@ var CharacterJSON []byte
 //go:embed fate.db.gz
 var FateDBGZ []byte
 
-//go:embed *
-var EmbeddedFS embed.FS
+//go:embed all:static
+var staticFS embed.FS
+
+var StaticSub fs.FS
+
+func init() {
+	var err error
+	StaticSub, err = fs.Sub(staticFS, "static")
+	if err != nil {
+		panic(err)
+	}
+}
 
 func HasDB() bool {
 	return len(FateDBGZ) > 0
@@ -53,3 +63,6 @@ func ExtractDB(destPath string) error {
 func OpenFS() fs.FS {
 	return EmbeddedFS
 }
+
+//go:embed *
+var EmbeddedFS embed.FS

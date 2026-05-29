@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 222 47% 14%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 47% 14%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 91% 60% / 0.1;
+    --accent-foreground: 217 91% 60%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 222 47% 18%;
+    --input: 222 47% 18%;
+    --ring: 217 91% 60%;
+    --celestial: 217 91% 60%;
+    --celestial-glow: 217 91% 60% / 0.3;
+    --nebula: 270 60% 60%;
+    --stardust: 40 80% 70%;
+    --radius: 0.625rem;
+
+    --font-serif: "EB Garamond", serif;
+    --font-mono: "JetBrains Mono", monospace;
+    --font-sans: "Inter", system-ui, sans-serif;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(217 91% 60% / 0.08), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 100%, hsl(270 60% 60% / 0.05), transparent);
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply backdrop-blur-xl border border-white/10 bg-white/5 rounded-lg;
+    box-shadow:
+      0 0 0 1px hsl(222 47% 18% / 0.5),
+      0 4px 24px -4px hsl(222 47% 2% / 0.6),
+      inset 0 1px 0 hsl(0 0% 100% / 0.05);
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300;
+  }
+
+  .glass-card-hover:hover {
+    @apply border-white/20 bg-white/5;
+    box-shadow:
+      0 0 0 1px hsl(217 91% 60% / 0.3),
+      0 8px 32px -4px hsl(222 47% 2% / 0.8),
+      0 0 20px hsl(217 91% 60% / 0.1),
+      inset 0 1px 0 hsl(0 0% 100% / 0.08);
+  }
+
+  .celestial-glow {
+    box-shadow: 0 0 20px hsl(217 91% 60% / 0.3), 0 0 40px hsl(217 91% 60% / 0.1);
+  }
+
+  .nebula-glow {
+    box-shadow: 0 0 20px hsl(270 60% 60% / 0.3), 0 0 40px hsl(270 60% 60% / 0.1);
+  }
+
+  .stardust-glow {
+    box-shadow: 0 0 20px hsl(40 80% 70% / 0.3), 0 0 40px hsl(40 80% 70% / 0.1);
+  }
+
+  .text-gradient-celestial {
+    @apply bg-gradient-to-r from-blue-400 to-violet-500 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-nebula {
+    @apply bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-stardust {
+    @apply bg-gradient-to-r from-amber-300 to-yellow-400 bg-clip-text text-transparent;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(222 47% 18%) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(222 47% 18%);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(222 47% 25%);
+  }
+}
