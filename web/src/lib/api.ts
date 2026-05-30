@@ -2,10 +2,9 @@ import type {
   GenerateRequest,
   GenerateResponse,
   TaskStatusResponse,
-  PoetrySearchRequest,
-  PoetrySearchResponse,
-  ReportRequest,
-  ReportResponse,
+  TaskResultResponse,
+  ExploreResponse,
+  NameDetailResponse,
 } from '@/types/api';
 
 const BASE = '/api';
@@ -16,8 +15,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     ...options,
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(err.message || `Request failed: ${res.status}`);
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error || `Request failed: ${res.status}`);
   }
   return res.json();
 }
@@ -31,23 +30,23 @@ export const api = {
   },
 
   getTaskStatus(taskId: string): Promise<TaskStatusResponse> {
-    return request(`/tasks/${taskId}`);
+    return request(`/generate/status?task_id=${taskId}`);
   },
 
-  searchPoetry(data: PoetrySearchRequest): Promise<PoetrySearchResponse> {
+  getTaskResult(taskId: string): Promise<TaskResultResponse> {
+    return request(`/generate/result?task_id=${taskId}`);
+  },
+
+  explore(taskId: string, count?: number, hasPoetry?: boolean, wuxing?: string): Promise<ExploreResponse> {
     const params = new URLSearchParams();
-    params.set('keyword', data.keyword);
-    if (data.dynasty) params.set('dynasty', data.dynasty);
-    if (data.author) params.set('author', data.author);
-    if (data.page) params.set('page', String(data.page));
-    if (data.page_size) params.set('page_size', String(data.page_size));
-    return request(`/poetry/search?${params.toString()}`);
+    params.set('task_id', taskId);
+    if (count) params.set('count', String(count));
+    if (hasPoetry) params.set('has_poetry', 'true');
+    if (wuxing) params.set('wuxing', wuxing);
+    return request(`/generate/explore?${params.toString()}`);
   },
 
-  downloadReport(data: ReportRequest): Promise<ReportResponse> {
-    return request('/report', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+  getNameDetail(taskId: string, char1: string, char2: string): Promise<NameDetailResponse> {
+    return request(`/name-detail?task_id=${taskId}&char1=${char1}&char2=${char2}`);
   },
 };
