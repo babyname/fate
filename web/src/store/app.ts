@@ -1,25 +1,31 @@
 import { create } from 'zustand';
-import type { NameResult, FixedChar } from '@/types/api';
+import type { NameResult, ExcellentEntry } from '@/types/api';
 
 interface AppState {
   surname: string;
-  gender: 'male' | 'female' | 'neutral';
-  fixedChars: FixedChar[];
-  blacklist: string[];
+  born: string;
+  sex: string;
+  avoidChars: string[];
+  requireChars: string[];
   count: number;
   taskId: string | null;
-  results: NameResult[];
+  topNames: NameResult[];
+  top10: ExcellentEntry[];
+  total: number;
   isGenerating: boolean;
   selectedName: NameResult | null;
   detailModalOpen: boolean;
 
   setSurname: (v: string) => void;
-  setGender: (v: 'male' | 'female' | 'neutral') => void;
-  setFixedChars: (v: FixedChar[]) => void;
-  setBlacklist: (v: string[]) => void;
+  setBorn: (v: string) => void;
+  setSex: (v: string) => void;
+  setAvoidChars: (v: string[]) => void;
+  setRequireChars: (v: string[]) => void;
   setCount: (v: number) => void;
   setTaskId: (v: string | null) => void;
-  setResults: (v: NameResult[]) => void;
+  setTopNames: (v: NameResult[]) => void;
+  setTop10: (v: ExcellentEntry[]) => void;
+  setTotal: (v: number) => void;
   setIsGenerating: (v: boolean) => void;
   setSelectedName: (v: NameResult | null) => void;
   setDetailModalOpen: (v: boolean) => void;
@@ -28,26 +34,32 @@ interface AppState {
 
 const initialState = {
   surname: '',
-  gender: 'neutral' as const,
-  fixedChars: [],
-  blacklist: [],
+  born: '',
+  sex: 'boy' as const,
+  avoidChars: [] as string[],
+  requireChars: [] as string[],
   count: 20,
-  taskId: null,
-  results: [],
+  taskId: null as string | null,
+  topNames: [] as NameResult[],
+  top10: [] as ExcellentEntry[],
+  total: 0,
   isGenerating: false,
-  selectedName: null,
+  selectedName: null as NameResult | null,
   detailModalOpen: false,
 };
 
 export const useAppStore = create<AppState>((set) => ({
   ...initialState,
   setSurname: (v) => set({ surname: v }),
-  setGender: (v) => set({ gender: v }),
-  setFixedChars: (v) => set({ fixedChars: v }),
-  setBlacklist: (v) => set({ blacklist: v }),
+  setBorn: (v) => set({ born: v }),
+  setSex: (v) => set({ sex: v }),
+  setAvoidChars: (v) => set({ avoidChars: v }),
+  setRequireChars: (v) => set({ requireChars: v }),
   setCount: (v) => set({ count: v }),
   setTaskId: (v) => set({ taskId: v }),
-  setResults: (v) => set({ results: v }),
+  setTopNames: (v) => set({ topNames: v }),
+  setTop10: (v) => set({ top10: v }),
+  setTotal: (v) => set({ total: v }),
   setIsGenerating: (v) => set({ isGenerating: v }),
   setSelectedName: (v) => set({ selectedName: v }),
   setDetailModalOpen: (v) => set({ detailModalOpen: v }),
