@@ -6,52 +6,74 @@ import { Badge } from '@/components/ui/badge';
 import { NameCard } from '@/components/naming/NameCard';
 import { ExploreSection } from '@/components/naming/ExploreSection';
 import { CandidateTable } from '@/components/naming/CandidateTable';
-import { ReportDownload } from '@/components/naming/ReportDownload';
 import { useAppStore } from '@/store/app';
 import { api } from '@/lib/api';
-import type { NameResult } from '@/types/api';
+import type { NameResult, ExcellentEntry } from '@/types/api';
 import { ArrowLeft, Loader2, Grid3X3, List, RefreshCw } from 'lucide-react';
 
 export function ResultsPage() {
   const { taskId } = useParams<{ taskId: string }>();
   const navigate = useNavigate();
-  const [results, setResults] = useState<NameResult[]>([]);
+  const [topNames, setTopNames] = useState<NameResult[]>([]);
+  const [top10, setTop10] = useState<ExcellentEntry[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
 
-  const storeResults = useAppStore((s) => s.results);
-  const setStoreResults = useAppStore((s) => s.setResults);
+  const storeTopNames = useAppStore((s) => s.topNames);
+  const storeTop10 = useAppStore((s) => s.top10);
+  const setStoreTopNames = useAppStore((s) => s.setTopNames);
+  const setStoreTop10 = useAppStore((s) => s.setTop10);
+  const setStoreTotal = useAppStore((s) => s.setTotal);
+
+  const fetchResult = useCallback(async () => {
+    if (!taskId) return;
+    try {
+      const res = await api.getTaskResult(taskId);
+      setTopNames(res.top_names);
+      setTop10(res.top10);
+      setTotal(res.total);
+      setStoreTopNames(res.top_names);
+      setStoreTop10(res.top10);
+      setStoreTotal(res.total);
+      setLoading(false);
+      setProgress(100);
+    } catch {
+      setError('获取结果失败');
+      setLoading(false);
+    }
+  }, [taskId, setStoreTopNames, setStoreTop10, setStoreTotal]);
 
   const pollStatus = useCallback(async () => {
     if (!taskId) return;
     try {
       const res = await api.getTaskStatus(taskId);
-      if (res.status === 'completed' && res.result) {
-        setResults(res.result);
-        setStoreResults(res.result);
-        setLoading(false);
-      } else if (res.status === 'failed') {
+      if (res.state === 'done') {
+        fetchResult();
+      } else if (res.state === 'failed') {
         setError(res.error || '生成失败');
         setLoading(false);
       } else {
-        setProgress(res.progress || 0);
+        setProgress(res.total ? Math.min((res.total / 100) * 100, 99) : 30);
       }
     } catch {
-      setError('获取结果失败');
+      setError('获取状态失败');
       setLoading(false);
     }
-  }, [taskId, setStoreResults]);
+  }, [taskId, fetchResult]);
 
   useEffect(() => {
-    if (storeResults.length > 0) {
-      setResults(storeResults);
+    if (storeTopNames.length > 0) {
+      setTopNames(storeTopNames);
+      setTop10(storeTop10);
       setLoading(false);
+      setProgress(100);
       return;
     }
     pollStatus();
-  }, [storeResults, pollStatus]);
+  }, [storeTopNames, storeTop10, pollStatus]);
 
   useEffect(() => {
     if (!loading || !taskId) return;
@@ -106,14 +128,16 @@ export function ResultsPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="celestial">{results.length} 个名字</Badge>
+          <Badge variant="celestial">{total} 个名字</Badge>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => {
               setLoading(true);
-              setResults([]);
-              setStoreResults([]);
+              setTopNames([]);
+              setTop10([]);
+              setStoreTopNames([]);
+              setStoreTop10([]);
               pollStatus();
             }}
           >
@@ -137,21 +161,19 @@ export function ResultsPage() {
         </div>
 
         <TabsContent value="card" className="mt-4 space-y-6">
-          <ExploreSection results={results} />
+          <ExploreSection taskId={taskId!} />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {results.map((result) => (
-              <NameCard key={result.name} name={result} />
+            {topNames.map((result) => (
+              <NameCard key={result.full_name} name={result} />
             ))}
           </div>
         </TabsContent>
 
         <TabsContent value="table" className="mt-4 space-y-4">
-          <CandidateTable results={results} />
+          <CandidateTable results={topNames} />
         </TabsContent>
       </Tabs>
-
-      <ReportDownload taskId={taskId!} />
     </div>
   );
 }

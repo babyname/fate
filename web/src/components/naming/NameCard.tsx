@@ -1,7 +1,15 @@
 import { Badge } from '@/components/ui/badge';
 import { useAppStore } from '@/store/app';
 import type { NameResult } from '@/types/api';
-import { Star, BookOpen } from 'lucide-react';
+import { Star } from 'lucide-react';
+
+const wuxingColors: Record<string, string> = {
+  金: 'text-amber-300',
+  木: 'text-green-400',
+  水: 'text-blue-400',
+  火: 'text-red-400',
+  土: 'text-yellow-600',
+};
 
 interface NameCardProps {
   name: NameResult;
@@ -31,45 +39,45 @@ export function NameCard({ name }: NameCardProps) {
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="text-2xl font-serif font-bold text-foreground group-hover:text-blue-300 transition-colors">
-            {name.name}
+            {name.full_name}
           </h3>
           <p className="text-sm text-muted-foreground font-mono mt-0.5">
-            {name.pronunciation.pinyin}
+            {name.char1.pinyin} {name.char2.pinyin}
           </p>
         </div>
         <div className="flex items-center gap-1">
           <Star className={`h-4 w-4 ${name.score >= 90 ? 'text-amber-400' : 'text-muted-foreground'}`} />
           <span className={`text-lg font-bold font-mono ${scoreColor}`}>
-            {name.score}
+            {name.score.toFixed(0)}
           </span>
         </div>
       </div>
 
       <p className="text-sm text-foreground/70 line-clamp-2 mb-3 leading-relaxed">
-        {name.meaning}
+        {name.char1.meaning}{name.char2.meaning ? `，${name.char2.meaning}` : ''}
       </p>
 
       <div className="flex flex-wrap gap-1.5 mb-2">
-        {name.wuxing.elements.map((el) => (
-          <Badge key={el} variant="celestial" className="text-xs">
-            {el}
-          </Badge>
-        ))}
-        {name.wuxing.missing.length > 0 && (
-          <Badge variant="outline" className="text-xs text-muted-foreground">
-            缺{name.wuxing.missing.join('')}
+        <Badge variant="celestial" className={`text-xs ${wuxingColors[name.char1.wu_xing] || ''}`}>
+          {name.char1.wu_xing}
+        </Badge>
+        <Badge variant="celestial" className={`text-xs ${wuxingColors[name.char2.wu_xing] || ''}`}>
+          {name.char2.wu_xing}
+        </Badge>
+        {name.san_cai_luck && (
+          <Badge variant="outline" className="text-xs">
+            {name.san_cai_luck}
           </Badge>
         )}
       </div>
 
-      {name.poetry.length > 0 && (
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <BookOpen className="h-3 w-3" />
-          <span className="truncate font-serif">
-            「{name.poetry[0].content.slice(0, 20)}...」— {name.poetry[0].author}
-          </span>
-        </div>
-      )}
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span className="font-mono">{name.grade}</span>
+        <span>三才: {name.san_cai}</span>
+        {name.has_poetry && (
+          <Badge variant="stardust" className="text-xs py-0">诗</Badge>
+        )}
+      </div>
     </button>
   );
 }
