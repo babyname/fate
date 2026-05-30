@@ -40,9 +40,10 @@ export function HomePage() {
     setIsGenerating(true);
     try {
       const bornFormatted = born.includes(':') ? born : `${born} 12:00`;
+      const bornFinal = bornFormatted.replace(/-/g, '/');
       const res = await api.generate({
         surname: surname.trim(),
-        born: bornFormatted,
+        born: bornFinal,
         sex,
         avoid_chars: avoidChars.length > 0 ? avoidChars : undefined,
         require_chars: requireChars.length > 0 ? requireChars : undefined,
