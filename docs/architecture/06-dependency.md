@@ -9,8 +9,6 @@ fate 的依赖分为两类：
 | **核心依赖** | 3个 | Go 运行时、chronos/v2、yi |
 | **可选依赖** | 2个 | MySQL 驱动、YAML 解析器 |
 
-> **注意**：Web API、诗词模块等商业功能已迁移至 qiming 项目，相关依赖（Web 框架等）已从 fate 中移除。
-
 ---
 
 ## go.mod 设计

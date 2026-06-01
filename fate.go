@@ -13,6 +13,7 @@ import (
 type Fate interface {
 	NewSession() Session
 	NewSessionWithFilter(f Filter) Session
+	Repo() *repository.Repository
 }
 
 type fateImpl struct {
@@ -26,6 +27,10 @@ func (f *fateImpl) NewSessionWithFilter(flt Filter) Session {
 
 func (f *fateImpl) NewSession() Session {
 	return f.NewSessionWithFilter(filterpkg.DefaultFilter())
+}
+
+func (f *fateImpl) Repo() *repository.Repository {
+	return f.db
 }
 
 func New(cfg *config.Config) (Fate, error) {
