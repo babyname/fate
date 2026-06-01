@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Printer, Star, Flame, Sparkles, Hexagon } from 'lucide-react';
+import { Printer, Star, Flame, Sparkles, Hexagon, BookOpen, Zap } from 'lucide-react';
 import type { NameResult } from '@/types/api';
 
 interface NameDetailModalProps {
@@ -52,6 +52,7 @@ th{background:#f5f5f5}
 <div class="score">${name.score.toFixed(0)}<span style="font-size:16px;color:#666"> / ${name.grade}</span></div>
 <h2>释义</h2>
 <p>${name.char1.meaning || '无'}；${name.char2.meaning || '无'}</p>
+${name.has_poetry ? `<h2>诗词出处</h2>` + (name.char1.has_poetry && name.char1.poetry_origin ? `<p>${name.char1.char} — ${name.char1.poetry_origin.dynasty}·${name.char1.poetry_origin.author}《${name.char1.poetry_origin.title}》</p>${name.char1.poetry_origin.sentence ? `<p style="font-style:italic;color:#666">${name.char1.poetry_origin.sentence}</p>` : ''}` : '') + (name.char2.has_poetry && name.char2.poetry_origin ? `<p>${name.char2.char} — ${name.char2.poetry_origin.dynasty}·${name.char2.poetry_origin.author}《${name.char2.poetry_origin.title}》</p>${name.char2.poetry_origin.sentence ? `<p style="font-style:italic;color:#666">${name.char2.poetry_origin.sentence}</p>` : ''}` : '') : ''}
 <h2>五格分析</h2>
 <table>
 <tr><th>格</th><th>笔画</th><th>吉凶</th><th>五行</th></tr>
@@ -115,6 +116,92 @@ ${name.wu_xing ? `<h2>五行</h2><p>喜: ${name.wu_xing.xi} | 忌: ${name.wu_xin
               打印
             </Button>
           </div>
+
+          {name.has_poetry && (
+            <div className="glass-card p-4 space-y-3 border-amber-500/20">
+              <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-amber-400" />
+                诗词出处
+              </h3>
+              {name.char1.has_poetry && name.char1.poetry_origin && (
+                <div className="space-y-1.5 pl-2 border-l-2 border-amber-500/30">
+                  <div className="flex items-center gap-2">
+                    <span className="font-serif text-lg text-amber-300">{name.char1.char}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {name.char1.poetry_origin.dynasty}·{name.char1.poetry_origin.author}
+                      {name.char1.poetry_origin.type === 'ci' ? '《' : '《'}
+                      {name.char1.poetry_origin.title}
+                      {name.char1.poetry_origin.type === 'ci' ? '》' : '》'}
+                    </span>
+                  </div>
+                  {name.char1.poetry_origin.sentence && (
+                    <p className="text-sm text-foreground/80 font-serif leading-relaxed italic">
+                      {name.char1.poetry_origin.sentence}
+                    </p>
+                  )}
+                </div>
+              )}
+              {name.char2.has_poetry && name.char2.poetry_origin && (
+                <div className="space-y-1.5 pl-2 border-l-2 border-amber-500/30">
+                  <div className="flex items-center gap-2">
+                    <span className="font-serif text-lg text-amber-300">{name.char2.char}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {name.char2.poetry_origin.dynasty}·{name.char2.poetry_origin.author}
+                      《{name.char2.poetry_origin.title}》
+                    </span>
+                  </div>
+                  {name.char2.poetry_origin.sentence && (
+                    <p className="text-sm text-foreground/80 font-serif leading-relaxed italic">
+                      {name.char2.poetry_origin.sentence}
+                    </p>
+                  )}
+                </div>
+              )}
+              <div className="flex gap-2 flex-wrap">
+                {name.char1.has_poetry && (
+                  <Badge variant="stardust" className="text-xs gap-1">
+                    <BookOpen className="h-2.5 w-2.5" />
+                    {name.char1.char} 诗词出处
+                  </Badge>
+                )}
+                {name.char2.has_poetry && (
+                  <Badge variant="stardust" className="text-xs gap-1">
+                    <BookOpen className="h-2.5 w-2.5" />
+                    {name.char2.char} 诗词出处
+                  </Badge>
+                )}
+              </div>
+            </div>
+          )}
+
+          {(name.char1.is_xi_yong || name.char2.is_xi_yong) && (
+            <div className="glass-card p-4 space-y-2 border-blue-500/20">
+              <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
+                <Zap className="h-4 w-4 text-blue-400" />
+                八字喜用
+              </h3>
+              <p className="text-sm text-foreground/80">
+                {name.char1.is_xi_yong && <span className="text-blue-300 font-serif">「{name.char1.char}」</span>}
+                {name.char1.is_xi_yong && name.char2.is_xi_yong && '、'}
+                {name.char2.is_xi_yong && <span className="text-blue-300 font-serif">「{name.char2.char}」</span>}
+                为八字喜用神之字，五行与命局相合
+              </p>
+              <div className="flex gap-2">
+                {name.char1.is_xi_yong && (
+                  <Badge variant="celestial" className="text-xs gap-1">
+                    <Zap className="h-2.5 w-2.5" />
+                    {name.char1.char} 喜用字
+                  </Badge>
+                )}
+                {name.char2.is_xi_yong && (
+                  <Badge variant="celestial" className="text-xs gap-1">
+                    <Zap className="h-2.5 w-2.5" />
+                    {name.char2.char} 喜用字
+                  </Badge>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className="glass-card p-4 space-y-2">
             <h3 className="text-sm font-medium text-foreground flex items-center gap-2">

@@ -162,7 +162,7 @@ sequenceDiagram
 
 ### API服务调用关系
 
-> **注意**：API 服务已迁移至 qiming 项目，以下仅为历史参考。
+> **注意**：API 服务模块为历史参考。
 
 ```mermaid
 sequenceDiagram
