@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,105 +8,90 @@ import { ExploreSection } from '@/components/naming/ExploreSection';
 import { CandidateTable } from '@/components/naming/CandidateTable';
 import { useAppStore } from '@/store/app';
 import { api } from '@/lib/api';
-import type { NameResult, ExcellentEntry } from '@/types/api';
-import { ArrowLeft, Loader2, Grid3X3, List, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Grid3X3, List, Search } from 'lucide-react';
+
+const PAGE_SIZE = 20;
 
 export function ResultsPage() {
   const { taskId } = useParams<{ taskId: string }>();
   const navigate = useNavigate();
-  const [topNames, setTopNames] = useState<NameResult[]>([]);
-  const [top10, setTop10] = useState<ExcellentEntry[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [progress, setProgress] = useState(0);
-  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagedNames, setPagedNames] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loadingPagination, setLoadingPagination] = useState(false);
+  const [polling, setPolling] = useState(true);
+  const [pollError, setPollError] = useState('');
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const storeTopNames = useAppStore((s) => s.topNames);
-  const storeTop10 = useAppStore((s) => s.top10);
   const setStoreTopNames = useAppStore((s) => s.setTopNames);
   const setStoreTop10 = useAppStore((s) => s.setTop10);
   const setStoreTotal = useAppStore((s) => s.setTotal);
+  const setIsGenerating = useAppStore((s) => s.setIsGenerating);
 
-  const fetchResult = useCallback(async () => {
+  const loadPage = useCallback(async (page: number) => {
     if (!taskId) return;
+    setLoadingPagination(true);
     try {
-      const res = await api.getTaskResult(taskId);
-      setTopNames(res.top_names);
-      setTop10(res.top10);
-      setTotal(res.total);
-      setStoreTopNames(res.top_names);
-      setStoreTop10(res.top10);
+      const res = await api.getNames(taskId, page, PAGE_SIZE);
+      setPagedNames(res.names);
+      setTotalCount(res.total);
+      setCurrentPage(page);
+      setStoreTopNames(res.names);
       setStoreTotal(res.total);
-      setLoading(false);
-      setProgress(100);
     } catch {
-      setError('获取结果失败');
-      setLoading(false);
+    } finally {
+      setLoadingPagination(false);
     }
-  }, [taskId, setStoreTopNames, setStoreTop10, setStoreTotal]);
+  }, [taskId, setStoreTopNames, setStoreTotal]);
 
-  const pollStatus = useCallback(async () => {
+  const onGenerationDone = useCallback(async () => {
+    setPolling(false);
+    setIsGenerating(false);
+    await loadPage(1);
+  }, [loadPage, setIsGenerating]);
+
+  useEffect(() => {
     if (!taskId) return;
-    try {
-      const res = await api.getTaskStatus(taskId);
-      if (res.state === 'done') {
-        fetchResult();
-      } else if (res.state === 'failed') {
-        setError(res.error || '生成失败');
-        setLoading(false);
-      } else {
-        setProgress(res.total ? Math.min((res.total / 100) * 100, 99) : 30);
+    setPolling(true);
+    setIsGenerating(true);
+
+    pollRef.current = setInterval(async () => {
+      try {
+        const status = await api.getTaskStatus(taskId);
+        if (status.state === 'done') {
+          if (pollRef.current) clearInterval(pollRef.current);
+          await onGenerationDone();
+        } else if (status.state === 'failed') {
+          if (pollRef.current) clearInterval(pollRef.current);
+          setPolling(false);
+          setIsGenerating(false);
+          setPollError(status.error || '生成失败');
+        }
+      } catch {
+        // 继续轮询
       }
-    } catch {
-      setError('获取状态失败');
-      setLoading(false);
-    }
-  }, [taskId, fetchResult]);
+    }, 500);
 
-  useEffect(() => {
-    if (storeTopNames.length > 0) {
-      setTopNames(storeTopNames);
-      setTop10(storeTop10);
-      setLoading(false);
-      setProgress(100);
-      return;
-    }
-    pollStatus();
-  }, [storeTopNames, storeTop10, pollStatus]);
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [taskId, onGenerationDone, setIsGenerating]);
 
-  useEffect(() => {
-    if (!loading || !taskId) return;
-    const interval = setInterval(pollStatus, 2000);
-    return () => clearInterval(interval);
-  }, [loading, taskId, pollStatus]);
-
-  if (loading) {
+  if (polling) {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
-        <Loader2 className="h-12 w-12 animate-spin text-blue-400" />
-        <div className="text-center space-y-2">
-          <p className="text-lg font-medium text-foreground">正在生成名字...</p>
-          <p className="text-sm text-muted-foreground font-mono">
-            任务ID: {taskId}
-          </p>
-          {progress > 0 && (
-            <div className="w-64 h-2 rounded-full bg-white/5 overflow-hidden mt-3">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-blue-500 to-violet-500 transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          )}
-        </div>
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-outline-variant border-t-primary" />
+        <p className="text-lg font-medium text-foreground">正在生成名字...</p>
+        <p className="text-sm text-muted-foreground font-mono">Task: {taskId}</p>
       </div>
     );
   }
 
-  if (error) {
+  if (pollError) {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
-        <p className="text-lg text-destructive">{error}</p>
+        <p className="text-lg text-destructive">{pollError}</p>
         <Button variant="outline" onClick={() => navigate('/')}>
           <ArrowLeft className="h-4 w-4" />
           返回首页
@@ -115,63 +100,132 @@ export function ResultsPage() {
     );
   }
 
+  if (pagedNames.length === 0 && !loadingPagination) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 space-y-4">
+        <p className="text-lg text-muted-foreground">暂无结果</p>
+        <Button variant="outline" onClick={() => navigate('/')}>
+          <ArrowLeft className="h-4 w-4" />
+          返回首页
+        </Button>
+      </div>
+    );
+  }
+
+  const top3 = pagedNames.slice(0, 3);
+  const moreNames = pagedNames.slice(3, 7);
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-xl font-semibold text-foreground">命名结果</h1>
-            <p className="text-xs text-muted-foreground font-mono">Task: {taskId}</p>
-          </div>
+    <div className="space-y-8">
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div>
+          <h1 className="font-serif text-xl font-semibold text-foreground">命名结果</h1>
+          <p className="text-xs text-muted-foreground font-mono">Task: {taskId}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="celestial">{total} 个名字</Badge>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              setLoading(true);
-              setTopNames([]);
-              setTop10([]);
-              setStoreTopNames([]);
-              setStoreTop10([]);
-              pollStatus();
-            }}
-          >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
-        </div>
+        <Badge variant="celestial">{totalCount} 个候选</Badge>
+        <div className="h-px flex-1 bg-gradient-to-r from-outline-variant to-transparent" />
       </div>
 
-      <Tabs defaultValue="card" onValueChange={(v) => setViewMode(v as 'card' | 'table')}>
-        <div className="flex items-center justify-between">
-          <TabsList>
-            <TabsTrigger value="card" className="gap-1.5">
-              <Grid3X3 className="h-4 w-4" />
-              卡片
-            </TabsTrigger>
-            <TabsTrigger value="table" className="gap-1.5">
-              <List className="h-4 w-4" />
-              表格
-            </TabsTrigger>
-          </TabsList>
-        </div>
+      <Tabs defaultValue="main">
+        <TabsList className="w-full sm:w-auto">
+          <TabsTrigger value="main">命名结果</TabsTrigger>
+          <TabsTrigger value="explore" className="gap-2">
+            <Search className="h-4 w-4" />
+            探索更多
+          </TabsTrigger>
+        </TabsList>
 
-        <TabsContent value="card" className="mt-4 space-y-6">
-          <ExploreSection taskId={taskId!} />
+        <TabsContent value="main" className="mt-6 space-y-6">
+          <div>
+            <h2 className="font-serif text-lg font-bold text-foreground mb-4">精选好名</h2>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {top3.map((item, index) => (
+                <NameCard key={`${item.full_name}-${index}`} name={item} />
+              ))}
+            </div>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {topNames.map((result) => (
-              <NameCard key={result.full_name} name={result} />
-            ))}
+          {moreNames.length > 0 && (
+            <div>
+              <h3 className="mb-3 font-serif text-base font-semibold text-foreground">更多推荐</h3>
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {moreNames.map((item, index) => (
+                  <div key={`${item.full_name}-more-${index}`} className="min-w-[200px] max-w-[240px] flex-shrink-0">
+                    <NameCard name={item} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="h-px bg-gradient-to-r from-outline-variant to-transparent" />
+
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-serif text-base font-semibold text-foreground">候选名册</h3>
+              <div className="flex items-center gap-2 border rounded-md p-1 bg-card">
+                <Button
+                  variant={viewMode === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => setViewMode('table')}
+                >
+                  <List className="h-4 w-4" />
+                  表格
+                </Button>
+                <Button
+                  variant={viewMode === 'card' ? 'default' : 'ghost'}
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => setViewMode('card')}
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                  卡片
+                </Button>
+              </div>
+            </div>
+            {viewMode === 'table' ? (
+              <CandidateTable results={pagedNames} />
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {pagedNames.map((result) => (
+                  <NameCard key={result.full_name} name={result} />
+                ))}
+              </div>
+            )}
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage <= 1 || loadingPagination}
+                  onClick={() => loadPage(currentPage - 1)}
+                >
+                  上一页
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  第 {currentPage} 页 / 共 {totalPages} 页
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage >= totalPages || loadingPagination}
+                  onClick={() => loadPage(currentPage + 1)}
+                >
+                  下一页
+                </Button>
+              </div>
+            )}
           </div>
         </TabsContent>
 
-        <TabsContent value="table" className="mt-4 space-y-4">
-          <CandidateTable results={topNames} />
+        <TabsContent value="explore" className="mt-6">
+          {taskId && <ExploreSection taskId={taskId} />}
         </TabsContent>
       </Tabs>
     </div>

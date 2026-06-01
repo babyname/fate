@@ -26,12 +26,11 @@ func GetFateData(input FateInput) (*FateData, error) {
 		WuxingStrength: wuxingStrength,
 	}
 
+	geJuInfo := determineGeJu(baziInfo, wuxingStrength)
+	data.GeJuInfo = geJuInfo
+
 	switch input.XiYongMethod {
-	case XiYongMethodBalance:
-		data.XiYongJiChou = balanceXiYongJi(wuxingStrength, baziInfo)
 	case XiYongMethodGeJu:
-		geJuInfo := determineGeJu(baziInfo, wuxingStrength)
-		data.GeJuInfo = geJuInfo
 		if geJuInfo != nil {
 			data.XiYongJiChou = XiYongJiChou{
 				Xi:   geJuInfo.XiShen,

@@ -18,10 +18,11 @@ export function ExploreSection({ taskId }: ExploreSectionProps) {
   const [poetryOnly, setPoetryOnly] = useState(false);
   const setSelectedName = useAppStore((s) => s.setSelectedName);
   const setDetailModalOpen = useAppStore((s) => s.setDetailModalOpen);
+  const surname = useAppStore((s) => s.surname);
 
   const fetchExplore = (hasPoetry?: boolean) => {
     setLoading(true);
-    api.explore(taskId, 10, hasPoetry).then((res) => {
+    api.explore(taskId, 100, hasPoetry).then((res) => {
       setEntries(res.names);
       setTotal(res.total);
       setLoading(false);
@@ -105,7 +106,7 @@ export function ExploreSection({ taskId }: ExploreSectionProps) {
           >
             <div className="flex items-center justify-between mb-1">
               <span className="text-lg font-serif font-bold text-foreground group-hover:text-blue-300 transition-colors">
-                {entry.char1}{entry.char2}
+                {surname}{entry.char1}{entry.char2}
               </span>
               <span className="text-sm font-mono text-muted-foreground">
                 {entry.score.toFixed(0)}分
