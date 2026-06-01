@@ -27,6 +27,9 @@ export function HomePage() {
   const setPoetryMode = useAppStore((s) => s.setPoetryMode);
   const setTaskId = useAppStore((s) => s.setTaskId);
   const setIsGenerating = useAppStore((s) => s.setIsGenerating);
+  const setTopNames = useAppStore((s) => s.setTopNames);
+  const setTop10 = useAppStore((s) => s.setTop10);
+  const setTotal = useAppStore((s) => s.setTotal);
 
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [avoidInput, setAvoidInput] = useState('');
@@ -39,10 +42,19 @@ export function HomePage() {
       return;
     }
     setError(null);
+    setTopNames([]);
+    setTop10([]);
+    setTotal(0);
     setIsGenerating(true);
     try {
-      const bornFormatted = born.includes(':') ? born : `${born} 12:00`;
-      const bornFinal = bornFormatted.replace(/-/g, '/');
+      const bornFormatted = born.includes('T')
+        ? born.replace('T', ' ').replace(/-/g, '/')
+        : born.includes(':')
+          ? born
+          : `${born} 12:00`;
+      const bornFinal = bornFormatted.includes(':')
+        ? bornFormatted
+        : bornFormatted.replace(/-/g, '/');
       const res = await api.generate({
         surname: surname.trim(),
         born: bornFinal,
@@ -55,10 +67,9 @@ export function HomePage() {
       navigate(`/results/${res.task_id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : '生成失败');
-    } finally {
       setIsGenerating(false);
     }
-  }, [surname, born, sex, poetryMode, avoidChars, requireChars, navigate, setTaskId, setIsGenerating]);
+  }, [surname, born, sex, poetryMode, avoidChars, requireChars, navigate, setTaskId, setIsGenerating, setTopNames, setTop10, setTotal]);
 
   const handleAddAvoid = useCallback(() => {
     const chars = avoidInput.trim().split('').filter((c) => c.trim() && !avoidChars.includes(c));
@@ -116,14 +127,14 @@ export function HomePage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">出生日期</label>
+            <label className="text-sm font-medium text-foreground">出生日期与时刻</label>
             <Input
-              type="date"
-              value={born.includes('T') ? born.split('T')[0] : born}
+              type="datetime-local"
+              value={born && !born.includes('T') && !born.includes(':') ? `${born}T12:00` : born.includes(' ') ? born.replace(' ', 'T') : born}
               onChange={(e) => setBorn(e.target.value)}
-              className="w-48"
+              className="w-64"
             />
-            <p className="text-xs text-muted-foreground">格式: YYYY/MM/DD（用于八字五行分析）</p>
+            <p className="text-xs text-muted-foreground">选择日期和时刻（用于八字时柱推算）</p>
           </div>
 
           <div className="space-y-2">

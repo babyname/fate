@@ -2,8 +2,6 @@ package chronosfate
 
 import (
 	"fmt"
-
-	"github.com/godcong/chronos/v2"
 )
 
 func determineGeJu(bazi BaziInfo, strength WuxingStrength) *GeJuInfo {
@@ -12,18 +10,44 @@ func determineGeJu(bazi BaziInfo, strength WuxingStrength) *GeJuInfo {
 	yueZhi := string([]rune(siZhu[1])[1:])
 
 	var mainQi string
-	if stems, ok := chronos.DiZhiHiddenStems[yueZhi]; ok && len(stems) > 0 {
-		mainQi = stems[0]
+	if stems, ok := diZhiHiddenStemsWeighted[yueZhi]; ok && len(stems) > 0 {
+		mainQi = stems[0].Stem
 	}
 	if mainQi == "" {
-		return nil
+		return &GeJuInfo{
+			Type:     GeJuUnknown,
+			Name:     "格局待定",
+			YongShen: "需详细排盘确认",
+			XiShen:   "需详细排盘确认",
+			JiShen:   "需详细排盘确认",
+			ChouShen: "需详细排盘确认",
+			Analysis: "出生时间信息不足，无法准确判断格局。",
+		}
 	}
 
 	shiShen := getShiShen(riZhuGan, mainQi)
 	geJuType := shiShenToGeJu(shiShen)
 
 	if geJuType == GeJuUnknown {
-		return nil
+		var yongShen, xiShen, jiShen string
+		if strength.Total > 50 {
+			yongShen = "克泄"
+			xiShen = "火土"
+			jiShen = "水木"
+		} else {
+			yongShen = "生扶"
+			xiShen = "水木"
+			jiShen = "火土"
+		}
+		return &GeJuInfo{
+			Type:     GeJuUnknown,
+			Name:     "普通格局",
+			YongShen: yongShen,
+			XiShen:   xiShen,
+			JiShen:   jiShen,
+			ChouShen: "需综合判断",
+			Analysis: fmt.Sprintf("日主%s，五行总分%.1f，以平衡为原则。", riZhuGan, strength.Total),
+		}
 	}
 
 	yangRenZhi := getYangRenZhi(riZhuGan)
