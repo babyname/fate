@@ -1,7 +1,5 @@
 # fate 开发计划 v2
 
-> 注意：此文档描述的功能中，诗词库（Phase 2.1）、数据迁移（cmd/transfer、cmd/fetchdata）已迁移至 qiming 项目。
-
 > 基于 2026-05-13 项目现状制定，反映已完成的重构工作（chronos/v2 升级、xorm 移除、sqlite3ent/sqlite3 集成、Character schema 重构）。
 
 ---
@@ -36,8 +34,8 @@
 | P1 | 周易卦象数据完善 | yi包GuaXiang.XiangYue为空，需补充64卦大象/事业/经商/求名/婚恋/决策解读 |
 | P1 | 生肖星座中文化 | 当前输出Dragon/Gemini，需映射为龙/双子座 |
 | P1 | 简繁体对照表 | 当前TraditionalChar直接取原字，需建立简繁映射 |
-| P2 | 诗词库 | 数据导入 + 出处追溯 | 已迁移至 qiming |
-| P2 | CLI 完善 | console/fetchdata/character 功能补全 | fetchdata 已迁移至 qiming |
+| P2 | 诗词库 | 数据导入 + 出处追溯 | — |
+| P2 | CLI 完善 | console/fetchdata/character 功能补全 | — |
 
 ---
 
@@ -230,8 +228,6 @@
 
 #### 2.1 诗词库 + 出处追溯
 
-> **注意**：此功能已迁移至 qiming 项目。
-
 **流程**：
 1. 确定诗词数据源（唐诗三百首/宋词三百首/诗经/楚辞）
 2. 设计 Poem/PoemChar schema（已有，需验证）
@@ -275,13 +271,11 @@
 
 **流程**：
 1. 完善 console 命令（起名交互流程）
-2. 完善 fetchdata 命令（数据抓取）— 已迁移至 qiming
-3. 完善 character 命令（字表管理）
-4. 添加 config 命令（配置管理）
+2. 完善 character 命令（字表管理）
+3. 添加 config 命令（配置管理）
 
 **成果物**：
 - [ ] 重构后的 `cmd/console/`
-- [ ] 重构后的 `cmd/fetchdata/` — 已迁移至 qiming
 - [ ] 重构后的 `cmd/character/`
 - [ ] 新增 `cmd/config/`
 

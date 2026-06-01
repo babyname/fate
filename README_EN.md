@@ -21,21 +21,7 @@
 
 ---
 
-## About fate and qiming
 
-**fate** is an open-source naming algorithm engine that provides core Bazi calculation, Xi-Yong analysis, Wuge filtering, and name generation capabilities, delivered as both a CLI tool and a Go library.
-
-**qiming** is a commercial naming service built on top of fate, providing a web interface, poetry-based naming, and other end-user features.
-
-| | fate | qiming |
-|---|---|---|
-| Purpose | Algorithm engine + CLI | Commercial service |
-| Bazi/Xi-Yong/5D scoring | Included | Included |
-| Poetry naming | Not included | Included |
-| Web interface | Not included | Included |
-| Open source | Yes | No |
-
----
 
 ## Quick Start
 

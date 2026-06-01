@@ -11,15 +11,19 @@ import (
 
 	"github.com/babyname/fate"
 	"github.com/babyname/fate/internal/analysis"
+	"github.com/babyname/fate/internal/dict"
+	"github.com/babyname/fate/internal/repository"
 	"github.com/babyname/fate/internal/session"
 )
 
 type Handler struct {
-	fate      fate.Fate
-	mux       *http.ServeMux
-	store     *taskStore
-	staticFS  fs.FS
-	fileServer http.Handler
+	fate         fate.Fate
+	mux          *http.ServeMux
+	store        *taskStore
+	staticFS     fs.FS
+	fileServer   http.Handler
+	repo         *repository.Repository
+	poetryIndex  map[string]*analysis.PoetryOrigin
 }
 
 type taskEntry struct {
@@ -52,13 +56,15 @@ func (s *taskStore) Get(id string) (*taskEntry, bool) {
 	return e, ok
 }
 
-func NewHandler(f fate.Fate, staticFS fs.FS) *Handler {
+func NewHandler(f fate.Fate, staticFS fs.FS, repo *repository.Repository, poetryDir string) *Handler {
 	h := &Handler{
-		fate:       f,
-		mux:        http.NewServeMux(),
-		store:      newTaskStore(),
-		staticFS:   staticFS,
-		fileServer: nil,
+		fate:        f,
+		mux:         http.NewServeMux(),
+		store:       newTaskStore(),
+		staticFS:    staticFS,
+		fileServer:  nil,
+		repo:        repo,
+		poetryIndex: buildPoetryIndex(poetryDir),
 	}
 
 	if staticFS != nil {
@@ -288,6 +294,10 @@ func (h *Handler) handleResult(w http.ResponseWriter, r *http.Request) {
 	topNames := output.TopNames()
 	table := output.ExcellentTable()
 
+	for i := range topNames {
+		h.enrichPoetryOrigin(&topNames[i])
+	}
+
 	top3 := make([]fate.NameResult, 0, 3)
 	for i := range topNames {
 		if i >= 3 {
@@ -386,6 +396,7 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 			topNames := output.TopNames()
 			for i := range topNames {
 				if topNames[i].Char1.Char == char1 && topNames[i].Char2.Char == char2 {
+					h.enrichPoetryOrigin(&topNames[i])
 					writeJSON(w, 200, map[string]any{"name_result": topNames[i]})
 					return
 				}
@@ -411,6 +422,7 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 					fateData := output.FateData()
 					if fateData != nil {
 						nr := analysis.BuildNameResult(0, surname, c1, c2, l1, l2, fateData)
+						h.enrichPoetryOrigin(&nr)
 						writeJSON(w, 200, map[string]any{"name_result": nr})
 						return
 					}
@@ -420,4 +432,46 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeError(w, 404, "name not found")
+}
+
+func (h *Handler) enrichPoetryOrigin(nr *analysis.NameResult) {
+	if h.poetryIndex == nil {
+		return
+	}
+	if nr.Char1.HasPoetry && nr.Char1.PoetryOrigin == nil {
+		if origin, ok := h.poetryIndex[nr.Char1.Char]; ok {
+			nr.Char1.PoetryOrigin = origin
+		}
+	}
+	if nr.Char2.HasPoetry && nr.Char2.PoetryOrigin == nil {
+		if origin, ok := h.poetryIndex[nr.Char2.Char]; ok {
+			nr.Char2.PoetryOrigin = origin
+		}
+	}
+}
+
+func buildPoetryIndex(poetryDir string) map[string]*analysis.PoetryOrigin {
+	if poetryDir == "" {
+		return nil
+	}
+	entries, err := dict.LoadSelectedPoetryFromDir(poetryDir)
+	if err != nil {
+		return nil
+	}
+	idx := make(map[string]*analysis.PoetryOrigin)
+	for _, e := range entries {
+		refs := dict.ExtractCharRefs(e.Content)
+		for _, ref := range refs {
+			if _, exists := idx[ref.Char]; !exists {
+				idx[ref.Char] = &analysis.PoetryOrigin{
+					Title:    e.Title,
+					Author:   e.Author,
+					Dynasty:  e.Dynasty,
+					Sentence: ref.Sentence,
+					Type:     e.Type,
+				}
+			}
+		}
+	}
+	return idx
 }

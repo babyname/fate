@@ -10,7 +10,7 @@ cmd（入口） → config（配置） → chronos（计算） → naming（推�
 
 每个模块职责清晰，接口定义明确，依赖关系单向。
 
-> **注意**：Web API 服务、诗词取名、报告生成等商业功能已迁移至 **qiming** 项目。fate 现仅保留核心起名计算能力。
+fate 是一个八字五行起名系统，采用模块化架构设计，分为入口层（cmd）、业务层（命名、分析）、数据层（chronos、八字）和配置层（config）。
 
 ---
 
@@ -392,8 +392,6 @@ func NewNaming(chronos ChronosInterface, config *Config) *Naming {
 **目标**：
 - 提高性能
 - 支持批量处理
-
-> Web API 服务、诗词取名等功能已迁移至 qiming 项目。
 
 ---
 

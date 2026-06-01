@@ -93,7 +93,7 @@ func cmdName() *cobra.Command {
 			fmt.Println("query end", time.Now().String())
 			time.Sleep(3 * time.Second)
 			if len(filter) > 0 {
-				fmt.Println("注意: 过滤功能已迁移到API层，请使用 qiming 服务")
+				fmt.Println("注意: 过滤功能已迁移至 Web API 层")
 			}
 			fmt.Println("end", time.Now().String())
 			if output != "" {

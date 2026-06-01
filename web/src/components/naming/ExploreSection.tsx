@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader2, BookOpen, Filter } from 'lucide-react';
 import type { ExcellentEntry } from '@/types/api';
 import { useAppStore } from '@/store/app';
 import { api } from '@/lib/api';
@@ -15,25 +15,37 @@ export function ExploreSection({ taskId }: ExploreSectionProps) {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
+  const [poetryOnly, setPoetryOnly] = useState(false);
   const setSelectedName = useAppStore((s) => s.setSelectedName);
   const setDetailModalOpen = useAppStore((s) => s.setDetailModalOpen);
 
-  useEffect(() => {
-    if (!taskId) return;
-    api.explore(taskId, 10).then((res) => {
+  const fetchExplore = (hasPoetry?: boolean) => {
+    setLoading(true);
+    api.explore(taskId, 10, hasPoetry).then((res) => {
       setEntries(res.names);
       setTotal(res.total);
       setLoading(false);
     }).catch(() => {
       setLoading(false);
     });
+  };
+
+  useEffect(() => {
+    if (!taskId) return;
+    fetchExplore();
   }, [taskId]);
+
+  const handlePoetryFilter = () => {
+    const next = !poetryOnly;
+    setPoetryOnly(next);
+    fetchExplore(next);
+  };
 
   const handleLoadMore = async () => {
     setExpanded(true);
     setLoading(true);
     try {
-      const res = await api.explore(taskId, 20);
+      const res = await api.explore(taskId, 20, poetryOnly);
       setEntries(res.names);
     } catch {
     } finally {
@@ -68,9 +80,20 @@ export function ExploreSection({ taskId }: ExploreSectionProps) {
         <h2 className="text-lg font-semibold text-foreground">
           探索名字
         </h2>
-        <Badge variant="secondary" className="font-mono">
-          {total} 个结果
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={poetryOnly ? 'celestial' : 'outline'}
+            size="sm"
+            onClick={handlePoetryFilter}
+            className="gap-1.5"
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            {poetryOnly ? '诗词优先' : '全部'}
+          </Button>
+          <Badge variant="secondary" className="font-mono">
+            {total} 个结果
+          </Badge>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -92,6 +115,12 @@ export function ExploreSection({ taskId }: ExploreSectionProps) {
               <Badge variant="celestial" className="text-xs py-0">{entry.wu_xing1}</Badge>
               <Badge variant="celestial" className="text-xs py-0">{entry.wu_xing2}</Badge>
               <span className="text-xs text-muted-foreground font-mono">{entry.grade}</span>
+              {entry.has_poetry && (
+                <Badge variant="stardust" className="text-xs py-0 gap-0.5">
+                  <BookOpen className="h-2.5 w-2.5" />
+                  诗
+                </Badge>
+              )}
             </div>
           </button>
         ))}

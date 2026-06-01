@@ -105,6 +105,7 @@ func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int
 			Radical:           c1.Radical,
 			Meaning:           c1.Meaning,
 			IsXiYong:          isXiYong1,
+			HasPoetry:         c1.HasPoetry,
 		},
 		Char2: CharInfo{
 			Char:              c2.Char,
@@ -118,6 +119,7 @@ func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int
 			Radical:           c2.Radical,
 			Meaning:           c2.Meaning,
 			IsXiYong:          isXiYong2,
+			HasPoetry:         c2.HasPoetry,
 		},
 		WuGe: &WuGeResult{
 			TianGe: GeItem{
@@ -179,6 +181,7 @@ func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int
 		Grade:        nr.Grade,
 		ScoreDetail:  scoreDetail,
 		Interpret:    nr.Interpret,
+		HasPoetry:    c1.HasPoetry || c2.HasPoetry,
 	}
 }
 
