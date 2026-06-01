@@ -1,14 +1,5 @@
 # Fate 起名系统 — 功能规划
 
-> **注意**：本文档中描述的以下功能已迁移至 **qiming** 项目：
-> - 古诗词/名言名句/名著来源取名（internal/poetry、ent/schema/poem.go、poem_char.go）
-> - 浏览页面/Web API（internal/api、cmd/server）
-> - 数据抓取（cmd/fetchpoem、cmd/fetchdata）
-> - 报告生成（cmd/gen_report、internal/analysis/format.go、report.go）
-> - 星座详情（internal/analysis/constellation.go）
-> - 周易详情（internal/analysis/zhouyi_data.go）
-> - 数据迁移（cmd/transfer、transfer/）
->
 > fate 现仅保留核心起名计算能力。以下内容保留作为历史参考。
 
 ## 一、古诗词/名言名句/名著来源取名
@@ -135,9 +126,9 @@ GET /api/poetry/search?char=瑞
 
 | 优先级 | 功能 | 预计工作量 | 状态 |
 |--------|------|-----------|------|
-| P0 | 诗词取名核心逻辑（internal/poetry） | 中 | 已迁移至 qiming |
-| P0 | 诗词数据导入 | 中 | 已迁移至 qiming |
-| P1 | 集成到生成流程 | 小 | 已迁移至 qiming |
-| P1 | Web API 层 | 中 | 已迁移至 qiming |
-| P2 | 前端页面 | 大 | 已迁移至 qiming |
-| P2 | 诗词浏览功能 | 小 | 已迁移至 qiming |
+| P0 | 诗词取名核心逻辑（internal/poetry） | 中 | 已迁移 |
+| P0 | 诗词数据导入 | 中 | 已迁移 |
+| P1 | 集成到生成流程 | 小 | 已迁移 |
+| P1 | Web API 层 | 中 | 已迁移 |
+| P2 | 前端页面 | 大 | 已迁移 |
+| P2 | 诗词浏览功能 | 小 | 已迁移 |

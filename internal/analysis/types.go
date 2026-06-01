@@ -22,18 +22,28 @@ type WuGeResult struct {
 	ZongGe GeItem `json:"zong_ge"`
 }
 
+type PoetryOrigin struct {
+	Title    string `json:"title"`
+	Author   string `json:"author"`
+	Dynasty  string `json:"dynasty"`
+	Sentence string `json:"sentence"`
+	Type     string `json:"type"`
+}
+
 type CharInfo struct {
-	Char              string `json:"char"`
-	TraditionalChar   string `json:"traditional_char"`
-	Pinyin            string `json:"pinyin"`
-	WuXing            string `json:"wu_xing"`
-	SimplifiedStroke  int    `json:"simplified_stroke"`
-	TraditionalStroke int    `json:"traditional_stroke"`
-	ScienceStroke     int    `json:"science_stroke"`
-	KangxiStroke      int    `json:"kangxi_stroke"`
-	Radical           string `json:"radical"`
-	Meaning           string `json:"meaning"`
-	IsXiYong          bool   `json:"is_xi_yong"`
+	Char              string        `json:"char"`
+	TraditionalChar   string        `json:"traditional_char"`
+	Pinyin            string        `json:"pinyin"`
+	WuXing            string        `json:"wu_xing"`
+	SimplifiedStroke  int           `json:"simplified_stroke"`
+	TraditionalStroke int           `json:"traditional_stroke"`
+	ScienceStroke     int           `json:"science_stroke"`
+	KangxiStroke      int           `json:"kangxi_stroke"`
+	Radical           string        `json:"radical"`
+	Meaning           string        `json:"meaning"`
+	IsXiYong          bool          `json:"is_xi_yong"`
+	HasPoetry         bool          `json:"has_poetry"`
+	PoetryOrigin      *PoetryOrigin `json:"poetry_origin,omitempty"`
 }
 
 type ScoreDetail struct {

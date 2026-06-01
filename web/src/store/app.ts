@@ -7,6 +7,7 @@ interface AppState {
   sex: string;
   avoidChars: string[];
   requireChars: string[];
+  poetryMode: number;
   count: number;
   taskId: string | null;
   topNames: NameResult[];
@@ -21,6 +22,7 @@ interface AppState {
   setSex: (v: string) => void;
   setAvoidChars: (v: string[]) => void;
   setRequireChars: (v: string[]) => void;
+  setPoetryMode: (v: number) => void;
   setCount: (v: number) => void;
   setTaskId: (v: string | null) => void;
   setTopNames: (v: NameResult[]) => void;
@@ -38,6 +40,7 @@ const initialState = {
   sex: 'boy' as const,
   avoidChars: [] as string[],
   requireChars: [] as string[],
+  poetryMode: 0,
   count: 20,
   taskId: null as string | null,
   topNames: [] as NameResult[],
@@ -55,6 +58,7 @@ export const useAppStore = create<AppState>((set) => ({
   setSex: (v) => set({ sex: v }),
   setAvoidChars: (v) => set({ avoidChars: v }),
   setRequireChars: (v) => set({ requireChars: v }),
+  setPoetryMode: (v) => set({ poetryMode: v }),
   setCount: (v) => set({ count: v }),
   setTaskId: (v) => set({ taskId: v }),
   setTopNames: (v) => set({ topNames: v }),

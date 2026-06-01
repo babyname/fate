@@ -15,7 +15,7 @@ const (
 	programName = `fate`
 
 	// helpContent ...
-	helpContent = "正在使用启命宝生成姓名列表，如遇到问题请访问项目地址：https://github.com/babyname/fate获取帮助!"
+	helpContent = "正在使用 fate 生成姓名列表，如遇到问题请访问项目地址：https://github.com/babyname/fate获取帮助!"
 )
 
 var (

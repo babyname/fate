@@ -40,6 +40,14 @@ export interface NameDetailResponse {
   name_result: NameResult
 }
 
+export interface PoetryOrigin {
+  title: string
+  author: string
+  dynasty: string
+  sentence: string
+  type: string
+}
+
 export interface CharInfo {
   char: string
   traditional_char: string
@@ -52,6 +60,8 @@ export interface CharInfo {
   radical: string
   meaning: string
   is_xi_yong: boolean
+  has_poetry: boolean
+  poetry_origin?: PoetryOrigin
 }
 
 export interface GeItem {

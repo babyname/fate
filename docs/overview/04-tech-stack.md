@@ -1,7 +1,5 @@
 # fate 技术栈选型
 
-> 注意：此文档描述的功能中，API服务已迁移至 qiming 项目。lunar-go 现通过 chronos/v2 间接依赖，Go 版本已升级至 1.25.0+，SQLite 驱动已替换为 sqlite3ent/sqlite3（纯Go）。
-
 ## 技术栈总览
 
 fate 采用以下技术栈：

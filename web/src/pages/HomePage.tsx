@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { useAppStore } from '@/store/app';
 import { api } from '@/lib/api';
-import { Sparkles, Settings, Loader2, X, Plus } from 'lucide-react';
+import { Sparkles, Settings, Loader2, X, Plus, BookOpen } from 'lucide-react';
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -17,12 +17,14 @@ export function HomePage() {
   const sex = useAppStore((s) => s.sex);
   const avoidChars = useAppStore((s) => s.avoidChars);
   const requireChars = useAppStore((s) => s.requireChars);
+  const poetryMode = useAppStore((s) => s.poetryMode);
   const isGenerating = useAppStore((s) => s.isGenerating);
   const setSurname = useAppStore((s) => s.setSurname);
   const setBorn = useAppStore((s) => s.setBorn);
   const setSex = useAppStore((s) => s.setSex);
   const setAvoidChars = useAppStore((s) => s.setAvoidChars);
   const setRequireChars = useAppStore((s) => s.setRequireChars);
+  const setPoetryMode = useAppStore((s) => s.setPoetryMode);
   const setTaskId = useAppStore((s) => s.setTaskId);
   const setIsGenerating = useAppStore((s) => s.setIsGenerating);
 
@@ -45,6 +47,7 @@ export function HomePage() {
         surname: surname.trim(),
         born: bornFinal,
         sex,
+        poetry_mode: poetryMode,
         avoid_chars: avoidChars.length > 0 ? avoidChars : undefined,
         require_chars: requireChars.length > 0 ? requireChars : undefined,
       });
@@ -55,7 +58,7 @@ export function HomePage() {
     } finally {
       setIsGenerating(false);
     }
-  }, [surname, born, sex, avoidChars, requireChars, navigate, setTaskId, setIsGenerating]);
+  }, [surname, born, sex, poetryMode, avoidChars, requireChars, navigate, setTaskId, setIsGenerating]);
 
   const handleAddAvoid = useCallback(() => {
     const chars = avoidInput.trim().split('').filter((c) => c.trim() && !avoidChars.includes(c));
@@ -121,6 +124,25 @@ export function HomePage() {
               className="w-48"
             />
             <p className="text-xs text-muted-foreground">格式: YYYY/MM/DD（用于八字五行分析）</p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-amber-400" />
+              诗词模式
+            </label>
+            <Select value={String(poetryMode)} onValueChange={(v) => setPoetryMode(Number(v))}>
+              <SelectTrigger className="w-64">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">不限 — 所有字均可</SelectItem>
+                <SelectItem value="2">诗词优先 — 仅选有诗词出处的字</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              诗词优先模式下，名字中的字均出自唐诗宋词诗经，更具文化底蕴
+            </p>
           </div>
 
           {error && (

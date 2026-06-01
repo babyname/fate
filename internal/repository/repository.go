@@ -9,6 +9,8 @@ import (
 
 	"github.com/babyname/fate/ent"
 	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/ent/poemchar"
+	"github.com/babyname/fate/internal/analysis"
 )
 
 type Repository struct {
@@ -121,4 +123,30 @@ func (m *Repository) QueryPoetryChars(ctx context.Context) ([]string, error) {
 		return nil, fmt.Errorf("query poetry chars: %w", err)
 	}
 	return chars, nil
+}
+
+func (m *Repository) QueryCharPoetryOrigin(ctx context.Context, char string) (*analysis.PoetryOrigin, error) {
+	pcs, err := m.PoemChar.Query().
+		Where(poemchar.CharEQ(char)).
+		WithPoem().
+		Limit(1).
+		All(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("query char poetry origin: %w", err)
+	}
+	if len(pcs) == 0 {
+		return nil, nil
+	}
+	pc := pcs[0]
+	p := pc.Edges.Poem
+	if p == nil {
+		return nil, nil
+	}
+	return &analysis.PoetryOrigin{
+		Title:    p.Title,
+		Author:   p.Author,
+		Dynasty:  p.Dynasty,
+		Sentence: pc.Sentence,
+		Type:     string(p.Type),
+	}, nil
 }
