@@ -5,6 +5,9 @@ import type {
   TaskResultResponse,
   ExploreResponse,
   NameDetailResponse,
+  NamesResponse,
+  NameScoreRequest,
+  PoetrySearchResponse,
 } from '@/types/api';
 
 const BASE = '/api';
@@ -37,6 +40,14 @@ export const api = {
     return request(`/generate/result?task_id=${taskId}`);
   },
 
+  getNames(taskId: string, page: number = 1, size: number = 20): Promise<NamesResponse> {
+    const params = new URLSearchParams();
+    params.set('task_id', taskId);
+    params.set('page', String(page));
+    params.set('size', String(size));
+    return request(`/generate/names?${params.toString()}`);
+  },
+
   explore(taskId: string, count?: number, hasPoetry?: boolean, wuxing?: string): Promise<ExploreResponse> {
     const params = new URLSearchParams();
     params.set('task_id', taskId);
@@ -48,5 +59,18 @@ export const api = {
 
   getNameDetail(taskId: string, char1: string, char2: string): Promise<NameDetailResponse> {
     return request(`/name-detail?task_id=${taskId}&char1=${char1}&char2=${char2}`);
+  },
+
+  nameScore(data: NameScoreRequest): Promise<NameDetailResponse> {
+    return request('/name-score', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  searchPoetry(keyword: string): Promise<PoetrySearchResponse> {
+    const params = new URLSearchParams();
+    params.set('keyword', keyword);
+    return request(`/poetry/search?${params.toString()}`);
   },
 };

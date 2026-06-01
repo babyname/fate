@@ -10,10 +10,14 @@ import (
 	"time"
 
 	"github.com/babyname/fate"
+	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/ent/character"
 	"github.com/babyname/fate/internal/analysis"
+	"github.com/babyname/fate/internal/chronosfate"
 	"github.com/babyname/fate/internal/dict"
 	"github.com/babyname/fate/internal/repository"
 	"github.com/babyname/fate/internal/session"
+	"github.com/godcong/chronos/v2"
 )
 
 type Handler struct {
@@ -76,6 +80,9 @@ func NewHandler(f fate.Fate, staticFS fs.FS, repo *repository.Repository, poetry
 	h.mux.HandleFunc("GET /api/generate/status", h.handleStatus)
 	h.mux.HandleFunc("GET /api/generate/result", h.handleResult)
 	h.mux.HandleFunc("GET /api/generate/explore", h.handleExplore)
+	h.mux.HandleFunc("GET /api/generate/names", h.handleNames)
+	h.mux.HandleFunc("POST /api/name-score", h.handleNameScore)
+	h.mux.HandleFunc("GET /api/poetry/search", h.handlePoetrySearch)
 	h.mux.HandleFunc("GET /api/name-detail", h.handleNameDetail)
 	h.mux.HandleFunc("/{path...}", h.handleDefault)
 
@@ -348,7 +355,7 @@ func (h *Handler) handleExplore(w http.ResponseWriter, r *http.Request) {
 	count := 10
 	if c := r.URL.Query().Get("count"); c != "" {
 		fmt.Sscanf(c, "%d", &count)
-		if count <= 0 || count > 20 {
+		if count <= 0 || count > 100 {
 			count = 10
 		}
 	}
@@ -376,6 +383,69 @@ func (h *Handler) handleExplore(w http.ResponseWriter, r *http.Request) {
 		"names":       names,
 		"shown_count": table.ShownCount(),
 		"total":       table.Len(),
+	})
+}
+
+func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
+	taskID := r.URL.Query().Get("task_id")
+	if taskID == "" {
+		writeError(w, 400, "task_id is required")
+		return
+	}
+
+	entry, ok := h.store.Get(taskID)
+	if !ok {
+		writeError(w, 404, "task not found")
+		return
+	}
+
+	if entry.session.State() != fate.SessionStateFinish {
+		writeError(w, 409, "task not ready")
+		return
+	}
+
+	output := entry.input.Output()
+	topNames := output.TopNames()
+
+	page := 1
+	if p := r.URL.Query().Get("page"); p != "" {
+		fmt.Sscanf(p, "%d", &page)
+		if page < 1 {
+			page = 1
+		}
+	}
+
+	pageSize := 20
+	if s := r.URL.Query().Get("size"); s != "" {
+		fmt.Sscanf(s, "%d", &pageSize)
+		if pageSize <= 0 || pageSize > 100 {
+			pageSize = 20
+		}
+	}
+
+	total := len(topNames)
+	start := (page - 1) * pageSize
+	if start >= total {
+		start = 0
+		page = 1
+	}
+	end := start + pageSize
+	if end > total {
+		end = total
+	}
+
+	pagedNames := make([]analysis.NameResult, 0, pageSize)
+	for i := start; i < end; i++ {
+		h.enrichPoetryOrigin(&topNames[i])
+		pagedNames = append(pagedNames, topNames[i])
+	}
+
+	writeJSON(w, 200, map[string]any{
+		"task_id": taskID,
+		"names":     pagedNames,
+		"page":     page,
+		"size":     pageSize,
+		"total":    total,
 	})
 }
 
@@ -474,4 +544,138 @@ func buildPoetryIndex(poetryDir string) map[string]*analysis.PoetryOrigin {
 		}
 	}
 	return idx
+}
+
+type nameScoreRequest struct {
+	Surname  string `json:"surname"`
+	Name1    string `json:"name1"`
+	Name2    string `json:"name2"`
+	Born     string `json:"born"`
+	Sex      string `json:"sex"`
+}
+
+func (h *Handler) handleNameScore(w http.ResponseWriter, r *http.Request) {
+	var req nameScoreRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, 400, "invalid request: "+err.Error())
+		return
+	}
+	defer r.Body.Close()
+
+	surnameRunes := []rune(req.Surname)
+	if len(surnameRunes) == 0 {
+		writeError(w, 400, "surname required")
+		return
+	}
+
+	name1Runes := []rune(req.Name1)
+	name2Runes := []rune(req.Name2)
+	if len(name1Runes) == 0 || len(name2Runes) == 0 {
+		writeError(w, 400, "both name characters required")
+		return
+	}
+
+	ctx := r.Context()
+	surnameChars, err := h.repo.QueryLastName(ctx, [2]string{string(surnameRunes[0]), ""})
+	if err != nil {
+		writeError(w, 500, "query surname: "+err.Error())
+		return
+	}
+
+	c1, err := h.repo.Character.Query().Where(character.CharEQ(string(name1Runes[0]))).First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			writeError(w, 404, "character not found: "+string(name1Runes[0]))
+			return
+		}
+		writeError(w, 500, "query character: "+err.Error())
+		return
+	}
+
+	c2, err := h.repo.Character.Query().Where(character.CharEQ(string(name2Runes[0]))).First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			writeError(w, 404, "character not found: "+string(name2Runes[0]))
+			return
+		}
+		writeError(w, 500, "query character: "+err.Error())
+		return
+	}
+
+	l1 := 0
+	if surnameChars[0] != nil {
+		l1 = surnameChars[0].ScienceStroke
+	}
+	l2 := 0
+
+	var fateData *chronosfate.FateData
+	if req.Born != "" {
+		sexInt := 1
+		if req.Sex == "2" || req.Sex == "女" {
+			sexInt = 2
+		}
+		input := chronosfate.FateInput{
+			Calendar:     chronos.NewSolarCalendar(req.Born),
+			Gender:       sexInt,
+			XiYongMethod: chronosfate.XiYongMethodBalance,
+		}
+		fateData, err = chronosfate.GetFateData(input)
+		if err != nil {
+			writeError(w, 500, "calculate fate: "+err.Error())
+			return
+		}
+	}
+
+	nr := analysis.BuildNameResult(0, req.Surname, c1, c2, l1, l2, fateData)
+	h.enrichPoetryOrigin(&nr)
+
+	writeJSON(w, 200, map[string]any{
+		"name_result": nr,
+	})
+}
+
+type poetrySearchResult struct {
+	Title   string `json:"title"`
+	Author  string `json:"author"`
+	Dynasty string `json:"dynasty"`
+	Type    string `json:"type"`
+	Sentence string `json:"sentence"`
+}
+
+func (h *Handler) handlePoetrySearch(w http.ResponseWriter, r *http.Request) {
+	key := r.URL.Query().Get("keyword")
+	if key == "" {
+		writeJSON(w, 200, map[string]any{"results": []poetrySearchResult{}})
+		return
+	}
+
+	var results []poetrySearchResult
+	keyRunes := []rune(key)
+
+	for char, origin := range h.poetryIndex {
+		charRunes := []rune(char)
+		if len(charRunes) == 0 {
+			continue
+		}
+
+		matched := false
+		for _, kr := range keyRunes {
+			if kr == charRunes[0] {
+				matched = true
+				break
+			}
+		}
+
+		if matched {
+			results = append(results, poetrySearchResult{
+				Title:    origin.Title,
+				Author:   origin.Author,
+				Dynasty:  origin.Dynasty,
+				Type:     origin.Type,
+				Sentence: origin.Sentence,
+			})
+		}
+	}
+
+	writeJSON(w, 200, map[string]any{"results": results})
 }
