@@ -12,6 +12,10 @@ export interface GenerateRequest {
 export interface GenerateResponse {
   task_id: string
   state: string
+  top_names?: NameResult[]
+  top3?: NameResult[]
+  top10?: ExcellentEntry[]
+  total?: number
 }
 
 export interface TaskStatusResponse {
@@ -153,4 +157,32 @@ export interface ExcellentEntry {
   wu_xing1: string
   wu_xing2: string
   has_poetry: boolean
+}
+
+export interface NamesResponse {
+  task_id: string
+  names: NameResult[]
+  page: number
+  size: number
+  total: number
+}
+
+export interface NameScoreRequest {
+  surname: string
+  name1: string
+  name2: string
+  born?: string
+  sex?: string
+}
+
+export interface PoetrySearchResult {
+  title: string
+  author: string
+  dynasty: string
+  type: string
+  sentence: string
+}
+
+export interface PoetrySearchResponse {
+  results: PoetrySearchResult[]
 }
