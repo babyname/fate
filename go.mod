@@ -3,7 +3,7 @@ module github.com/babyname/fate
 require (
 	entgo.io/ent v0.11.9
 	github.com/go-sql-driver/mysql v1.7.0
-	github.com/godcong/chronos/v2 v2.0.7
+	github.com/godcong/chronos/v2 v2.0.10
 	github.com/godcong/yi v1.6.0
 	github.com/spf13/cobra v1.6.1
 	github.com/sqlite3ent/sqlite3 v1.50.0
@@ -40,5 +40,3 @@ require (
 )
 
 go 1.25.0
-
-replace github.com/godcong/chronos/v2 => ../chronos
