@@ -2,17 +2,17 @@ package rating
 
 import (
 	"testing"
-	"time"
 
-	v2 "github.com/godcong/chronos/v2"
+	"github.com/godcong/chronos/v2"
+	chronosfate "github.com/babyname/fate/internal/chronosfate"
 	"github.com/babyname/fate/ent"
 )
 
 func TestNewRater(t *testing.T) {
-	fateData, _ := v2.GetFateData(&v2.FateInput{
-		BirthDate: time.Date(2024, 1, 15, 10, 30, 0, 0, time.Local),
-		Gender:    1,
-		Surname:   "张",
+	cal := chronos.ParseSolarDate(2024, 1, 15, 10, 30, 0)
+	fateData, _ := chronosfate.GetFateData(chronosfate.FateInput{
+		Calendar: cal,
+		Gender:   1,
 	})
 
 	rater := NewRater(fateData)
@@ -22,10 +22,10 @@ func TestNewRater(t *testing.T) {
 }
 
 func TestRateName(t *testing.T) {
-	fateData, _ := v2.GetFateData(&v2.FateInput{
-		BirthDate: time.Date(2024, 1, 15, 10, 30, 0, 0, time.Local),
-		Gender:    1,
-		Surname:   "张",
+	cal := chronos.ParseSolarDate(2024, 1, 15, 10, 30, 0)
+	fateData, _ := chronosfate.GetFateData(chronosfate.FateInput{
+		Calendar: cal,
+		Gender:   1,
 	})
 
 	rater := NewRaterWithStrokes(fateData, 11, 0)
@@ -98,10 +98,10 @@ func TestScoreToGrade(t *testing.T) {
 }
 
 func TestRateNameWithXiWuxing(t *testing.T) {
-	fateData, _ := v2.GetFateData(&v2.FateInput{
-		BirthDate: time.Date(2024, 1, 15, 10, 30, 0, 0, time.Local),
-		Gender:    1,
-		Surname:   "张",
+	cal := chronos.ParseSolarDate(2024, 1, 15, 10, 30, 0)
+	fateData, _ := chronosfate.GetFateData(chronosfate.FateInput{
+		Calendar: cal,
+		Gender:   1,
 	})
 
 	rater := NewRaterWithStrokes(fateData, 11, 0)
