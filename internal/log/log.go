@@ -1,4 +1,4 @@
-package log
+﻿package log
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/v4/config"
 	"golang.org/x/exp/slog"
 )
 

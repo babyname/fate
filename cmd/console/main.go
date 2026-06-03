@@ -1,11 +1,11 @@
-package main
+﻿package main
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/babyname/fate"
-	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/v4"
+	"github.com/babyname/fate/v4/config"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/spf13/cobra"
 	_ "github.com/sqlite3ent/sqlite3"

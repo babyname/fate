@@ -1,15 +1,15 @@
-// Package filter provides character filtering for name generation.
+﻿// Package filter provides character filtering for name generation.
 package filter
 
 import (
 	"errors"
 	"strings"
 
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/ent/character"
-	"github.com/babyname/fate/ent/predicate"
-	"github.com/babyname/fate/internal/wuge"
-	"github.com/babyname/fate/internal/wuxing"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/ent/character"
+	"github.com/babyname/fate/v4/ent/predicate"
+	"github.com/babyname/fate/v4/internal/wuge"
+	"github.com/babyname/fate/v4/internal/wuxing"
 )
 
 var defaultFilter = newFilter()

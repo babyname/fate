@@ -1,4 +1,4 @@
-module github.com/babyname/fate
+module github.com/babyname/fate/v4
 
 require (
 	entgo.io/ent v0.11.9

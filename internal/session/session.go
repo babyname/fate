@@ -1,19 +1,19 @@
-package session
+﻿package session
 
 import (
 	"context"
 	"sync/atomic"
 
 	v2 "github.com/godcong/chronos/v2"
-	"github.com/babyname/fate/internal/chronosfate"
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/internal/analysis"
-	filterpkg "github.com/babyname/fate/internal/filter"
-	"github.com/babyname/fate/internal/log"
-	"github.com/babyname/fate/internal/naming"
-	"github.com/babyname/fate/internal/rating"
-	"github.com/babyname/fate/internal/repository"
-	"github.com/babyname/fate/internal/wuge"
+	"github.com/babyname/fate/v4/internal/chronosfate"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/internal/analysis"
+	filterpkg "github.com/babyname/fate/v4/internal/filter"
+	"github.com/babyname/fate/v4/internal/log"
+	"github.com/babyname/fate/v4/internal/naming"
+	"github.com/babyname/fate/v4/internal/rating"
+	"github.com/babyname/fate/v4/internal/repository"
+	"github.com/babyname/fate/v4/internal/wuge"
 	"golang.org/x/sync/errgroup"
 )
 

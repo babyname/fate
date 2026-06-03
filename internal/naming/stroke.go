@@ -1,8 +1,8 @@
-package naming
+﻿package naming
 
 import (
-	"github.com/babyname/fate/internal/wuge"
-	"github.com/babyname/fate/internal/wuxing"
+	"github.com/babyname/fate/v4/internal/wuge"
+	"github.com/babyname/fate/v4/internal/wuxing"
 )
 
 // NameStroke 表示姓名各字的笔画数。

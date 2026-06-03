@@ -1,15 +1,15 @@
-// Package analysis provides name analysis and report generation.
+﻿// Package analysis provides name analysis and report generation.
 package analysis
 
 import (
 	"fmt"
 	"sort"
 
-	"github.com/babyname/fate/internal/chronosfate"
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/internal/rating"
-	"github.com/babyname/fate/internal/wuge"
-	"github.com/babyname/fate/internal/wuxing"
+	"github.com/babyname/fate/v4/internal/chronosfate"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/internal/rating"
+	"github.com/babyname/fate/v4/internal/wuge"
+	"github.com/babyname/fate/v4/internal/wuxing"
 )
 
 // BuildNameResult builds a single NameResult from the given character data and fate information.

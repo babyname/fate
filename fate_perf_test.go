@@ -1,11 +1,11 @@
-package fate
+﻿package fate
 
 import (
 	"fmt"
 	"testing"
 	"time"
 
-	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/v4/config"
 )
 
 func TestNameGenerationPerformance(t *testing.T) {

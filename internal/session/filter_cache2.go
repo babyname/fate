@@ -1,10 +1,10 @@
-package session
+﻿package session
 
 import (
 	"sync"
 	"time"
 
-	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/v4/ent"
 )
 
 type filterCache struct {

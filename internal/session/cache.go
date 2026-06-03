@@ -1,7 +1,7 @@
-package session
+﻿package session
 
 import (
-	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/v4/ent"
 )
 
 // CacheFilter 定义名字缓存的过滤与访问接口。

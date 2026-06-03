@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"bufio"
@@ -9,13 +9,13 @@ import (
 	"time"
 
 	v2 "github.com/godcong/chronos/v2"
-	"github.com/babyname/fate/internal/chronosfate"
-	"github.com/babyname/fate"
-	"github.com/babyname/fate/internal/analysis"
-	"github.com/babyname/fate/internal/database"
-	"github.com/babyname/fate/internal/log"
-	"github.com/babyname/fate/internal/repository"
-	"github.com/babyname/fate/internal/seeddb"
+	"github.com/babyname/fate/v4/internal/chronosfate"
+	"github.com/babyname/fate/v4"
+	"github.com/babyname/fate/v4/internal/analysis"
+	"github.com/babyname/fate/v4/internal/database"
+	"github.com/babyname/fate/v4/internal/log"
+	"github.com/babyname/fate/v4/internal/repository"
+	"github.com/babyname/fate/v4/internal/seeddb"
 
 	"github.com/spf13/cobra"
 )

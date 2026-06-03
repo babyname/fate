@@ -1,12 +1,12 @@
-package main
+﻿package main
 
 import (
 	"context"
 	"fmt"
 	"os"
 
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/ent/character"
 	_ "github.com/sqlite3ent/sqlite3"
 )
 
