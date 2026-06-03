@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"flag"
@@ -6,10 +6,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/babyname/fate"
-	"github.com/babyname/fate/config"
-	fatehttp "github.com/babyname/fate/internal/http"
-	"github.com/babyname/fate/resources"
+	"github.com/babyname/fate/v4"
+	"github.com/babyname/fate/v4/config"
+	fatehttp "github.com/babyname/fate/v4/internal/http"
+	"github.com/babyname/fate/v4/resources"
 )
 
 func main() {

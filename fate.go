@@ -1,13 +1,13 @@
-package fate
+﻿package fate
 
 import (
-	"github.com/babyname/fate/config"
-	"github.com/babyname/fate/internal/analysis"
-	"github.com/babyname/fate/internal/database"
-	filterpkg "github.com/babyname/fate/internal/filter"
-	"github.com/babyname/fate/internal/naming"
-	"github.com/babyname/fate/internal/repository"
-	"github.com/babyname/fate/internal/session"
+	"github.com/babyname/fate/v4/config"
+	"github.com/babyname/fate/v4/internal/analysis"
+	"github.com/babyname/fate/v4/internal/database"
+	filterpkg "github.com/babyname/fate/v4/internal/filter"
+	"github.com/babyname/fate/v4/internal/naming"
+	"github.com/babyname/fate/v4/internal/repository"
+	"github.com/babyname/fate/v4/internal/session"
 )
 
 type Fate interface {

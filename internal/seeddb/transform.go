@@ -1,9 +1,9 @@
-package seeddb
+﻿package seeddb
 
 import (
 	"fmt"
 
-	"github.com/babyname/fate/internal/wuge"
+	"github.com/babyname/fate/v4/internal/wuge"
 )
 
 func (e *Exporter) transformNCharacters(oldList []oldNCharacter, idLookup map[int]string) []SeedCharacter {

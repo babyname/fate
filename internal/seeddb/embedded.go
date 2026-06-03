@@ -1,11 +1,11 @@
-package seeddb
+﻿package seeddb
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 
-	"github.com/babyname/fate/resources"
+	"github.com/babyname/fate/v4/resources"
 )
 
 func LoadEmbeddedCharacters() ([]SeedCharacter, error) {

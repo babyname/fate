@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"compress/gzip"
@@ -9,11 +9,11 @@ import (
 	"os"
 	"unicode"
 
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/ent/character"
-	"github.com/babyname/fate/ent/schema"
-	"github.com/babyname/fate/internal/dict"
-	"github.com/babyname/fate/internal/seeddb"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/ent/character"
+	"github.com/babyname/fate/v4/ent/schema"
+	"github.com/babyname/fate/v4/internal/dict"
+	"github.com/babyname/fate/v4/internal/seeddb"
 	_ "github.com/sqlite3ent/sqlite3"
 )
 

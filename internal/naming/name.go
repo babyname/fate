@@ -1,11 +1,11 @@
-package naming
+﻿package naming
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/godcong/chronos/v2"
-	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/v4/ent"
 )
 
 // Sex 表示性别类型。

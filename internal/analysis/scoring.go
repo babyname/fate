@@ -1,7 +1,7 @@
-package analysis
+﻿package analysis
 
 import (
-	"github.com/babyname/fate/internal/rating"
+	"github.com/babyname/fate/v4/internal/rating"
 )
 
 func calcScoreDetail(nr *rating.NameRating) ScoreDetail {

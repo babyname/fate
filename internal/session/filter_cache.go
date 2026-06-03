@@ -1,7 +1,7 @@
-package session
+﻿package session
 
 import (
-	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/v4/ent"
 )
 
 // PutFilter 名字过滤器，使用链表和字符索引实现名字的存储、过滤和移除。

@@ -1,10 +1,10 @@
-package main
+﻿package main
 
 import (
 	"fmt"
 
-	"github.com/babyname/fate/internal/database"
-	"github.com/babyname/fate/internal/repository"
+	"github.com/babyname/fate/v4/internal/database"
+	"github.com/babyname/fate/v4/internal/repository"
 	"github.com/spf13/cobra"
 )
 

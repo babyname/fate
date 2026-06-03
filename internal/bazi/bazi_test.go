@@ -1,11 +1,11 @@
-package bazi_test
+﻿package bazi_test
 
 import (
 	"log"
 	"testing"
 
 	"github.com/godcong/chronos/v2"
-	"github.com/babyname/fate/internal/bazi"
+	"github.com/babyname/fate/v4/internal/bazi"
 )
 
 func TestPoint(t *testing.T) {

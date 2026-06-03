@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/babyname/fate/internal/dict"
+	"github.com/babyname/fate/v4/internal/dict"
 )
 
 func main() {

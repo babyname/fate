@@ -1,7 +1,7 @@
-package repository
+﻿package repository
 
 import (
-	logger "github.com/babyname/fate/internal/log"
+	logger "github.com/babyname/fate/v4/internal/log"
 )
 
 var _ logger.Logger

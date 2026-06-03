@@ -1,7 +1,7 @@
-package analysis
+﻿package analysis
 
 import (
-	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/v4/ent"
 )
 
 type GeItem struct {
