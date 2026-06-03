@@ -1,13 +1,13 @@
-package seeddb
+﻿package seeddb
 
 import (
 	"context"
 	"fmt"
 	"log"
 
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/ent/character"
-	"github.com/babyname/fate/internal/repository"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/ent/character"
+	"github.com/babyname/fate/v4/internal/repository"
 )
 
 const (

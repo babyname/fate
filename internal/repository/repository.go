@@ -1,4 +1,4 @@
-package repository
+﻿package repository
 
 import (
 	"context"
@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/ent/character"
-	"github.com/babyname/fate/ent/poemchar"
-	"github.com/babyname/fate/internal/analysis"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/ent/character"
+	"github.com/babyname/fate/v4/ent/poemchar"
+	"github.com/babyname/fate/v4/internal/analysis"
 )
 
 type Repository struct {

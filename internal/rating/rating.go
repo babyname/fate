@@ -1,14 +1,14 @@
-package rating
+﻿package rating
 
 import (
 	"fmt"
 	"math"
 	"strings"
 
-	"github.com/babyname/fate/internal/chronosfate"
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/internal/wuge"
-	"github.com/babyname/fate/internal/wuxing"
+	"github.com/babyname/fate/v4/internal/chronosfate"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/internal/wuge"
+	"github.com/babyname/fate/v4/internal/wuxing"
 )
 
 type NameRating struct {

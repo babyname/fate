@@ -1,10 +1,10 @@
-package wuge_test
+﻿package wuge_test
 
 import (
 	"strings"
 	"testing"
 
-	"github.com/babyname/fate/internal/wuge"
+	"github.com/babyname/fate/v4/internal/wuge"
 )
 
 func TestWuGe_WaiGe(t *testing.T) {

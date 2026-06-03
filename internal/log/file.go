@@ -1,10 +1,10 @@
-package log
+﻿package log
 
 import (
 	"os"
 	"path/filepath"
 
-	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/v4/config"
 	"golang.org/x/exp/slog"
 )
 

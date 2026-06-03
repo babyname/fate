@@ -1,4 +1,4 @@
-package database
+﻿package database
 
 import (
 	"context"
@@ -8,10 +8,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/babyname/fate/config"
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/ent/schema"
-	"github.com/babyname/fate/resources"
+	"github.com/babyname/fate/v4/config"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/ent/schema"
+	"github.com/babyname/fate/v4/resources"
 	_ "github.com/sqlite3ent/sqlite3"
 )
 

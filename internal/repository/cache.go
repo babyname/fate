@@ -1,12 +1,12 @@
-// Package repository 提供字符数据的存储、缓存与查询功能。
+﻿// Package repository 提供字符数据的存储、缓存与查询功能。
 package repository
 
 import (
 	"context"
 	"sync"
 
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/ent/character"
 )
 
 // CharCache 按笔画数缓存字符数据的并发安全缓存。

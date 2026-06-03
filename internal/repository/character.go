@@ -1,11 +1,11 @@
-package repository
+﻿package repository
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/ent/character"
 )
 
 // CharQuery 定义字符查询的过滤函数类型。
