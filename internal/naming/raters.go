@@ -1,8 +1,8 @@
-package naming
+﻿package naming
 
 import (
-	"github.com/babyname/fate/internal/chronosfate"
-	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/v4/internal/chronosfate"
+	"github.com/babyname/fate/v4/config"
 )
 
 type WuxingRater struct {

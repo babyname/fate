@@ -1,4 +1,4 @@
-package seeddb
+﻿package seeddb
 
 import (
 	"context"
@@ -7,9 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/babyname/fate/config"
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/internal/database"
+	"github.com/babyname/fate/v4/config"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/internal/database"
 
 	// import mysql driver
 	_ "github.com/go-sql-driver/mysql"

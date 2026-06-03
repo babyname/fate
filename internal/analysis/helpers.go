@@ -1,8 +1,8 @@
-// Package analysis provides name analysis and report generation.
+﻿// Package analysis provides name analysis and report generation.
 package analysis
 
 import (
-	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/v4/ent"
 )
 
 // shengMap defines the wuxing sheng (generating) cycle:

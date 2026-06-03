@@ -1,9 +1,9 @@
-package fate
+﻿package fate
 
 import (
 	"testing"
 
-	"github.com/babyname/fate/config"
+	"github.com/babyname/fate/v4/config"
 	_ "github.com/sqlite3ent/sqlite3"
 )
 

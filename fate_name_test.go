@@ -1,4 +1,4 @@
-package fate
+﻿package fate
 
 import (
 	"context"
@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/babyname/fate/config"
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/ent/character"
+	"github.com/babyname/fate/v4/config"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/ent/character"
 	_ "github.com/sqlite3ent/sqlite3"
 )
 

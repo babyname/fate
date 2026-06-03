@@ -1,10 +1,10 @@
-package bazi
+﻿package bazi
 
 import (
 	"fmt"
 	"strings"
 
-	"github.com/babyname/fate/ent"
+	"github.com/babyname/fate/v4/ent"
 
 	v2 "github.com/godcong/chronos/v2"
 )

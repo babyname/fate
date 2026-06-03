@@ -1,6 +1,6 @@
-package seeddb
+﻿package seeddb
 
-import "github.com/babyname/fate/internal/wuxing"
+import "github.com/babyname/fate/v4/internal/wuxing"
 
 func sc(char, pinyin, wuxing, radical string, kangxiStroke, commonLevel int, genderHint, meaning string) SeedCharacter {
 	return SeedCharacter{

@@ -1,13 +1,13 @@
-package session
+﻿package session
 
 import (
 	"sync"
 	"time"
 
-	"github.com/babyname/fate/internal/chronosfate"
-	"github.com/babyname/fate/ent"
-	"github.com/babyname/fate/internal/analysis"
-	"github.com/babyname/fate/internal/naming"
+	"github.com/babyname/fate/v4/internal/chronosfate"
+	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/internal/analysis"
+	"github.com/babyname/fate/v4/internal/naming"
 )
 
 type Input struct {
