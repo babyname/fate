@@ -11,6 +11,20 @@
 
 ---
 
+## Branch Strategy
+
+| Branch | Purpose | Module Path |
+|--------|---------|-------------|
+| `main` / `v4` | Development主线 (v4.x) | `github.com/babyname/fate/v4` |
+| `v3` | Bugfix maintenance (v3.x, bug fixes only) | `github.com/babyname/fate` |
+| `feat-ent` | Historical branch, merged into main | — |
+
+> **v4 Changes**: Module path upgraded from `github.com/babyname/fate` to `github.com/babyname/fate/v4`,
+> introducing Ent ORM, chronos/v2, ExcellentTable streaming scoring, and more.
+> For v3, switch to the `v3` branch.
+
+---
+
 ## Features
 
 - Bazi Calculation — Four Pillars, Wuxing strength, Tiaohou Shen
@@ -75,7 +89,7 @@ go run ./cmd/console name -h
 Integrate into your Go project:
 
 ```bash
-go get github.com/babyname/fate
+go get github.com/babyname/fate/v4
 ```
 
 ```go
@@ -85,8 +99,8 @@ import (
     "fmt"
     "time"
 
-    "github.com/babyname/fate"
-    "github.com/babyname/fate/config"
+    "github.com/babyname/fate/v4"
+    "github.com/babyname/fate/v4/config"
 )
 
 func main() {

@@ -11,6 +11,20 @@
 
 ---
 
+## 分支策略
+
+| 分支 | 用途 | 模块路径 |
+|------|------|----------|
+| `main` / `v4` | 开发主线（v4.x） | `github.com/babyname/fate/v4` |
+| `v3` | Bugfix 维护（v3.x，仅修 bug） | `github.com/babyname/fate` |
+| `feat-ent` | 历史分支，已合并至 main | — |
+
+> **v4 变更**：模块路径从 `github.com/babyname/fate` 升级为 `github.com/babyname/fate/v4`，
+> 引入 Ent ORM、chronos/v2、ExcellentTable 流式评分等特性。
+> 如需使用 v3，请切换到 `v3` 分支。
+
+---
+
 ## 功能特性
 
 - 八字计算 — 四柱八字、五行强弱、调候用神
@@ -73,7 +87,7 @@ go run ./cmd/console name -h
 适合集成到其他 Go 项目中：
 
 ```bash
-go get github.com/babyname/fate
+go get github.com/babyname/fate/v4
 ```
 
 ```go
@@ -83,8 +97,8 @@ import (
     "fmt"
     "time"
 
-    "github.com/babyname/fate"
-    "github.com/babyname/fate/config"
+    "github.com/babyname/fate/v4"
+    "github.com/babyname/fate/v4/config"
 )
 
 func main() {
