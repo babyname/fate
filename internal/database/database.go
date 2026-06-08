@@ -1,17 +1,14 @@
-﻿package database
+package database
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
-	"os"
 	"time"
 
 	"github.com/babyname/fate/v4/config"
 	"github.com/babyname/fate/v4/ent"
 	"github.com/babyname/fate/v4/ent/schema"
-	"github.com/babyname/fate/v4/resources"
 	_ "github.com/sqlite3ent/sqlite3"
 )
 
@@ -53,14 +50,6 @@ func buildSqlite3(cfg config.DBConfig) (*ent.Client, error) {
 		name := cfg.Name
 		if name == "" {
 			name = "fate"
-		}
-		if resources.HasDB() {
-			if _, err := os.Stat(name); err != nil {
-				log.Printf("[DB] Extracting embedded database to %s (%d bytes compressed)", name, resources.FateDBGZSize())
-				if err := resources.ExtractDB(name); err != nil {
-					return nil, fmt.Errorf("extract embedded db: %w", err)
-				}
-			}
 		}
 		return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", name))
 	default:

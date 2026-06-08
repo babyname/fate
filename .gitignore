@@ -38,7 +38,13 @@ go.sum
 *.db
 *.db-shm
 *.db-wal
+.beads/
 .beads-credential-key
+
+# AI tool files
+.claude/
+.team/
+_docs/
 
 # Database files
 fate_db/
@@ -46,6 +52,7 @@ fate
 fate-shm
 fate-wal
 *.zip
+fate.db.gz
 
 # Seed data - character.json is tracked (core data, MUST NOT be lost)
 # Only large/temporary seed files are excluded
