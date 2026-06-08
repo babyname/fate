@@ -9,11 +9,15 @@ permissions:
   contents: write
 
 jobs:
-  release-db:
+  prepare-db:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    outputs:
+      db_changed: ${{ steps.check-db-changes.outputs.db_changed }}
+      db_version: ${{ steps.determine-db-version.outputs.db_version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-go@v5
         with:
@@ -24,29 +28,76 @@ jobs:
           python-version: '3.12'
 
       - name: Get version from tag
-        id: get_version
+        id: get-version
         run: |
           TAG="${GITHUB_REF#refs/tags/v}"
           echo "version=$TAG" >> $GITHUB_OUTPUT
-          echo "Using version: $TAG"
+
+      - name: Determine if database has changed
+        id: check-db-changes
+        run: |
+          # Check if this is the first release
+          if git rev-list --count HEAD > /dev/null 2>&1 && [ "$(git rev-list --count HEAD)" -gt 1 ]; then
+            # Get previous tag or previous commit
+            PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+            
+            if [ -n "$PREVIOUS_TAG" ]; then
+              echo "Checking changes between $PREVIOUS_TAG and HEAD..."
+              
+              # Check if data-related files have changed
+              # Core data is resources/character.json, plus dbinit code and DB_VERSION
+              DB_FILES=$(git diff --name-only "$PREVIOUS_TAG" HEAD -- resources/character.json cmd/dbinit/ DB_VERSION 2>/dev/null | head -1)
+              
+              if [ -n "$DB_FILES" ]; then
+                echo "Database-related files changed!"
+                echo "db_changed=true" >> $GITHUB_OUTPUT
+              else
+                echo "No database-related files changed."
+                echo "db_changed=false" >> $GITHUB_OUTPUT
+              fi
+            else
+              # No previous tag, assume changed
+              echo "No previous tag found, treating as changed."
+              echo "db_changed=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            # First commit, treat as changed
+            echo "First release, treating as changed."
+            echo "db_changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Determine database version
+        id: determine-db-version
+        run: |
+          if [ -f DB_VERSION ]; then
+            DB_VER=$(cat DB_VERSION)
+          else
+            DB_VER="${{ steps.get-version.outputs.version }}"
+          fi
+          echo "db_version=$DB_VER" >> $GITHUB_OUTPUT
+          echo "Using database version: $DB_VER"
 
       - name: Build dbinit tool
+        if: steps.check-db-changes.outputs.db_changed == 'true'
         run: go build -o dbinit ./cmd/dbinit/
 
       - name: Generate database
+        if: steps.check-db-changes.outputs.db_changed == 'true'
         run: ./dbinit
 
-      - name: Package database
-        run: python scripts/release_db.py --version ${{ steps.get_version.outputs.version }} --ci
+      - name: Package database (if changed)
+        if: steps.check-db-changes.outputs.db_changed == 'true'
+        run: python scripts/release_db.py --version ${{ steps.determine-db-version.outputs.db_version }} --ci
 
       - name: Upload database artifacts
+        if: steps.check-db-changes.outputs.db_changed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: db-release
           path: releases/
 
   release:
-    needs: release-db
+    needs: prepare-db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,14 +108,8 @@ jobs:
         with:
           go-version: '1.22'
 
-      - name: Download database artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: db-release
-          path: releases/
-
       - name: Get version from tag
-        id: get_version
+        id: get-version
         run: |
           TAG="${GITHUB_REF#refs/tags/v}"
           echo "version=$TAG" >> $GITHUB_OUTPUT
@@ -78,11 +123,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Attach database to release
+      - name: Download database artifacts
+        if: needs.prepare-db.outputs.db_changed == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: db-release
+          path: releases/
+
+      - name: Attach database to release (if changed)
+        if: needs.prepare-db.outputs.db_changed == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
+          tag_name: v${{ steps.get-version.outputs.version }}
           files: |
-            releases/fate-v${{ steps.get_version.outputs.version }}.zip
-            releases/fate-v${{ steps.get_version.outputs.version }}.zip.sha256
+            releases/fate-v${{ needs.prepare-db.outputs.db_version }}.zip
+            releases/fate-v${{ needs.prepare-db.outputs.db_version }}.zip.sha256
           fail_on_unmatched_files: false
