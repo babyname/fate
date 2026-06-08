@@ -1,0 +1,64 @@
+name: Release Database
+
+on:
+  push:
+    tags:
+      - 'db-v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 4.2.0)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  release-db:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          elif [ -f DB_VERSION ]; then
+            echo "version=$(cat DB_VERSION)" >> $GITHUB_OUTPUT
+          elif [ -f VERSION ]; then
+            echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+          else
+            echo "version=0.0.0" >> $GITHUB_OUTPUT
+          fi
+          echo "Using version: $(cat $GITHUB_OUTPUT | grep version | cut -d= -f2)"
+
+      - name: Build dbinit tool
+        run: go build -o dbinit ./cmd/dbinit/
+
+      - name: Generate database
+        run: ./dbinit
+
+      - name: Package database
+        run: python scripts/release_db.py --version ${{ steps.version.outputs.version }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: db-v${{ steps.version.outputs.version }}
+          name: fate database v${{ steps.version.outputs.version }}
+          files: |
+            releases/fate-v${{ steps.version.outputs.version }}.zip
+            releases/fate-v${{ steps.version.outputs.version }}.zip.sha256
+          generate_release_notes: true
+          fail_on_unmatched_files: true

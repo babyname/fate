@@ -1,0 +1,44 @@
+name: Check Database Change
+
+on:
+  push:
+    paths:
+      - 'data/**'
+      - 'resources/**'
+      - 'cmd/dbinit/**'
+  pull_request:
+    paths:
+      - 'data/**'
+      - 'resources/**'
+      - 'cmd/dbinit/**'
+
+jobs:
+  check-db:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build dbinit
+        run: go build -o dbinit ./cmd/dbinit/
+
+      - name: Generate database
+        run: ./dbinit
+
+      - name: Check if database file exists
+        run: |
+          if [ -f fate.db.gz ]; then
+            echo "Database generated successfully"
+            echo "Size: $(du -h fate.db.gz)"
+            sha256sum fate.db.gz
+          else
+            echo "ERROR: Database not generated"
+            exit 1
+          fi
