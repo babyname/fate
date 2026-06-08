@@ -9,7 +9,44 @@ permissions:
   contents: write
 
 jobs:
+  release-db:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+          echo "Using version: $TAG"
+
+      - name: Build dbinit tool
+        run: go build -o dbinit ./cmd/dbinit/
+
+      - name: Generate database
+        run: ./dbinit
+
+      - name: Package database
+        run: python scripts/release_db.py --version ${{ steps.get_version.outputs.version }} --ci
+
+      - name: Upload database artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-release
+          path: releases/
+
   release:
+    needs: release-db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +57,18 @@ jobs:
         with:
           go-version: '1.22'
 
+      - name: Download database artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: db-release
+          path: releases/
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
@@ -28,3 +77,12 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Attach database to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          files: |
+            releases/fate-v${{ steps.get_version.outputs.version }}.zip
+            releases/fate-v${{ steps.get_version.outputs.version }}.zip.sha256
+          fail_on_unmatched_files: false

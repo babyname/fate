@@ -44,6 +44,7 @@ def main():
     parser = argparse.ArgumentParser(description="Package fate database for release")
     parser.add_argument("--version", help="Override version number")
     parser.add_argument("--force", action="store_true", help="Force release even if database unchanged")
+    parser.add_argument("--ci", action="store_true", help="CI mode: always release even if unchanged")
     args = parser.parse_args()
 
     script_dir = os.path.dirname(__file__)
@@ -69,7 +70,7 @@ def main():
     current_db_sha256 = calculate_sha256(db_path)
     latest_metadata = load_latest_metadata(releases_dir)
     
-    if latest_metadata and not args.force:
+    if latest_metadata and not args.force and not args.ci:
         print(f"Checking if database has changed...")
         
         # Check if the latest release has the same SHA256 hash (database not changed)
