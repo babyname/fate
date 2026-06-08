@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 import (
 	"compress/gzip"
@@ -19,7 +19,7 @@ import (
 
 func main() {
 	dbName := "fate"
-	outputPath := "resources/fate.db.gz"
+	outputPath := "fate.db.gz"
 
 	for _, p := range []string{dbName, dbName + "-shm", dbName + "-wal"} {
 		os.Remove(p)
