@@ -53,6 +53,7 @@ fate-shm
 fate-wal
 *.zip
 fate.db.gz
+releases/
 
 # Seed data - character.json is tracked (core data, MUST NOT be lost)
 # Only large/temporary seed files are excluded
