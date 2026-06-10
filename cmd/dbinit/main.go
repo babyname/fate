@@ -85,6 +85,9 @@ func importCharacters(ctx context.Context, client *ent.Client) error {
 		return fmt.Errorf("load embedded seeds: %w", err)
 	}
 	log.Printf("Importing %d characters...", len(seeds))
+
+	// First, create all characters and build a char -> ID map
+	charMap := make(map[string]*ent.Character, len(seeds))
 	imported := 0
 	for i, s := range seeds {
 		builder := client.Character.Create().
@@ -96,6 +99,9 @@ func importCharacters(ctx context.Context, client *ent.Client) error {
 			SetIsAncient(s.IsAncient).
 			SetRegular(s.Regular).
 			SetNameable(s.Nameable)
+		if s.Unicode != "" {
+			builder.SetUnicode(s.Unicode)
+		}
 		if len(s.Pinyin) > 0 {
 			builder.SetPinyin(s.Pinyin)
 		}
@@ -132,19 +138,62 @@ func importCharacters(ctx context.Context, client *ent.Client) error {
 		if s.Source != "" {
 			builder.SetSource(s.Source)
 		}
+		if s.SourceConfidence > 0 {
+			builder.SetSourceConfidence(s.SourceConfidence)
+		}
 		if s.Comment != "" {
 			builder.SetComment(s.Comment)
 		}
-		if _, err := builder.Save(ctx); err != nil {
+		created, err := builder.Save(ctx)
+		if err != nil {
 			log.Printf("  Warning: failed to create char %q: %v", s.Char, err)
 			continue
 		}
+		charMap[s.Char] = created
 		imported++
 		if (i+1)%5000 == 0 {
-			log.Printf("  Progress: %d/%d", i+1, len(seeds))
+			log.Printf("  Progress (insert): %d/%d", i+1, len(seeds))
 		}
 	}
 	log.Printf("Imported %d characters", imported)
+
+	// Second pass: link simplified/variant relationships using edges
+	linkedSimp := 0
+	linkedVar := 0
+	for i, s := range seeds {
+		thisChar, ok := charMap[s.Char]
+		if !ok {
+			continue
+		}
+		updater := thisChar.Update()
+		updated := false
+
+		if s.SimplifiedOfChar != "" {
+			if target, ok := charMap[s.SimplifiedOfChar]; ok {
+				// this char is a simplified form of target (traditional)
+				updater.AddSimplifiedOf(target)
+				linkedSimp++
+				updated = true
+			}
+		}
+		if s.VariantOfChar != "" {
+			if target, ok := charMap[s.VariantOfChar]; ok {
+				// this char is a variant of target (standard form)
+				updater.SetVariantOf(target)
+				linkedVar++
+				updated = true
+			}
+		}
+		if updated {
+			if _, err := updater.Save(ctx); err != nil {
+				log.Printf("  Warning: failed to update char %q: %v", s.Char, err)
+			}
+		}
+		if (i+1)%5000 == 0 {
+			log.Printf("  Progress (link): %d/%d", i+1, len(seeds))
+		}
+	}
+	log.Printf("Linked %d simplified-of and %d variant-of relationships", linkedSimp, linkedVar)
 
 	finalCount, _ := client.Character.Query().Count(ctx)
 	log.Printf("Database has %d characters total", finalCount)
