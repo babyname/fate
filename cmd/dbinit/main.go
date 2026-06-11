@@ -4,6 +4,7 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -46,15 +47,16 @@ type SeedChar struct {
 }
 
 func main() {
-	dbName := "fate"
-	outputPath := "fate.db.gz"
+	dbName := flag.String("db", "fate", "database file name (without extension)")
+	outputPath := *dbName + ".db.gz"
+	flag.Parse()
 
-	for _, p := range []string{dbName, dbName + "-shm", dbName + "-wal"} {
+	for _, p := range []string{*dbName, *dbName + "-shm", *dbName + "-wal"} {
 		os.Remove(p)
 	}
 	log.Printf("Cleared existing database files")
 
-	client, err := ent.Open("sqlite3", fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", dbName))
+	client, err := ent.Open("sqlite3", fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", *dbName))
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)
 	}
@@ -85,8 +87,8 @@ func main() {
 	verifyCharacters(ctx, client)
 	client.Close()
 
-	log.Printf("Compressing %s -> %s...", dbName, outputPath)
-	if err := compressFile(dbName, outputPath); err != nil {
+	log.Printf("Compressing %s -> %s...", *dbName, outputPath)
+	if err := compressFile(*dbName, outputPath); err != nil {
 		log.Fatalf("Failed to compress: %v", err)
 	}
 	log.Println("Done! fate.db.gz is ready for embedding")
