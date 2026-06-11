@@ -15,7 +15,6 @@ import (
 	"github.com/babyname/fate/v4/internal/analysis"
 	"github.com/babyname/fate/v4/internal/chronosfate"
 	"github.com/babyname/fate/v4/internal/repository"
-	"github.com/babyname/fate/v4/internal/session"
 	"github.com/godcong/chronos/v2"
 )
 
@@ -355,9 +354,9 @@ func (h *Handler) handleExplore(w http.ResponseWriter, r *http.Request) {
 	hasPoetry := r.URL.Query().Get("has_poetry")
 	wuxing := r.URL.Query().Get("wuxing")
 
-	var filter func(session.ExcellentEntry) bool
+	var filter func(fate.ExcellentEntry) bool
 	if hasPoetry == "true" || wuxing != "" {
-		filter = func(e session.ExcellentEntry) bool {
+		filter = func(e fate.ExcellentEntry) bool {
 			if hasPoetry == "true" && !e.HasPoetry {
 				return false
 			}
