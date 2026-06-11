@@ -12,9 +12,9 @@ data/
 ├── DATA_SOURCES.md         # Attribution: source, license, version
 ├── .gitignore              # Ignore all downloaded/generated data
 ├── download/               # Download scripts (idempotent)
-│   ├── chinese_poetry.ps1  # Clone/pull chinese-poetry dataset
-│   ├── unihan.ps1          # Download Unihan data
-│   └── xinhua.ps1          # Download xinhua dictionary word.json
+│   ├── chinese_poetry.py   # Clone/pull chinese-poetry dataset
+│   ├── unihan.py           # Download Unihan data
+│   └── xinhua.py           # Download xinhua dictionary word.json
 └── seed/                   # Curated seed data (tracked in git)
     └── .gitkeep
 ```
@@ -39,4 +39,4 @@ Only character.json (in `resources/`) is essential.
 
 - Requires `data/chinese-poetry/` directory
 - Server gracefully degrades if absent (poetry search returns empty)
-- Run `./data/download/chinese_poetry.ps1` to download the dataset
+- Run `python3 data/download/chinese_poetry.py` to download the dataset

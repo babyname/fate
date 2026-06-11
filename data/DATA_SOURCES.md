@@ -10,7 +10,7 @@
 | **Used Version** | commit `99ebbef` (May 2026) |
 | **What we use** | `全唐诗/唐诗三百首.json`, `宋词/宋词三百首.json`, `诗经/shijing.json` |
 | **Usage in fate** | Poetry origin lookup — when a character in a generated name appears in classical poetry, show the source verse |
-| **Download** | `./download/chinese_poetry.ps1` |
+| **Download** | `python3 data/download/chinese_poetry.py` |
 
 ## Unihan (Unicode Han Database)
 
@@ -22,7 +22,7 @@
 | **Used Version** | Unicode 16.0 |
 | **What we use** | `Unihan_IRGSources.txt`, `Unihan_Readings.txt`, `Unihan_Variants.txt`, `Unihan_RadicalStrokeCounts.txt`, `Unihan_DictionaryLikeData.txt` |
 | **Usage in fate** | Building `resources/character.json` — radical, stroke count, simplified/traditional mapping, variant mapping |
-| **Download** | `./download/unihan.ps1` |
+| **Download** | `python3 data/download/unihan.py` |
 
 ## xinhua (新华字典)
 
@@ -33,7 +33,7 @@
 | **License** | Open data — free for non-commercial and commercial use |
 | **What we use** | `word.json` — Chinese character definitions, pinyin, strokes |
 | **Usage in fate** | Filling `resources/character.json` with Chinese meanings (via `dictctl fill-xinhua`) |
-| **Download** | `./download/xinhua.ps1` |
+| **Download** | `python3 data/download/xinhua.py` |
 
 ## character.json
 
