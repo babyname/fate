@@ -35,7 +35,7 @@ type GenerateResult struct {
 // (create Session → Start → poll State → Wait → read Output).
 func (f *fateImpl) Generate(ctx context.Context, req GenerateRequest) (*GenerateResult, error) {
 	// 1. Lookup surname characters in DB.
-	last := [2]string{req.LastName, ""}
+	last := splitSurname(req.LastName)
 	lastName, err := f.db.QueryLastName(ctx, last)
 	if err != nil {
 		return nil, err
@@ -99,4 +99,19 @@ func charInfoFromCharacter(c *ent.Character) CharInfo {
 		IsXiYong:          false, // XiYong is per-name-triad, not per-character
 		HasPoetry:         c.HasPoetry,
 	}
+}
+
+// splitSurname splits a surname string into a [2]string array.
+// For single-character surnames like "张", returns ["张", ""].
+// For compound surnames like "欧阳", returns ["欧", "阳"].
+func splitSurname(surname string) [2]string {
+	var result [2]string
+	runes := []rune(surname)
+	if len(runes) >= 1 {
+		result[0] = string(runes[0])
+	}
+	if len(runes) >= 2 {
+		result[1] = string(runes[1])
+	}
+	return result
 }
