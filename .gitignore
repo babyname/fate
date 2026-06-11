@@ -56,13 +56,14 @@ fate-wal
 fate.db.gz
 releases/
 
-# Seed data - character.json is tracked (core data, MUST NOT be lost)
-# Only large/temporary seed files are excluded
-data/seed/wu_xing.json
-data/seed/wu_ge_lucky.json
-data/seed/changelog.json
-data/seed/report.json
+# Data directory: only README/DATA_SOURCES and download scripts are tracked
+# All large external datasets and generated files are downloaded at build time
+# See data/README.md for architecture and data/DATA_SOURCES.md for attribution
+data/chinese-poetry/
+data/poetry/
+data/xinhua/
 data/raw/
+data/seed/
 
 # Generated output
 output/
