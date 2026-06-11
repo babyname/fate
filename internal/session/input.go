@@ -109,7 +109,7 @@ func (o *Output) AllNames() []ScoredName {
 	if o.excellentTable == nil {
 		return nil
 	}
-	entries := o.excellentTable.entries
+	entries := o.excellentTable.AllEntries()
 	result := make([]ScoredName, 0, len(entries))
 	for _, e := range entries {
 		var c1, c2 *ent.Character
