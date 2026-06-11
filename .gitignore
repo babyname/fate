@@ -53,7 +53,7 @@ fate
 fate-shm
 fate-wal
 *.zip
-fate.db.gz
+*.db.gz
 releases/
 
 # Data directory: only README/DATA_SOURCES and download scripts are tracked
