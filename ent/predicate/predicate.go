@@ -11,6 +11,3 @@ type Character func(*sql.Selector)
 
 // Version is the predicate function for version builders.
 type Version func(*sql.Selector)
-
-// WuXing is the predicate function for wuxing builders.
-type WuXing func(*sql.Selector)

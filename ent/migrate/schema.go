@@ -168,29 +168,10 @@ var (
 		Columns:    VersionsColumns,
 		PrimaryKey: []*schema.Column{VersionsColumns[0]},
 	}
-	// WuXingColumns holds the columns for the "wu_xing" table.
-	WuXingColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created", Type: field.TypeTime, Nullable: true},
-		{Name: "updated", Type: field.TypeTime, Nullable: true},
-		{Name: "deleted", Type: field.TypeTime, Nullable: true},
-		{Name: "version", Type: field.TypeInt, Nullable: true},
-		{Name: "first", Type: field.TypeString, Nullable: true},
-		{Name: "second", Type: field.TypeString, Nullable: true},
-		{Name: "third", Type: field.TypeString, Nullable: true},
-		{Name: "fortune", Type: field.TypeString, Nullable: true},
-	}
-	// WuXingTable holds the schema information for the "wu_xing" table.
-	WuXingTable = &schema.Table{
-		Name:       "wu_xing",
-		Columns:    WuXingColumns,
-		PrimaryKey: []*schema.Column{WuXingColumns[0]},
-	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CharacterTable,
 		VersionsTable,
-		WuXingTable,
 	}
 )
 
@@ -199,8 +180,5 @@ func init() {
 	CharacterTable.ForeignKeys[1].RefTable = CharacterTable
 	CharacterTable.Annotation = &entsql.Annotation{
 		Table: "character",
-	}
-	WuXingTable.Annotation = &entsql.Annotation{
-		Table: "wu_xing",
 	}
 }

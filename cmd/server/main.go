@@ -22,7 +22,7 @@ func main() {
 		log.Fatal("failed to initialize fate: ", err)
 	}
 
-	handler := fatehttp.NewHandler(f, resources.StaticSub, f.Repo(), "data/chinese-poetry")
+	handler := fatehttp.NewHandler(f, resources.StaticSub, f.Repo())
 
 	fmt.Printf("Fate server listening on %s\n", *addr)
 	fmt.Println("Endpoints:")

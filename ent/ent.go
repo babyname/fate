@@ -13,7 +13,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/babyname/fate/v4/ent/character"
 	"github.com/babyname/fate/v4/ent/version"
-	"github.com/babyname/fate/v4/ent/wuxing"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -69,7 +68,6 @@ func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		character.Table: character.ValidColumn,
 		version.Table:   version.ValidColumn,
-		wuxing.Table:    wuxing.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

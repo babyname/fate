@@ -3,19 +3,47 @@ package main
 import (
 	"compress/gzip"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"os"
-	"unicode"
 
 	"github.com/babyname/fate/v4/ent"
 	"github.com/babyname/fate/v4/ent/character"
 	"github.com/babyname/fate/v4/ent/schema"
-	"github.com/babyname/fate/v4/internal/dict"
-	"github.com/babyname/fate/v4/internal/seeddb"
+	"github.com/babyname/fate/v4/resources"
 	_ "github.com/sqlite3ent/sqlite3"
 )
+
+// SeedChar matches the JSON schema in resources/character.json.
+type SeedChar struct {
+	Char              string   `json:"char"`
+	Unicode           string   `json:"unicode,omitempty"`
+	IsSimplified      bool     `json:"is_simplified"`
+	IsTraditional     bool     `json:"is_traditional"`
+	IsKangxi          bool     `json:"is_kangxi"`
+	IsVariant         bool     `json:"is_variant"`
+	IsAncient         bool     `json:"is_ancient"`
+	Pinyin            []string `json:"pinyin,omitempty"`
+	Radical           string   `json:"radical,omitempty"`
+	RadicalStroke     int      `json:"radical_stroke,omitempty"`
+	SimplifiedStroke  int      `json:"simplified_stroke,omitempty"`
+	TraditionalStroke int      `json:"traditional_stroke,omitempty"`
+	KangxiStroke      int      `json:"kangxi_stroke,omitempty"`
+	ScienceStroke     int      `json:"science_stroke,omitempty"`
+	WuXing            string   `json:"wu_xing,omitempty"`
+	Regular           bool     `json:"regular"`
+	CommonLevel       int      `json:"common_level,omitempty"`
+	GenderHint        string   `json:"gender_hint,omitempty"`
+	Nameable          bool     `json:"nameable"`
+	Meaning           string   `json:"meaning,omitempty"`
+	Source            string   `json:"source,omitempty"`
+	SourceConfidence  float64  `json:"source_confidence,omitempty"`
+	Comment           string   `json:"comment,omitempty"`
+	SimplifiedOfChar  string   `json:"simplified_of_char,omitempty"`
+	VariantOfChar     string   `json:"variant_of_char,omitempty"`
+}
 
 func main() {
 	dbName := "fate"
@@ -53,21 +81,6 @@ func main() {
 	if err := importCharacters(ctx, client); err != nil {
 		log.Fatalf("Failed to import characters: %v", err)
 	}
-	if err := importWuXing(ctx, client); err != nil {
-		log.Fatalf("Failed to import wuxing: %v", err)
-	}
-
-	poetryDir := "data/chinese-poetry"
-	if len(os.Args) > 1 {
-		poetryDir = os.Args[1]
-	}
-	if info, err := os.Stat(poetryDir); err == nil && info.IsDir() {
-		if err := importPoetry(ctx, client, poetryDir); err != nil {
-			log.Printf("Warning: Failed to import poetry: %v", err)
-		}
-	} else {
-		log.Printf("Poetry directory %s not found, skipping poetry import", poetryDir)
-	}
 
 	verifyCharacters(ctx, client)
 	client.Close()
@@ -79,14 +92,22 @@ func main() {
 	log.Println("Done! fate.db.gz is ready for embedding")
 }
 
+func loadEmbeddedCharacters() ([]SeedChar, error) {
+	var seeds []SeedChar
+	if err := json.Unmarshal(resources.CharacterJSON, &seeds); err != nil {
+		return nil, fmt.Errorf("parse character.json: %w", err)
+	}
+	log.Printf("Loaded %d characters from embedded resources", len(seeds))
+	return seeds, nil
+}
+
 func importCharacters(ctx context.Context, client *ent.Client) error {
-	seeds, err := seeddb.LoadEmbeddedCharacters()
+	seeds, err := loadEmbeddedCharacters()
 	if err != nil {
-		return fmt.Errorf("load embedded seeds: %w", err)
+		return fmt.Errorf("load embedded characters: %w", err)
 	}
 	log.Printf("Importing %d characters...", len(seeds))
 
-	// First, create all characters and build a char -> ID map
 	charMap := make(map[string]*ent.Character, len(seeds))
 	imported := 0
 	for i, s := range seeds {
@@ -157,7 +178,6 @@ func importCharacters(ctx context.Context, client *ent.Client) error {
 	}
 	log.Printf("Imported %d characters", imported)
 
-	// Second pass: link simplified/variant relationships using edges
 	linkedSimp := 0
 	linkedVar := 0
 	for i, s := range seeds {
@@ -170,7 +190,6 @@ func importCharacters(ctx context.Context, client *ent.Client) error {
 
 		if s.SimplifiedOfChar != "" {
 			if target, ok := charMap[s.SimplifiedOfChar]; ok {
-				// this char is a simplified form of target (traditional)
 				updater.AddSimplifiedOf(target)
 				linkedSimp++
 				updated = true
@@ -178,7 +197,6 @@ func importCharacters(ctx context.Context, client *ent.Client) error {
 		}
 		if s.VariantOfChar != "" {
 			if target, ok := charMap[s.VariantOfChar]; ok {
-				// this char is a variant of target (standard form)
 				updater.SetVariantOf(target)
 				linkedVar++
 				updated = true
@@ -197,73 +215,6 @@ func importCharacters(ctx context.Context, client *ent.Client) error {
 
 	finalCount, _ := client.Character.Query().Count(ctx)
 	log.Printf("Database has %d characters total", finalCount)
-	return nil
-}
-
-func importWuXing(ctx context.Context, client *ent.Client) error {
-	wxSeeds := seeddb.BuiltinWuXingSeeds()
-	for i := range wxSeeds {
-		w := &wxSeeds[i]
-		builder := client.WuXing.Create().SetID(w.ID)
-		if w.First != "" {
-			builder.SetFirst(w.First)
-		}
-		if w.Second != "" {
-			builder.SetSecond(w.Second)
-		}
-		if w.Third != "" {
-			builder.SetThird(w.Third)
-		}
-		if w.Fortune != "" {
-			builder.SetFortune(w.Fortune)
-		}
-		if _, err := builder.Save(ctx); err != nil {
-			continue
-		}
-	}
-	log.Printf("Imported wu_xing data")
-	return nil
-}
-
-func importPoetry(ctx context.Context, client *ent.Client, poetryDir string) error {
-	log.Printf("Importing poetry from %s...", poetryDir)
-
-	entries, err := dict.LoadSelectedPoetryFromDir(poetryDir)
-	if err != nil {
-		return fmt.Errorf("load poetry: %w", err)
-	}
-	log.Printf("Loaded %d poems", len(entries))
-
-	uniqueChars := make(map[string]bool)
-
-	for i, e := range entries {
-		refs := dict.ExtractCharRefs(e.Content)
-		for _, ref := range refs {
-			if !unicode.Is(unicode.Han, []rune(ref.Char)[0]) {
-				continue
-			}
-			uniqueChars[ref.Char] = true
-		}
-
-		if (i+1)%500 == 0 {
-			log.Printf("  Poetry progress: %d/%d", i+1, len(entries))
-		}
-	}
-
-	log.Printf("Found %d unique chars with poetry source from %d poems", len(uniqueChars), len(entries))
-
-	charWithPoetry := 0
-	for ch := range uniqueChars {
-		n, err := client.Character.Update().
-			Where(character.CharEQ(ch)).
-			SetHasPoetry(true).
-			Save(ctx)
-		if err == nil && n > 0 {
-			charWithPoetry++
-		}
-	}
-	log.Printf("Marked %d characters with has_poetry=true", charWithPoetry)
-
 	return nil
 }
 
