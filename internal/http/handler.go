@@ -28,8 +28,8 @@ type Handler struct {
 }
 
 type taskEntry struct {
-	session fate.Session
-	input   *fate.Input
+	result  *fate.GenerateResult
+	request generateRequest
 	created time.Time
 }
 
@@ -179,48 +179,38 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 		sex = fate.SexGirl
 	}
 
-	l := [2]string{}
-	runes := []rune(req.Surname)
-	if len(runes) >= 1 {
-		l[0] = string(runes[0])
-	}
-	if len(runes) >= 2 {
-		l[1] = string(runes[1])
-	}
-
-	filterOpt := fate.NewFilter(fate.FilterOption{
-		CharacterFilter:     true,
-		RegularFilter:       true,
-		WuXingFilter:        true,
-		PoetryMode:          req.PoetryMode,
-		XiYongMethod:        req.XiYongMethod,
-		AvoidCharacters:     req.AvoidChars,
-		RequireCharacters:   req.RequireChars,
-		CharacterFilterType: fate.CharacterFilterType(req.FilterType),
+	// Synchronous generation using the new API.
+	result, err := h.fate.Generate(r.Context(), fate.GenerateRequest{
+		LastName: req.Surname,
+		Born:     born,
+		Sex:      sex,
+		Filter: &fate.FilterOption{
+			CharacterFilter:     true,
+			RegularFilter:       true,
+			WuXingFilter:        true,
+			PoetryMode:          req.PoetryMode,
+			XiYongMethod:        req.XiYongMethod,
+			AvoidCharacters:     req.AvoidChars,
+			RequireCharacters:   req.RequireChars,
+			CharacterFilterType: fate.CharacterFilterType(req.FilterType),
+		},
 	})
-
-	sess := h.fate.NewSessionWithFilter(filterOpt)
-	input := &fate.Input{
-		Last: l,
-		Born: born,
-		Sex:  sex,
-	}
-
-	if err := sess.Start(input); err != nil {
-		writeError(w, 500, "failed to start: "+err.Error())
+	if err != nil {
+		writeError(w, 500, "failed to generate: "+err.Error())
 		return
 	}
 
 	taskID := fmt.Sprintf("%d", time.Now().UnixNano())
 	h.store.Set(taskID, &taskEntry{
-		session: sess,
-		input:   input,
+		result:  result,
+		request: req,
 		created: time.Now(),
 	})
 
 	writeJSON(w, 200, map[string]any{
 		"task_id": taskID,
-		"state":   "computing",
+		"state":   "done",
+		"total":   result.ExcellentTable.Len(),
 	})
 }
 
@@ -231,47 +221,16 @@ func (h *Handler) handleStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entry, ok := h.store.Get(taskID)
+	_, ok := h.store.Get(taskID)
 	if !ok {
 		writeError(w, 404, "task not found")
 		return
 	}
 
-	state := entry.session.State()
-	stateStr := ""
-	switch state {
-	case fate.SessionStateGenerating:
-		stateStr = "computing"
-	case fate.SessionStateFinish:
-		stateStr = "done"
-	case fate.SessionStateFailed:
-		stateStr = "failed"
-	case fate.SessionStateCanceled:
-		stateStr = "canceled"
-	default:
-		stateStr = "waiting"
-	}
-
-	resp := map[string]any{
+	writeJSON(w, 200, map[string]any{
 		"task_id": taskID,
-		"state":   stateStr,
-	}
-
-	if state == fate.SessionStateFinish {
-		output := entry.input.Output()
-		table := output.ExcellentTable()
-		if table != nil {
-			resp["total"] = table.Len()
-		}
-	}
-
-	if state == fate.SessionStateFailed {
-		if err := entry.session.Err(); err != nil {
-			resp["error"] = err.Error()
-		}
-	}
-
-	writeJSON(w, 200, resp)
+		"state":   "done",
+	})
 }
 
 func (h *Handler) handleResult(w http.ResponseWriter, r *http.Request) {
@@ -287,14 +246,8 @@ func (h *Handler) handleResult(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if entry.session.State() != fate.SessionStateFinish {
-		writeError(w, 409, "task not ready")
-		return
-	}
-
-	output := entry.input.Output()
-	topNames := output.TopNames()
-	table := output.ExcellentTable()
+	result := entry.result
+	topNames := result.TopNames
 
 	top3 := make([]fate.NameResult, 0, 3)
 	for i := range topNames {
@@ -304,9 +257,9 @@ func (h *Handler) handleResult(w http.ResponseWriter, r *http.Request) {
 		top3 = append(top3, topNames[i])
 	}
 
-	top10Entries := make([]fate.ExcellentEntry, 0, 10)
-	if table != nil {
-		top10Entries = table.TopN(10)
+	top10Entries := result.ExcellentTable.TopN(10)
+	for i := range top10Entries {
+		result.ExcellentTable.MarkShown(top10Entries[i].Char1, top10Entries[i].Char2)
 	}
 
 	writeJSON(w, 200, map[string]any{
@@ -314,7 +267,7 @@ func (h *Handler) handleResult(w http.ResponseWriter, r *http.Request) {
 		"top_names": topNames,
 		"top3":      top3,
 		"top10":     top10Entries,
-		"total":     output.Total(),
+		"total":     result.ExcellentTable.Len(),
 	})
 }
 
@@ -331,17 +284,8 @@ func (h *Handler) handleExplore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if entry.session.State() != fate.SessionStateFinish {
-		writeError(w, 409, "task not ready")
-		return
-	}
-
-	output := entry.input.Output()
-	table := output.ExcellentTable()
-	if table == nil {
-		writeError(w, 500, "excellent table not available")
-		return
-	}
+	result := entry.result
+	table := result.ExcellentTable
 
 	count := 10
 	if c := r.URL.Query().Get("count"); c != "" {
@@ -390,13 +334,8 @@ func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if entry.session.State() != fate.SessionStateFinish {
-		writeError(w, 409, "task not ready")
-		return
-	}
-
-	output := entry.input.Output()
-	topNames := output.TopNames()
+	result := entry.result
+	topNames := result.TopNames
 
 	page := 1
 	if p := r.URL.Query().Get("page"); p != "" {
@@ -425,10 +364,7 @@ func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
 		end = total
 	}
 
-	pagedNames := make([]analysis.NameResult, 0, pageSize)
-	for i := start; i < end; i++ {
-		pagedNames = append(pagedNames, topNames[i])
-	}
+	pagedNames := topNames[start:end]
 
 	writeJSON(w, 200, map[string]any{
 		"task_id": taskID,
@@ -451,40 +387,33 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 
 	if taskID != "" {
 		entry, ok := h.store.Get(taskID)
-		if ok && entry.session.State() == fate.SessionStateFinish {
-			output := entry.input.Output()
-			topNames := output.TopNames()
-			for i := range topNames {
-				if topNames[i].Char1.Char == char1 && topNames[i].Char2.Char == char2 {
-					writeJSON(w, 200, map[string]any{"name_result": topNames[i]})
+		if ok {
+			result := entry.result
+
+			// Search top names for a match.
+			for i := range result.TopNames {
+				if result.TopNames[i].Char1.Char == char1 && result.TopNames[i].Char2.Char == char2 {
+					writeJSON(w, 200, map[string]any{"name_result": result.TopNames[i]})
 					return
 				}
 			}
 
-			charMap := output.CharMap()
-			table := output.ExcellentTable()
-			if charMap != nil && table != nil {
-				c1 := charMap[char1]
-				c2 := charMap[char2]
-				if c1 != nil && c2 != nil {
-					basic := output.Basic()
-					surname := ""
-					l1, l2 := 0, 0
-					if basic.LastName[0] != nil {
-						surname = basic.LastName[0].Char
-						l1 = basic.LastName[0].ScienceStroke
-					}
-					if basic.LastName[1] != nil {
-						surname += basic.LastName[1].Char
-						l2 = basic.LastName[1].ScienceStroke
-					}
-					fateData := output.FateData()
-					if fateData != nil {
-						nr := analysis.BuildNameResult(0, surname, c1, c2, l1, l2, fateData)
-						writeJSON(w, 200, map[string]any{"name_result": nr})
-						return
-					}
+			// Return partial info from CharMap if characters exist.
+			c1, ok1 := result.CharMap[char1]
+			c2, ok2 := result.CharMap[char2]
+			if ok1 && ok2 {
+				surname := ""
+				if len(result.TopNames) > 0 {
+					surname = result.TopNames[0].Surname
 				}
+				nr := fate.NameResult{
+					FullName: surname + char1 + char2,
+					Surname:  surname,
+					Char1:    c1,
+					Char2:    c2,
+				}
+				writeJSON(w, 200, map[string]any{"name_result": nr})
+				return
 			}
 		}
 	}
