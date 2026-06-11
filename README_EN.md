@@ -1,8 +1,16 @@
-# fate
+<p align="center">
+  <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat&logo=go" alt="Go Version" />
+  <img src="https://img.shields.io/badge/version-4.2.0-blue" alt="Version" />
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
+  <img src="https://img.shields.io/badge/module-v4-7B42BC" alt="Module v4" />
+</p>
 
 <p align="center">
-  <strong>fate — Bazi Wuxing Naming Algorithm Engine</strong><br>
-  <em>Intelligent naming algorithm engine and CLI based on Bazi Wuxing, Sancai Wuge, and Zhouyi hexagrams</em>
+  <h1 align="center">🌌 fate · Celestial Naming Engine</h1>
+  <p align="center">
+    <strong>Intelligent Chinese name generator powered by Bazi (八字), Wuxing (五行), Zhouyi (周易), and classical poetry</strong><br>
+    <em>FATE — Celestial Naming Engine</em>
+  </p>
 </p>
 
 <p align="center">
@@ -11,82 +19,133 @@
 
 ---
 
-## Branch Strategy
+## ✨ Features
 
-| Branch | Purpose | Module Path |
-|--------|---------|-------------|
-| `main` / `v4` | Development主线 (v4.x) | `github.com/babyname/fate/v4` |
-| `v3` | Bugfix maintenance (v3.x, bug fixes only) | `github.com/babyname/fate` |
-| `feat-ent` | Historical branch, merged into main | — |
+<table>
+<tr>
+<td width="50%">
 
-> **v4 Changes**: Module path upgraded from `github.com/babyname/fate` to `github.com/babyname/fate/v4`,
-> introducing Ent ORM, chronos/v2, ExcellentTable streaming scoring, and more.
-> For v3, switch to the `v3` branch.
+### 🎯 Bazi Analysis
+- Four Pillars (year/month/day/hour) precision calculation
+- Wuxing strength analysis + Tiaohou Yongshen
+- **Dual Xi-Yong algorithm**: Balance Method & GeJu Method (10 pattern types)
+- Chinese zodiac integration
+
+</td>
+<td width="50%">
+
+### 📊 Multi-Dimension Scoring
+- **5-dimension scoring**: Cultural · Wuxing · Zodiac · Wuge · Phonetics
+- Sancai configuration analysis
+- 81 Dayan numbers O(1) lookup
+- 64 Zhouyi hexagram interpretations
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 🌐 Modern Web UI
+- React 19 + Tailwind CSS responsive design
+- Real-time streaming generation with polling
+- Candidate table & card dual view
+- Explore mode: random sampling with filters
+
+</td>
+<td width="50%">
+
+### ⚡ High Performance
+- Ent ORM + SQLite for efficient data access
+- ExcellentTable streaming Top-N data structure
+- Async concurrent generation (session mode)
+- Embedded web frontend (single binary distribution)
+
+</td>
+</tr>
+</table>
 
 ---
 
-## Features
+## 📸 Screenshots
 
-- Bazi Calculation — Four Pillars, Wuxing strength, Tiaohou Shen
-- Dual Xi-Yong Algorithm — Balance Method + GeJu Method (10 pattern types)
-- Sancai Wuge — 81 Dayan numbers, Yin-Yang Wuxing, O(1) lookup
-- Zhouyi Hexagrams — 64 hexagram interpretations
-- 5-Dimension Scoring — Cultural/Wuxing/Zodiac/Wuge/Yinyun
+> 💡 **Tip**: Start the server and visit `http://localhost:18080`.
+
+| Home | Results |
+|------|---------|
+| ![Home](docs/screenshots/home.png) | ![Results](docs/screenshots/results.png) |
+
+| Candidate Table | Card View |
+|-----------------|-----------|
+| ![Table](docs/screenshots/table.png) | ![Cards](docs/screenshots/cards.png) |
 
 ---
 
-
-
-## Quick Start
+## 🚀 Quick Start
 
 ### Requirements
 
-- Go 1.22+
+- **Go** 1.22+
+- **Bun** (for frontend dev only; not needed for production)
 
-### Install
+### Install & Run
 
 ```bash
+# Clone
 git clone https://github.com/babyname/fate.git
 cd fate
+
+# Download dependencies
 go mod download
+
+# Initialize database (required)
+go run ./cmd/dbinit
+
+# Start web server
+go run ./cmd/server
+# Open http://localhost:18080
 ```
 
----
-
-## Two Usage Modes
-
-### Mode 1: Command Line
-
-Fast name generation with clean output:
+### CLI
 
 ```bash
+# Build
+go build -o fate ./cmd/console
+
 # Generate names
-go run ./cmd/console name -s 张 -b "2024/06/15 10:30" -g boy
+./fate name -s Zhang -b "2024/06/15 10:30" -g boy
 
-# View detailed analysis for a specific name
-go run ./cmd/console name detail 峰 瑞 -s 张 -b "2024/06/15 10:30" -g boy
-
-# View all options
-go run ./cmd/console name -h
+# Detailed analysis
+./fate name detail Shi Lun -s Zhang -b "2024/06/15 10:30" -g boy
 ```
 
-**Options:**
+### CLI Options
 
-| Flag | Description | Example |
-|------|-------------|---------|
-| `-s, --surname` | Surname | `-s 张` |
-| `-b, --born` | Birth date | `-b "2024/06/15 10:30"` |
-| `-g, --gender` | Gender | `-g boy` or `-g girl` |
-| `--xiyong` | Xi-Yong algorithm | `--xiyong balance` or `--xiyong geju` |
-| `--strictness` | Wuge filter strictness | `--strictness moderate` |
-| `-f, --filter` | Filter out specific characters | `-f 病死` |
-| `-o, --output` | Output to file | `-o result.txt` |
+| Flag | Short | Description | Example |
+|------|-------|-------------|---------|
+| `--surname` | `-s` | Surname | `-s Zhang` |
+| `--born` | `-b` | Birth date & time | `-b "2024/06/15 10:30"` |
+| `--gender` | `-g` | Gender | `-g boy` / `-g girl` |
+| `--xiyong` | | Xi-Yong algorithm | `balance` / `geju` |
+| `--strictness` | | Wuge strictness | `loose` / `moderate` / `strict` |
+| `--filter` | `-f` | Filter characters | `-f 病死穷` |
+| `--output` | `-o` | Output to file | `-o result.txt` |
 
 ---
 
-### Mode 2: Library Import
+## 🔌 Web API
 
-Integrate into your Go project:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/health` | Health check |
+| `POST` | `/api/generate` | Async name generation (returns task_id) |
+| `GET` | `/api/task/:id` | Query task status |
+| `GET` | `/api/names/:taskId` | Paginated name list |
+| `GET` | `/api/name-detail` | Detailed name analysis |
+| `GET` | `/api/explore/:taskId` | Random name exploration |
+
+---
+
+## 🧩 Library Usage
 
 ```bash
 go get github.com/babyname/fate/v4
@@ -105,99 +164,137 @@ import (
 
 func main() {
     cfg := config.DefaultConfig()
-
-    f, err := fate.New(cfg)
-    if err != nil {
-        panic(err)
-    }
+    f, _ := fate.New(cfg)
 
     filter := fate.NewFilter(fate.FilterOption{
         CharacterFilter:     true,
-        CharacterFilterType: fate.CharacterFilterTypeDefault,
         MinStroke:           3,
         MaxStroke:           18,
         RegularFilter:       true,
         DaYanFilter:         true,
         WuXingFilter:        true,
+        AvoidCharacters:     []string{"病", "死"},
     })
 
     s := f.NewSessionWithFilter(filter)
-
     born, _ := time.Parse("2006/01/02 15:04", "2024/06/15 10:30")
     input := &fate.Input{
-        Last: [2]string{"张", ""},
+        Last: [2]string{"Zhang", ""},
         Born: born,
         Sex:  fate.SexBoy,
     }
 
-    err = s.Start(input)
-    if err != nil {
-        panic(err)
-    }
+    s.Start(input)
     s.Wait()
 
     output := input.Output()
-    fmt.Printf("Generated %d names\n", output.Total())
-
     for _, nr := range output.TopNames() {
-        fmt.Printf("  %s - Score: %.1f\n", nr.FullName, nr.Score)
+        fmt.Printf("%s - %.1f (%s)\n", nr.FullName, nr.Score, nr.Grade)
+    }
+
+    // ExcellentTable: streaming Top-N access
+    table := output.GetExcellentTable()
+    for _, e := range table.TopN(10) {
+        fmt.Printf("%s%s - %.1f has_poetry=%v\n", e.Char1, e.Char2, e.Score, e.HasPoetry)
     }
 }
 ```
 
-**Core API:**
+---
 
-| Type | Description |
-|------|-------------|
-| `fate.New(cfg)` | Create Fate instance |
-| `fate.NewSessionWithFilter(filter)` | Create session with filter options |
-| `fate.NewFilter(option)` | Create filter from options |
-| `fate.FilterOption{}` | Filter options (stroke range / Wuxing / Dayan / gender etc.) |
-| `fate.Input{}` | Input parameters (surname / birthday / gender) |
-| `fate.Output` | Output results (TopNames / AllNames / Total) |
-| `fate.Session` | Session interface (Start / Stop / Wait) |
+## 🏛️ Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│              fate CLI / Server               │
+├─────────────────────────────────────────────┤
+│  cmd/console     │  cmd/server               │
+│  (CLI tool)      │  (HTTP API + embedded UI) │
+├─────────────────────────────────────────────┤
+│           internal/http (API routes)         │
+├─────────────────────────────────────────────┤
+│              fate Core Engine                │
+│  ┌──────────┬──────────┬──────────────────┐ │
+│  │ Session  │ Filter   │ ExcellentTable   │ │
+│  │ Async    │ Multi    │ Streaming        │ │
+│  │ Gen      │ Stage    │ Top-N            │ │
+│  ├──────────┼──────────┼──────────────────┤ │
+│  │ Bazi     │ Wuge     │ Zhouyi           │ │
+│  └──────────┴──────────┴──────────────────┘ │
+├─────────────────────────────────────────────┤
+│          chronos/v2 (Bazi engine)            │
+│          yi (Zhouyi engine)                  │
+│          Ent ORM (data layer)                │
+├─────────────────────────────────────────────┤
+│          SQLite3 (data storage)              │
+│          character.json (character DB)       │
+│          chinese-poetry (poetry corpus)      │
+└─────────────────────────────────────────────┘
+```
 
 ---
 
-## Xi-Yong Algorithms
+## 📐 5-Dimension Scoring
 
-### Balance Method
-
-Determines Xi-Yong based on Day Master's strength (same vs opposite camp):
-
-| Day Master | Yong Shen | Xi Shen | Ji Shen |
-|------------|-----------|---------|---------|
-| Strong | Officer/Kill (克制) | Wealth+Resource (我克+生我) | Peer/Rob (同我) |
-| Weak | Resource (生我) | Peer/Rob (同我) | Officer+Output (克我+我生) |
-
-### GeJu Method
-
-First determines pattern type (10 types: Zheng Guan, Qi Sha, Shi Shen, Shang Guan, Zheng Cai, Pian Cai, Jian Lu, Yang Ren, etc.), then selects Xi-Yong accordingly.
+| Dimension | Weight | Criteria |
+|-----------|:------:|----------|
+| 🎨 **Cultural** | 20% | Common usage, regular script, semantic richness |
+| 🔥 **Wuxing** | 25% | Name Wuxing vs Day Master Xi-Yong match |
+| 🐉 **Zodiac** | 10% | Zodiac Wuxing vs name Wuxing interaction |
+| 📏 **Wuge** | 25% | Tian/Ren/Di/Wai/Zong Ge fortune scores |
+| 🎵 **Phonetics** | 20% | Syllable tone harmony, ping-ze balance |
 
 ---
 
-## 5-Dimension Scoring
+## 🔀 Branch Strategy
 
-| Dimension | Weight | Description |
-|-----------|--------|-------------|
-| Cultural Impression | 20% | Common characters, regular forms, meaning richness |
-| Wuxing Bazi | 25% | Name Wuxing match with Xi-Yong |
-| Zodiac | 10% | Zodiac and name Wuxing relationship |
-| Wuge Shuli | 25% | Tian/Ren/Di/Wai/Zong Ge fortune |
-| Yinyun | 20% | Name phonetic harmony |
+| Branch | Purpose | go.mod module |
+|--------|---------|---------------|
+| `main` | v4.x active development | `github.com/babyname/fate/v4` |
+| `v3` | v3.x bugfix maintenance | `github.com/babyname/fate` |
 
----
-
-## Tech Stack
-
-- **Go 1.22+** — Main language
-- **Ent ORM** — Database ORM
-- **SQLite3** — Data storage
-- **chronos/v2** — Bazi calculation
-- **yi** — Zhouyi hexagrams
+> ⚠️ **Historical**: v3 branch lacks `/v3` suffix (pre-dates stricter Go module conventions).
+> From v4 onward, `/v4` suffix is consistently used. Future v5 will use `/v5`.
 
 ---
 
-## License
+## 🛠️ Tech Stack
 
-MIT License
+| Layer | Technology |
+|-------|-----------|
+| Language | Go 1.22+ |
+| Frontend | React 19 + Tailwind CSS 3 + Rsbuild |
+| State | Zustand |
+| UI Kit | Radix UI + Lucide Icons |
+| ORM | Ent |
+| Storage | SQLite3 (modernc, CGo-free) |
+| Bazi | chronos/v2 |
+| Zhouyi | yi |
+
+---
+
+## 🧪 Development
+
+```bash
+# Frontend (hot reload)
+cd web && bun install && bun run dev
+
+# Backend
+go run ./cmd/server
+
+# Production build
+cd web && bun run build
+go build -o fate-server ./cmd/server
+
+# Tests
+go test ./...
+
+# Lint
+golangci-lint run
+```
+
+---
+
+## 📄 License
+
+[MIT](LICENSE) © babyname
