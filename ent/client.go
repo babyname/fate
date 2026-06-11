@@ -16,7 +16,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/babyname/fate/v4/ent/character"
 	"github.com/babyname/fate/v4/ent/version"
-	"github.com/babyname/fate/v4/ent/wuxing"
 )
 
 // Client is the client that holds all ent builders.
@@ -28,8 +27,6 @@ type Client struct {
 	Character *CharacterClient
 	// Version is the client for interacting with the Version builders.
 	Version *VersionClient
-	// WuXing is the client for interacting with the WuXing builders.
-	WuXing *WuXingClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -45,7 +42,6 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Character = NewCharacterClient(c.config)
 	c.Version = NewVersionClient(c.config)
-	c.WuXing = NewWuXingClient(c.config)
 }
 
 type (
@@ -130,7 +126,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:    cfg,
 		Character: NewCharacterClient(cfg),
 		Version:   NewVersionClient(cfg),
-		WuXing:    NewWuXingClient(cfg),
 	}, nil
 }
 
@@ -152,7 +147,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:    cfg,
 		Character: NewCharacterClient(cfg),
 		Version:   NewVersionClient(cfg),
-		WuXing:    NewWuXingClient(cfg),
 	}, nil
 }
 
@@ -183,7 +177,6 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.Character.Use(hooks...)
 	c.Version.Use(hooks...)
-	c.WuXing.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
@@ -191,7 +184,6 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Character.Intercept(interceptors...)
 	c.Version.Intercept(interceptors...)
-	c.WuXing.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -201,8 +193,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Character.mutate(ctx, m)
 	case *VersionMutation:
 		return c.Version.mutate(ctx, m)
-	case *WuXingMutation:
-		return c.WuXing.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -508,130 +498,12 @@ func (c *VersionClient) mutate(ctx context.Context, m *VersionMutation) (Value, 
 	}
 }
 
-// WuXingClient is a client for the WuXing schema.
-type WuXingClient struct {
-	config
-}
-
-// NewWuXingClient returns a client for the WuXing from the given config.
-func NewWuXingClient(c config) *WuXingClient {
-	return &WuXingClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `wuxing.Hooks(f(g(h())))`.
-func (c *WuXingClient) Use(hooks ...Hook) {
-	c.hooks.WuXing = append(c.hooks.WuXing, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `wuxing.Intercept(f(g(h())))`.
-func (c *WuXingClient) Intercept(interceptors ...Interceptor) {
-	c.inters.WuXing = append(c.inters.WuXing, interceptors...)
-}
-
-// Create returns a builder for creating a WuXing entity.
-func (c *WuXingClient) Create() *WuXingCreate {
-	mutation := newWuXingMutation(c.config, OpCreate)
-	return &WuXingCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of WuXing entities.
-func (c *WuXingClient) CreateBulk(builders ...*WuXingCreate) *WuXingCreateBulk {
-	return &WuXingCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for WuXing.
-func (c *WuXingClient) Update() *WuXingUpdate {
-	mutation := newWuXingMutation(c.config, OpUpdate)
-	return &WuXingUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *WuXingClient) UpdateOne(wx *WuXing) *WuXingUpdateOne {
-	mutation := newWuXingMutation(c.config, OpUpdateOne, withWuXing(wx))
-	return &WuXingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *WuXingClient) UpdateOneID(id int) *WuXingUpdateOne {
-	mutation := newWuXingMutation(c.config, OpUpdateOne, withWuXingID(id))
-	return &WuXingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for WuXing.
-func (c *WuXingClient) Delete() *WuXingDelete {
-	mutation := newWuXingMutation(c.config, OpDelete)
-	return &WuXingDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *WuXingClient) DeleteOne(wx *WuXing) *WuXingDeleteOne {
-	return c.DeleteOneID(wx.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *WuXingClient) DeleteOneID(id int) *WuXingDeleteOne {
-	builder := c.Delete().Where(wuxing.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &WuXingDeleteOne{builder}
-}
-
-// Query returns a query builder for WuXing.
-func (c *WuXingClient) Query() *WuXingQuery {
-	return &WuXingQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeWuXing},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a WuXing entity by its id.
-func (c *WuXingClient) Get(ctx context.Context, id int) (*WuXing, error) {
-	return c.Query().Where(wuxing.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *WuXingClient) GetX(ctx context.Context, id int) *WuXing {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *WuXingClient) Hooks() []Hook {
-	return c.hooks.WuXing
-}
-
-// Interceptors returns the client interceptors.
-func (c *WuXingClient) Interceptors() []Interceptor {
-	return c.inters.WuXing
-}
-
-func (c *WuXingClient) mutate(ctx context.Context, m *WuXingMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&WuXingCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&WuXingUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&WuXingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&WuXingDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown WuXing mutation op: %q", m.Op())
-	}
-}
-
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Character, Version, WuXing []ent.Hook
+		Character, Version []ent.Hook
 	}
 	inters struct {
-		Character, Version, WuXing []ent.Interceptor
+		Character, Version []ent.Interceptor
 	}
 )

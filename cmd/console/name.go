@@ -2,7 +2,6 @@
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -15,7 +14,6 @@ import (
 	"github.com/babyname/fate/v4/internal/database"
 	"github.com/babyname/fate/v4/internal/log"
 	"github.com/babyname/fate/v4/internal/repository"
-	"github.com/babyname/fate/v4/internal/seeddb"
 
 	"github.com/spf13/cobra"
 )
@@ -39,9 +37,7 @@ func cmdName() *cobra.Command {
 				fmt.Println("数据库未初始化")
 				return
 			}
-			if err := seeddb.EnsureSeeded(context.Background(), repo); err != nil {
-				log.Error("ensure seeded", err)
-			}
+
 			f := fate.NewWithRepo(cfg, repo)
 			s := f.NewSessionWithFilter(fate.NewFilter(fate.FilterOption{
 				CharacterFilter:     true,

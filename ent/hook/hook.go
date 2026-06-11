@@ -33,18 +33,6 @@ func (f VersionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.VersionMutation", m)
 }
 
-// The WuXingFunc type is an adapter to allow the use of ordinary
-// function as WuXing mutator.
-type WuXingFunc func(context.Context, *ent.WuXingMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f WuXingFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.WuXingMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WuXingMutation", m)
-}
-
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

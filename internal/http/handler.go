@@ -1,4 +1,4 @@
-﻿package http
+package http
 
 import (
 	"encoding/json"
@@ -14,20 +14,18 @@ import (
 	"github.com/babyname/fate/v4/ent/character"
 	"github.com/babyname/fate/v4/internal/analysis"
 	"github.com/babyname/fate/v4/internal/chronosfate"
-	"github.com/babyname/fate/v4/internal/dict"
 	"github.com/babyname/fate/v4/internal/repository"
 	"github.com/babyname/fate/v4/internal/session"
 	"github.com/godcong/chronos/v2"
 )
 
 type Handler struct {
-	fate         fate.Fate
-	mux          *http.ServeMux
-	store        *taskStore
-	staticFS     fs.FS
-	fileServer   http.Handler
-	repo         *repository.Repository
-	poetryIndex  map[string]*analysis.PoetryOrigin
+	fate       fate.Fate
+	mux        *http.ServeMux
+	store      *taskStore
+	staticFS   fs.FS
+	fileServer http.Handler
+	repo       *repository.Repository
 }
 
 type taskEntry struct {
@@ -37,8 +35,8 @@ type taskEntry struct {
 }
 
 type taskStore struct {
-	mu     sync.RWMutex
-	tasks  map[string]*taskEntry
+	mu    sync.RWMutex
+	tasks map[string]*taskEntry
 }
 
 func newTaskStore() *taskStore {
@@ -60,15 +58,14 @@ func (s *taskStore) Get(id string) (*taskEntry, bool) {
 	return e, ok
 }
 
-func NewHandler(f fate.Fate, staticFS fs.FS, repo *repository.Repository, poetryDir string) *Handler {
+func NewHandler(f fate.Fate, staticFS fs.FS, repo *repository.Repository) *Handler {
 	h := &Handler{
-		fate:        f,
-		mux:         http.NewServeMux(),
-		store:       newTaskStore(),
-		staticFS:    staticFS,
-		fileServer:  nil,
-		repo:        repo,
-		poetryIndex: buildPoetryIndex(poetryDir),
+		fate:       f,
+		mux:        http.NewServeMux(),
+		store:      newTaskStore(),
+		staticFS:   staticFS,
+		fileServer: nil,
+		repo:       repo,
 	}
 
 	if staticFS != nil {
@@ -82,7 +79,6 @@ func NewHandler(f fate.Fate, staticFS fs.FS, repo *repository.Repository, poetry
 	h.mux.HandleFunc("GET /api/generate/explore", h.handleExplore)
 	h.mux.HandleFunc("GET /api/generate/names", h.handleNames)
 	h.mux.HandleFunc("POST /api/name-score", h.handleNameScore)
-	h.mux.HandleFunc("GET /api/poetry/search", h.handlePoetrySearch)
 	h.mux.HandleFunc("GET /api/name-detail", h.handleNameDetail)
 	h.mux.HandleFunc("/{path...}", h.handleDefault)
 
@@ -301,10 +297,6 @@ func (h *Handler) handleResult(w http.ResponseWriter, r *http.Request) {
 	topNames := output.TopNames()
 	table := output.ExcellentTable()
 
-	for i := range topNames {
-		h.enrichPoetryOrigin(&topNames[i])
-	}
-
 	top3 := make([]fate.NameResult, 0, 3)
 	for i := range topNames {
 		if i >= 3 {
@@ -436,16 +428,15 @@ func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
 
 	pagedNames := make([]analysis.NameResult, 0, pageSize)
 	for i := start; i < end; i++ {
-		h.enrichPoetryOrigin(&topNames[i])
 		pagedNames = append(pagedNames, topNames[i])
 	}
 
 	writeJSON(w, 200, map[string]any{
 		"task_id": taskID,
-		"names":     pagedNames,
-		"page":     page,
-		"size":     pageSize,
-		"total":    total,
+		"names":   pagedNames,
+		"page":    page,
+		"size":    pageSize,
+		"total":   total,
 	})
 }
 
@@ -466,7 +457,6 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 			topNames := output.TopNames()
 			for i := range topNames {
 				if topNames[i].Char1.Char == char1 && topNames[i].Char2.Char == char2 {
-					h.enrichPoetryOrigin(&topNames[i])
 					writeJSON(w, 200, map[string]any{"name_result": topNames[i]})
 					return
 				}
@@ -492,7 +482,6 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 					fateData := output.FateData()
 					if fateData != nil {
 						nr := analysis.BuildNameResult(0, surname, c1, c2, l1, l2, fateData)
-						h.enrichPoetryOrigin(&nr)
 						writeJSON(w, 200, map[string]any{"name_result": nr})
 						return
 					}
@@ -504,54 +493,12 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 	writeError(w, 404, "name not found")
 }
 
-func (h *Handler) enrichPoetryOrigin(nr *analysis.NameResult) {
-	if h.poetryIndex == nil {
-		return
-	}
-	if nr.Char1.HasPoetry && nr.Char1.PoetryOrigin == nil {
-		if origin, ok := h.poetryIndex[nr.Char1.Char]; ok {
-			nr.Char1.PoetryOrigin = origin
-		}
-	}
-	if nr.Char2.HasPoetry && nr.Char2.PoetryOrigin == nil {
-		if origin, ok := h.poetryIndex[nr.Char2.Char]; ok {
-			nr.Char2.PoetryOrigin = origin
-		}
-	}
-}
-
-func buildPoetryIndex(poetryDir string) map[string]*analysis.PoetryOrigin {
-	if poetryDir == "" {
-		return nil
-	}
-	entries, err := dict.LoadSelectedPoetryFromDir(poetryDir)
-	if err != nil {
-		return nil
-	}
-	idx := make(map[string]*analysis.PoetryOrigin)
-	for _, e := range entries {
-		refs := dict.ExtractCharRefs(e.Content)
-		for _, ref := range refs {
-			if _, exists := idx[ref.Char]; !exists {
-				idx[ref.Char] = &analysis.PoetryOrigin{
-					Title:    e.Title,
-					Author:   e.Author,
-					Dynasty:  e.Dynasty,
-					Sentence: ref.Sentence,
-					Type:     e.Type,
-				}
-			}
-		}
-	}
-	return idx
-}
-
 type nameScoreRequest struct {
-	Surname  string `json:"surname"`
-	Name1    string `json:"name1"`
-	Name2    string `json:"name2"`
-	Born     string `json:"born"`
-	Sex      string `json:"sex"`
+	Surname string `json:"surname"`
+	Name1   string `json:"name1"`
+	Name2   string `json:"name2"`
+	Born    string `json:"born"`
+	Sex     string `json:"sex"`
 }
 
 func (h *Handler) handleNameScore(w http.ResponseWriter, r *http.Request) {
@@ -627,55 +574,8 @@ func (h *Handler) handleNameScore(w http.ResponseWriter, r *http.Request) {
 	}
 
 	nr := analysis.BuildNameResult(0, req.Surname, c1, c2, l1, l2, fateData)
-	h.enrichPoetryOrigin(&nr)
 
 	writeJSON(w, 200, map[string]any{
 		"name_result": nr,
 	})
-}
-
-type poetrySearchResult struct {
-	Title   string `json:"title"`
-	Author  string `json:"author"`
-	Dynasty string `json:"dynasty"`
-	Type    string `json:"type"`
-	Sentence string `json:"sentence"`
-}
-
-func (h *Handler) handlePoetrySearch(w http.ResponseWriter, r *http.Request) {
-	key := r.URL.Query().Get("keyword")
-	if key == "" {
-		writeJSON(w, 200, map[string]any{"results": []poetrySearchResult{}})
-		return
-	}
-
-	var results []poetrySearchResult
-	keyRunes := []rune(key)
-
-	for char, origin := range h.poetryIndex {
-		charRunes := []rune(char)
-		if len(charRunes) == 0 {
-			continue
-		}
-
-		matched := false
-		for _, kr := range keyRunes {
-			if kr == charRunes[0] {
-				matched = true
-				break
-			}
-		}
-
-		if matched {
-			results = append(results, poetrySearchResult{
-				Title:    origin.Title,
-				Author:   origin.Author,
-				Dynasty:  origin.Dynasty,
-				Type:     origin.Type,
-				Sentence: origin.Sentence,
-			})
-		}
-	}
-
-	writeJSON(w, 200, map[string]any{"results": results})
 }

@@ -119,39 +119,3 @@ func (vu *VersionUpdate) SetVersionWithOptional(input *Version) *VersionUpdate {
 	vu.SetUpdatedUnix(input.UpdatedUnix)
 	return vu
 }
-
-func (wxc *WuXingCreate) SetWuXing(input *WuXing) *WuXingCreate {
-	return wxc
-}
-
-func (wxc *WuXingCreate) SetWuXingWithOptional(input *WuXing) *WuXingCreate {
-	wxc.SetCreated(input.Created)
-	wxc.SetUpdated(input.Updated)
-	wxc.SetDeleted(input.Deleted)
-	wxc.SetVersion(input.Version)
-	wxc.SetFirst(input.First)
-	wxc.SetSecond(input.Second)
-	wxc.SetThird(input.Third)
-	wxc.SetFortune(input.Fortune)
-	return wxc
-}
-
-func (wxuo *WuXingUpdateOne) SetWuXing(input *WuXing) *WuXingUpdateOne {
-	return wxuo
-}
-
-func (wxu *WuXingUpdate) SetWuXing(input *WuXing) *WuXingUpdate {
-	return wxu
-}
-
-func (wxu *WuXingUpdate) SetWuXingWithOptional(input *WuXing) *WuXingUpdate {
-	wxu.SetCreated(input.Created)
-	wxu.SetUpdated(input.Updated)
-	wxu.SetDeleted(input.Deleted)
-	wxu.SetVersion(input.Version)
-	wxu.SetFirst(input.First)
-	wxu.SetSecond(input.Second)
-	wxu.SetThird(input.Third)
-	wxu.SetFortune(input.Fortune)
-	return wxu
-}

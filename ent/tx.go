@@ -16,8 +16,6 @@ type Tx struct {
 	Character *CharacterClient
 	// Version is the client for interacting with the Version builders.
 	Version *VersionClient
-	// WuXing is the client for interacting with the WuXing builders.
-	WuXing *WuXingClient
 
 	// lazily loaded.
 	client     *Client
@@ -151,7 +149,6 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Character = NewCharacterClient(tx.config)
 	tx.Version = NewVersionClient(tx.config)
-	tx.WuXing = NewWuXingClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
