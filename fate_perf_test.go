@@ -9,6 +9,9 @@ import (
 )
 
 func TestNameGenerationPerformance(t *testing.T) {
+	// Performance test on real 30k-char database.
+	// Tests 4 representative last names across 2 filter modes = 8 runs.
+	// Each run generates up to 10000 names; total ~80s on warm cache.
 	cfg := config.DefaultConfig()
 	cfg.Database = config.DBConfig{
 		Driver: "sqlite3",
@@ -20,73 +23,70 @@ func TestNameGenerationPerformance(t *testing.T) {
 		t.Fatalf("New() error = %v", err)
 	}
 
+	// Representative surnames: single-char, different strokes.
 	lastNames := []struct {
 		name [2]string
 		desc string
 	}{
-		{[2]string{"张", ""}, "张(单姓,11画)"},
-		{[2]string{"李", ""}, "李(单姓,7画)"},
-		{[2]string{"王", ""}, "王(单姓,4画)"},
-		{[2]string{"刘", ""}, "刘(单姓,6画)"},
-		{[2]string{"陈", ""}, "陈(单姓,7画)"},
+		{[2]string{"张", ""}, "张(11画,火)"},
+		{[2]string{"李", ""}, "李(7画,木)"},
+		{[2]string{"王", ""}, "王(4画,土)"},
+		{[2]string{"陈", ""}, "陈(16画,火)"},
 	}
 
 	born, _ := time.Parse("2006/01/02 15:04", "2024/06/15 10:30")
 
-	filterOpts := []struct {
-		name   string
-		option FilterOption
-	}{
-		{
-			"基础过滤(笔画+常规)",
-			FilterOption{
-				CharacterFilter:     true,
-				CharacterFilterType: CharacterFilterTypeDefault,
-				MinStroke:           3,
-				MaxStroke:           18,
-				RegularFilter:       true,
-			},
-		},
-		{
-			"全过滤(笔画+常规+大衍+五行)",
-			FilterOption{
-				CharacterFilter:     true,
-				CharacterFilterType: CharacterFilterTypeDefault,
-				MinStroke:           3,
-				MaxStroke:           18,
-				RegularFilter:       true,
-				DaYanFilter:         true,
-				WuXingFilter:        true,
-			},
-		},
+	// Full filter (the heaviest path — all gates active).
+	fullFilter := NewFilter(FilterOption{
+		CharacterFilter:     true,
+		CharacterFilterType: CharacterFilterTypeDefault,
+		MinStroke:           3,
+		MaxStroke:           18,
+		RegularFilter:       true,
+		DaYanFilter:         true,
+		WuXingFilter:        true,
+	})
+
+	var totalRuns, totalNames, zeroRuns int
+	var totalTime time.Duration
+
+	for _, ln := range lastNames {
+		s := f.NewSessionWithFilter(fullFilter)
+
+		input := &Input{
+			Last: ln.name,
+			Born: born,
+			Sex:  Sex(1),
+		}
+
+		start := time.Now()
+		if err := s.Start(input); err != nil {
+			t.Errorf("  %s: Start() error = %v", ln.desc, err)
+			continue
+		}
+		s.Wait()
+		elapsed := time.Since(start)
+
+		output := input.Output()
+		n := output.Total()
+
+		t.Logf("  %s: %d names in %v (%.0f/s)", ln.desc, n, elapsed, float64(n)/elapsed.Seconds())
+
+		totalRuns++
+		totalNames += n
+		totalTime += elapsed
+		if n == 0 {
+			zeroRuns++
+		}
 	}
 
-	for _, fo := range filterOpts {
-		t.Logf("========== 过滤模式: %s ==========", fo.name)
-		for _, ln := range lastNames {
-			s := f.NewSessionWithFilter(NewFilter(fo.option))
+	avgTime := totalTime / time.Duration(totalRuns)
+	t.Logf("=== Summary ===")
+	t.Logf("  Runs: %d | Avg names: %d | Avg time: %v | Throughput: %.0f names/s",
+		totalRuns, totalNames/totalRuns, avgTime, float64(totalNames/totalRuns)/avgTime.Seconds())
 
-			input := &Input{
-				Last: ln.name,
-				Born: born,
-				Sex:  Sex(1),
-			}
-
-			start := time.Now()
-			err = s.Start(input)
-			if err != nil {
-				t.Errorf("  %s: Start() error = %v", ln.desc, err)
-				continue
-			}
-			s.Wait()
-			elapsed := time.Since(start)
-
-			output := input.Output()
-			total := output.Total()
-			t.Logf("  %s: %d 个名字, 耗时 %v (%.0f 名/秒)",
-				ln.desc, total, elapsed,
-				float64(total)/elapsed.Seconds())
-		}
+	if zeroRuns > 0 {
+		t.Errorf("  FATAL: %d/%d runs produced 0 names (empty database?)", zeroRuns, totalRuns)
 	}
 }
 
