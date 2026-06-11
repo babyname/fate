@@ -1,8 +1,11 @@
 ﻿package fate
 
 import (
+	"context"
+
 	"github.com/babyname/fate/v4/config"
 	"github.com/babyname/fate/v4/internal/analysis"
+	"github.com/babyname/fate/v4/internal/chronosfate"
 	"github.com/babyname/fate/v4/internal/database"
 	filterpkg "github.com/babyname/fate/v4/internal/filter"
 	"github.com/babyname/fate/v4/internal/naming"
@@ -14,6 +17,9 @@ type Fate interface {
 	NewSession() Session
 	NewSessionWithFilter(f Filter) Session
 	Repo() *repository.Repository
+	// Generate runs the full name generation pipeline synchronously.
+	// This is a simpler alternative to the Session state machine.
+	Generate(ctx context.Context, req GenerateRequest) (*GenerateResult, error)
 }
 
 type fateImpl struct {
@@ -81,6 +87,9 @@ type CharInfo = analysis.CharInfo
 type GeItem = analysis.GeItem
 type WuGeResult = analysis.WuGeResult
 type ScoreDetail = analysis.ScoreDetail
+
+// FateData is a type alias for the internal chronosfate.FateData.
+type FateData = chronosfate.FateData
 
 const (
 	SexBoy  Sex = naming.SexBoy
