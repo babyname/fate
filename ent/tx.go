@@ -14,10 +14,6 @@ type Tx struct {
 	config
 	// Character is the client for interacting with the Character builders.
 	Character *CharacterClient
-	// Poem is the client for interacting with the Poem builders.
-	Poem *PoemClient
-	// PoemChar is the client for interacting with the PoemChar builders.
-	PoemChar *PoemCharClient
 	// Version is the client for interacting with the Version builders.
 	Version *VersionClient
 	// WuXing is the client for interacting with the WuXing builders.
@@ -154,8 +150,6 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Character = NewCharacterClient(tx.config)
-	tx.Poem = NewPoemClient(tx.config)
-	tx.PoemChar = NewPoemCharClient(tx.config)
 	tx.Version = NewVersionClient(tx.config)
 	tx.WuXing = NewWuXingClient(tx.config)
 }
