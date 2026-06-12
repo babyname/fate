@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"strings"
@@ -11,11 +12,7 @@ import (
 
 	"github.com/babyname/fate/v4"
 	"github.com/babyname/fate/v4/ent"
-	"github.com/babyname/fate/v4/ent/character"
-	"github.com/babyname/fate/v4/internal/analysis"
-	"github.com/babyname/fate/v4/internal/chronosfate"
 	"github.com/babyname/fate/v4/internal/repository"
-	"github.com/godcong/chronos/v2"
 )
 
 type Handler struct {
@@ -28,9 +25,22 @@ type Handler struct {
 }
 
 type taskEntry struct {
+	mu      sync.RWMutex
 	result  *fate.GenerateResult
 	request generateRequest
 	created time.Time
+}
+
+func (e *taskEntry) loadResult() *fate.GenerateResult {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	return e.result
+}
+
+func (e *taskEntry) storeResult(r *fate.GenerateResult) {
+	e.mu.Lock()
+	e.result = r
+	e.mu.Unlock()
 }
 
 type taskStore struct {
@@ -38,123 +48,81 @@ type taskStore struct {
 	tasks map[string]*taskEntry
 }
 
-func newTaskStore() *taskStore {
-	return &taskStore{
-		tasks: make(map[string]*taskEntry),
-	}
+type generateRequest struct {
+	Surname       string `json:"surname"`
+	Born          string `json:"born"`
+	Sex           string `json:"sex"`
+	PoetryMode    int    `json:"poetry_mode"`
+	XiYongMethod  string `json:"xi_yong_method"`
+	AvoidChars    string `json:"avoid_chars"`
+	RequireChars  string `json:"require_chars"`
+	FilterType    int    `json:"filter_type"`
 }
 
-func (s *taskStore) Set(id string, entry *taskEntry) {
-	s.mu.Lock()
-	s.tasks[id] = entry
-	s.mu.Unlock()
-}
-
-func (s *taskStore) Get(id string) (*taskEntry, bool) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	e, ok := s.tasks[id]
-	return e, ok
-}
-
+// NewHandler creates an initialized Handler with all routes registered.
 func NewHandler(f fate.Fate, staticFS fs.FS, repo *repository.Repository) *Handler {
 	h := &Handler{
-		fate:       f,
-		mux:        http.NewServeMux(),
-		store:      newTaskStore(),
-		staticFS:   staticFS,
-		fileServer: nil,
-		repo:       repo,
+		fate:     f,
+		mux:      http.NewServeMux(),
+		store:    newTaskStore(),
+		staticFS: staticFS,
+		repo:     repo,
 	}
-
-	if staticFS != nil {
-		h.fileServer = http.FileServerFS(staticFS)
-	}
-
-	h.mux.HandleFunc("GET /health", h.handleHealth)
-	h.mux.HandleFunc("POST /api/generate", h.handleGenerate)
-	h.mux.HandleFunc("GET /api/generate/status", h.handleStatus)
-	h.mux.HandleFunc("GET /api/generate/result", h.handleResult)
-	h.mux.HandleFunc("GET /api/generate/explore", h.handleExplore)
-	h.mux.HandleFunc("GET /api/generate/names", h.handleNames)
-	h.mux.HandleFunc("POST /api/name-score", h.handleNameScore)
-	h.mux.HandleFunc("GET /api/name-detail", h.handleNameDetail)
-	h.mux.HandleFunc("/{path...}", h.handleDefault)
-
+	h.fileServer = http.FileServer(http.FS(h.staticFS))
+	h.registerRoutes()
 	return h
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	origin := r.Header.Get("Origin")
+	if origin != "" {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	}
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(204)
+		return
+	}
 	h.mux.ServeHTTP(w, r)
 }
 
-func (h *Handler) handleDefault(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.NotFound(w, r)
-		return
-	}
-
-	path := r.URL.Path
-
-	if strings.HasPrefix(path, "/api/") {
-		http.NotFound(w, r)
-		return
-	}
-
-	if h.fileServer != nil {
-		if path != "/" {
-			if _, err := fs.Stat(h.staticFS, strings.TrimPrefix(path, "/")); err == nil {
-				h.fileServer.ServeHTTP(w, r)
-				return
-			}
-		}
-
-		f, err := h.staticFS.Open("index.html")
-		if err != nil {
-			http.NotFound(w, r)
-			return
-		}
-		defer f.Close()
-
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		stat, _ := f.Stat()
-		if stat != nil {
-			buf := make([]byte, stat.Size())
-			f.Read(buf)
-			w.Write(buf)
-			return
-		}
-	}
-
-	http.NotFound(w, r)
+func (h *Handler) registerRoutes() {
+	h.mux.HandleFunc("POST /api/v1/generate", h.handleGenerate)
+	h.mux.HandleFunc("GET /api/v1/status", h.handleStatus)
+	h.mux.HandleFunc("GET /api/v1/result", h.handleResult)
+	h.mux.HandleFunc("GET /api/v1/explore", h.handleExplore)
+	h.mux.HandleFunc("GET /api/v1/names", h.handleNames)
+	h.mux.HandleFunc("GET /api/v1/name_detail", h.handleNameDetail)
+	h.mux.HandleFunc("GET /api/v1/characters", h.handleCharacters)
+	h.mux.HandleFunc("GET /", h.handleStatic)
 }
 
-func writeJSON(w http.ResponseWriter, status int, v any) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+func newTaskStore() *taskStore {
+	return &taskStore{tasks: make(map[string]*taskEntry)}
+}
+
+func (s *taskStore) Get(key string) (*taskEntry, bool) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	entry, ok := s.tasks[key]
+	return entry, ok
+}
+
+func (s *taskStore) Set(key string, entry *taskEntry) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.tasks[key] = entry
+}
+
+func writeJSON(w http.ResponseWriter, status int, data any) {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(v)
+	_ = json.NewEncoder(w).Encode(data)
 }
 
 func writeError(w http.ResponseWriter, status int, msg string) {
 	writeJSON(w, status, map[string]string{"error": msg})
-}
-
-func (h *Handler) handleHealth(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, http.StatusOK, map[string]string{
-		"status":    "ok",
-		"timestamp": time.Now().Format(time.RFC3339),
-	})
-}
-
-type generateRequest struct {
-	Surname      string   `json:"surname"`
-	Born         string   `json:"born"`
-	Sex          string   `json:"sex"`
-	PoetryMode   int      `json:"poetry_mode"`
-	XiYongMethod string   `json:"xiyong_method"`
-	AvoidChars   []string `json:"avoid_chars"`
-	RequireChars []string `json:"require_chars"`
-	FilterType   uint     `json:"filter_type"`
 }
 
 func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
@@ -179,7 +147,17 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 		sex = fate.SexGirl
 	}
 
-	// Synchronous generation using the new API.
+	// Parse optional comma-separated char lists.
+	avoidChars := strings.Split(req.AvoidChars, ",")
+	requireChars := strings.Split(req.RequireChars, ",")
+	if len(avoidChars) == 1 && avoidChars[0] == "" {
+		avoidChars = nil
+	}
+	if len(requireChars) == 1 && requireChars[0] == "" {
+		requireChars = nil
+	}
+
+	// Generate synchronously.
 	result, err := h.fate.Generate(r.Context(), fate.GenerateRequest{
 		LastName: req.Surname,
 		Born:     born,
@@ -190,8 +168,8 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 			WuXingFilter:        true,
 			PoetryMode:          req.PoetryMode,
 			XiYongMethod:        req.XiYongMethod,
-			AvoidCharacters:     req.AvoidChars,
-			RequireCharacters:   req.RequireChars,
+			AvoidCharacters:     avoidChars,
+			RequireCharacters:   requireChars,
 			CharacterFilterType: fate.CharacterFilterType(req.FilterType),
 		},
 	})
@@ -201,11 +179,12 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	taskID := fmt.Sprintf("%d", time.Now().UnixNano())
-	h.store.Set(taskID, &taskEntry{
+	entry := &taskEntry{
 		result:  result,
 		request: req,
 		created: time.Now(),
-	})
+	}
+	h.store.Set(taskID, entry)
 
 	writeJSON(w, 200, map[string]any{
 		"task_id": taskID,
@@ -246,7 +225,12 @@ func (h *Handler) handleResult(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := entry.result
+	result := entry.loadResult()
+	if result == nil {
+		writeError(w, 500, "result not available")
+		return
+	}
+
 	topNames := result.TopNames
 
 	top3 := make([]fate.NameResult, 0, 3)
@@ -284,7 +268,12 @@ func (h *Handler) handleExplore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := entry.result
+	result := entry.loadResult()
+	if result == nil {
+		writeError(w, 500, "result not available")
+		return
+	}
+
 	table := result.ExcellentTable
 
 	count := 10
@@ -334,7 +323,12 @@ func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := entry.result
+	result := entry.loadResult()
+	if result == nil {
+		writeError(w, 500, "result not available")
+		return
+	}
+
 	topNames := result.TopNames
 
 	page := 1
@@ -388,32 +382,33 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 	if taskID != "" {
 		entry, ok := h.store.Get(taskID)
 		if ok {
-			result := entry.result
+			result := entry.loadResult()
+			if result != nil {
+				// Search top names for a match.
+				for i := range result.TopNames {
+					if result.TopNames[i].Char1.Char == char1 && result.TopNames[i].Char2.Char == char2 {
+						writeJSON(w, 200, map[string]any{"name_result": result.TopNames[i]})
+						return
+					}
+				}
 
-			// Search top names for a match.
-			for i := range result.TopNames {
-				if result.TopNames[i].Char1.Char == char1 && result.TopNames[i].Char2.Char == char2 {
-					writeJSON(w, 200, map[string]any{"name_result": result.TopNames[i]})
+				// Return partial info from CharMap.
+				c1, ok1 := result.CharMap[char1]
+				c2, ok2 := result.CharMap[char2]
+				if ok1 && ok2 {
+					surname := ""
+					if len(result.TopNames) > 0 {
+						surname = result.TopNames[0].Surname
+					}
+					nr := fate.NameResult{
+						FullName: surname + char1 + char2,
+						Surname:  surname,
+						Char1:    c1,
+						Char2:    c2,
+					}
+					writeJSON(w, 200, map[string]any{"name_result": nr})
 					return
 				}
-			}
-
-			// Return partial info from CharMap if characters exist.
-			c1, ok1 := result.CharMap[char1]
-			c2, ok2 := result.CharMap[char2]
-			if ok1 && ok2 {
-				surname := ""
-				if len(result.TopNames) > 0 {
-					surname = result.TopNames[0].Surname
-				}
-				nr := fate.NameResult{
-					FullName: surname + char1 + char2,
-					Surname:  surname,
-					Char1:    c1,
-					Char2:    c2,
-				}
-				writeJSON(w, 200, map[string]any{"name_result": nr})
-				return
 			}
 		}
 	}
@@ -421,89 +416,85 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 	writeError(w, 404, "name not found")
 }
 
-type nameScoreRequest struct {
-	Surname string `json:"surname"`
-	Name1   string `json:"name1"`
-	Name2   string `json:"name2"`
-	Born    string `json:"born"`
-	Sex     string `json:"sex"`
-}
-
-func (h *Handler) handleNameScore(w http.ResponseWriter, r *http.Request) {
-	var req nameScoreRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeError(w, 400, "invalid request: "+err.Error())
-		return
-	}
-	defer r.Body.Close()
-
-	surnameRunes := []rune(req.Surname)
-	if len(surnameRunes) == 0 {
-		writeError(w, 400, "surname required")
-		return
-	}
-
-	name1Runes := []rune(req.Name1)
-	name2Runes := []rune(req.Name2)
-	if len(name1Runes) == 0 || len(name2Runes) == 0 {
-		writeError(w, 400, "both name characters required")
+func (h *Handler) handleCharacters(w http.ResponseWriter, r *http.Request) {
+	char := r.URL.Query().Get("char")
+	if char == "" {
+		writeError(w, 400, "character is required")
 		return
 	}
 
 	ctx := r.Context()
-	surnameChars, err := h.repo.QueryLastName(ctx, [2]string{string(surnameRunes[0]), ""})
+	results, err := h.repo.GetCharacters(ctx, repository.Char(char))
 	if err != nil {
-		writeError(w, 500, "query surname: "+err.Error())
+		writeError(w, 500, "query failed: "+err.Error())
 		return
 	}
 
-	c1, err := h.repo.Character.Query().Where(character.CharEQ(string(name1Runes[0]))).First(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			writeError(w, 404, "character not found: "+string(name1Runes[0]))
-			return
-		}
-		writeError(w, 500, "query character: "+err.Error())
+	if results == nil {
+		results = []*ent.Character{}
+	}
+
+	writeJSON(w, 200, map[string]any{"characters": results})
+}
+
+func (h *Handler) handleStatic(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	if path == "/" || path == "" {
+		path = "/index.html"
+	}
+
+	// If staticFS is nil, fallback gracefully.
+	if h.staticFS == nil {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(200)
+		_, _ = w.Write([]byte("Fate API Server\n\nAvailable endpoints:\n  POST /api/v1/generate\n  GET  /api/v1/status\n  GET  /api/v1/result\n  GET  /api/v1/explore\n  GET  /api/v1/characters\n"))
 		return
 	}
 
-	c2, err := h.repo.Character.Query().Where(character.CharEQ(string(name2Runes[0]))).First(ctx)
+	// Try the requested path.
+	cleaned := strings.TrimPrefix(path, "/")
+	f, err := h.staticFS.Open(cleaned)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			writeError(w, 404, "character not found: "+string(name2Runes[0]))
-			return
-		}
-		writeError(w, 500, "query character: "+err.Error())
-		return
-	}
-
-	l1 := 0
-	if surnameChars[0] != nil {
-		l1 = surnameChars[0].ScienceStroke
-	}
-	l2 := 0
-
-	var fateData *chronosfate.FateData
-	if req.Born != "" {
-		sexInt := 1
-		if req.Sex == "2" || req.Sex == "女" {
-			sexInt = 2
-		}
-		input := chronosfate.FateInput{
-			Calendar:     chronos.NewSolarCalendar(req.Born),
-			Gender:       sexInt,
-			XiYongMethod: chronosfate.XiYongMethodBalance,
-		}
-		fateData, err = chronosfate.GetFateData(input)
+		// Fallback to index.html for SPA routes.
+		f, err = h.staticFS.Open("index.html")
 		if err != nil {
-			writeError(w, 500, "calculate fate: "+err.Error())
+			http.NotFound(w, r)
 			return
 		}
 	}
+	defer f.Close()
 
-	nr := analysis.BuildNameResult(0, req.Surname, c1, c2, l1, l2, fateData)
+	// Read file content and serve.
+	data, err := io.ReadAll(f)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
 
-	writeJSON(w, 200, map[string]any{
-		"name_result": nr,
-	})
+	// Set content type based on extension.
+	switch {
+	case strings.HasSuffix(path, ".html"):
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	case strings.HasSuffix(path, ".css"):
+		w.Header().Set("Content-Type", "text/css; charset=utf-8")
+	case strings.HasSuffix(path, ".js"):
+		w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+	case strings.HasSuffix(path, ".png"):
+		w.Header().Set("Content-Type", "image/png")
+	case strings.HasSuffix(path, ".jpg") || strings.HasSuffix(path, ".jpeg"):
+		w.Header().Set("Content-Type", "image/jpeg")
+	case strings.HasSuffix(path, ".svg"):
+		w.Header().Set("Content-Type", "image/svg+xml")
+	case strings.HasSuffix(path, ".ico"):
+		w.Header().Set("Content-Type", "image/x-icon")
+	case strings.HasSuffix(path, ".json"):
+		w.Header().Set("Content-Type", "application/json")
+	case strings.HasSuffix(path, ".woff2"):
+		w.Header().Set("Content-Type", "font/woff2")
+	case strings.HasSuffix(path, ".ttf"):
+		w.Header().Set("Content-Type", "font/ttf")
+	}
+
+	w.WriteHeader(200)
+	_, _ = w.Write(data)
 }

@@ -2,6 +2,7 @@ package naming
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/babyname/fate/v4/ent"
@@ -29,16 +30,24 @@ type GenerateRequest struct {
 
 // GenerateResult holds the output of a completed generation run.
 type GenerateResult struct {
-	TopNames       []analysis.NameResult
-	ExcellentTable *ExcellentTable
-	CharMap        map[string]*ent.Character
-	FateData       *chronosfate.FateData
-	// LastNameStrokes records the stroke values computed for the surname.
+	TopNames        []analysis.NameResult
+	ExcellentTable  *ExcellentTable
+	CharMap         map[string]*ent.Character
+	FateData        *chronosfate.FateData
 	LastNameStrokes [2]int
 }
 
-// Pipeline orchestrates the full name generation workflow:
-// fate calculation → lucky wuge combos → character preload → scoring → output.
+// StreamBatch is delivered by GenerateStream as top results become available.
+type StreamBatch struct {
+	TopResults []analysis.NameResult
+	Total      int
+	IsFinal    bool
+	// Result is set only on the final batch (IsFinal=true) and provides the
+	// complete GenerationResult for pagination.
+	Result *GenerateResult
+}
+
+// Pipeline orchestrates the full name generation workflow.
 type Pipeline struct {
 	db *repository.Repository
 }
@@ -48,28 +57,13 @@ func NewPipeline(db *repository.Repository) *Pipeline {
 	return &Pipeline{db: db}
 }
 
-// Generate runs the complete name generation pipeline.
+// Generate runs the complete name generation pipeline synchronously.
 func (p *Pipeline) Generate(ctx context.Context, req GenerateRequest) (*GenerateResult, error) {
 	// 1. Calculate surname strokes from filter.
 	strokes := surnameStrokes(req.Filter, req.LastName)
 
 	// 2. Use pre-calculated fate data or compute it from birth info.
-	fateData := req.FateData
-	if fateData == nil {
-		method := chronosfate.XiYongMethodBalance
-		if req.Filter.XiYongMethod() == "geju" {
-			method = chronosfate.XiYongMethodGeJu
-		}
-		var err error
-		fateData, err = chronosfate.GetFateData(chronosfate.FateInput{
-			Calendar:     v2.NewSolarCalendar(req.Born),
-			Gender:       int(req.Sex),
-			XiYongMethod: method,
-		})
-		if err != nil {
-			log.Error("get fate data", err)
-		}
-	}
+	fateData := p.resolveFateData(req)
 
 	// 3. Get lucky wuge combinations for this surname.
 	lucky := wuge.GetLuckyByLastName(strokes[0], strokes[1])
@@ -77,7 +71,7 @@ func (p *Pipeline) Generate(ctx context.Context, req GenerateRequest) (*Generate
 	// 4. Preload characters needed by lucky combos.
 	chars := preloadChars(ctx, p.db, lucky, req.Filter)
 
-	// 5. Query poetry set (HasPoetry flag from DB).
+	// 5. Query poetry set.
 	poetrySet := p.queryPoetrySet(ctx)
 
 	// 6. Create rater with fate data and surname strokes.
@@ -85,18 +79,7 @@ func (p *Pipeline) Generate(ctx context.Context, req GenerateRequest) (*Generate
 
 	// 7. Score all candidates with 3-tier filter strictness fallback.
 	table := NewExcellentTable()
-	runScoring(ctx, lucky, rater, table, poetrySet, chars, req.Filter)
-
-	if table.HeapLen() == 0 && req.Filter.FilterStrictness() != "relaxed" {
-		req.Filter.SetFilterStrictness("moderate")
-		chars = preloadChars(ctx, p.db, lucky, req.Filter)
-		runScoring(ctx, lucky, rater, table, poetrySet, chars, req.Filter)
-	}
-	if table.HeapLen() == 0 && req.Filter.FilterStrictness() != "relaxed" {
-		req.Filter.SetFilterStrictness("relaxed")
-		chars = preloadChars(ctx, p.db, lucky, req.Filter)
-		runScoring(ctx, lucky, rater, table, poetrySet, chars, req.Filter)
-	}
+	table, chars = p.runScoringWithFallback(ctx, lucky, rater, table, poetrySet, chars, req)
 
 	// 8. Finalize the heap into sorted entries.
 	table.Finalize()
@@ -105,7 +88,120 @@ func (p *Pipeline) Generate(ctx context.Context, req GenerateRequest) (*Generate
 	charMap := buildCharMap(chars)
 
 	// 10. Convert top entries to analysis.NameResult slices.
+	result := p.buildResults(table, charMap, strokes, fateData, surnameStr(req.LastName))
+	return result, nil
+}
+
+// GenerateStream runs the name generation pipeline in parallel and sends
+// batches of top results via callback as workers complete.
+func (p *Pipeline) GenerateStream(ctx context.Context, req GenerateRequest, onBatch func(StreamBatch)) error {
+	strokes := surnameStrokes(req.Filter, req.LastName)
+	fateData := p.resolveFateData(req)
+	lucky := wuge.GetLuckyByLastName(strokes[0], strokes[1])
+	chars := preloadChars(ctx, p.db, lucky, req.Filter)
+	poetrySet := p.queryPoetrySet(ctx)
+	rater := rating.NewRaterWithStrokes(fateData, strokes[0], strokes[1])
 	surname := surnameStr(req.LastName)
+
+	table := NewExcellentTable()
+
+	var batchMu sync.Mutex
+	batchSeq := 0
+
+	cb := func() {
+		batchMu.Lock()
+		seq := batchSeq + 1
+		batchSeq = seq
+		batchMu.Unlock()
+
+		if seq == 1 || seq%2 == 0 {
+			snapshot := heapPreview(table, 10, surname, strokes)
+			onBatch(StreamBatch{
+				TopResults: snapshot,
+				Total:      table.HeapLen(),
+				IsFinal:    false,
+			})
+		}
+	}
+
+	runScoringParallel(ctx, lucky, rater, table, poetrySet, chars, req.Filter, cb)
+
+	// Fallback tiers if no results.
+	strictness := req.Filter.FilterStrictness()
+	if table.HeapLen() == 0 && strictness != "relaxed" {
+		req.Filter.SetFilterStrictness("moderate")
+		chars = preloadChars(ctx, p.db, lucky, req.Filter)
+		runScoringParallel(ctx, lucky, rater, table, poetrySet, chars, req.Filter, cb)
+	}
+	if table.HeapLen() == 0 && strictness != "relaxed" {
+		req.Filter.SetFilterStrictness("relaxed")
+		chars = preloadChars(ctx, p.db, lucky, req.Filter)
+		runScoringParallel(ctx, lucky, rater, table, poetrySet, chars, req.Filter, cb)
+	}
+
+	table.Finalize()
+	charMap := buildCharMap(chars)
+	result := p.buildResults(table, charMap, strokes, fateData, surname)
+
+	onBatch(StreamBatch{
+		TopResults: result.TopNames,
+		Total:      table.Len(),
+		IsFinal:    true,
+		Result:     result,
+	})
+	return nil
+}
+
+// resolveFateData returns the fate data, computing it from birth info if needed.
+func (p *Pipeline) resolveFateData(req GenerateRequest) *chronosfate.FateData {
+	if req.FateData != nil {
+		return req.FateData
+	}
+	method := chronosfate.XiYongMethodBalance
+	if req.Filter.XiYongMethod() == "geju" {
+		method = chronosfate.XiYongMethodGeJu
+	}
+	fateData, err := chronosfate.GetFateData(chronosfate.FateInput{
+		Calendar:     v2.NewSolarCalendar(req.Born),
+		Gender:       int(req.Sex),
+		XiYongMethod: method,
+	})
+	if err != nil {
+		log.Error("get fate data", err)
+	}
+	return fateData
+}
+
+// runScoringWithFallback runs scoring with up to 3 filter strictness tiers.
+// Returns the populated table and the final set of preloaded characters.
+func (p *Pipeline) runScoringWithFallback(
+	ctx context.Context,
+	lucky []wuge.WuGeResult,
+	rater *rating.Rater,
+	table *ExcellentTable,
+	poetrySet map[string]bool,
+	chars map[int][]*ent.Character,
+	req GenerateRequest,
+) (*ExcellentTable, map[int][]*ent.Character) {
+	runScoring(ctx, lucky, rater, table, poetrySet, chars, req.Filter)
+
+	strictness := req.Filter.FilterStrictness()
+	if table.HeapLen() == 0 && strictness != "relaxed" {
+		req.Filter.SetFilterStrictness("moderate")
+		chars = preloadChars(ctx, p.db, lucky, req.Filter)
+		runScoring(ctx, lucky, rater, table, poetrySet, chars, req.Filter)
+	}
+	if table.HeapLen() == 0 && strictness != "relaxed" {
+		req.Filter.SetFilterStrictness("relaxed")
+		chars = preloadChars(ctx, p.db, lucky, req.Filter)
+		runScoring(ctx, lucky, rater, table, poetrySet, chars, req.Filter)
+	}
+
+	return table, chars
+}
+
+// buildResults converts the final excellent table into public result types.
+func (p *Pipeline) buildResults(table *ExcellentTable, charMap map[string]*ent.Character, strokes [2]int, fateData *chronosfate.FateData, surname string) *GenerateResult {
 	topEntries := table.TopN(10)
 	topResults := make([]analysis.NameResult, 0, len(topEntries))
 	for i, e := range topEntries {
@@ -124,7 +220,38 @@ func (p *Pipeline) Generate(ctx context.Context, req GenerateRequest) (*Generate
 		CharMap:         charMap,
 		FateData:        fateData,
 		LastNameStrokes: strokes,
-	}, nil
+	}
+}
+
+// heapPreview returns a lightweight preview of top N entries from the heap
+// before finalization. Uses only ExcellentEntry-level data (not full NameResult).
+func heapPreview(table *ExcellentTable, n int, surname string, strokes [2]int) []analysis.NameResult {
+	entries := table.SortedPreview(n)
+	if len(entries) == 0 {
+		return nil
+	}
+	results := make([]analysis.NameResult, 0, len(entries))
+	for i, e := range entries {
+		results = append(results, analysis.NameResult{
+			Rank:     i + 1,
+			Surname:  surname,
+			FullName: surname + e.Char1 + e.Char2,
+			Score:    e.Score,
+			Grade:    e.Grade,
+			HasPoetry: e.HasPoetry,
+			Char1: analysis.CharInfo{
+				Char:      e.Char1,
+				WuXing:    e.WuXing1,
+				HasPoetry: e.HasPoetry,
+			},
+			Char2: analysis.CharInfo{
+				Char:      e.Char2,
+				WuXing:    e.WuXing2,
+				HasPoetry: e.HasPoetry,
+			},
+		})
+	}
+	return results
 }
 
 // queryPoetrySet loads character IDs with HasPoetry=true from the database.

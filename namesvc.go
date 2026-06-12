@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/babyname/fate/v4/ent"
 	"github.com/babyname/fate/v4/internal/naming"
 	namesvc "github.com/babyname/fate/v4/internal/service/naming"
-	"github.com/babyname/fate/v4/ent"
 )
 
 // GenerateRequest is the public input for synchronous name generation.
@@ -73,6 +73,39 @@ func (f *fateImpl) Generate(ctx context.Context, req GenerateRequest) (*Generate
 		CharMap:        charMap,
 		FateData:       result.FateData,
 	}, nil
+}
+
+// StreamBatch is delivered during streaming generation.
+type StreamBatch = namesvc.StreamBatch
+
+// GenerateStream runs the pipeline in parallel, sending batches of top results
+// via onBatch as workers complete. The last call always has IsFinal=true.
+func (f *fateImpl) GenerateStream(ctx context.Context, req GenerateRequest, onBatch func(StreamBatch)) error {
+	last := splitSurname(req.LastName)
+	lastName, err := f.db.QueryLastName(ctx, last)
+	if err != nil {
+		return err
+	}
+
+	var flt Filter
+	if req.Filter != nil {
+		flt = NewFilter(*req.Filter)
+	} else {
+		flt = DefaultFilter()
+	}
+
+	pipe := namesvc.NewPipeline(f.db)
+
+	// Wrap the public onBatch to convert internal StreamBatch to public type.
+	// Since StreamBatch is a type alias, no conversion is needed.
+	return pipe.GenerateStream(ctx, namesvc.GenerateRequest{
+		LastName: lastName,
+		Born:     req.Born,
+		Sex:      naming.Sex(req.Sex),
+		Filter:   flt,
+	}, func(batch namesvc.StreamBatch) {
+		onBatch(batch)
+	})
 }
 
 // charInfoFromCharacter converts an ent.Character to the public CharInfo type.
