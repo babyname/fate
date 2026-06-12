@@ -18,8 +18,10 @@ type Fate interface {
 	NewSessionWithFilter(f Filter) Session
 	Repo() *repository.Repository
 	// Generate runs the full name generation pipeline synchronously.
-	// This is a simpler alternative to the Session state machine.
 	Generate(ctx context.Context, req GenerateRequest) (*GenerateResult, error)
+	// GenerateStream runs the pipeline in parallel and sends batches of top
+	// results via onBatch as workers complete. The last call has IsFinal=true.
+	GenerateStream(ctx context.Context, req GenerateRequest, onBatch func(StreamBatch)) error
 }
 
 type fateImpl struct {

@@ -105,6 +105,30 @@ func (t *ExcellentTable) HeapLen() int {
 	return len(t.h)
 }
 
+// SortedPreview returns top N entries sorted by score descending.
+// This is only valid before Finalize() and is slower than TopN() because it
+// sorts the heap on each call. It is intended for streaming batch snapshots.
+func (t *ExcellentTable) SortedPreview(n int) []ExcellentEntry {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+
+	if len(t.h) == 0 {
+		return nil
+	}
+
+	// Copy all heap entries and sort descending.
+	all := make([]ExcellentEntry, len(t.h))
+	copy(all, t.h)
+	sort.Slice(all, func(i, j int) bool {
+		return all[i].Score > all[j].Score
+	})
+
+	if n > len(all) {
+		n = len(all)
+	}
+	return all[:n]
+}
+
 // TopN returns the top n entries by score.
 func (t *ExcellentTable) TopN(n int) []ExcellentEntry {
 	t.mu.RLock()
