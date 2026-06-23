@@ -11,7 +11,7 @@ builds:
     main: ./cmd/console
     binary: fate
     env:
-      - CGO_ENABLED=1
+      - CGO_ENABLED=0
     goos:
       - windows
       - darwin

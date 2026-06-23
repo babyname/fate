@@ -9,7 +9,6 @@ require (
 	github.com/sqlite3ent/sqlite3 v1.50.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.20.0
-	golang.org/x/text v0.37.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -32,6 +31,7 @@ require (
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	golang.org/x/mod v0.36.0 // indirect
 	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	golang.org/x/tools v0.45.0 // indirect
 	modernc.org/libc v1.72.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
