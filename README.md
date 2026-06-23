@@ -1,74 +1,101 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat&logo=go" alt="Go Version" />
-  <img src="https://img.shields.io/badge/version-4.2.0-blue" alt="Version" />
-  <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
-  <img src="https://img.shields.io/badge/module-v4-7B42BC" alt="Module v4" />
-</p>
+<div align="center">
 
-<p align="center">
-  <h1 align="center">🌌 fate · 天命之名</h1>
-  <p align="center">
-    <strong>基于八字五行 · 三才五格 · 周易卦象 · 诗词出处的智能起名引擎</strong><br>
+[![Go Version](https://img.shields.io/badge/Go-1.22+-00ADD8?style=for-the-badge&logo=go)](https://go.dev/)
+[![Version](https://img.shields.io/badge/v4.2.0-blue?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/babyname/fate/releases)
+[![License](https://img.shields.io/badge/MIT-green?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
+[![Module](https://img.shields.io/badge/module-v4-7B42BC?style=for-the-badge&logo=go&logoColor=white)](https://pkg.go.dev/github.com/babyname/fate/v4)
+
+</div>
+
+<div align="center">
+  <img src="docs/images/fate-hero.svg" alt="fate" width="120" height="120" style="margin-bottom: 12px;">
+  <h1>🌌 fate · 天命之名</h1>
+  <p>
+    <strong>基于八字五行 · 三才五格 · 周易卦象 · 诗词出处的智能起名引擎</strong>
+  </p>
+  <p>
     <em>FATE — Celestial Naming Engine</em>
   </p>
-</p>
+</div>
 
-<p align="center">
-  <a href="README_EN.md">English</a> | 中文
-</p>
+<div align="center">
+
+[English](README_EN.md) | **中文**
+
+</div>
 
 ---
 
-## ✨ 功能亮点
+## ✨ 核心特性
 
+<div align="center">
 <table>
 <tr>
-<td width="50%">
+<td width="33%" valign="top">
 
-### 🎯 八字推命
-- 四柱八字精密推算（年/月/日/时）
-- 五行强弱分析 + 调候用神
-- **双算法喜用神**：平衡用神法 & 格局用神法（10种格局）
-- 生肖关系、纳音五行
+### 🔮 八字推命
+- 四柱八字精密推算
+- 五行强弱 + 调候用神
+- **双算法喜用神**：平衡法 & 格局法（10种格局）
+- 生肖关系 · 纳音五行
 
 </td>
-<td width="50%">
+<td width="33%" valign="top">
 
 ### 📊 多维评分
-- **五维评分体系**：文化印象 · 五行八字 · 生肖 · 五格数理 · 音韵
+- **五维评分体系**
 - 三才配置吉凶分析
 - 81数大衍 O(1) 查找
 - 64卦周易卦象解读
 
 </td>
-</tr>
-<tr>
-<td width="50%">
+<td width="33%" valign="top">
 
 ### 🌐 Web 界面
-- 现代 React + Tailwind CSS 响应式 UI
-- 实时流式生成 + 轮询进度
-- 候选名册（表格/卡片双视图）
-- 探索模式：随机抽样 + 条件过滤
+- React + Tailwind CSS
+- 实时流式生成
+- 候选名册双视图
+- 探索模式随机抽样
 
 </td>
-<td width="50%">
+</tr>
+<tr>
+<td width="33%" valign="top">
 
 ### ⚡ 高性能
-- Ent ORM + SQLite 高效数据层
-- ExcellentTable 流式 Top-N 数据结构
-- 异步并发生成（session 模式）
-- 嵌入式 Web 前端（单二进制分发）
+- Ent ORM + SQLite
+- ExcellentTable Top-N
+- 异步并发生成
+- 嵌入式单二进制分发
+
+</td>
+<td width="33%" valign="top">
+
+### 🔌 灵活集成
+- Go 库直接调用
+- RESTful API
+- CLI 命令行工具
+- 流式生成接口
+
+</td>
+<td width="33%" valign="top">
+
+### 📚 丰富数据
+- 30,000+ 汉字字库
+- 诗词出处关联
+- 拼音 · 部首 · 笔画
+- 五行 · 性别倾向
 
 </td>
 </tr>
 </table>
+</div>
 
 ---
 
 ## 📸 界面预览
 
-> 💡 **提示**：Web 界面运行在 `http://localhost:18080`，启动服务器后即可访问。
+> 💡 Web 界面运行在 `http://localhost:18080`，启动服务器后即可访问。
 
 | 首页 | 命名结果 |
 |------|----------|
@@ -84,8 +111,10 @@
 
 ### 环境要求
 
-- **Go** 1.22+
-- **Bun**（前端开发需要，生产部署无需）
+| 依赖 | 版本 | 说明 |
+|------|------|------|
+| **Go** | ≥ 1.22 | 核心引擎 & 服务 |
+| **Bun** | ≥ 1.0 | 前端开发（生产部署无需） |
 
 ### 安装 & 运行
 
@@ -118,6 +147,7 @@ go build -o fate ./cmd/console
 <details>
 <summary>📋 CLI 输出示例</summary>
 
+**Top 10 推荐：**
 ```
 ═══════════════════════════════════════
            Top 10 推荐名字
@@ -134,8 +164,7 @@ go build -o fate ./cmd/console
 ═══════════════════════════════════════
 ```
 
-**详细分析**（`name detail`）：
-
+**详细分析（`name detail`）：**
 ```
 ═══════════════════════════════════════
   张适抡  评分: 90.1  等级: 上上
@@ -156,6 +185,7 @@ go build -o fate ./cmd/console
   文化:86  五行:94  生肖:94  五格:89  音韵:89
 ═══════════════════════════════════════
 ```
+
 </details>
 
 ### CLI 参数
@@ -165,7 +195,7 @@ go build -o fate ./cmd/console
 | `--surname` | `-s` | 姓氏 | `-s 张` |
 | `--born` | `-b` | 出生日期与时刻 | `-b "2024/06/15 10:30"` |
 | `--gender` | `-g` | 性别 | `-g boy` / `-g girl` |
-| `--xiyong` | | 喜用神算法 | `balance`（平衡法）/ `geju`（格局法） |
+| `--xiyong` | | 喜用神算法 | `balance` / `geju` |
 | `--strictness` | | 五格严格度 | `loose` / `moderate` / `strict` |
 | `--filter` | `-f` | 过滤汉字 | `-f 病死穷` |
 | `--output` | `-o` | 输出到文件 | `-o result.txt` |
@@ -174,7 +204,7 @@ go build -o fate ./cmd/console
 
 ## 🔌 Web API
 
-启动服务器后可用：
+启动服务器后可用以下接口：
 
 | Method | Endpoint | 说明 |
 |--------|----------|------|
@@ -244,25 +274,9 @@ func main() {
     s.Start(input)
     s.Wait()
 
-    // 获取结果
     output := input.Output()
     for _, nr := range output.TopNames() {
         fmt.Printf("%s - %.1f (%s)\n", nr.FullName, nr.Score, nr.Grade)
-    }
-
-    // ExcellentTable: 流式 Top-N 访问
-    table := output.GetExcellentTable()
-    entries := table.TopN(10)
-    for _, e := range entries {
-        fmt.Printf("%s%s - %.1f has_poetry=%v\n", e.Char1, e.Char2, e.Score, e.HasPoetry)
-    }
-
-    // Explore: 随机采样 + 条件过滤
-    explored := table.Explore(10, func(e fate.ExcellentEntry) bool {
-        return e.HasPoetry
-    })
-    for _, e := range explored {
-        fmt.Printf("%s%s - %.1f\n", e.Char1, e.Char2, e.Score)
     }
 }
 ```
@@ -281,35 +295,32 @@ func main() {
 
 ---
 
-## 🏛️ 架构
+## 🏛️ 架构设计
 
 ```
-┌─────────────────────────────────────────────┐
-│                  fate CLI / Server           │
-├─────────────────────────────────────────────┤
-│  cmd/console     │  cmd/server               │
-│  (CLI 工具)     │  (HTTP API + 嵌入式前端)   │
-├─────────────────────────────────────────────┤
-│               internal/http                  │
-│               (API 路由 & 中间件)             │
-├─────────────────────────────────────────────┤
-│                  fate 核心引擎                │
-│  ┌──────────┬──────────┬──────────────────┐ │
-│  │ Session  │ Filter   │ ExcellentTable   │ │
-│  │ 异步生成 │ 多级筛选  │ 流式Top-N        │ │
-│  ├──────────┼──────────┼──────────────────┤ │
-│  │ Bazi     │ Wuge     │ Zhouyi           │ │
-│  │ 八字推算 │ 五格数理  │ 周易卦象          │ │
-│  └──────────┴──────────┴──────────────────┘ │
-├─────────────────────────────────────────────┤
-│              chronos/v2 (八字引擎)            │
-│              yi (周易引擎)                    │
-│              Ent ORM (数据层)                 │
-├─────────────────────────────────────────────┤
-│              SQLite3 (数据存储)               │
-│              character.json (汉字数据库)       │
-│              chinese-poetry (诗词库)          │
-└─────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                  fate CLI / Web Server                    │
+├─────────────────────┬────────────────────────────────────┤
+│   cmd/console       │   cmd/server                       │
+│   (CLI 工具)        │   (HTTP API + 嵌入式前端)          │
+├─────────────────────┴────────────────────────────────────┤
+│                    internal/http                          │
+│                (API 路由 & 中间件)                        │
+├──────────────────────────────────────────────────────────┤
+│                     fate 核心引擎                         │
+│  ┌───────────┬───────────┬────────────────────────────┐  │
+│  │  Session  │  Filter   │  ExcellentTable            │  │
+│  │  异步生成  │  多级筛选  │  流式Top-N                 │  │
+│  ├───────────┼───────────┼────────────────────────────┤  │
+│  │  Bazi     │  Wuge     │  Zhouyi                    │  │
+│  │  八字推算  │  五格数理  │  周易卦象                   │  │
+│  └───────────┴───────────┴────────────────────────────┘  │
+├──────────────────────────────────────────────────────────┤
+│            chronos/v2 (八字引擎)  ·  yi (周易引擎)        │
+│            Ent ORM (数据层)  ·  SQLite3 (数据存储)        │
+├──────────────────────────────────────────────────────────┤
+│  character.json (汉字库)  ·  chinese-poetry (诗词库)     │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ### 目录结构
@@ -317,33 +328,29 @@ func main() {
 ```
 fate/
 ├── cmd/                # 命令行入口
-│   ├── console/        #   主 CLI（name / dbinit / dictctl）
+│   ├── console/        #   CLI 工具
 │   ├── server/         #   Web 服务
-│   ├── dbinit/         #   数据库初始化
-│   ├── character/      #   汉字数据工具
-│   ├── dictctl/        #   字典管理工具
-│   └── tools/          #   开发调试工具
+│   └── dbinit/         #   数据库初始化
 ├── config/             # 配置定义
-├── data/               # 种子数据
-│   ├── chinese-poetry/ #   诗词库
-│   └── seed/           #   基础数据
-├── docs/               # 文档 & 截图
 ├── ent/                # Ent Schema & 生成代码
-├── internal/           # 内部包
+├── internal/           # 内部实现
+│   ├── analysis/       #   分析评分模块
+│   ├── bazi/           #   八字模块
 │   ├── chronosfate/    #   chronos 适配层
+│   ├── filter/         #   筛选器
 │   ├── http/           #   HTTP API
-│   └── ...
-├── model/              # 数据模型
+│   ├── naming/         #   命名服务
+│   ├── rating/         #   评分模块
+│   ├── repository/     #   数据仓储
+│   ├── session/        #   会话管理
+│   ├── wuge/           #   五格数理
+│   └── zhouyi/         #   周易卦象
 ├── resources/          # 嵌入式资源
 │   ├── character.json  #   汉字元数据库
 │   └── static/         #   Web 前端构建产物
-├── scripts/            # 构建脚本
+├── scripts/            # 数据与构建脚本
+├── docs/               # 文档 & 截图
 └── web/                # React 前端源码
-    └── src/
-        ├── components/ # UI 组件
-        ├── pages/      # 页面
-        ├── lib/        # API 客户端 & 工具
-        └── store/      # 状态管理 (Zustand)
 ```
 
 ---
@@ -382,14 +389,14 @@ fate/
 | `main` | v4.x 开发主线 | `github.com/babyname/fate/v4` |
 | `v3` | v3.x Bugfix 维护 | `github.com/babyname/fate` |
 
-> ⚠️ **历史原因**：v3 分支的模块路径不含 `/v3`（早期 Go module 规范未强制要求）。
+> **历史原因**：v3 分支的模块路径不含 `/v3`（早期 Go module 规范未强制要求）。
 > 从 v4 开始引入 `/v4` 后缀，未来 v5 也将统一使用 `/v5`。
 
 ### 版本标签
 
-| 系列 | 最新 | 标签 |
-|------|------|------|
-| v4.x | v4.2.0 | `v4.0.0` |
+| 系列 | 最新版本 | 标签范围 |
+|------|----------|----------|
+| v4.x | v4.2.0 | `v4.0.0` ~ `v4.2.0` |
 | v3.x | v3.6.0 | `v3.0.0` ~ `v3.6.0`（共 14 个发布） |
 | v2.x | v2.0.2 | `v2.0.0` ~ `v2.0.2` |
 
@@ -397,20 +404,20 @@ fate/
 
 ## 🛠️ 技术栈
 
-| 层 | 技术 | 说明 |
-|----|------|------|
+| 层级 | 技术 | 说明 |
+|------|------|------|
 | 语言 | Go 1.22+ | 核心引擎 & 服务 |
 | 前端 | React 19 + Tailwind CSS 3 + Rsbuild | Web 界面 |
 | 状态 | Zustand | 前端状态管理 |
-| UI | Radix UI + Lucide Icons | 无障碍组件库 |
+| UI 组件 | Radix UI + Lucide Icons | 无障碍组件库 |
 | ORM | Ent | 类型安全的 Go ORM |
-| 存储 | SQLite3 (modernc) | 嵌入式数据库，零依赖 |
+| 存储 | SQLite3 (modernc) | 嵌入式数据库，零 CGO 依赖 |
 | 八字 | chronos/v2 | 八字推算引擎 |
 | 卦象 | yi | 周易六十四卦 |
 
 ---
 
-## 🧪 开发
+## 🧪 开发指南
 
 ```bash
 # 前端开发（热更新）
@@ -420,9 +427,12 @@ cd web && bun install && bun run dev
 go run ./cmd/server
 
 # 构建生产版本
-cd web && bun run build    # 前端构建 → resources/static/
-go build -o fate ./cmd/console    # CLI 工具
+cd web && bun run build          # 前端构建 → resources/static/
+go build -o fate ./cmd/console   # CLI 工具
 go build -o fate-server ./cmd/server  # 服务器（含嵌入式前端）
+
+# 数据库初始化（生成 fate.db.gz）
+go run ./cmd/dbinit
 
 # 运行测试
 go test ./...
