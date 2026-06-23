@@ -87,7 +87,7 @@ def main():
                     print("\nUse --force to force a new release anyway.")
                     return
 
-    zip_name = f"fate-v{version}.zip"
+    zip_name = f"fate-db-v{version}.zip"
     zip_path = os.path.join(releases_dir, zip_name)
 
     print(f"Packaging {db_path} ({os.path.getsize(db_path):,} bytes)...")

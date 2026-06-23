@@ -8,7 +8,6 @@ import (
 
 	"github.com/babyname/fate/v4/config"
 	"github.com/babyname/fate/v4/ent"
-	"github.com/babyname/fate/v4/ent/schema"
 	_ "github.com/sqlite3ent/sqlite3"
 )
 
@@ -51,7 +50,33 @@ func buildSqlite3(cfg config.DBConfig) (*ent.Client, error) {
 		if name == "" {
 			name = "fate"
 		}
-		return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", name))
+
+		initMode := cfg.InitMode
+		if initMode == "" {
+			initMode = config.InitModeAuto
+		}
+
+		switch initMode {
+		case config.InitModeDB:
+			dbFile, err := ensureDBFile(cfg)
+			if err != nil {
+				return nil, err
+			}
+			if dbFile == "" {
+				return nil, fmt.Errorf("database file not found and init_mode is 'db'")
+			}
+			return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", dbFile))
+		case config.InitModeJSON:
+			return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", name))
+		case config.InitModeAuto:
+			fallthrough
+		default:
+			dbFile, _ := ensureDBFile(cfg)
+			if dbFile != "" {
+				return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", dbFile))
+			}
+			return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", name))
+		}
 	default:
 		return nil, fmt.Errorf("unknown sqlite3 mode: %s", cfg.Mode)
 	}
@@ -84,23 +109,36 @@ func (d *database) Client() (*ent.Client, error) {
 	if err := c.Schema.Create(ctx); err != nil {
 		return nil, fmt.Errorf("create schema: %w", err)
 	}
-	first, err := c.Version.Query().First(ctx)
-	if err != nil && !ent.IsNotFound(err) {
+
+	initMode := d.InitMode
+	if initMode == "" {
+		initMode = config.InitModeAuto
+	}
+
+	needs, err := needsInit(c)
+	if err != nil {
 		return nil, err
 	}
-	if first == nil {
-		_, err := c.Version.Create().
-			SetCurrentVersion(schema.CurrentDataVersion).
-			SetUpdatedUnix(int(time.Now().Unix())).
-			Save(ctx)
-		if err != nil {
-			return nil, err
-		}
+
+	if !needs {
 		return c, nil
 	}
-	if first.CurrentVersion != schema.CurrentDataVersion {
-		return nil, fmt.Errorf("database version %d is not current,please get the correct version database", first.CurrentVersion)
+
+	switch initMode {
+	case config.InitModeDB:
+		return nil, fmt.Errorf("database version mismatch and init_mode is 'db'")
+	case config.InitModeJSON:
+		if err := initializeFromJSON(ctx, c); err != nil {
+			return nil, fmt.Errorf("initialize from json: %w", err)
+		}
+	case config.InitModeAuto:
+		fallthrough
+	default:
+		if err := initializeFromJSON(ctx, c); err != nil {
+			return nil, fmt.Errorf("initialize from json: %w", err)
+		}
 	}
+
 	return c, nil
 }
 

@@ -136,6 +136,6 @@ jobs:
         with:
           tag_name: v${{ steps.get-version.outputs.version }}
           files: |
-            releases/fate-v${{ needs.prepare-db.outputs.db_version }}.zip
-            releases/fate-v${{ needs.prepare-db.outputs.db_version }}.zip.sha256
+            releases/fate-db-v${{ needs.prepare-db.outputs.db_version }}.zip
+            releases/fate-db-v${{ needs.prepare-db.outputs.db_version }}.zip.sha256
           fail_on_unmatched_files: false
