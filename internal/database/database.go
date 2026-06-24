@@ -46,11 +46,6 @@ func buildSqlite3(cfg config.DBConfig) (*ent.Client, error) {
 	case "memory":
 		return ent.Open(cfg.Driver, "file::memory:?cache=shared&_fk=1")
 	case "file", "":
-		name := cfg.Name
-		if name == "" {
-			name = "fate"
-		}
-
 		initMode := cfg.InitMode
 		if initMode == "" {
 			initMode = config.InitModeAuto
@@ -67,15 +62,20 @@ func buildSqlite3(cfg config.DBConfig) (*ent.Client, error) {
 			}
 			return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", dbFile))
 		case config.InitModeJSON:
-			return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", name))
+			dbFile := cfg.GetDBFile()
+			return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", dbFile))
 		case config.InitModeAuto:
 			fallthrough
 		default:
-			dbFile, _ := ensureDBFile(cfg)
+			dbFile, err := ensureDBFile(cfg)
+			if err != nil {
+				return nil, err
+			}
 			if dbFile != "" {
 				return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", dbFile))
 			}
-			return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", name))
+			dbFile = cfg.GetDBFile()
+			return ent.Open(cfg.Driver, fmt.Sprintf("file:%s?cache=shared&_journal=WAL&_fk=1", dbFile))
 		}
 	default:
 		return nil, fmt.Errorf("unknown sqlite3 mode: %s", cfg.Mode)
@@ -126,7 +126,12 @@ func (d *database) Client() (*ent.Client, error) {
 
 	switch initMode {
 	case config.InitModeDB:
-		return nil, fmt.Errorf("database version mismatch and init_mode is 'db'")
+		if d.Driver == "sqlite3" {
+			return nil, fmt.Errorf("database version mismatch and init_mode is 'db'")
+		}
+		if err := initializeFromJSON(ctx, c); err != nil {
+			return nil, fmt.Errorf("initialize from json: %w", err)
+		}
 	case config.InitModeJSON:
 		if err := initializeFromJSON(ctx, c); err != nil {
 			return nil, fmt.Errorf("initialize from json: %w", err)

@@ -14,6 +14,7 @@ jobs:
     outputs:
       db_changed: ${{ steps.check-db-changes.outputs.db_changed }}
       db_version: ${{ steps.determine-db-version.outputs.db_version }}
+      db_gz_name: ${{ steps.determine-db-version.outputs.db_gz_name }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,10 +23,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.22'
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
 
       - name: Get version from tag
         id: get-version
@@ -36,16 +33,11 @@ jobs:
       - name: Determine if database has changed
         id: check-db-changes
         run: |
-          # Check if this is the first release
           if git rev-list --count HEAD > /dev/null 2>&1 && [ "$(git rev-list --count HEAD)" -gt 1 ]; then
-            # Get previous tag or previous commit
             PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
             
             if [ -n "$PREVIOUS_TAG" ]; then
               echo "Checking changes between $PREVIOUS_TAG and HEAD..."
-              
-              # Check if data-related files have changed
-              # Core data is resources/character.json, plus dbinit code and DB_VERSION
               DB_FILES=$(git diff --name-only "$PREVIOUS_TAG" HEAD -- resources/character.json cmd/dbinit/ DB_VERSION 2>/dev/null | head -1)
               
               if [ -n "$DB_FILES" ]; then
@@ -56,12 +48,10 @@ jobs:
                 echo "db_changed=false" >> $GITHUB_OUTPUT
               fi
             else
-              # No previous tag, assume changed
               echo "No previous tag found, treating as changed."
               echo "db_changed=true" >> $GITHUB_OUTPUT
             fi
           else
-            # First commit, treat as changed
             echo "First release, treating as changed."
             echo "db_changed=true" >> $GITHUB_OUTPUT
           fi
@@ -75,6 +65,7 @@ jobs:
             DB_VER="${{ steps.get-version.outputs.version }}"
           fi
           echo "db_version=$DB_VER" >> $GITHUB_OUTPUT
+          echo "db_gz_name=fate-db-v${DB_VER}.db.gz" >> $GITHUB_OUTPUT
           echo "Using database version: $DB_VER"
 
       - name: Build dbinit tool
@@ -85,9 +76,17 @@ jobs:
         if: steps.check-db-changes.outputs.db_changed == 'true'
         run: ./dbinit
 
-      - name: Package database (if changed)
+      - name: Prepare database artifacts
         if: steps.check-db-changes.outputs.db_changed == 'true'
-        run: python scripts/release_db.py --version ${{ steps.determine-db-version.outputs.db_version }} --ci
+        run: |
+          mkdir -p releases
+          cp fate.db.gz "releases/${{ steps.determine-db-version.outputs.db_gz_name }}"
+          cp fate.db.gz "releases/fate.db.gz"
+          cd releases
+          sha256sum "${{ steps.determine-db-version.outputs.db_gz_name }}" > "${{ steps.determine-db-version.outputs.db_gz_name }}.sha256"
+          sha256sum "fate.db.gz" > "fate.db.gz.sha256"
+          echo "Generated artifacts:"
+          ls -la
 
       - name: Upload database artifacts
         if: steps.check-db-changes.outputs.db_changed == 'true'
@@ -136,6 +135,8 @@ jobs:
         with:
           tag_name: v${{ steps.get-version.outputs.version }}
           files: |
-            releases/fate-db-v${{ needs.prepare-db.outputs.db_version }}.zip
-            releases/fate-db-v${{ needs.prepare-db.outputs.db_version }}.zip.sha256
+            releases/${{ needs.prepare-db.outputs.db_gz_name }}
+            releases/${{ needs.prepare-db.outputs.db_gz_name }}.sha256
+            releases/fate.db.gz
+            releases/fate.db.gz.sha256
           fail_on_unmatched_files: false

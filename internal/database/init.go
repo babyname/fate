@@ -7,7 +7,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
+	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/babyname/fate/v4/config"
@@ -45,21 +48,13 @@ type seedChar struct {
 }
 
 func ensureDBFile(cfg config.DBConfig) (string, error) {
-	name := cfg.Name
-	if name == "" {
-		name = "fate"
-	}
-
-	dbFile := cfg.DBFile
-	if dbFile == "" {
-		dbFile = name + ".db"
-	}
+	dbFile := cfg.GetDBFile()
+	gzFile := cfg.GetDBGZFile()
 
 	if _, err := os.Stat(dbFile); err == nil {
 		return dbFile, nil
 	}
 
-	gzFile := dbFile + ".gz"
 	if _, err := os.Stat(gzFile); err == nil {
 		if err := decompressGZ(gzFile, dbFile); err != nil {
 			return "", fmt.Errorf("decompress %s: %w", gzFile, err)
@@ -67,7 +62,57 @@ func ensureDBFile(cfg config.DBConfig) (string, error) {
 		return dbFile, nil
 	}
 
+	if cfg.Driver == "sqlite3" && cfg.ShouldAutoDownload() {
+		log.Printf("[DB] Local database not found, attempting to download...")
+		if err := downloadDB(cfg, gzFile); err != nil {
+			log.Printf("[DB] Download failed: %v, will initialize from embedded JSON", err)
+			return "", nil
+		}
+		if err := decompressGZ(gzFile, dbFile); err != nil {
+			return "", fmt.Errorf("decompress downloaded db: %w", err)
+		}
+		log.Printf("[DB] Database downloaded and ready at %s", dbFile)
+		return dbFile, nil
+	}
+
 	return "", nil
+}
+
+func downloadDB(cfg config.DBConfig, destGZ string) error {
+	downloadURL := cfg.GetDownloadURL()
+	url := downloadURL + "/fate.db.gz"
+
+	log.Printf("[DB] Downloading from %s ...", url)
+
+	client := &http.Client{Timeout: 120 * time.Second}
+	resp, err := client.Get(url)
+	if err != nil {
+		return fmt.Errorf("http get: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status: %s", resp.Status)
+	}
+
+	if err := os.MkdirAll(filepath.Dir(destGZ), 0755); err != nil {
+		return fmt.Errorf("create dir: %w", err)
+	}
+
+	out, err := os.Create(destGZ)
+	if err != nil {
+		return fmt.Errorf("create gz file: %w", err)
+	}
+	defer out.Close()
+
+	written, err := io.Copy(out, resp.Body)
+	if err != nil {
+		os.Remove(destGZ)
+		return fmt.Errorf("download: %w", err)
+	}
+
+	log.Printf("[DB] Downloaded %d bytes", written)
+	return nil
 }
 
 func decompressGZ(src, dst string) error {
@@ -109,6 +154,8 @@ func initializeFromJSON(ctx context.Context, client *ent.Client) error {
 	if err := json.Unmarshal(resources.CharacterJSON, &seeds); err != nil {
 		return fmt.Errorf("parse character.json: %w", err)
 	}
+
+	log.Printf("[DB] Initializing database from embedded JSON (%d characters)...", len(seeds))
 
 	charMap := make(map[string]*ent.Character, len(seeds))
 	for _, s := range seeds {
@@ -203,5 +250,11 @@ func initializeFromJSON(ctx context.Context, client *ent.Client) error {
 		SetCurrentVersion(schema.CurrentDataVersion).
 		SetUpdatedUnix(int(time.Now().Unix())).
 		Save(ctx)
-	return err
+	if err != nil {
+		return err
+	}
+
+	count, _ := client.Character.Query().Count(ctx)
+	log.Printf("[DB] Database initialized with %d characters", count)
+	return nil
 }
