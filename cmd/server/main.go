@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 import (
 	"flag"
@@ -14,9 +14,35 @@ import (
 
 func main() {
 	addr := flag.String("addr", ":18080", "listen address")
+	dbDriver := flag.String("db-driver", "", "database driver: sqlite3 (default), mysql")
+	dbFile := flag.String("db-file", "", "sqlite3 database file path (default: ./fate.db)")
+	initMode := flag.String("init-mode", "", "database init mode: auto (default), db, json")
+	noDownload := flag.Bool("no-download", false, "disable auto-download of database")
+	downloadURL := flag.String("download-url", "", "custom database download URL")
+	configPath := flag.String("config", "", "config file path")
 	flag.Parse()
 
-	cfg := config.DefaultConfig()
+	cfg, err := config.LoadConfig(*configPath)
+	if err != nil {
+		log.Fatal("failed to load config: ", err)
+	}
+
+	if *dbDriver != "" {
+		cfg.Database.Driver = *dbDriver
+	}
+	if *dbFile != "" {
+		cfg.Database.DBFile = *dbFile
+	}
+	if *initMode != "" {
+		cfg.Database.InitMode = *initMode
+	}
+	if *noDownload {
+		cfg.Database.AutoDownload = false
+	}
+	if *downloadURL != "" {
+		cfg.Database.DownloadURL = *downloadURL
+	}
+
 	f, err := fate.New(cfg)
 	if err != nil {
 		log.Fatal("failed to initialize fate: ", err)
