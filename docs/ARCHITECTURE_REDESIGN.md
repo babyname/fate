@@ -1,4 +1,4 @@
-# Fate/Qiming Architecture Redesign
+# Architecture Redesign
 
 **Date**: 2026-06-11
 
@@ -40,13 +40,8 @@ internal/  ← 什么都有：
 ```
 
 **cmd/ 同样混乱**：
-- `server` (CE) / `console` (CE) 和 `migratedb` (EE) / `dictctl` (EE) / `character` (EE) 混在一起
-- CE 和 EE 命令无区分，无构建标签
-
-### 3. qiming 架构问题
-
-`internal/` 平铺：poetry、enhance、payment、order、admin 全部同级，无层次感。
-数据流水线（import-poetry）是独立脚本，不在 internal 中，与其他模块割裂。
+- `server` / `console` 等命令混在一起，无清晰分层
+- 命令无区分，无构建标签
 
 ---
 
@@ -73,7 +68,7 @@ internal/  ← 什么都有：
 3. **Service 层** 同时依赖 engine 和 data，负责编排
 4. **Server 层** 只依赖 service，不直接碰 engine/data
 
-### fate（CE）目标架构
+### fate 目标架构
 
 ```
 fate/
@@ -98,41 +93,12 @@ fate/
 ├── server/                 ← Web 层
 │   ├── handler/            ← HTTP handler (从 internal/http 迁移)
 │   └── middleware/
-├── cmd/                    ← CE 命令（不含 EE 命令）
+├── cmd/                    ← 命令
 │   ├── server/
 │   ├── console/
 │   └── dbinit/
 ├── resources/
 └── fate.go                 ← 顶层 API facade
-```
-
-### qiming（EE）目标架构
-
-```
-qiming/
-├── ent/                    ← Model 层 (poem, poem_char, 可扩展 character)
-├── config/
-├── pipeline/               ← 数据生产线：繁简匹配、诗词索引、字库修复
-│   ├── poetry/             ← 诗词导入 + 汉字提取 + 变体匹配
-│   ├── character/          ← 字库管理 (从 chinese-poetry export)
-│   ├── mapping/            ← 简繁/异体映射
-│   └── quality/            ← 数据质量检查
-├── service/                ← 业务层
-│   ├── poetry/             ← 诗词查询（从 internal/poetry 迁移）
-│   ├── naming/             ← EE 增强命名（调用fate引擎 + 诗词增强）
-│   ├── enhance/            ← AI 解读
-│   ├── report/             ← 报告生成
-│   ├── admin/              ← 管理功能
-│   └── payment/            ← 支付
-├── server/                 ← Web 层
-│   ├── handler/
-│   └── middleware/
-├── cmd/                    ← 工具命令
-│   ├── server/
-│   ├── seed/
-│   └── import-poetry/
-├── resources/
-└── web/                    ← 前端
 ```
 
 ---
@@ -263,61 +229,14 @@ import-poetry 使用 mapping.json
 
 ---
 
-## 数据流全景
-
-```
-┌────────────── qiming (EE 数据生产层) ──────────────┐
-│                                                      │
-│  chinese-poetry repo ─┐                               │
-│  Werneror/Poetry  ────┤                               │
-│  sheepzh/poetry   ────┼→ import-poetry                │
-│  character.json   ────┤    │                          │
-│                       │    ├ normalize (简繁统一)      │
-│                       │    ├ extract char refs         │
-│                       │    └→ poem + poem_char 表      │
-│                                                      │
-│  pipeline/quality/ ────→ 数据质量报告                  │
-│  pipeline/character/ ──→ character.json 维护           │
-│                                                      │
-│                        ↓ 输出                          │
-│              character.json (加工后)                   │
-│              has_poetry 字段 (从 poem_char 计算)        │
-│                                                      │
-└──────────────────────┬───────────────────────────────┘
-                       │
-                       ▼ 复制到 fate/resources/
-┌────────────── fate (CE 命名引擎层) ──────────────────┐
-│                                                      │
-│  character.json → dbinit embed → 内存数据库            │
-│                                                      │
-│  User Request: 姓氏 + 生日 + 性别                      │
-│       │                                              │
-│       ├→ engine/bazi      → 八字                      │
-│       ├→ engine/chronosfate → 喜用神                   │
-│       ├→ engine/wuxing    → 五行分析                   │
-│       ├→ engine/zhouyi    → 周易卦象                   │
-│       ├→ data/repository  → 查字库                    │
-│       ├→ engine/naming    → 组合名字                   │
-│       ├→ engine/rating    → 评分排序                   │
-│       └→ service/analysis → 组装结果                   │
-│                                                      │
-│  Response: ranked name list + scores                  │
-│                                                      │
-└──────────────────────────────────────────────────────┘
-```
-
----
-
 ## 实施路径
 
-### Phase 1: 繁简诗词匹配（qiming，立即）
+### Phase 1: 繁简诗词匹配
 
-1. **构建 mapping.json**
+1. **构建映射表**
    - 源：`character.json` 的 `simplified_of_char` + `variant_of_char` 字段
-   - 新建 `pipeline/mapping/` + `normalizer.go`
 
-2. **重构 import-poetry**
-   - 添加 `-mapping` 参数，加载规范字表
+2. **重构导入工具**
    - `extractCharRefs` 中每个汉字先 `normalize()` 再存储
    - `PoemChar` schema 加 `original_char` 字段 (ALTER TABLE 兼容)
 
@@ -331,10 +250,4 @@ import-poetry 使用 mapping.json
 2. **提取 data 层** — `internal/{repository,dict,seeddb}` → `data/`
 3. **提取 service 层** — `internal/{analysis,session,filter}` → `service/`
 4. **提取 server 层** — `internal/http` → `server/handler`
-5. **清理 cmd**: 移除 EE 命令（migratedb, dictctl, character, tools）
-
-### Phase 3: qiming 架构重整
-
-1. **提取 pipeline 层** — 新建 `pipeline/{poetry,character,mapping,quality}`
-2. **重整 service** — `internal/` → `service/` 按功能分组
-3. **提取 server** — `internal/api` → `server/handler`
+5. **清理 cmd**: 移除冗余命令
