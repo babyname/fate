@@ -1,54 +1,70 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronUp, Loader2, BookOpen, Filter } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader2, BookOpen } from 'lucide-react';
 import type { ExcellentEntry } from '@/types/api';
 import { useAppStore } from '@/store/app';
 import { api } from '@/lib/api';
 
 interface ExploreSectionProps {
   taskId: string;
+  surname: string;
 }
 
-export function ExploreSection({ taskId }: ExploreSectionProps) {
+export function ExploreSection({ taskId, surname }: ExploreSectionProps) {
   const [entries, setEntries] = useState<ExcellentEntry[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [poetryOnly, setPoetryOnly] = useState(false);
+  const [exhausted, setExhausted] = useState(false);
+  const [error, setError] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
   const setSelectedName = useAppStore((s) => s.setSelectedName);
   const setDetailModalOpen = useAppStore((s) => s.setDetailModalOpen);
-  const surname = useAppStore((s) => s.surname);
-
-  const fetchExplore = (hasPoetry?: boolean) => {
-    setLoading(true);
-    api.explore(taskId, 100, hasPoetry).then((res) => {
-      setEntries(res.names);
-      setTotal(res.total);
-      setLoading(false);
-    }).catch(() => {
-      setLoading(false);
-    });
-  };
 
   useEffect(() => {
     if (!taskId) return;
-    fetchExplore();
-  }, [taskId]);
+    let active = true;
+    setLoading(true);
+    setError('');
+    setEntries([]);
+    setExpanded(false);
+    setExhausted(false);
+    api.explore(taskId, 6, poetryOnly).then((res) => {
+      if (!active) return;
+      const names = res.names ?? [];
+      setEntries(names);
+      setTotal(res.total);
+      setExhausted(names.length === 0);
+    }).catch((err) => {
+      if (active) setError(err instanceof Error ? err.message : '加载名字失败，请重试');
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
+    return () => { active = false; };
+  }, [taskId, poetryOnly, retryCount]);
 
   const handlePoetryFilter = () => {
-    const next = !poetryOnly;
-    setPoetryOnly(next);
-    fetchExplore(next);
+    setPoetryOnly((value) => !value);
   };
 
   const handleLoadMore = async () => {
-    setExpanded(true);
+    if (!expanded && entries.length > 6) {
+      setExpanded(true);
+      return;
+    }
     setLoading(true);
+    setError('');
     try {
       const res = await api.explore(taskId, 20, poetryOnly);
-      setEntries(res.names);
-    } catch {
+      const names = res.names ?? [];
+      setEntries((previous) => [...previous, ...names]);
+      setTotal(res.total);
+      setExhausted(names.length === 0);
+      setExpanded(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '加载名字失败，请重试');
     } finally {
       setLoading(false);
     }
@@ -59,7 +75,8 @@ export function ExploreSection({ taskId }: ExploreSectionProps) {
       const res = await api.getNameDetail(taskId, entry.char1, entry.char2);
       setSelectedName(res.name_result);
       setDetailModalOpen(true);
-    } catch {
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '加载名字详情失败，请重试');
     }
   };
 
@@ -73,8 +90,6 @@ export function ExploreSection({ taskId }: ExploreSectionProps) {
     );
   }
 
-  if (entries.length === 0) return null;
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -86,6 +101,7 @@ export function ExploreSection({ taskId }: ExploreSectionProps) {
             variant={poetryOnly ? 'celestial' : 'outline'}
             size="sm"
             onClick={handlePoetryFilter}
+            disabled={loading}
             className="gap-1.5"
           >
             <BookOpen className="h-3.5 w-3.5" />
@@ -96,6 +112,23 @@ export function ExploreSection({ taskId }: ExploreSectionProps) {
           </Badge>
         </div>
       </div>
+
+      {error && (
+        <div role="alert" className="space-y-2 text-sm text-destructive">
+          <p>{error}</p>
+          {entries.length === 0 && (
+            <Button variant="outline" size="sm" onClick={() => setRetryCount((value) => value + 1)}>
+              重试
+            </Button>
+          )}
+        </div>
+      )}
+
+      {!error && entries.length === 0 && (
+        <p role="status" className="glass-card p-6 text-center text-sm text-muted-foreground">
+          暂无可探索的名字，请调整筛选或返回首页重新生成。
+        </p>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {displayEntries.map((entry) => (
@@ -127,8 +160,14 @@ export function ExploreSection({ taskId }: ExploreSectionProps) {
         ))}
       </div>
 
+      {exhausted && entries.length > 0 && (
+        <p role="status" className="text-center text-sm text-muted-foreground">
+          本轮可探索的名字已全部展示，可返回命名结果或重新生成。
+        </p>
+      )}
+
       <div className="flex justify-center gap-2">
-        {entries.length > 6 && !expanded && (
+        {entries.length > 0 && (!exhausted || (!expanded && entries.length > 6)) && (
           <Button
             variant="ghost"
             size="sm"
@@ -140,7 +179,7 @@ export function ExploreSection({ taskId }: ExploreSectionProps) {
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <>
-                查看更多 ({entries.length - 6}) <ChevronDown className="h-4 w-4" />
+                {expanded ? '继续探索' : '查看更多'} <ChevronDown className="h-4 w-4" />
               </>
             )}
           </Button>

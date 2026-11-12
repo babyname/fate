@@ -274,7 +274,7 @@ func (h *Handler) handleExplore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	table := result.ExcellentTable
+	table := &result.ExcellentTable
 
 	count := 10
 	if c := r.URL.Query().Get("count"); c != "" {
@@ -301,6 +301,9 @@ func (h *Handler) handleExplore(w http.ResponseWriter, r *http.Request) {
 	}
 
 	names := table.Explore(count, filter)
+	if names == nil {
+		names = []fate.ExcellentEntry{}
+	}
 
 	writeJSON(w, 200, map[string]any{
 		"task_id":     taskID,

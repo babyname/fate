@@ -7,6 +7,8 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { SameNameLookupButton } from '@/components/naming/SameNameLookup';
+import { wuGeFields, wuGeLuckColor } from '@/lib/wu-ge';
 import { Printer, Star, Flame, Sparkles, Hexagon, BookOpen, Zap } from 'lucide-react';
 import type { NameResult } from '@/types/api';
 
@@ -22,12 +24,6 @@ const wuxingColors: Record<string, string> = {
   水: 'text-blue-400',
   火: 'text-red-400',
   土: 'text-yellow-600',
-};
-
-const luckyColor = (s: string) => {
-  if (s === '大吉' || s === '吉') return 'text-green-400';
-  if (s === '凶' || s === '大凶') return 'text-red-400';
-  return 'text-muted-foreground';
 };
 
 export function NameDetailModal({ name, open, onOpenChange }: NameDetailModalProps) {
@@ -102,7 +98,7 @@ ${name.wu_xing ? `<h2>五行</h2><p>喜: ${name.wu_xing.xi} | 忌: ${name.wu_xin
         </DialogHeader>
 
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Star className="h-5 w-5 text-amber-400" />
               <span className="text-2xl font-bold font-mono text-gradient-stardust">
@@ -111,10 +107,15 @@ ${name.wu_xing ? `<h2>五行</h2><p>喜: ${name.wu_xing.xi} | 忌: ${name.wu_xin
               <span className="text-sm text-muted-foreground">综合评分</span>
               <Badge variant="celestial">{name.grade}</Badge>
             </div>
-            <Button variant="outline" size="sm" onClick={handlePrint}>
-              <Printer className="h-4 w-4" />
-              打印
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <SameNameLookupButton fullName={name.full_name} />
+              {name.wu_ge && name.zhou_yi && (
+                <Button variant="outline" size="sm" onClick={handlePrint}>
+                  <Printer className="h-4 w-4" />
+                  打印
+                </Button>
+              )}
+            </div>
           </div>
 
           {name.has_poetry && (
@@ -218,26 +219,25 @@ ${name.wu_xing ? `<h2>五行</h2><p>喜: ${name.wu_xing.xi} | 忌: ${name.wu_xin
             </div>
           </div>
 
-          <div className="glass-card p-4 space-y-3">
+          {name.wu_ge && <div className="glass-card p-4 space-y-3">
             <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
               <Hexagon className="h-4 w-4 text-violet-400" />
               五格分析
             </h3>
             <div className="grid grid-cols-5 gap-2 text-center">
-              {(['tian_ge', 'ren_ge', 'di_ge', 'wai_ge', 'zong_ge'] as const).map((key) => {
+              {wuGeFields.map(({ key, label }) => {
                 const ge = name.wu_ge[key];
-                const labels: Record<string, string> = { tian_ge: '天', ren_ge: '人', di_ge: '地', wai_ge: '外', zong_ge: '总' };
                 return (
                   <div key={key} className="space-y-1">
-                    <p className="text-xs text-muted-foreground">{labels[key]}格</p>
+                    <p className="text-xs text-muted-foreground">{label}</p>
                     <p className="text-lg font-mono font-bold text-foreground">{ge.stroke}</p>
-                    <p className={`text-xs ${luckyColor(ge.lucky)}`}>{ge.lucky}</p>
+                    <p className={`text-xs ${wuGeLuckColor(ge.lucky)}`}>{ge.lucky}</p>
                     <p className="text-xs text-muted-foreground">{ge.yin_yang_wu_xing}</p>
                   </div>
                 );
               })}
             </div>
-          </div>
+          </div>}
 
           <div className="glass-card p-4 space-y-2">
             <h3 className="text-sm font-medium text-foreground">三才配置</h3>
