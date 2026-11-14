@@ -267,6 +267,22 @@ print("no orphan v4.2.0 releases")
 PY
   then pass "automation wiring clean, tags consistent, no orphan drafts"; else fail "automation/history (see automation-history.log)"; fi
 
+# 8. Validate .goreleaser.yml with the same GoReleaser version CI uses.
+#    Set GORELEASER_BIN to enable; without it the check is reported as SKIPPED,
+#    never silently counted as a pass.
+log ""
+log "## 8. GoReleaser configuration validation"
+if [ -n "${GORELEASER_BIN:-}" ] && [ -x "$GORELEASER_BIN" ]; then
+  if "$GORELEASER_BIN" check --config "$ROOT/.goreleaser.yml" \
+      >"$OUT/goreleaser-check.log" 2>&1; then
+    pass "goreleaser check: configuration validated"
+  else
+    fail "goreleaser check (see goreleaser-check.log)"
+  fi
+else
+  log "- goreleaser check: SKIPPED (set GORELEASER_BIN to enable)"
+fi
+
 log ""
 if [ "$FAILURES" -eq 0 ]; then
   log "**Overall: PASS**"
