@@ -49,12 +49,12 @@ checksum:
   name_template: checksums.txt
 
 changelog:
-  sort: asc
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
-      - "^chore:"
+  # GoReleaser's default `git` implementation requires a reachable previous
+  # tag. This repository's tag history is divergent (only the current tag sits
+  # on main), so it emitted the entire 993-commit history as release notes.
+  # GitHub's release-notes generation API builds notes from merged PRs and has
+  # no previous-tag requirement. Verified for v4.3.0: 287 chars, clean.
+  use: github-native
 
 release:
   github:

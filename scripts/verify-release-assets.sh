@@ -186,42 +186,86 @@ PY
   then pass "all downloaded assets match their published sha256"; else fail "checksum verification (see checksums.log)"; fi
 fi
 
-# 6. GoReleaser falls back to the entire repository history when no previous tag
-#    is reachable. Assert the published body is the curated user-facing notes.
+# 6. Release notes must be produced automatically by GitHub's generation API.
+#    No hand-written notes file, no full-history git changelog.
 log ""
-log "## 6. Curated release notes"
-NOTES="$ROOT/docs/release-notes/$LABEL.md"
-if [ -f "$NOTES" ]; then
-  if python - "$OUT/release.json" "$NOTES" >"$OUT/release-notes.log" 2>&1 <<'PY'
+log "## 6. Automated release notes"
+TAG_SHA="$(git -C "$ROOT" rev-parse "$LABEL^{commit}")"
+if gh api "repos/$REPO/releases/generate-notes" \
+    -f tag_name="$LABEL" -f target_commitish="$TAG_SHA" \
+    >"$OUT/generated-notes.json" 2>"$OUT/generated-notes.err"; then
+  if python - "$OUT/release.json" "$OUT/generated-notes.json" >"$OUT/release-notes.log" 2>&1 <<'PY'
 import json, sys
-data = json.load(open(sys.argv[1], encoding="utf-8"))
-notes = open(sys.argv[2], encoding="utf-8").read().strip()
-body = (data.get("body") or "").strip()
-print("published body length =", len(body))
-print("curated notes length  =", len(notes))
-assert body == notes, "published release notes differ from docs/release-notes"
+release = json.load(open(sys.argv[1], encoding="utf-8"))
+generated = json.load(open(sys.argv[2], encoding="utf-8"))
+notes = (generated.get("body") or "").strip()
+body = (release.get("body") or "").strip()
+print("generated notes length =", len(notes))
+print("published body length  =", len(body))
+assert notes, "GitHub returned empty generated notes"
+assert body == notes, "published release notes differ from generated-notes API output"
 assert len(body) < 20000, "release notes look like an auto-generated full-history changelog"
 assert "Initial commit" not in body, "release notes contain raw repository history"
-print("published notes match the curated document")
+print("published body equals GitHub-generated notes")
 PY
-  then pass "release notes match curated document"; else fail "release notes (see release-notes.log)"; fi
+  then pass "release notes equal GitHub-generated output"; else fail "release notes (see release-notes.log)"; fi
 else
-  fail "curated notes file missing: docs/release-notes/$LABEL.md"
+  fail "generate-notes API call (see generated-notes.err)"
 fi
 
-# 7. The curated notes must actually be in the repository, otherwise the
-#    release workflow step cannot read them after checkout.
+# 7. Automation wiring and cleaned history: no manual-notes residue, local tag
+#    refs identical to origin, no orphan draft releases.
 log ""
-log "## 7. Curated notes are source-controlled and wired into CI"
-NOTES_REL="docs/release-notes/$LABEL.md"
-if (cd "$ROOT" && git ls-files --error-unmatch "$NOTES_REL") \
-    >"$OUT/notes-tracked.log" 2>&1 \
-   && grep -q 'Apply curated release notes' "$ROOT/.github/workflows/release.yml" \
-    >>"$OUT/notes-tracked.log" 2>&1; then
-  pass "curated notes tracked in git and wired into release workflow"
-else
-  fail "curated notes not tracked or not wired into workflow (see notes-tracked.log)"
-fi
+log "## 7. Automation wiring and cleaned release/tag history"
+if python - "$ROOT" "$REPO" >"$OUT/automation-history.log" 2>&1 <<'PY'
+import json, os, subprocess, sys
+root, repo = sys.argv[1], sys.argv[2]
+
+gr = open(os.path.join(root, ".goreleaser.yml"), encoding="utf-8").read()
+wf = open(os.path.join(root, ".github/workflows/release.yml"), encoding="utf-8").read()
+assert "use: github-native" in gr, "GoReleaser not configured for github-native changelog"
+assert "Apply curated release notes" not in wf, "curated notes step still present"
+assert "--notes-file" not in wf, "manual notes upload still present"
+assert not os.path.exists(os.path.join(root, "docs/release-notes")), "manual notes directory still present"
+print("config: github-native changelog; no manual notes path")
+
+proxy_env = os.environ.get("FATE_GIT_PROXY")
+proxy = ["-c", f"http.proxy={proxy_env}", "-c", f"https.proxy={proxy_env}"] if proxy_env else []
+remote = subprocess.run(["git"] + proxy + ["ls-remote", "--tags", "origin"], cwd=root,
+                        capture_output=True, text=True)
+assert remote.returncode == 0, remote.stderr
+tags = {}
+for line in remote.stdout.splitlines():
+    parts = line.split()
+    if len(parts) < 2:
+        continue
+    sha, ref = parts[0], parts[1].replace("refs/tags/", "")
+    if ref.endswith("^{}"):
+        tags[ref[:-3]] = sha
+    elif ref not in tags:
+        tags[ref] = sha
+local = subprocess.run(["git", "tag", "-l"], cwd=root, capture_output=True, text=True).stdout.split()
+assert set(local) == set(tags), (
+    f"tag names differ: local-only={sorted(set(local) - set(tags))} "
+    f"remote-only={sorted(set(tags) - set(local))}")
+bad = []
+for t in tags:
+    got = subprocess.run(["git", "rev-parse", "-q", "--verify", f"refs/tags/{t}^{{commit}}"],
+                         cwd=root, capture_output=True, text=True).stdout.strip()
+    if got != tags[t]:
+        bad.append((t, got[:10], tags[t][:10]))
+print("local tags:", len(local), "remote tags:", len(tags))
+assert not bad, "tag SHA mismatch: " + str(bad)
+print("all local tags match origin")
+
+rel = subprocess.run(["gh", "api", f"repos/{repo}/releases?per_page=100"], cwd=root,
+                     capture_output=True, text=True)
+assert rel.returncode == 0, rel.stderr
+orphans = [x["id"] for x in json.loads(rel.stdout) if x["tag_name"] == "v4.2.0"]
+assert not orphans, "orphan v4.2.0 draft releases remain: " + str(orphans)
+print("no orphan v4.2.0 releases")
+PY
+  then pass "automation wiring clean, tags consistent, no orphan drafts"; else fail "automation/history (see automation-history.log)"; fi
 
 log ""
 if [ "$FAILURES" -eq 0 ]; then
