@@ -21,9 +21,5 @@ func init() {
 	}
 }
 
-func OpenFS() fs.FS {
-	return EmbeddedFS
-}
-
-//go:embed *
-var EmbeddedFS embed.FS
+// StaticSub is the only embedded filesystem. Embedding the whole resources
+// directory would pull temporary backups into every compiled binary.

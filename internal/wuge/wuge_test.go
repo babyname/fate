@@ -102,6 +102,12 @@ func TestGetLuckyByLastName_TotalCount(t *testing.T) {
 		}
 	}
 	t.Logf("Total lucky: %d / %d (%.1f%%)", totalLucky, totalAll, float64(totalLucky)/float64(totalAll)*100)
+	if totalLucky == 0 {
+		t.Fatal("GetLuckyByLastName returned no lucky combinations")
+	}
+	if totalLucky >= totalAll {
+		t.Fatalf("every combination marked lucky (%d/%d): lucky table is probably broken", totalLucky, totalAll)
+	}
 }
 
 func isLucky(s string) bool {

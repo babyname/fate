@@ -274,7 +274,7 @@ func (h *Handler) handleExplore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	table := &result.ExcellentTable
+	table := result.ExcellentTable
 
 	count := 10
 	if c := r.URL.Query().Get("count"); c != "" {
@@ -450,7 +450,7 @@ func (h *Handler) handleStatic(w http.ResponseWriter, r *http.Request) {
 	if h.staticFS == nil {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(200)
-		_, _ = w.Write([]byte("Fate API Server\n\nAvailable endpoints:\n  POST /api/v1/generate\n  GET  /api/v1/status\n  GET  /api/v1/result\n  GET  /api/v1/explore\n  GET  /api/v1/characters\n"))
+		_, _ = w.Write([]byte("Fate API Server\n\nAvailable endpoints:\n  POST /api/v1/generate\n  GET  /api/v1/status\n  GET  /api/v1/result\n  GET  /api/v1/names\n  GET  /api/v1/explore\n  GET  /api/v1/name_detail\n  GET  /api/v1/characters\n"))
 		return
 	}
 

@@ -6,8 +6,6 @@ import type {
   ExploreResponse,
   NameDetailResponse,
   NamesResponse,
-  NameScoreRequest,
-  PoetrySearchResponse,
 } from '@/types/api';
 
 const BASE = '/api/v1';
@@ -65,16 +63,4 @@ export const api = {
     return request(`/name_detail?${new URLSearchParams({ task_id: taskId, char1, char2 })}`);
   },
 
-  nameScore(data: NameScoreRequest): Promise<NameDetailResponse> {
-    return request('/name-score', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  searchPoetry(keyword: string): Promise<PoetrySearchResponse> {
-    const params = new URLSearchParams();
-    params.set('keyword', keyword);
-    return request(`/poetry/search?${params.toString()}`);
-  },
 };

@@ -18,9 +18,6 @@ type Config struct {
 	Output   OutputConfig `yaml:"output"`
 }
 
-// DatabaseConfig 数据库配置 (deprecated: use DBConfig)
-type DatabaseConfig = DBConfig
-
 // RateConfig 评分权重与阈值配置
 type RateConfig struct {
 	WuxingWeight float64 `yaml:"wuxing_weight"`

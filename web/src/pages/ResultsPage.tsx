@@ -28,7 +28,6 @@ export function ResultsPage() {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const setStoreTopNames = useAppStore((s) => s.setTopNames);
-  const setStoreTop10 = useAppStore((s) => s.setTop10);
   const setStoreTotal = useAppStore((s) => s.setTotal);
   const setIsGenerating = useAppStore((s) => s.setIsGenerating);
 

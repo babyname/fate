@@ -1,2 +1,3 @@
 node_modules/
-dist/
+# Rsbuild emits hashed bundles to ../resources/static (see rsbuild.config.ts),
+# not to web/dist; cleanDistPath keeps that directory free of stale artifacts.

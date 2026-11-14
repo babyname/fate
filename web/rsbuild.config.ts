@@ -13,6 +13,8 @@ export default defineConfig({
     },
   },
   output: {
+    // Clean hashed bundles on every build so obsolete files never accumulate.
+    cleanDistPath: true,
     distPath: {
       root: path.resolve(__dirname, '../resources/static'),
       js: 'js',

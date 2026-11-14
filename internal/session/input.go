@@ -129,31 +129,3 @@ func (o *Output) AllNames() []ScoredName {
 	return result
 }
 
-func (o *Output) BuildNameResult(char1, char2 string) *analysis.NameResult {
-	o.mu.RLock()
-	defer o.mu.RUnlock()
-
-	if o.charMap == nil || o.fateData == nil || o.basic == nil {
-		return nil
-	}
-
-	c1 := o.charMap[char1]
-	c2 := o.charMap[char2]
-	if c1 == nil || c2 == nil {
-		return nil
-	}
-
-	surname := ""
-	l1, l2 := 0, 0
-	if o.basic.LastName[0] != nil {
-		surname = o.basic.LastName[0].Char
-		l1 = o.basic.LastName[0].ScienceStroke
-	}
-	if o.basic.LastName[1] != nil {
-		surname += o.basic.LastName[1].Char
-		l2 = o.basic.LastName[1].ScienceStroke
-	}
-
-	nr := analysis.BuildNameResult(0, surname, c1, c2, l1, l2, o.fateData)
-	return &nr
-}

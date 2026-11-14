@@ -131,6 +131,12 @@ func TestRateNameWithXiWuxing(t *testing.T) {
 	}
 
 	rating := rater.RateName("张", c1, c2)
-	t.Logf("浩然: Total=%.1f, WuXing=%.1f, WuGe=%.1f, Grade=%s", rating.TotalScore, rating.WuXingScore, rating.WuGeScore, rating.Grade)
-	t.Logf("Interpret: %s", rating.Interpret)
+	// This fixture has no half-lucky grids, so it must stay at the untouched baseline.
+	if math.Abs(rating.WuGeScore-74.0) > 1e-9 {
+		t.Fatalf("WuGeScore = %g, want 74.0", rating.WuGeScore)
+	}
+	if rating.Grade != "中吉" {
+		t.Fatalf("Grade = %s, want 中吉", rating.Grade)
+	}
+	t.Logf("浩然: Total=%.1f, WuGe=%.1f, Grade=%s", rating.TotalScore, rating.WuGeScore, rating.Grade)
 }

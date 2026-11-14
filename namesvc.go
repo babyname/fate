@@ -69,7 +69,7 @@ func (f *fateImpl) Generate(ctx context.Context, req GenerateRequest) (*Generate
 
 	return &GenerateResult{
 		TopNames:       result.TopNames,
-		ExcellentTable: *result.ExcellentTable,
+		ExcellentTable: result.ExcellentTable,
 		CharMap:        charMap,
 		FateData:       result.FateData,
 	}, nil

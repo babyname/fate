@@ -167,22 +167,3 @@ export interface NamesResponse {
   total: number
 }
 
-export interface NameScoreRequest {
-  surname: string
-  name1: string
-  name2: string
-  born?: string
-  sex?: string
-}
-
-export interface PoetrySearchResult {
-  title: string
-  author: string
-  dynasty: string
-  type: string
-  sentence: string
-}
-
-export interface PoetrySearchResponse {
-  results: PoetrySearchResult[]
-}

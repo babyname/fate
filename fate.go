@@ -79,7 +79,9 @@ type FirstName = naming.FirstName
 
 type ScoredName = session.ScoredName
 type ExcellentEntry = session.ExcellentEntry
-type ExcellentTable = session.ExcellentTable
+// ExcellentTable is a pointer alias: the underlying type owns a sync.RWMutex
+// and must never be copied by value.
+type ExcellentTable = *session.ExcellentTable
 
 type NameResult = analysis.NameResult
 type ZhouYiBasic = analysis.ZhouYiBasic

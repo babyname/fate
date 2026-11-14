@@ -1,438 +1,90 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat&logo=go" alt="Go Version" />
-  <img src="https://img.shields.io/badge/version-4.2.0-blue" alt="Version" />
-  <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
-  <img src="https://img.shields.io/badge/module-v4-7B42BC" alt="Module v4" />
-</p>
+# FATE · 智能起名
 
-<p align="center">
-  <h1 align="center">🌌 fate · 天命之名</h1>
-  <p align="center">
-    <strong>基于八字五行 · 三才五格 · 周易卦象 · 诗词出处的智能起名引擎</strong><br>
-    <em>FATE — Celestial Naming Engine</em>
-  </p>
-</p>
+输入姓氏和出生时间，FATE 会结合八字喜用神、三才五格、音韵与字义，生成一批**带解释、可比较**的候选名字。所有计算都在你自己的机器上完成，名字和生日不需要上传到任何服务。
 
-<p align="center">
-  <a href="README_EN.md">English</a> | 中文
-</p>
+[![最新版本](https://img.shields.io/github/v/release/babyname/fate)](https://github.com/babyname/fate/releases/latest) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE) · [English](README_EN.md) · [开发者文档](docs/DEVELOPMENT.md)
 
 ---
 
-## ✨ 功能亮点
+## 先看效果
 
-<table>
-<tr>
-<td width="50%">
+| 首页：填写姓氏与出生时间 | 结果页：候选名与综合评分 |
+| :---: | :---: |
+| ![首页](docs/screenshots/home.png) | ![结果页](docs/screenshots/results.png) |
 
-### 🎯 八字推命
-- 四柱八字精密推算（年/月/日/时）
-- 五行强弱分析 + 调候用神
-- **双算法喜用神**：平衡用神法 & 格局用神法（10种格局）
-- 生肖关系、纳音五行
+| 表格视图：逐项对比、分页 | 卡片视图：五格吉凶与同名查询 |
+| :---: | :---: |
+| ![表格视图](docs/screenshots/table.png) | ![卡片视图](docs/screenshots/cards.png) |
 
-</td>
-<td width="50%">
-
-### 📊 多维评分
-- **五维评分体系**：文化印象 · 五行八字 · 生肖 · 五格数理 · 音韵
-- 三才配置吉凶分析
-- 81数大衍 O(1) 查找
-- 64卦周易卦象解读
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 🌐 Web 界面
-- 现代 React + Tailwind CSS 响应式 UI
-- 实时流式生成 + 轮询进度
-- 候选名册（表格/卡片双视图）
-- 探索模式：随机抽样 + 条件过滤
-
-</td>
-<td width="50%">
-
-### ⚡ 高性能
-- Ent ORM + SQLite 高效数据层
-- ExcellentTable 流式 Top-N 数据结构
-- 异步并发生成（session 模式）
-- 嵌入式 Web 前端（单二进制分发）
-
-</td>
-</tr>
-</table>
+> 截图来自本项目 v4.3.0 实际运行的 Web 界面，见 [截图说明](docs/screenshots/README.md)。
 
 ---
 
-## 📸 界面预览
+## 开始使用
 
-> 💡 **提示**：Web 界面运行在 `http://localhost:18080`，启动服务器后即可访问。
+### 方式一：命令行（无需安装 Go）
 
-| 首页 | 命名结果 |
-|------|----------|
-| ![首页](docs/screenshots/home.png) | ![结果](docs/screenshots/results.png) |
-
-| 候选名册（表格） | 候选名册（卡片） |
-|------------------|-------------------|
-| ![表格](docs/screenshots/table.png) | ![卡片](docs/screenshots/cards.png) |
-
----
-
-## 🚀 快速开始
-
-### 环境要求
-
-- **Go** 1.22+
-- **Bun**（前端开发需要，生产部署无需）
-
-### 安装 & 运行
+1. 打开 [Releases 最新版](https://github.com/babyname/fate/releases/latest)，下载对应系统的压缩包并解压。
+2. 若该版本附带 `fate-v*.zip` 数据库包，把它解压到程序同目录；若没有附带，需要先按方式二用源码初始化数据库（这一步需要 Go）。
+3. 运行：
 
 ```bash
-# 克隆项目
+fate name -s 张 -b "2024/06/15 10:30" -g boy
+```
+
+常用参数：`-s` 姓氏、`-b` 出生日期时刻、`-g` 性别（`boy`/`girl`）、`-f` 需要避开的字、`-o` 输出到文件。完整参数表见 [开发者文档](docs/DEVELOPMENT.md)。
+
+### 方式二：Web 界面（推荐，可视化对比）
+
+需要 **Go 1.22+**。前端已内嵌，生产运行不需要 Bun / Node。
+
+```bash
 git clone https://github.com/babyname/fate.git
 cd fate
-
-# 下载依赖
 go mod download
-
-# 初始化数据库（必需）
-go run ./cmd/dbinit
-
-# 启动 Web 服务
-go run ./cmd/server
-# 访问 http://localhost:18080
+go run ./cmd/dbinit      # 初始化本地数据库，只需一次
+go run ./cmd/server      # 启动服务
 ```
 
-### CLI 命令行
+浏览器打开 **http://localhost:18080** 。填写姓氏、出生日期与性别，点击「开始命名」即可。
 
-```bash
-# 编译
-go build -o fate ./cmd/console
-
-# 生成名字
-./fate name -s 张 -b "2024/06/15 10:30" -g boy
-```
-
-<details>
-<summary>📋 CLI 输出示例</summary>
-
-```
-═══════════════════════════════════════
-           Top 10 推荐名字
-═══════════════════════════════════════
-  #1  张适抡  评分:90.1  等级:上上  五行:火火
-      天格:凶 人格:吉 地格:半吉 总格:吉
-      三才:木水水(大吉)
-
-  #2  张粮屠  评分:90.1  等级:上上  五行:火火
-  #3  张适晶  评分:90.1  等级:上上  五行:火火
-  ...
-───────────────────────────────────────
-  全部候选名字共 10000 个
-═══════════════════════════════════════
-```
-
-**详细分析**（`name detail`）：
-
-```
-═══════════════════════════════════════
-  张适抡  评分: 90.1  等级: 上上
-═══════════════════════════════════════
-  【五格分析】
-  天格:12(凶)  人格:29(吉)  地格:30(半吉)
-  外格:13(吉)  总格:41(吉)
-  三才: 木水水(大吉)
-
-  【八字分析】
-  四柱: 甲辰 庚午 庚戌 乙酉
-  喜神: 火  忌神: 金
-
-  【周易卦象】
-  本卦: 水山蹇  变卦: 地山谦
-
-  【评分明细】
-  文化:86  五行:94  生肖:94  五格:89  音韵:89
-═══════════════════════════════════════
-```
-</details>
-
-### CLI 参数
-
-| 参数 | 简写 | 说明 | 示例 |
-|------|------|------|------|
-| `--surname` | `-s` | 姓氏 | `-s 张` |
-| `--born` | `-b` | 出生日期与时刻 | `-b "2024/06/15 10:30"` |
-| `--gender` | `-g` | 性别 | `-g boy` / `-g girl` |
-| `--xiyong` | | 喜用神算法 | `balance`（平衡法）/ `geju`（格局法） |
-| `--strictness` | | 五格严格度 | `loose` / `moderate` / `strict` |
-| `--filter` | `-f` | 过滤汉字 | `-f 病死穷` |
-| `--output` | `-o` | 输出到文件 | `-o result.txt` |
+> Web 服务接口统一为 `/api/v1/*`；接口清单见 [开发者文档](docs/DEVELOPMENT.md)。
 
 ---
 
-## 🔌 Web API
+## 你会得到什么
 
-启动服务器后可用：
-
-| Method | Endpoint | 说明 |
-|--------|----------|------|
-| `GET` | `/health` | 健康检查 |
-| `POST` | `/api/generate` | 异步生成名字（返回 task_id） |
-| `GET` | `/api/task/:id` | 查询任务状态 |
-| `GET` | `/api/names/:taskId` | 分页获取名字列表 |
-| `GET` | `/api/name-detail` | 名字详细分析 |
-| `GET` | `/api/explore/:taskId` | 随机探索名字 |
-
-### 生成请求示例
-
-```bash
-curl -X POST http://localhost:18080/api/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "surname": "张",
-    "born": "2024/06/15 10:30",
-    "sex": "boy",
-    "poetry_mode": 2,
-    "avoid_chars": ["病", "死"]
-  }'
-```
+- **可解释的评分**：文化印象、五行八字、生肖、五格数理、音韵五个维度分别计分，详情页列出每一项明细。半吉按独立档位计分，不再被当作「吉」加分。
+- **八字喜用神**：按出生时间排四柱，判断喜用神，再据此筛选用字。
+- **五格与三才**：天格、人格、地格、外格、总格的数理吉凶，以及三才配置，在名册和详情页直接可见。
+- **可比较的候选名册**：表格视图排序与分页、卡片视图展示五格吉凶；「探索更多」逐批补充新名字，取尽时明确提示。
+- **官方同名人数查询**：一键复制全名，打开所选地区的官方查询入口；查到的结果可以手动记录，只保存在当前浏览器，不会上传。
 
 ---
 
-## 🧩 代码集成
+## 常见问题
 
-```bash
-go get github.com/babyname/fate/v4
-```
+**我的数据会上传吗？**
+不会。生成与评分全部在本地进程完成。同名查询功能只是把全名复制到剪贴板并打开一个官方网页，记录结果也只写入本机浏览器存储。
 
-```go
-package main
+**为什么必须填出生时间？**
+出生时间用于排八字与判断喜用神，进而影响五行用字的筛选。日期格式为 `YYYY/MM/DD HH:MM`。
 
-import (
-    "fmt"
-    "time"
+**分数越高就一定越好吗？**
+分数是五维加权的可解释参考，不是唯一标准。建议同时看详情页的五行、三才、音韵明细，以及字义和你的家庭偏好。
 
-    "github.com/babyname/fate/v4"
-    "github.com/babyname/fate/v4/config"
-)
+**「探索更多」点不出新名字？**
+每轮可探索的名字有上限；界面会提示本轮已全部展示，可返回命名结果或重新生成。
 
-func main() {
-    cfg := config.DefaultConfig()
-    f, _ := fate.New(cfg)
-
-    filter := fate.NewFilter(fate.FilterOption{
-        CharacterFilter:     true,
-        CharacterFilterType: fate.CharacterFilterTypeDefault,
-        MinStroke:           3,
-        MaxStroke:           18,
-        RegularFilter:       true,
-        DaYanFilter:         true,
-        WuXingFilter:        true,
-        AvoidCharacters:     []string{"病", "死", "穷"},
-    })
-
-    s := f.NewSessionWithFilter(filter)
-    born, _ := time.Parse("2006/01/02 15:04", "2024/06/15 10:30")
-    input := &fate.Input{
-        Last: [2]string{"张", ""},
-        Born: born,
-        Sex:  fate.SexBoy,
-    }
-
-    s.Start(input)
-    s.Wait()
-
-    // 获取结果
-    output := input.Output()
-    for _, nr := range output.TopNames() {
-        fmt.Printf("%s - %.1f (%s)\n", nr.FullName, nr.Score, nr.Grade)
-    }
-
-    // ExcellentTable: 流式 Top-N 访问
-    table := output.GetExcellentTable()
-    entries := table.TopN(10)
-    for _, e := range entries {
-        fmt.Printf("%s%s - %.1f has_poetry=%v\n", e.Char1, e.Char2, e.Score, e.HasPoetry)
-    }
-
-    // Explore: 随机采样 + 条件过滤
-    explored := table.Explore(10, func(e fate.ExcellentEntry) bool {
-        return e.HasPoetry
-    })
-    for _, e := range explored {
-        fmt.Printf("%s%s - %.1f\n", e.Char1, e.Char2, e.Score)
-    }
-}
-```
-
-### 核心 API
-
-| 类型 | 说明 |
-|------|------|
-| `fate.New(cfg)` | 创建引擎实例 |
-| `fate.NewSessionWithFilter(filter)` | 创建带筛选器的会话 |
-| `fate.NewFilter(option)` | 创建筛选器 |
-| `fate.FilterOption` | 筛选选项（笔画/五行/大衍/性别/避用字等） |
-| `fate.Input` | 输入（姓氏/生日/性别） |
-| `fate.Output` | 输出（TopNames/ExcellentTable/CharMap） |
-| `fate.ExcellentTable` | 流式 Top-N 结构（TryPush/Finalize/TopN/Explore） |
+**「姓名测分」「诗词搜索」在哪？**
+这两个入口对应的后端能力尚未实现，v4.3.0 起已从界面下线，避免点了之后报错。恢复计划见 [#146](https://github.com/babyname/fate/issues/146)。
 
 ---
 
-## 🏛️ 架构
+## 开发者入口
 
-```
-┌─────────────────────────────────────────────┐
-│                  fate CLI / Server           │
-├─────────────────────────────────────────────┤
-│  cmd/console     │  cmd/server               │
-│  (CLI 工具)     │  (HTTP API + 嵌入式前端)   │
-├─────────────────────────────────────────────┤
-│               internal/http                  │
-│               (API 路由 & 中间件)             │
-├─────────────────────────────────────────────┤
-│                  fate 核心引擎                │
-│  ┌──────────┬──────────┬──────────────────┐ │
-│  │ Session  │ Filter   │ ExcellentTable   │ │
-│  │ 异步生成 │ 多级筛选  │ 流式Top-N        │ │
-│  ├──────────┼──────────┼──────────────────┤ │
-│  │ Bazi     │ Wuge     │ Zhouyi           │ │
-│  │ 八字推算 │ 五格数理  │ 周易卦象          │ │
-│  └──────────┴──────────┴──────────────────┘ │
-├─────────────────────────────────────────────┤
-│              chronos/v2 (八字引擎)            │
-│              yi (周易引擎)                    │
-│              Ent ORM (数据层)                 │
-├─────────────────────────────────────────────┤
-│              SQLite3 (数据存储)               │
-│              character.json (汉字数据库)       │
-│              chinese-poetry (诗词库)          │
-└─────────────────────────────────────────────┘
-```
+架构、目录结构、Web API、代码集成、编译与发布流程已迁到 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)；问题分析与版本变更见 [issue #147](https://github.com/babyname/fate/issues/147)。
 
-### 目录结构
+## License
 
-```
-fate/
-├── cmd/                # 命令行入口
-│   ├── console/        #   主 CLI（name / dbinit / dictctl）
-│   ├── server/         #   Web 服务
-│   ├── dbinit/         #   数据库初始化
-│   ├── character/      #   汉字数据工具
-│   ├── dictctl/        #   字典管理工具
-│   └── tools/          #   开发调试工具
-├── config/             # 配置定义
-├── data/               # 种子数据
-│   ├── chinese-poetry/ #   诗词库
-│   └── seed/           #   基础数据
-├── docs/               # 文档 & 截图
-├── ent/                # Ent Schema & 生成代码
-├── internal/           # 内部包
-│   ├── chronosfate/    #   chronos 适配层
-│   ├── http/           #   HTTP API
-│   └── ...
-├── model/              # 数据模型
-├── resources/          # 嵌入式资源
-│   ├── character.json  #   汉字元数据库
-│   └── static/         #   Web 前端构建产物
-├── scripts/            # 构建脚本
-└── web/                # React 前端源码
-    └── src/
-        ├── components/ # UI 组件
-        ├── pages/      # 页面
-        ├── lib/        # API 客户端 & 工具
-        └── store/      # 状态管理 (Zustand)
-```
-
----
-
-## 📐 五维评分体系
-
-| 维度 | 权重 | 评分依据 |
-|------|:----:|----------|
-| 🎨 **文化印象** | 20% | 常用度、正体字、字义丰富度、文化关联 |
-| 🔥 **五行八字** | 25% | 名字五行与日主喜用神匹配度 |
-| 🐉 **生肖** | 10% | 生肖五行与名字五行的生克关系 |
-| 📏 **五格数理** | 25% | 天格/人格/地格/外格/总格 81 数吉凶 |
-| 🎵 **音韵** | 20% | 姓名声韵调和谐度、平仄组合 |
-
----
-
-## 🌿 喜用神算法
-
-### 平衡用神法
-基于日主强弱，通过同党/异党力量对比取用神：
-
-| 日主 | 用神 | 喜神 | 忌神 |
-|------|------|------|------|
-| 强 | 克我（官杀） | 我克 + 生我 | 同我（比劫） |
-| 弱 | 生我（印星） | 同我（比劫） | 克我 + 我生 |
-
-### 格局用神法
-先定格局（正官/七杀/食神/伤官/正财/偏财/建禄/阳刃等 10 种），再按格局取用神。
-
----
-
-## 🔀 分支策略
-
-| 分支 | 用途 | go.mod module |
-|------|------|---------------|
-| `main` | v4.x 开发主线 | `github.com/babyname/fate/v4` |
-| `v3` | v3.x Bugfix 维护 | `github.com/babyname/fate` |
-
-> ⚠️ **历史原因**：v3 分支的模块路径不含 `/v3`（早期 Go module 规范未强制要求）。
-> 从 v4 开始引入 `/v4` 后缀，未来 v5 也将统一使用 `/v5`。
-
-### 版本标签
-
-| 系列 | 最新 | 标签 |
-|------|------|------|
-| v4.x | v4.2.0 | `v4.0.0` |
-| v3.x | v3.6.0 | `v3.0.0` ~ `v3.6.0`（共 14 个发布） |
-| v2.x | v2.0.2 | `v2.0.0` ~ `v2.0.2` |
-
----
-
-## 🛠️ 技术栈
-
-| 层 | 技术 | 说明 |
-|----|------|------|
-| 语言 | Go 1.22+ | 核心引擎 & 服务 |
-| 前端 | React 19 + Tailwind CSS 3 + Rsbuild | Web 界面 |
-| 状态 | Zustand | 前端状态管理 |
-| UI | Radix UI + Lucide Icons | 无障碍组件库 |
-| ORM | Ent | 类型安全的 Go ORM |
-| 存储 | SQLite3 (modernc) | 嵌入式数据库，零依赖 |
-| 八字 | chronos/v2 | 八字推算引擎 |
-| 卦象 | yi | 周易六十四卦 |
-
----
-
-## 🧪 开发
-
-```bash
-# 前端开发（热更新）
-cd web && bun install && bun run dev
-
-# 后端开发
-go run ./cmd/server
-
-# 构建生产版本
-cd web && bun run build    # 前端构建 → resources/static/
-go build -o fate ./cmd/console    # CLI 工具
-go build -o fate-server ./cmd/server  # 服务器（含嵌入式前端）
-
-# 运行测试
-go test ./...
-
-# 代码检查
-golangci-lint run
-```
-
----
-
-## 📄 License
-
-[MIT](LICENSE) © babyname
+[MIT](LICENSE)

@@ -41,7 +41,6 @@ type ExcellentTable struct {
 	mu      sync.RWMutex
 	h       excellentMinHeap
 	entries []ExcellentEntry
-	index   map[string]int
 	shown   map[string]bool
 	seen    map[string]bool
 	cap     int
@@ -90,10 +89,6 @@ func (t *ExcellentTable) Finalize() {
 	sort.Slice(t.entries, func(i, j int) bool {
 		return t.entries[i].Score > t.entries[j].Score
 	})
-	t.index = make(map[string]int, len(t.entries))
-	for i, e := range t.entries {
-		t.index[e.Char1+e.Char2] = i
-	}
 	t.h = nil
 	t.seen = nil
 }
@@ -186,23 +181,6 @@ func (t *ExcellentTable) Explore(count int, filter func(ExcellentEntry) bool) []
 	return result
 }
 
-// Entries returns a slice of entries in [offset, offset+limit).
-func (t *ExcellentTable) Entries(offset, limit int) []ExcellentEntry {
-	t.mu.RLock()
-	defer t.mu.RUnlock()
-
-	if offset >= len(t.entries) {
-		return nil
-	}
-	end := offset + limit
-	if end > len(t.entries) {
-		end = len(t.entries)
-	}
-	result := make([]ExcellentEntry, end-offset)
-	copy(result, t.entries[offset:end])
-	return result
-}
-
 // MarkShown marks an entry as shown (for Explore tracking).
 func (t *ExcellentTable) MarkShown(char1, char2 string) {
 	t.mu.Lock()
@@ -231,12 +209,3 @@ func (t *ExcellentTable) ShownCount() int {
 	return len(t.shown)
 }
 
-// FindEntry looks up an entry by its two characters.
-func (t *ExcellentTable) FindEntry(char1, char2 string) *ExcellentEntry {
-	t.mu.RLock()
-	defer t.mu.RUnlock()
-	if i, ok := t.index[char1+char2]; ok {
-		return &t.entries[i]
-	}
-	return nil
-}

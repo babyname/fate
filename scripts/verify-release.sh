@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+# Reproducible acceptance gate for a fate release.
+#
+#   bash scripts/verify-release.sh [v4.3.0]
+#
+# Produces evidence under tests/acceptance/<version>/evidence/ :
+#   build/vet/test/tsc/web-build logs, real HTTP status + response bodies,
+#   server log, README image link check, and report.md.
+# Requires: Go, Node 22+, curl, python3. No external services.
+set -uo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+LABEL="${1:-v4.3.0}"
+OUT="$ROOT/tests/acceptance/$LABEL/evidence"
+TMP="$(mktemp -d)"
+PORT="${FATE_PORT:-18081}"
+BASE="http://127.0.0.1:$PORT"
+RESULT=0
+ROWS=()
+SERVER_PID=""
+
+mkdir -p "$OUT"
+: > "$OUT/report.md"
+cleanup() {
+  if [ -n "$SERVER_PID" ]; then kill "$SERVER_PID" 2>/dev/null || true; fi
+  rm -rf "$TMP"
+}
+trap cleanup EXIT
+
+step() {
+  local name="$1"; shift
+  local log="$OUT/$name.log"
+  printf '== %s == ' "$name"
+  if "$@" > "$log" 2>&1; then
+    echo PASS
+    ROWS+=("| $name | PASS | [$name.log]($name.log) |")
+  else
+    echo FAIL
+    ROWS+=("| $name | FAIL | [$name.log]($name.log) |")
+    RESULT=1
+  fi
+}
+
+# The integration tests open fate_test.db, which is intentionally untracked.
+if [ ! -f "$ROOT/fate_test.db" ]; then
+  if [ -f "$ROOT/fate" ]; then
+    cp "$ROOT/fate" "$ROOT/fate_test.db"
+  else
+    (cd "$ROOT" && go run ./cmd/dbinit -db fate_test) > "$OUT/dbinit.log" 2>&1
+  fi
+fi
+
+step go-build   bash -c "cd '$ROOT' && go build ./..."
+step go-vet     bash -c "cd '$ROOT' && go vet ./..."
+step go-test    bash -c "cd '$ROOT' && go test ./... -count=1"
+step tsc        bash -c "cd '$ROOT/web' && node node_modules/typescript/bin/tsc --noEmit"
+step web-build  bash -c "cd '$ROOT/web' && npm run build"
+
+# README links must point at real screenshot files.
+check_assets() {
+  cd "$ROOT" || return 1
+  local missing=0 f
+  while IFS= read -r f; do
+    if [ -f "$f" ]; then echo "OK $f"; else echo "MISSING $f"; missing=1; fi
+  done < <(grep -hoE 'docs/screenshots/[A-Za-z0-9._-]+\.(png|jpg|svg)' README.md README_EN.md | sort -u)
+  return "$missing"
+}
+step readme-assets check_assets
+
+# Start a dedicated server instance so the captured log belongs to this run.
+(cd "$ROOT" && go build -o "$TMP/fate-server" ./cmd/server) > "$OUT/server-build.log" 2>&1
+(cd "$ROOT" && "$TMP/fate-server" -addr "127.0.0.1:$PORT") > "$OUT/server.log" 2>&1 &
+SERVER_PID=$!
+for _ in $(seq 1 60); do
+  if curl -s -o /dev/null "$BASE/"; then break; fi
+  sleep 0.5
+done
+
+check_http() {
+  local name="$1" method="$2" url="$3" body="${4:-}" want="${5:-200}"
+  local bodyfile="$OUT/http-$name.body" jsonfile="$OUT/http-$name.json"
+  local code
+  if [ "$method" = POST ]; then
+    code=$(curl -sS -X POST -H 'Content-Type: application/json' -d "$body" \
+      -o "$bodyfile" -w '%{http_code}' "$BASE$url")
+  else
+    code=$(curl -sS -X GET -o "$bodyfile" -w '%{http_code}' "$BASE$url")
+  fi
+  python -c '
+import json, sys
+code, want, url = int(sys.argv[1]), int(sys.argv[2]), sys.argv[3]
+raw = sys.stdin.read()
+try:
+    payload = json.loads(raw)
+except Exception:
+    payload = raw[:4000]
+print(json.dumps({"url": url, "status": code, "expected": want, "body": payload},
+                 ensure_ascii=False, indent=2))
+' "$code" "$want" "$url" < "$bodyfile" > "$jsonfile"
+  if [ "$code" = "$want" ]; then
+    echo "http $name: $code PASS"
+    ROWS+=("| http-$name | PASS ($code) | [http-$name.json](http-$name.json) |")
+  else
+    echo "http $name: $code FAIL (want $want)"
+    ROWS+=("| http-$name | FAIL ($code, want $want) | [http-$name.json](http-$name.json) |")
+    RESULT=1
+  fi
+}
+
+check_http root GET "/"
+GEN_BODY='{"surname":"张","born":"2024/06/15 10:30","sex":"boy","poetry_mode":0}'
+check_http generate POST "/api/v1/generate" "$GEN_BODY"
+TASK_ID="$(python -c 'import json,sys; print(json.load(sys.stdin)["task_id"])' < "$OUT/http-generate.body" 2>/dev/null || true)"
+if [ -z "$TASK_ID" ]; then
+  echo "generate returned no task_id"; RESULT=1
+fi
+check_http status      GET "/api/v1/status?task_id=$TASK_ID"
+check_http result      GET "/api/v1/result?task_id=$TASK_ID"
+check_http names       GET "/api/v1/names?task_id=$TASK_ID&page=1&size=20"
+check_http explore     GET "/api/v1/explore?task_id=$TASK_ID&count=6"
+check_http characters  GET "/api/v1/characters?char=%E5%BC%A0"
+check_http spa-fallback GET "/api/v1/name-score" "" 200
+
+# The explore response must always expose an array, never JSON null.
+check_explore_array() {
+  python -c 'import json,sys; b=json.load(sys.stdin); assert isinstance(b.get("names"),list), b; print("names is a JSON array, length",len(b["names"]))' < "$OUT/http-explore.body"
+}
+step explore-array check_explore_array
+
+# The two unimplemented features must be gone from the frontend, and the old
+# URL must be served by the SPA fallback (HTML), never by an API handler.
+check_removed_ui() {
+  cd "$ROOT" || return 1
+  if grep -R -nE 'nameScore|searchPoetry|/name-score|/poetry/search' web/src; then
+    echo "dead API calls still present in web/src"
+    return 1
+  fi
+  echo "no dead API calls in web/src"
+  python -c 'import sys; s=sys.stdin.read(); assert "<div id=\"root\">" in s, "not SPA HTML"; print("unimplemented path is SPA fallback, not an API endpoint")' < "$OUT/http-spa-fallback.body"
+}
+step removed-ui-contract check_removed_ui
+
+{
+  echo "# Acceptance evidence — $LABEL"
+  echo
+  echo "Generated at: $(date -Iseconds)"
+  echo "Server base: $BASE"
+  echo
+  echo "| Check | Result | Evidence |"
+  echo "|---|---|---|"
+  for row in "${ROWS[@]}"; do echo "$row"; done
+  echo
+  echo "## Notes"
+  echo "- HTTP evidence files contain the real status code and full response body."
+  echo "- server.log is the log of the dedicated server started by this script."
+  echo "- Screenshots are captured separately by scripts/capture-screenshots.mjs."
+  echo "- Unimplemented name-score / poetry-search paths are served by the SPA fallback (HTML); their frontend entry points were removed."
+  echo
+  if [ "$RESULT" = 0 ]; then echo "**Overall: PASS**"; else echo "**Overall: FAIL**"; fi
+} > "$OUT/report.md"
+
+echo "report: $OUT/report.md"
+exit "$RESULT"

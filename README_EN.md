@@ -1,300 +1,77 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat&logo=go" alt="Go Version" />
-  <img src="https://img.shields.io/badge/version-4.2.0-blue" alt="Version" />
-  <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
-  <img src="https://img.shields.io/badge/module-v4-7B42BC" alt="Module v4" />
-</p>
+# FATE · Name Generation
 
-<p align="center">
-  <h1 align="center">🌌 fate · Celestial Naming Engine</h1>
-  <p align="center">
-    <strong>Intelligent Chinese name generator powered by Bazi (八字), Wuxing (五行), Zhouyi (周易), and classical poetry</strong><br>
-    <em>FATE — Celestial Naming Engine</em>
-  </p>
-</p>
+Enter a surname and a birth time; FATE combines Bazi elemental preferences, three-talent/five-grid numerology, phonetics and character meaning into a shortlist of **explained, comparable** names. Everything runs locally — names and birth dates are never uploaded.
 
-<p align="center">
-  English | <a href="README.md">中文</a>
-</p>
+[![Latest release](https://img.shields.io/github/v/release/babyname/fate)](https://github.com/babyname/fate/releases/latest) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE) · [中文](README.md) · [Developer docs](docs/DEVELOPMENT.md)
 
 ---
 
-## ✨ Features
-
-<table>
-<tr>
-<td width="50%">
-
-### 🎯 Bazi Analysis
-- Four Pillars (year/month/day/hour) precision calculation
-- Wuxing strength analysis + Tiaohou Yongshen
-- **Dual Xi-Yong algorithm**: Balance Method & GeJu Method (10 pattern types)
-- Chinese zodiac integration
-
-</td>
-<td width="50%">
-
-### 📊 Multi-Dimension Scoring
-- **5-dimension scoring**: Cultural · Wuxing · Zodiac · Wuge · Phonetics
-- Sancai configuration analysis
-- 81 Dayan numbers O(1) lookup
-- 64 Zhouyi hexagram interpretations
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 🌐 Modern Web UI
-- React 19 + Tailwind CSS responsive design
-- Real-time streaming generation with polling
-- Candidate table & card dual view
-- Explore mode: random sampling with filters
-
-</td>
-<td width="50%">
-
-### ⚡ High Performance
-- Ent ORM + SQLite for efficient data access
-- ExcellentTable streaming Top-N data structure
-- Async concurrent generation (session mode)
-- Embedded web frontend (single binary distribution)
-
-</td>
-</tr>
-</table>
-
----
-
-## 📸 Screenshots
-
-> 💡 **Tip**: Start the server and visit `http://localhost:18080`.
+## Screenshots
 
 | Home | Results |
-|------|---------|
+| :---: | :---: |
 | ![Home](docs/screenshots/home.png) | ![Results](docs/screenshots/results.png) |
 
-| Candidate Table | Card View |
-|-----------------|-----------|
+| Table view | Card view |
+| :---: | :---: |
 | ![Table](docs/screenshots/table.png) | ![Cards](docs/screenshots/cards.png) |
 
+Captured from the running v4.3.0 Web UI; see [capture notes](docs/screenshots/README.md).
+
 ---
 
-## 🚀 Quick Start
+## Get started
 
-### Requirements
+### CLI (no Go toolchain required)
 
-- **Go** 1.22+
-- **Bun** (for frontend dev only; not needed for production)
-
-### Install & Run
+1. Download the archive for your OS from the [latest release](https://github.com/babyname/fate/releases/latest) and unpack it.
+2. If the release includes a `fate-v*.zip` database bundle, unpack it next to the binary; otherwise initialise the database from source as shown below.
+3. Run:
 
 ```bash
-# Clone
+fate name -s 张 -b "2024/06/15 10:30" -g boy
+```
+
+Options: `-s` surname, `-b` birth date/time, `-g` gender (`boy`/`girl`), `-f` characters to avoid, `-o` output file.
+
+### Web UI (recommended)
+
+Requires **Go 1.22+**. The frontend is embedded; Bun/Node is not needed at runtime.
+
+```bash
 git clone https://github.com/babyname/fate.git
 cd fate
-
-# Download dependencies
 go mod download
-
-# Initialize database (required)
-go run ./cmd/dbinit
-
-# Start web server
+go run ./cmd/dbinit      # one-time local database setup
 go run ./cmd/server
-# Open http://localhost:18080
 ```
 
-### CLI
-
-```bash
-# Build
-go build -o fate ./cmd/console
-
-# Generate names
-./fate name -s Zhang -b "2024/06/15 10:30" -g boy
-
-# Detailed analysis
-./fate name detail Shi Lun -s Zhang -b "2024/06/15 10:30" -g boy
-```
-
-### CLI Options
-
-| Flag | Short | Description | Example |
-|------|-------|-------------|---------|
-| `--surname` | `-s` | Surname | `-s Zhang` |
-| `--born` | `-b` | Birth date & time | `-b "2024/06/15 10:30"` |
-| `--gender` | `-g` | Gender | `-g boy` / `-g girl` |
-| `--xiyong` | | Xi-Yong algorithm | `balance` / `geju` |
-| `--strictness` | | Wuge strictness | `loose` / `moderate` / `strict` |
-| `--filter` | `-f` | Filter characters | `-f 病死穷` |
-| `--output` | `-o` | Output to file | `-o result.txt` |
+Open **http://localhost:18080**, fill in surname, birth date and gender, then click "开始命名". All HTTP endpoints live under `/api/v1/*`; see the [developer docs](docs/DEVELOPMENT.md).
 
 ---
 
-## 🔌 Web API
+## What you get
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/health` | Health check |
-| `POST` | `/api/generate` | Async name generation (returns task_id) |
-| `GET` | `/api/task/:id` | Query task status |
-| `GET` | `/api/names/:taskId` | Paginated name list |
-| `GET` | `/api/name-detail` | Detailed name analysis |
-| `GET` | `/api/explore/:taskId` | Random name exploration |
+- **Explainable scoring** — five weighted dimensions (cultural impression, Bazi elements, zodiac, five-grid numerology, phonetics), each with a breakdown. Half-lucky grids are scored in their own tier.
+- **Bazi preference** — four pillars from the birth time, used to filter characters by element.
+- **Five grids & three talents** — luck ratings for all five grids, visible in the shortlist and detail view.
+- **Comparable shortlist** — sortable/paginated table, cards with grid luck, and batched "explore more" with an explicit exhausted state.
+- **Official same-name lookup** — copy the full name, open an official query page, and optionally record the result locally in your browser.
 
----
+## FAQ
 
-## 🧩 Library Usage
+**Is my data uploaded?** No. Generation and scoring are local; the same-name feature only copies text and opens an official page. Records stay in browser storage.
 
-```bash
-go get github.com/babyname/fate/v4
-```
+**Why is birth time required?** It drives the Bazi calculation and elemental filtering. Format: `YYYY/MM/DD HH:MM`.
 
-```go
-package main
+**Is the highest score always the best name?** The score is a weighted, explainable reference, not a verdict. Check the detail breakdown, character meanings and your own preferences.
 
-import (
-    "fmt"
-    "time"
-
-    "github.com/babyname/fate/v4"
-    "github.com/babyname/fate/v4/config"
-)
-
-func main() {
-    cfg := config.DefaultConfig()
-    f, _ := fate.New(cfg)
-
-    filter := fate.NewFilter(fate.FilterOption{
-        CharacterFilter:     true,
-        MinStroke:           3,
-        MaxStroke:           18,
-        RegularFilter:       true,
-        DaYanFilter:         true,
-        WuXingFilter:        true,
-        AvoidCharacters:     []string{"病", "死"},
-    })
-
-    s := f.NewSessionWithFilter(filter)
-    born, _ := time.Parse("2006/01/02 15:04", "2024/06/15 10:30")
-    input := &fate.Input{
-        Last: [2]string{"Zhang", ""},
-        Born: born,
-        Sex:  fate.SexBoy,
-    }
-
-    s.Start(input)
-    s.Wait()
-
-    output := input.Output()
-    for _, nr := range output.TopNames() {
-        fmt.Printf("%s - %.1f (%s)\n", nr.FullName, nr.Score, nr.Grade)
-    }
-
-    // ExcellentTable: streaming Top-N access
-    table := output.GetExcellentTable()
-    for _, e := range table.TopN(10) {
-        fmt.Printf("%s%s - %.1f has_poetry=%v\n", e.Char1, e.Char2, e.Score, e.HasPoetry)
-    }
-}
-```
+**Where are name scoring and poetry search?** Their backend endpoints are not implemented; the UI entry points were removed in v4.3.0 to avoid broken clicks. See [#146](https://github.com/babyname/fate/issues/146).
 
 ---
 
-## 🏛️ Architecture
+Architecture, directory layout, API reference, library usage and release engineering: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Cleanup analysis: [#147](https://github.com/babyname/fate/issues/147).
 
-```
-┌─────────────────────────────────────────────┐
-│              fate CLI / Server               │
-├─────────────────────────────────────────────┤
-│  cmd/console     │  cmd/server               │
-│  (CLI tool)      │  (HTTP API + embedded UI) │
-├─────────────────────────────────────────────┤
-│           internal/http (API routes)         │
-├─────────────────────────────────────────────┤
-│              fate Core Engine                │
-│  ┌──────────┬──────────┬──────────────────┐ │
-│  │ Session  │ Filter   │ ExcellentTable   │ │
-│  │ Async    │ Multi    │ Streaming        │ │
-│  │ Gen      │ Stage    │ Top-N            │ │
-│  ├──────────┼──────────┼──────────────────┤ │
-│  │ Bazi     │ Wuge     │ Zhouyi           │ │
-│  └──────────┴──────────┴──────────────────┘ │
-├─────────────────────────────────────────────┤
-│          chronos/v2 (Bazi engine)            │
-│          yi (Zhouyi engine)                  │
-│          Ent ORM (data layer)                │
-├─────────────────────────────────────────────┤
-│          SQLite3 (data storage)              │
-│          character.json (character DB)       │
-│          chinese-poetry (poetry corpus)      │
-└─────────────────────────────────────────────┘
-```
+## License
 
----
-
-## 📐 5-Dimension Scoring
-
-| Dimension | Weight | Criteria |
-|-----------|:------:|----------|
-| 🎨 **Cultural** | 20% | Common usage, regular script, semantic richness |
-| 🔥 **Wuxing** | 25% | Name Wuxing vs Day Master Xi-Yong match |
-| 🐉 **Zodiac** | 10% | Zodiac Wuxing vs name Wuxing interaction |
-| 📏 **Wuge** | 25% | Tian/Ren/Di/Wai/Zong Ge fortune scores |
-| 🎵 **Phonetics** | 20% | Syllable tone harmony, ping-ze balance |
-
----
-
-## 🔀 Branch Strategy
-
-| Branch | Purpose | go.mod module |
-|--------|---------|---------------|
-| `main` | v4.x active development | `github.com/babyname/fate/v4` |
-| `v3` | v3.x bugfix maintenance | `github.com/babyname/fate` |
-
-> ⚠️ **Historical**: v3 branch lacks `/v3` suffix (pre-dates stricter Go module conventions).
-> From v4 onward, `/v4` suffix is consistently used. Future v5 will use `/v5`.
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Language | Go 1.22+ |
-| Frontend | React 19 + Tailwind CSS 3 + Rsbuild |
-| State | Zustand |
-| UI Kit | Radix UI + Lucide Icons |
-| ORM | Ent |
-| Storage | SQLite3 (modernc, CGo-free) |
-| Bazi | chronos/v2 |
-| Zhouyi | yi |
-
----
-
-## 🧪 Development
-
-```bash
-# Frontend (hot reload)
-cd web && bun install && bun run dev
-
-# Backend
-go run ./cmd/server
-
-# Production build
-cd web && bun run build
-go build -o fate-server ./cmd/server
-
-# Tests
-go test ./...
-
-# Lint
-golangci-lint run
-```
-
----
-
-## 📄 License
-
-[MIT](LICENSE) © babyname
+[MIT](LICENSE)

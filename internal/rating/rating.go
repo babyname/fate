@@ -483,15 +483,6 @@ func getZodiacWuXing(zodiac string) string {
 	return ""
 }
 
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
-}
-
 func getTone(pinyin string) int {
 	runes := []rune(pinyin)
 	if len(runes) == 0 {
@@ -502,22 +493,6 @@ func getTone(pinyin string) int {
 		return int(last - '0')
 	}
 	return 0
-}
-
-func getInitial(pinyin string) string {
-	runes := []rune(pinyin)
-	if len(runes) == 0 {
-		return ""
-	}
-	return string(runes[0])
-}
-
-func getFinal(pinyin string) string {
-	runes := []rune(pinyin)
-	if len(runes) <= 1 {
-		return ""
-	}
-	return string(runes[1:])
 }
 
 func absInt(x int) int {
