@@ -11,7 +11,13 @@ builds:
     main: ./cmd/console
     binary: fate
     env:
-      - CGO_ENABLED=1
+      # The sqlite driver (github.com/sqlite3ent/sqlite3 -> modernc.org/sqlite)
+      # is pure Go. Enabling CGO makes GoReleaser cross-compile runtime/cgo for
+      # linux/arm64 on the x86 ubuntu-latest runner, which fails with assembler
+      # errors (gcc_arm64.S: "no such instruction: stp ..."). Keep CGO off for
+      # every release target. Verified with CGO_ENABLED=0 builds for all 5 GOOS/
+      # GOARCH pairs in .goreleaser.yml.
+      - CGO_ENABLED=0
     goos:
       - windows
       - darwin
