@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { WuGeLuck } from '@/components/naming/WuGeLuck';
 import { useAppStore } from '@/store/app';
 import type { NameResult } from '@/types/api';
 import { Star } from 'lucide-react';
@@ -13,9 +14,10 @@ const wuxingColors: Record<string, string> = {
 
 interface NameCardProps {
   name: NameResult;
+  showWuGeLuck?: boolean;
 }
 
-export function NameCard({ name }: NameCardProps) {
+export function NameCard({ name, showWuGeLuck }: NameCardProps) {
   const setSelectedName = useAppStore((s) => s.setSelectedName);
   const setDetailModalOpen = useAppStore((s) => s.setDetailModalOpen);
 
@@ -78,6 +80,11 @@ export function NameCard({ name }: NameCardProps) {
           <Badge variant="stardust" className="text-xs py-0">诗</Badge>
         )}
       </div>
+      {showWuGeLuck && (
+        <div className="mt-3 border-t border-white/10 pt-3">
+          <WuGeLuck wuGe={name.wu_ge} />
+        </div>
+      )}
     </button>
   );
 }

@@ -1,4 +1,6 @@
 import { Badge } from '@/components/ui/badge';
+import { SameNameLookupButton } from '@/components/naming/SameNameLookup';
+import { WuGeLuck } from '@/components/naming/WuGeLuck';
 import { useAppStore } from '@/store/app';
 import type { NameResult } from '@/types/api';
 import { ArrowUpDown, Star } from 'lucide-react';
@@ -74,6 +76,7 @@ export function CandidateTable({ results }: CandidateTableProps) {
               </th>
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">等级</th>
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">三才</th>
+              <th scope="col" className="whitespace-nowrap px-4 py-3 text-center font-medium text-muted-foreground">五格吉凶</th>
             </tr>
           </thead>
           <tbody>
@@ -86,8 +89,9 @@ export function CandidateTable({ results }: CandidateTableProps) {
                 }}
                 className="border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors"
               >
-                <td className="px-4 py-3">
+                <td className="whitespace-nowrap px-4 py-3">
                   <span className="font-serif font-bold text-foreground">{result.full_name}</span>
+                  <div className="mt-1"><SameNameLookupButton fullName={result.full_name} compact /></div>
                 </td>
                 <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
                   {result.char1.pinyin} {result.char2.pinyin}
@@ -124,6 +128,7 @@ export function CandidateTable({ results }: CandidateTableProps) {
                     {result.san_cai}
                   </Badge>
                 </td>
+                <td className="px-4 py-3"><WuGeLuck wuGe={result.wu_ge} /></td>
               </tr>
             ))}
           </tbody>

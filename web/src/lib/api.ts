@@ -10,7 +10,7 @@ import type {
   PoetrySearchResponse,
 } from '@/types/api';
 
-const BASE = '/api';
+const BASE = '/api/v1';
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
@@ -28,16 +28,20 @@ export const api = {
   generate(data: GenerateRequest): Promise<GenerateResponse> {
     return request('/generate', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        avoid_chars: data.avoid_chars?.join(','),
+        require_chars: data.require_chars?.join(','),
+      }),
     });
   },
 
   getTaskStatus(taskId: string): Promise<TaskStatusResponse> {
-    return request(`/generate/status?task_id=${taskId}`);
+    return request(`/status?task_id=${taskId}`);
   },
 
   getTaskResult(taskId: string): Promise<TaskResultResponse> {
-    return request(`/generate/result?task_id=${taskId}`);
+    return request(`/result?task_id=${taskId}`);
   },
 
   getNames(taskId: string, page: number = 1, size: number = 20): Promise<NamesResponse> {
@@ -45,7 +49,7 @@ export const api = {
     params.set('task_id', taskId);
     params.set('page', String(page));
     params.set('size', String(size));
-    return request(`/generate/names?${params.toString()}`);
+    return request(`/names?${params.toString()}`);
   },
 
   explore(taskId: string, count?: number, hasPoetry?: boolean, wuxing?: string): Promise<ExploreResponse> {
@@ -54,11 +58,11 @@ export const api = {
     if (count) params.set('count', String(count));
     if (hasPoetry) params.set('has_poetry', 'true');
     if (wuxing) params.set('wuxing', wuxing);
-    return request(`/generate/explore?${params.toString()}`);
+    return request(`/explore?${params.toString()}`);
   },
 
   getNameDetail(taskId: string, char1: string, char2: string): Promise<NameDetailResponse> {
-    return request(`/name-detail?task_id=${taskId}&char1=${char1}&char2=${char2}`);
+    return request(`/name_detail?${new URLSearchParams({ task_id: taskId, char1, char2 })}`);
   },
 
   nameScore(data: NameScoreRequest): Promise<NameDetailResponse> {

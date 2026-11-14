@@ -1,12 +1,23 @@
-﻿package rating
+package rating
 
 import (
+	"math"
 	"testing"
 
-	"github.com/godcong/chronos/v2"
-	chronosfate "github.com/babyname/fate/v4/internal/chronosfate"
 	"github.com/babyname/fate/v4/ent"
+	chronosfate "github.com/babyname/fate/v4/internal/chronosfate"
+	"github.com/godcong/chronos/v2"
 )
+
+func TestRateNameUsesHalfLuckyAdjustment(t *testing.T) {
+	rater := NewRaterWithStrokes(nil, 4, 0)
+	result := rater.RateName("王", &ent.Character{ScienceStroke: 12}, &ent.Character{ScienceStroke: 18})
+	// 吉天格、吉人格、半吉地格、凶外格、凶总格，以及土土水的三才减分。
+	const want = 60 + 15*.15 + 15*.30 + 8*.20 - 5*.15 - 5*.20 - 2
+	if math.Abs(result.WuGeScore-want) > 1e-9 {
+		t.Fatalf("five-grid score with a half-lucky earth grid = %g, want %g", result.WuGeScore, want)
+	}
+}
 
 func TestNewRater(t *testing.T) {
 	cal := chronos.ParseSolarDate(2024, 1, 15, 10, 30, 0)

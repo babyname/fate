@@ -1,11 +1,13 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import type { NameResult } from '@/types/api';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { NameCard } from '@/components/naming/NameCard';
 import { ExploreSection } from '@/components/naming/ExploreSection';
 import { CandidateTable } from '@/components/naming/CandidateTable';
+import { SameNameLookupButton } from '@/components/naming/SameNameLookup';
 import { useAppStore } from '@/store/app';
 import { api } from '@/lib/api';
 import { ArrowLeft, Grid3X3, List, Search } from 'lucide-react';
@@ -16,8 +18,9 @@ export function ResultsPage() {
   const { taskId } = useParams<{ taskId: string }>();
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
+  const [exploreVisited, setExploreVisited] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pagedNames, setPagedNames] = useState<any[]>([]);
+  const [pagedNames, setPagedNames] = useState<NameResult[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loadingPagination, setLoadingPagination] = useState(false);
   const [polling, setPolling] = useState(true);
@@ -34,21 +37,23 @@ export function ResultsPage() {
     setLoadingPagination(true);
     try {
       const res = await api.getNames(taskId, page, PAGE_SIZE);
-      setPagedNames(res.names);
+      const names = res.names ?? [];
+      setPagedNames(names);
       setTotalCount(res.total);
-      setCurrentPage(page);
-      setStoreTopNames(res.names);
+      setCurrentPage(res.page);
+      setStoreTopNames(names);
       setStoreTotal(res.total);
-    } catch {
+    } catch (error) {
+      setPollError(error instanceof Error ? error.message : '读取候选名失败。');
     } finally {
       setLoadingPagination(false);
     }
   }, [taskId, setStoreTopNames, setStoreTotal]);
 
   const onGenerationDone = useCallback(async () => {
+    await loadPage(1);
     setPolling(false);
     setIsGenerating(false);
-    await loadPage(1);
   }, [loadPage, setIsGenerating]);
 
   useEffect(() => {
@@ -68,8 +73,11 @@ export function ResultsPage() {
           setIsGenerating(false);
           setPollError(status.error || '生成失败');
         }
-      } catch {
-        // 继续轮询
+      } catch (error) {
+        if (pollRef.current) clearInterval(pollRef.current);
+        setPolling(false);
+        setIsGenerating(false);
+        setPollError(error instanceof Error ? error.message : '读取命名任务失败。');
       }
     }, 500);
 
@@ -130,7 +138,9 @@ export function ResultsPage() {
         <div className="h-px flex-1 bg-gradient-to-r from-outline-variant to-transparent" />
       </div>
 
-      <Tabs defaultValue="main">
+      <Tabs defaultValue="main" onValueChange={(value) => {
+        if (value === 'explore') setExploreVisited(true);
+      }}>
         <TabsList className="w-full sm:w-auto">
           <TabsTrigger value="main">命名结果</TabsTrigger>
           <TabsTrigger value="explore" className="gap-2">
@@ -193,7 +203,10 @@ export function ResultsPage() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {pagedNames.map((result) => (
-                  <NameCard key={result.full_name} name={result} />
+                  <div key={result.full_name}>
+                    <NameCard name={result} showWuGeLuck />
+                    <div className="px-2 pt-2"><SameNameLookupButton fullName={result.full_name} compact /></div>
+                  </div>
                 ))}
               </div>
             )}
@@ -224,8 +237,8 @@ export function ResultsPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="explore" className="mt-6">
-          {taskId && <ExploreSection taskId={taskId} />}
+        <TabsContent value="explore" forceMount={exploreVisited || undefined} className="mt-6 data-[state=inactive]:hidden">
+          {taskId && exploreVisited && <ExploreSection key={taskId} taskId={taskId} surname={pagedNames[0]?.surname || ''} />}
         </TabsContent>
       </Tabs>
     </div>

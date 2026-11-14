@@ -1,12 +1,12 @@
-﻿package rating
+package rating
 
 import (
 	"fmt"
 	"math"
 	"strings"
 
-	"github.com/babyname/fate/v4/internal/chronosfate"
 	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/internal/chronosfate"
 	"github.com/babyname/fate/v4/internal/wuge"
 	"github.com/babyname/fate/v4/internal/wuxing"
 )
@@ -288,7 +288,6 @@ func (r *Rater) rateWuGe(rating *NameRating, c1, c2 *ent.Character) {
 	score := 60.0
 	var details []string
 
-	luckyCount := 0
 	geItems := []struct {
 		name   string
 		daYan  wuge.DaYan
@@ -302,18 +301,15 @@ func (r *Rater) rateWuGe(rating *NameRating, c1, c2 *ent.Character) {
 	}
 
 	for _, item := range geItems {
-		switch {
-		case strings.Contains(item.daYan.Lucky, "吉") && !strings.Contains(item.daYan.Lucky, "凶"):
-			luckyCount++
+		switch item.daYan.Lucky {
+		case "吉", "大吉":
 			score += 15 * item.weight
-			details = append(details, fmt.Sprintf("%s%d(%s)吉", item.name, item.daYan.Number, item.daYan.Lucky))
-		case strings.Contains(item.daYan.Lucky, "半吉"):
+		case "半吉":
 			score += 8 * item.weight
-			details = append(details, fmt.Sprintf("%s%d(%s)", item.name, item.daYan.Number, item.daYan.Lucky))
 		default:
 			score -= 5 * item.weight
-			details = append(details, fmt.Sprintf("%s%d(%s)凶", item.name, item.daYan.Number, item.daYan.Lucky))
 		}
+		details = append(details, fmt.Sprintf("%s%d(%s)", item.name, item.daYan.Number, item.daYan.Lucky))
 	}
 
 	if zongDaYan.Max {
