@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { SameNameLookupButton } from '@/components/naming/SameNameLookup';
 import { useAppStore } from '@/store/app';
 import { api } from '@/lib/api';
 import { Sparkles, Settings, Loader2, X, Plus, BookOpen } from 'lucide-react';
@@ -47,14 +48,7 @@ export function HomePage() {
     setTotal(0);
     setIsGenerating(true);
     try {
-      const bornFormatted = born.includes('T')
-        ? born.replace('T', ' ').replace(/-/g, '/')
-        : born.includes(':')
-          ? born
-          : `${born} 12:00`;
-      const bornFinal = bornFormatted.includes(':')
-        ? bornFormatted
-        : bornFormatted.replace(/-/g, '/');
+      const bornFinal = (born.includes(':') ? born : `${born} 12:00`).replace('T', ' ').replace(/-/g, '/');
       const res = await api.generate({
         surname: surname.trim(),
         born: bornFinal,
@@ -181,7 +175,7 @@ export function HomePage() {
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-center">
+      <div className="flex flex-wrap items-center justify-center gap-2">
         <Button
           variant="ghost"
           size="sm"
@@ -191,6 +185,7 @@ export function HomePage() {
           <Settings className="h-4 w-4" />
           {showAdvanced ? '收起高级配置' : '高级配置'}
         </Button>
+        <SameNameLookupButton />
       </div>
 
       {showAdvanced && (
