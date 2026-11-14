@@ -72,3 +72,12 @@ tools/
 
 # Unihan raw data (downloaded, not source)
 Unihan/
+
+# Curated, user-facing release notes are source, not build output.
+# [Rr]elease*/ above would otherwise hide docs/release-notes/ from CI checkout.
+!docs/release-notes/
+!docs/release-notes/*.md
+
+# Acceptance evidence logs are tracked deliberately: they contain real HTTP and
+# GitHub API responses, not throwaway build output.
+!tests/acceptance/**/evidence/*.log

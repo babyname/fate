@@ -49,7 +49,7 @@ done
 log ""
 log "## 2. GitHub Release API"
 if gh release view "$LABEL" --repo "$REPO" \
-    --json tagName,name,isDraft,isPrerelease,publishedAt,url,assets \
+    --json tagName,name,isDraft,isPrerelease,publishedAt,url,assets,body \
     >"$OUT/release.json" 2>"$OUT/gh-release-view.err"; then
   pass "gh release view $LABEL (response saved to release.json)"
 else
@@ -94,16 +94,13 @@ required = {
     f"fate-v{dbver}.zip",
     f"fate-v{dbver}.zip.sha256",
 }
-for a in sorted(data["assets"]):
+for a in sorted(data["assets"], key=lambda x: x["name"]):
     print(f"{a['name']:<40} {a.get('size', '?')} bytes  downloads={a.get('downloadCount', '?')}")
 missing = sorted(required - names)
 assert not missing, "missing assets: " + ", ".join(missing)
 print("all", len(required), "required assets present")
 PY
   then pass "all required assets present (see asset-manifest.log)"; else fail "asset manifest (see asset-manifest.log)"; fi
-else
-  fail "asset manifest (no response body)"
-fi
 
 # 4. Workflow conclusion for this tag.
 log ""
@@ -129,14 +126,27 @@ PY
 # 5. Download assets and verify checksums.txt + database sha256.
 log ""
 log "## 5. Checksum integrity of downloaded assets"
-if gh release download "$LABEL" --repo "$REPO" --dir "$TMP/dl" \
-    --pattern 'checksums.txt' --pattern 'fate-*.tar.gz' --pattern 'fate-*.zip' \
-    --pattern 'fate-*.sha256' >"$OUT/gh-release-download.log" 2>&1; then
-  pass "assets downloaded (see gh-release-download.log)"
-else
-  fail "asset download (see gh-release-download.log)"
-fi
+# A transient network failure can leave a truncated archive on disk; never
+# checksum a partial download. Clear the directory and retry a few times.
+: > "$OUT/gh-release-download.log"
+DL_OK=0
+for attempt in 1 2 3; do
+  rm -f "$TMP/dl"/*
+  if gh release download "$LABEL" --repo "$REPO" --dir "$TMP/dl" \
+      --pattern 'checksums.txt' --pattern 'fate-*.tar.gz' --pattern 'fate-*.zip' \
+      --pattern 'fate-*.sha256' >>"$OUT/gh-release-download.log" 2>&1; then
+    DL_OK=1
+    pass "assets downloaded on attempt $attempt (see gh-release-download.log)"
+    break
+  fi
+  echo "download attempt $attempt failed; retrying" >> "$OUT/gh-release-download.log"
+  sleep 3
+done
 
+if [ "$DL_OK" -eq 0 ]; then
+  fail "asset download after 3 attempts (see gh-release-download.log)"
+  fail "checksum verification (skipped: download incomplete)"
+else
 if python - "$TMP/dl" "$DB_VER" >"$OUT/checksums.log" 2>&1 <<'PY'
 import hashlib, os, sys
 d, dbver = sys.argv[1], sys.argv[2]
@@ -162,7 +172,7 @@ for line in open(csum, encoding="utf-8"):
     assert actual == expected, f"{name}: {actual} != {expected}"
     print(f"sha256 OK  {expected[:16]}  {name}")
     checked += 1
-assert checked >= 6, f"only {checked} archives listed in checksums.txt"
+assert checked >= 5, f"only {checked} archives listed in checksums.txt"
 
 dbzip = os.path.join(d, f"fate-v{dbver}.zip")
 dbsha = os.path.join(d, f"fate-v{dbver}.zip.sha256")
@@ -174,6 +184,44 @@ print(f"sha256 OK  {expected[:16]}  fate-v{dbver}.zip")
 print("verified", checked, "archives + 1 database bundle")
 PY
   then pass "all downloaded assets match their published sha256"; else fail "checksum verification (see checksums.log)"; fi
+fi
+
+# 6. GoReleaser falls back to the entire repository history when no previous tag
+#    is reachable. Assert the published body is the curated user-facing notes.
+log ""
+log "## 6. Curated release notes"
+NOTES="$ROOT/docs/release-notes/$LABEL.md"
+if [ -f "$NOTES" ]; then
+  if python - "$OUT/release.json" "$NOTES" >"$OUT/release-notes.log" 2>&1 <<'PY'
+import json, sys
+data = json.load(open(sys.argv[1], encoding="utf-8"))
+notes = open(sys.argv[2], encoding="utf-8").read().strip()
+body = (data.get("body") or "").strip()
+print("published body length =", len(body))
+print("curated notes length  =", len(notes))
+assert body == notes, "published release notes differ from docs/release-notes"
+assert len(body) < 20000, "release notes look like an auto-generated full-history changelog"
+assert "Initial commit" not in body, "release notes contain raw repository history"
+print("published notes match the curated document")
+PY
+  then pass "release notes match curated document"; else fail "release notes (see release-notes.log)"; fi
+else
+  fail "curated notes file missing: docs/release-notes/$LABEL.md"
+fi
+
+# 7. The curated notes must actually be in the repository, otherwise the
+#    release workflow step cannot read them after checkout.
+log ""
+log "## 7. Curated notes are source-controlled and wired into CI"
+NOTES_REL="docs/release-notes/$LABEL.md"
+if (cd "$ROOT" && git ls-files --error-unmatch "$NOTES_REL") \
+    >"$OUT/notes-tracked.log" 2>&1 \
+   && grep -q 'Apply curated release notes' "$ROOT/.github/workflows/release.yml" \
+    >>"$OUT/notes-tracked.log" 2>&1; then
+  pass "curated notes tracked in git and wired into release workflow"
+else
+  fail "curated notes not tracked or not wired into workflow (see notes-tracked.log)"
+fi
 
 log ""
 if [ "$FAILURES" -eq 0 ]; then

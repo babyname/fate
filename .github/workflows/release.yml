@@ -139,3 +139,17 @@ jobs:
             releases/fate-v${{ needs.prepare-db.outputs.db_version }}.zip
             releases/fate-v${{ needs.prepare-db.outputs.db_version }}.zip.sha256
           fail_on_unmatched_files: false
+
+      # GoReleaser emits the whole repository history as changelog when no
+      # previous tag is reachable (this repo's tag history is divergent).
+      # Prefer the curated, user-facing notes for the tag when present.
+      - name: Apply curated release notes
+        run: |
+          NOTES="docs/release-notes/v${{ steps.get-version.outputs.version }}.md"
+          if [ -f "$NOTES" ]; then
+            gh release edit "v${{ steps.get-version.outputs.version }}" --notes-file "$NOTES"
+          else
+            echo "No curated notes for this tag; keeping GoReleaser-generated body."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
