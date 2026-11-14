@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+# FATE pre-commit gate (AGENTS.md §5).
+# Install once from the repository root:
+#   git config core.hooksPath scripts/git-hooks
+#
+# Thin wrapper only: all rules live in scripts/check_repo.py so the hook, the
+# local full gate and CI cannot drift apart. Never bypass with --no-verify.
+set -e
+ROOT=$(git rev-parse --show-toplevel)
+exec python "$ROOT/scripts/check_repo.py" --staged

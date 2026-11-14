@@ -33,7 +33,7 @@ go run ./cmd/server -addr :18080
 - HTTP 端点统一在 `/api/v1/*` 下；`generate` 是同步的，直接返回 `task_id` 与 `total`。
 - `avoid_chars` / `require_chars` 是**逗号分隔字符串**，不是 JSON 数组。
 - `explore` 的 `names` 恒为 JSON 数组；候选取尽时返回 `[]`，不会是 `null`。
-- `FilterOption` 为 `nil` 时 `Generate` 使用共享的 `fate.DefaultFilter()`；它刻意宽松，会让候选组合数量急剧膨胀。**所有示例都显式传入有界 `FilterOption`**（与 Web 表单一致），以保证秒级完成。
+- `FilterOption` 为 `nil` 时，`Generate` / `GenerateStream` 使用 `fate.DefaultFilterOption()`（有界、与 Web 表单一致），**不会**退回宽松的共享 `fate.DefaultFilter()`（后者候选组合无限膨胀、实测 10 分钟不收敛）。定制时以 `fate.DefaultFilterOption().WithAvoidCharacters(...)` 为基座，不要再写一份魔法数字。
 - `GenerateStream` 的 `onBatch` 可能由多个 worker 并发调用，回调内共享状态必须自己加锁。
 
 完整的 Web API 表、请求/响应字段与库集成说明见 [docs/DEVELOPMENT.md](../docs/DEVELOPMENT.md)。

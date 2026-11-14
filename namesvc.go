@@ -18,7 +18,9 @@ type GenerateRequest struct {
 	Born time.Time
 	// Sex is SexBoy or SexGirl.
 	Sex Sex
-	// Filter is the filter option. If nil, DefaultFilter() is used.
+	// Filter is the filter option. If nil, DefaultFilterOption() is applied:
+	// a bounded, Web-equivalent configuration. DefaultFilter() is never used
+	// by Generate because its unbounded stroke range does not converge.
 	Filter *FilterOption
 }
 
@@ -41,13 +43,8 @@ func (f *fateImpl) Generate(ctx context.Context, req GenerateRequest) (*Generate
 		return nil, err
 	}
 
-	// 2. Build filter from option or use default.
-	var flt Filter
-	if req.Filter != nil {
-		flt = NewFilter(*req.Filter)
-	} else {
-		flt = DefaultFilter()
-	}
+	// 2. Build filter. A nil option resolves to the bounded default.
+	flt := NewFilter(resolveFilterOption(req.Filter))
 
 	// 3. Create pipeline and run generation.
 	pipe := namesvc.NewPipeline(f.db)
@@ -87,12 +84,7 @@ func (f *fateImpl) GenerateStream(ctx context.Context, req GenerateRequest, onBa
 		return err
 	}
 
-	var flt Filter
-	if req.Filter != nil {
-		flt = NewFilter(*req.Filter)
-	} else {
-		flt = DefaultFilter()
-	}
+	flt := NewFilter(resolveFilterOption(req.Filter))
 
 	pipe := namesvc.NewPipeline(f.db)
 

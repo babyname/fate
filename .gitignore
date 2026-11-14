@@ -76,3 +76,7 @@ Unihan/
 # Acceptance evidence logs are tracked deliberately: they contain real HTTP and
 # GitHub API responses, not throwaway build output.
 !tests/acceptance/**/evidence/*.log
+
+# Python bytecode from scripts/check_repo.py and release helpers
+__pycache__/
+*.pyc

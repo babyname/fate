@@ -260,20 +260,14 @@ func main() {
         log.Fatalf("init fate (run 'go run ./cmd/dbinit' first): %v", err)
     }
 
+    // nil Filter 会自动使用 fate.DefaultFilterOption()（有界，与 Web 表单一致）；
+    // 显式给出是为了演示定制入口。
+    opt := fate.DefaultFilterOption().WithAvoidCharacters("病", "死")
     result, err := engine.Generate(context.Background(), fate.GenerateRequest{
         LastName: "张",
         Born:     born,
         Sex:      fate.SexBoy,
-        // 显式给出有界筛选：nil 会使用宽松的 DefaultFilter，候选组合数量极大。
-        Filter: &fate.FilterOption{
-            CharacterFilter:     true,
-            CharacterFilterType: fate.CharacterFilterTypeDefault,
-            MinStroke:           3,
-            MaxStroke:           18,
-            RegularFilter:       true,
-            DaYanFilter:         true,
-            WuXingFilter:        true,
-        },
+        Filter:   &opt,
     })
     if err != nil {
         log.Fatal(err)
@@ -301,7 +295,9 @@ func main() {
 | `Fate.Generate(ctx, req)` | 同步主链路，返回 `*GenerateResult` |
 | `Fate.GenerateStream(ctx, req, onBatch)` | 并行生成，按批次回调 `StreamBatch` |
 | `fate.GenerateResult` | `TopNames`、`ExcellentTable`、`CharMap`、`FateData` |
+| `fate.DefaultFilterOption()` | `Generate` / `GenerateStream` 在 `Filter == nil` 时使用的有界唯一真相源；用链式 `With*` 定制 |
 | `fate.FilterOption` / `fate.NewFilter` | 筛选选项（笔画/五行/大衍/性别/避用字等）与筛选器实例 |
+| `fate.DefaultFilter()` | 仅供旧 Session 路径使用的宽松共享实例；不得作为 `Generate` 的默认值 |
 | `fate.ExcellentTable` | 指针类型（内部含锁，禁止按值复制）；`TopN/MarkShown/Explore/Len` |
 | `fate.Session` / `fate.Input` / `fate.Output` | 旧状态机路径，仍被 `cmd/console` 使用；新代码优先用 `Generate` |
 

@@ -29,22 +29,15 @@ func main() {
 		log.Fatalf("init fate (run 'go run ./cmd/dbinit' first): %v", err)
 	}
 
-	// Pass an explicit, bounded FilterOption. A nil Filter uses the shared
-	// DefaultFilter, which is deliberately permissive and expands the candidate
-	// cross-product; the Web UI always sends a bounded option like this one.
+	// DefaultFilterOption() is the single source of truth for bounded scoring.
+	// A nil Filter resolves to exactly this option; spelling it out here shows
+	// how to customise it, e.g. .WithAvoidCharacters("病", "死").
+	opt := fate.DefaultFilterOption()
 	result, err := engine.Generate(context.Background(), fate.GenerateRequest{
 		LastName: "张",
 		Born:     born,
 		Sex:      fate.SexBoy,
-		Filter: &fate.FilterOption{
-			CharacterFilter:     true,
-			CharacterFilterType: fate.CharacterFilterTypeDefault,
-			MinStroke:           3,
-			MaxStroke:           18,
-			RegularFilter:       true,
-			DaYanFilter:         true,
-			WuXingFilter:        true,
-		},
+		Filter:   &opt,
 	})
 	if err != nil {
 		log.Fatalf("generate: %v", err)

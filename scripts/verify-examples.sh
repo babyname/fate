@@ -221,6 +221,12 @@ run_example http-client \
   'names is a JSON array' \
   'http-client complete: 5 endpoints OK'
 
+# 7. Repository gate (detector controls + full static gate) and the runtime
+#    proof that a nil GenerateRequest.Filter actually converges.
+step gate-self-test bash -c "cd '$ROOT' && python scripts/check_repo.py --self-test"
+step gate-full      bash -c "cd '$ROOT' && python scripts/check_repo.py"
+step nil-filter-integration bash -c "cd '$ROOT' && go test -tags integration . -run TestGenerateNilFilterCompletes -v -count=1 -timeout 120s"
+
 {
   echo "# examples/ 验收报告"
   echo

@@ -1,0 +1,52 @@
+name: CI
+
+# The legacy build_*.yml workflows only target `master` and would create an
+# `auto_build` Release with Go 1.19 + CGO=1. They are intentionally left
+# dormant; see AGENTS.md §5. This is the real gate for `main` and PRs.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: Repository gate and Go tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Detector self-test
+        run: python scripts/check_repo.py --self-test
+
+      - name: Repository gate
+        run: python scripts/check_repo.py --ci
+
+      - name: Prepare test databases
+        run: |
+          go run ./cmd/dbinit -db fate
+          cp fate fate_test.db
+
+      - name: Go tests
+        run: go test ./... -count=1
+
+      - name: Integration guard (nil Filter converges)
+        run: go test -tags integration . -run TestGenerateNilFilterCompletes -v -count=1 -timeout 120s
