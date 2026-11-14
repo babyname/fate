@@ -112,9 +112,13 @@ fate/
 │       ├── simplified_traditional.go # 简繁体
 │       └── types.go        # 类型定义
 │
-├── example/                # 示例代码
-│   └── create_a_name/      # 起名示例
-│       └── main.go         # 示例入口
+├── examples/               # 可运行示例
+│   ├── quickstart/         #   New + Generate 最小主链路
+│   ├── stream/             #   GenerateStream 增量批次
+│   ├── filters/            #   FilterOption 筛选
+│   ├── explore/            #   ExcellentTable 排名与探索
+│   ├── http-client/        #   标准库调用 /api/v1/*
+│   └── README.md           #   前置条件与运行说明
 │
 ├── docs/                   # 文档目录
 │   ├── architecture/       # 架构设计文档

@@ -2,13 +2,14 @@
 
 > 本文件由 v4.2.0 时期的 README 迁出，保留架构、目录结构、Web API、代码集成、编译与发布说明。
 > 面向用户的使用说明见仓库根目录 [README.md](../README.md)。
-> 注意：其中的 API 路径与部分命令反映的是迁出时的状态，实际以 [源码](../internal/http/handler.go) 与 [发布配置](../.goreleaser.yml) 为准。
+> Web API 与代码集成章节已对齐 v4.3.0；其余架构、目录结构与历史版本描述仍反映迁出时状态，实际以 [源码](../internal/http/handler.go) 与 [发布配置](../.goreleaser.yml) 为准。
+> 可直接运行的示例见 [examples/README.md](../examples/README.md)。
 
 ---
 
 <p align="center">
   <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat&logo=go" alt="Go Version" />
-  <img src="https://img.shields.io/badge/version-4.2.0-blue" alt="Version" />
+  <img src="https://img.shields.io/badge/version-4.3.0-blue" alt="Version" />
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
   <img src="https://img.shields.io/badge/module-v4-7B42BC" alt="Module v4" />
 </p>
@@ -182,30 +183,51 @@ go build -o fate ./cmd/console
 
 ## 🔌 Web API
 
-启动服务器后可用：
+启动服务器后可用（全部在 `/api/v1` 下，`go run ./cmd/server` 默认监听 `:18080`）：
 
 | Method | Endpoint | 说明 |
 |--------|----------|------|
-| `GET` | `/health` | 健康检查 |
-| `POST` | `/api/generate` | 异步生成名字（返回 task_id） |
-| `GET` | `/api/task/:id` | 查询任务状态 |
-| `GET` | `/api/names/:taskId` | 分页获取名字列表 |
-| `GET` | `/api/name-detail` | 名字详细分析 |
-| `GET` | `/api/explore/:taskId` | 随机探索名字 |
+| `POST` | `/api/v1/generate` | 同步生成，返回 `task_id`、`state`、`total` |
+| `GET` | `/api/v1/status` | 查询任务状态（`?task_id=`） |
+| `GET` | `/api/v1/result` | 精选好名：`top_names`、`top3`、`top10`、`total` |
+| `GET` | `/api/v1/names` | 分页候选名册（`?page=`、`?size=`） |
+| `GET` | `/api/v1/explore` | 探索更多（`?count=`，可加 `has_poetry=true`、`wuxing=`） |
+| `GET` | `/api/v1/name_detail` | 名字详细分析（`?char1=`、`?char2=`，可带 `task_id`） |
+| `GET` | `/api/v1/characters` | 汉字查询（`?char=`） |
+| `GET` | `/` | 嵌入式 Web UI；其它非 API 路径回退到 `index.html` |
 
 ### 生成请求示例
 
 ```bash
-curl -X POST http://localhost:18080/api/generate \
+curl -X POST http://localhost:18080/api/v1/generate \
   -H "Content-Type: application/json" \
   -d '{
     "surname": "张",
     "born": "2024/06/15 10:30",
     "sex": "boy",
-    "poetry_mode": 2,
-    "avoid_chars": ["病", "死"]
+    "poetry_mode": 0,
+    "xi_yong_method": "balance",
+    "avoid_chars": "病,死",
+    "require_chars": "",
+    "filter_type": 0
   }'
 ```
+
+响应：
+
+```json
+{"state":"done","task_id":"1794682052714840300","total":10000}
+```
+
+后续请求沿用 `task_id`：
+
+```bash
+curl "http://localhost:18080/api/v1/result?task_id=<task_id>"
+curl "http://localhost:18080/api/v1/names?task_id=<task_id>&page=1&size=20"
+curl "http://localhost:18080/api/v1/explore?task_id=<task_id>&count=6"
+```
+
+> 契约要点：`avoid_chars` / `require_chars` 是**逗号分隔字符串**（不是 JSON 数组）；`born` 格式为 `YYYY/MM/DD HH:MM`；`explore` 的 `names` 恒为 JSON 数组，取尽时返回 `[]` 而非 `null`；`generate` 是同步的，`state` 直接为 `done`。
 
 ---
 
@@ -215,11 +237,15 @@ curl -X POST http://localhost:18080/api/generate \
 go get github.com/babyname/fate/v4
 ```
 
+v4.3.0 的主链路是 `fate.New` → `Generate`（或并行的 `GenerateStream`），不再需要手动驱动 Session 状态机：
+
 ```go
 package main
 
 import (
+    "context"
     "fmt"
+    "log"
     "time"
 
     "github.com/babyname/fate/v4"
@@ -227,65 +253,61 @@ import (
 )
 
 func main() {
-    cfg := config.DefaultConfig()
-    f, _ := fate.New(cfg)
-
-    filter := fate.NewFilter(fate.FilterOption{
-        CharacterFilter:     true,
-        CharacterFilterType: fate.CharacterFilterTypeDefault,
-        MinStroke:           3,
-        MaxStroke:           18,
-        RegularFilter:       true,
-        DaYanFilter:         true,
-        WuXingFilter:        true,
-        AvoidCharacters:     []string{"病", "死", "穷"},
-    })
-
-    s := f.NewSessionWithFilter(filter)
     born, _ := time.Parse("2006/01/02 15:04", "2024/06/15 10:30")
-    input := &fate.Input{
-        Last: [2]string{"张", ""},
-        Born: born,
-        Sex:  fate.SexBoy,
+
+    engine, err := fate.New(config.DefaultConfig())
+    if err != nil {
+        log.Fatalf("init fate (run 'go run ./cmd/dbinit' first): %v", err)
     }
 
-    s.Start(input)
-    s.Wait()
-
-    // 获取结果
-    output := input.Output()
-    for _, nr := range output.TopNames() {
-        fmt.Printf("%s - %.1f (%s)\n", nr.FullName, nr.Score, nr.Grade)
-    }
-
-    // ExcellentTable: 流式 Top-N 访问
-    table := output.GetExcellentTable()
-    entries := table.TopN(10)
-    for _, e := range entries {
-        fmt.Printf("%s%s - %.1f has_poetry=%v\n", e.Char1, e.Char2, e.Score, e.HasPoetry)
-    }
-
-    // Explore: 随机采样 + 条件过滤
-    explored := table.Explore(10, func(e fate.ExcellentEntry) bool {
-        return e.HasPoetry
+    result, err := engine.Generate(context.Background(), fate.GenerateRequest{
+        LastName: "张",
+        Born:     born,
+        Sex:      fate.SexBoy,
+        // 显式给出有界筛选：nil 会使用宽松的 DefaultFilter，候选组合数量极大。
+        Filter: &fate.FilterOption{
+            CharacterFilter:     true,
+            CharacterFilterType: fate.CharacterFilterTypeDefault,
+            MinStroke:           3,
+            MaxStroke:           18,
+            RegularFilter:       true,
+            DaYanFilter:         true,
+            WuXingFilter:        true,
+        },
     })
-    for _, e := range explored {
-        fmt.Printf("%s%s - %.1f\n", e.Char1, e.Char2, e.Score)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    for _, n := range result.TopNames {
+        fmt.Printf("%s - %.1f (%s)\n", n.FullName, n.Score, n.Grade)
+    }
+
+    // ExcellentTable 支持只读排名与「探索更多」两种读取方式。
+    for _, e := range result.ExcellentTable.TopN(10) {
+        fmt.Printf("%s%s - %.1f has_poetry=%v\n", e.Char1, e.Char2, e.Score, e.HasPoetry)
     }
 }
 ```
 
+并行流式版本用 `GenerateStream(ctx, req, onBatch)`；`onBatch` 可能由多个 worker 并发调用，回调内共享状态需自行加锁，最后一批 `IsFinal=true`。
+
 ### 核心 API
 
-| 类型 | 说明 |
+| 类型 / 方法 | 说明 |
 |------|------|
-| `fate.New(cfg)` | 创建引擎实例 |
-| `fate.NewSessionWithFilter(filter)` | 创建带筛选器的会话 |
-| `fate.NewFilter(option)` | 创建筛选器 |
-| `fate.FilterOption` | 筛选选项（笔画/五行/大衍/性别/避用字等） |
-| `fate.Input` | 输入（姓氏/生日/性别） |
-| `fate.Output` | 输出（TopNames/ExcellentTable/CharMap） |
-| `fate.ExcellentTable` | 流式 Top-N 结构（TryPush/Finalize/TopN/Explore） |
+| `fate.New(cfg)` / `fate.NewWithRepo(cfg, repo)` | 创建引擎实例 |
+| `fate.GenerateRequest` | 输入：姓氏、出生时间、性别、`*FilterOption` |
+| `Fate.Generate(ctx, req)` | 同步主链路，返回 `*GenerateResult` |
+| `Fate.GenerateStream(ctx, req, onBatch)` | 并行生成，按批次回调 `StreamBatch` |
+| `fate.GenerateResult` | `TopNames`、`ExcellentTable`、`CharMap`、`FateData` |
+| `fate.FilterOption` / `fate.NewFilter` | 筛选选项（笔画/五行/大衍/性别/避用字等）与筛选器实例 |
+| `fate.ExcellentTable` | 指针类型（内部含锁，禁止按值复制）；`TopN/MarkShown/Explore/Len` |
+| `fate.Session` / `fate.Input` / `fate.Output` | 旧状态机路径，仍被 `cmd/console` 使用；新代码优先用 `Generate` |
+
+### 可运行示例
+
+[examples/README.md](../examples/README.md) 提供 5 个独立示例：`quickstart`、`stream`、`filters`、`explore`、`http-client`，均可用 `go run ./examples/<name>` 直接运行；统一自动化验收见 [scripts/verify-examples.sh](../scripts/verify-examples.sh)。
 
 ---
 
@@ -397,7 +419,7 @@ fate/
 
 | 系列 | 最新 | 标签 |
 |------|------|------|
-| v4.x | v4.2.0 | `v4.0.0` |
+| v4.x | v4.3.0 | `v4.3.0` |
 | v3.x | v3.6.0 | `v3.0.0` ~ `v3.6.0`（共 14 个发布） |
 | v2.x | v2.0.2 | `v2.0.0` ~ `v2.0.2` |
 
