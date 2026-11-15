@@ -73,9 +73,11 @@ tools/
 # Unihan raw data (downloaded, not source)
 Unihan/
 
-# Acceptance evidence logs are tracked deliberately: they contain real HTTP and
-# GitHub API responses, not throwaway build output.
-!tests/acceptance/**/evidence/*.log
+# Acceptance evidence is LOCAL proof only. It must never enter git: it is
+# generated per-run (HTTP bodies, logs, probe files), often empty on success,
+# and 506K of it once polluted main (fixed 2026-11-15). The gate
+# (scripts/check_repo.py) fails if any tests/**/evidence/ file is tracked.
+tests/acceptance/**/evidence/
 
 # Python bytecode from scripts/check_repo.py and release helpers
 __pycache__/

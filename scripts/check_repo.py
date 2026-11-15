@@ -61,8 +61,9 @@ CONVENTIONAL = re.compile(
 # --------------------------------------------------------------------------
 def is_temp_name(path: str) -> bool:
     p = path.replace("\\", "/")
-    # Acceptance evidence logs are deliberately tracked (see .gitignore).
-    if p.startswith("tests/acceptance/") and p.endswith(".log"):
+    # Evidence paths are handled by is_evidence_path (one clear message);
+    # a bare `.log` suffix alone is still a temp-name signal.
+    if p.startswith("tests/") and "/evidence/" in p:
         return False
     return p.endswith(TEMP_SUFFIXES) or p.endswith("~")
 
@@ -77,6 +78,18 @@ def is_evidence_log(path: str) -> bool:
     # log is legitimately empty. The summary report carries the exit status.
     p = path.replace("\\", "/")
     return p.startswith("tests/acceptance/") and "/evidence/" in p
+
+
+def is_evidence_path(path: str) -> bool:
+    """Acceptance evidence must never be committed.
+
+    Evidence is generated per-run (HTTP bodies, logs, probe files) and often
+    empty on success. 83 such files (506K) once polluted main because a
+    `.gitignore` negation re-included them. This detector is the gate side of
+    that fix: any tracked or staged evidence path is pollution.
+    """
+    p = path.replace("\\", "/")
+    return p.startswith("tests/") and "/evidence/" in p
 
 
 def has_machine_path(data: bytes) -> bool:
@@ -191,6 +204,8 @@ SCRIPT_SUFFIXES = (".sh", ".py", ".mjs", ".cjs", ".js", ".ps1", ".bat", ".cmd")
 def check_pollution(files: list[str], label: str) -> None:
     bad: list[str] = []
     for f in files:
+        if is_evidence_path(f):
+            bad.append(f"acceptance evidence committed (test pollution): {f}")
         if is_temp_name(f):
             bad.append(f"temp/binary artifact: {f}")
         if is_ai_artifact(f):
@@ -203,6 +218,19 @@ def check_pollution(files: list[str], label: str) -> None:
         if f.endswith(SCRIPT_SUFFIXES) and data and has_machine_path(data):
             bad.append(f"machine-absolute path in script: {f}")
     record(f"pollution [{label}]", not bad, "; ".join(bad))
+
+
+def check_evidence_untracked() -> None:
+    """Head-level guard: evidence under tests/**/evidence/ must not be tracked.
+
+    check_pollution only sees the staged/changed set; this check walks the
+    whole tracked index so pollution already sitting in HEAD is caught too
+    (it fired on the 83 files from the v4.3.0 commits).
+    """
+    bad = sorted(f for f in tracked() if is_evidence_path(f))
+    record("evidence: no acceptance evidence tracked in git", not bad,
+           f"{len(bad)} tracked evidence files; run: git rm -r --cached "
+           f"tests/acceptance/*/evidence/" + ("; " + "; ".join(bad[:5]) if bad else ""))
 
 
 def check_static_assets() -> None:
@@ -333,8 +361,12 @@ def self_test() -> int:
         ("gofmt detects bad format", lambda d: not gofmt_clean(d),
          b"package main\nfunc  main( ) { }\n", b"package main\n\nfunc main() {}\n"),
         ("empty probe file", lambda d: d == b"", b"", b"package main\n"),
-        ("evidence log exempt", is_evidence_log,
+        ("evidence log exempt (empty ok)", is_evidence_log,
          "tests/acceptance/v4.3.0/evidence/go-build.log", "status"),
+        ("evidence path flagged", is_evidence_path,
+         "tests/acceptance/v4.3.0/evidence/go-build.log", "docs/ACCEPTANCE.md"),
+        ("evidence dir flagged", is_evidence_path,
+         "tests\\acceptance\\v4.3.0\\evidence\\x.body", "tests/acceptance/v4.3.0/report.md"),
     ]
     print("== detector self-test (positive control must fire, negative must not) ==")
     for name, fn, positive, negative in cases:  # type: ignore[misc]
@@ -394,12 +426,14 @@ def main() -> int:
             print("no staged files; nothing to check")
             return 0
         check_pollution(files, "staged")
+        check_evidence_untracked()
         check_bom(files, "staged")
         check_static_assets()
         check_contracts()
         check_versions()
     else:
         check_pollution(tracked() + untracked(), "tracked+untracked")
+        check_evidence_untracked()
         check_static_assets()
         check_contracts()
         check_versions()

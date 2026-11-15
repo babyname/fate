@@ -20,7 +20,9 @@
 
 ## 3. 证据落盘
 
-统一写到 `tests/acceptance/<version>/evidence/`：每个断言一条 `.log` / `.json` / `.status` / `.body`，汇总报告为 `report.md` 或 `*-verification.md`。证据文件随代码一起提交，`.gitignore` 已为 `tests/acceptance/**/evidence/*.log` 开放例外。
+统一写到 `tests/acceptance/<version>/evidence/`：每个断言一条 `.log` / `.json` / `.status` / `.body`，汇总报告为 `report.md` 或 `*-verification.md`。
+
+**证据只存在于本地，禁止提交进 git**（2026-11-15 裁定：v4.3.0 的 83 个证据文件曾被错误提交，属测试污染）。`.gitignore` 忽略 `tests/acceptance/**/evidence/`，`scripts/check_repo.py` 会对「任何 `tests/**/evidence/` 文件被跟踪」直接判 FAIL；交付时以证据目录路径 + `*-verification.md` 摘要作为验收证据提交给用户，而非提交文件本身。
 
 证据必须包含：真实退出码、真实 HTTP 状态码与响应体、服务端日志、断言的期望值与实际值。只写「PASS」不算证据。
 
