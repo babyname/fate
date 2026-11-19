@@ -5,11 +5,54 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/babyname/fate/v4"
+	"github.com/babyname/fate/v4/internal/analysis"
 	"github.com/babyname/fate/v4/internal/service/naming"
 )
+
+func TestRecommendationPagesAndDetailsUseFullCatalogue(t *testing.T) {
+	h := NewHandler(nil, nil, nil)
+	result := newPopulatedResult(22)
+	names := make([]fate.NameResult, 22)
+	for i := range names {
+		names[i] = fate.NameResult{
+			Rank: i + 1, Char1: analysis.CharInfo{Char: fmt.Sprintf("字%03d", i)}, Char2: analysis.CharInfo{Char: "远"},
+			Ranking: &analysis.RecommendationRanking{Traditional: 70, SoundAndMeaning: 90, Total: 82},
+		}
+	}
+	result.TopNames = names[:10]
+	h.store.Set("recommendation", &taskEntry{result: result, candidates: names})
+
+	rec := httptest.NewRecorder()
+	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/api/v1/names?task_id=recommendation&page=2", nil))
+	var page struct {
+		Page  int
+		Total int
+		Names []fate.NameResult
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &page); err != nil {
+		t.Fatal(err)
+	}
+	if rec.Code != http.StatusOK || page.Page != 2 || page.Total != 22 || len(page.Names) != 2 || page.Names[0].Rank != 21 {
+		t.Fatalf("wrong catalogue page: HTTP %d: %s", rec.Code, rec.Body.String())
+	}
+
+	rec = httptest.NewRecorder()
+	query := url.Values{"task_id": {"recommendation"}, "char1": {names[21].Char1.Char}, "char2": {"远"}}
+	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/api/v1/name_detail?"+query.Encode(), nil))
+	var detail struct {
+		Name fate.NameResult `json:"name_result"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &detail); err != nil {
+		t.Fatal(err)
+	}
+	if rec.Code != http.StatusOK || detail.Name.Rank != 22 || detail.Name.Ranking == nil || detail.Name.Ranking.Total != 82 {
+		t.Fatalf("wrong candidate detail: HTTP %d: %s", rec.Code, rec.Body.String())
+	}
+}
 
 // newPopulatedResult builds a finalized table with n distinct candidates.
 func newPopulatedResult(n int) *fate.GenerateResult {

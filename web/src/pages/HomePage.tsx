@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { ScoreWeightControl } from '@/components/naming/ScoreWeightControl';
 import { SameNameLookupButton } from '@/components/naming/SameNameLookup';
 import { useAppStore } from '@/store/app';
 import { api } from '@/lib/api';
@@ -36,10 +37,11 @@ export function HomePage() {
   const [avoidInput, setAvoidInput] = useState('');
   const [requireInput, setRequireInput] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [recommendation, setRecommendation] = useState<'natural' | 'traditional'>('natural');
 
   const handleGenerate = useCallback(async () => {
-    if (!surname.trim() || !born.trim()) {
-      setError('请填写姓氏和出生日期');
+    if (!surname.trim() || (recommendation === 'traditional' && !born.trim())) {
+      setError('请填写姓氏，使用传统数理模式时请填写出生时间。');
       return;
     }
     setError(null);
@@ -48,11 +50,12 @@ export function HomePage() {
     setTotal(0);
     setIsGenerating(true);
     try {
-      const bornFinal = (born.includes(':') ? born : `${born} 12:00`).replace('T', ' ').replace(/-/g, '/');
+      const bornFinal = born ? (born.includes(':') ? born : `${born} 12:00`).replace('T', ' ').replace(/-/g, '/') : '';
       const res = await api.generate({
         surname: surname.trim(),
         born: bornFinal,
         sex,
+        recommendation,
         poetry_mode: poetryMode,
         avoid_chars: avoidChars.length > 0 ? avoidChars : undefined,
         require_chars: requireChars.length > 0 ? requireChars : undefined,
@@ -63,7 +66,7 @@ export function HomePage() {
       setError(err instanceof Error ? err.message : '生成失败');
       setIsGenerating(false);
     }
-  }, [surname, born, sex, poetryMode, avoidChars, requireChars, navigate, setTaskId, setIsGenerating, setTopNames, setTop10, setTotal]);
+  }, [surname, born, sex, recommendation, poetryMode, avoidChars, requireChars, navigate, setTaskId, setIsGenerating, setTopNames, setTop10, setTotal]);
 
   const handleAddAvoid = useCallback(() => {
     const chars = avoidInput.trim().split('').filter((c) => c.trim() && !avoidChars.includes(c));
@@ -121,14 +124,33 @@ export function HomePage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">出生日期与时刻</label>
+            <label className="text-sm font-medium text-foreground">推荐方式</label>
+            <Select value={recommendation} onValueChange={(value: 'natural' | 'traditional') => setRecommendation(value)}>
+              <SelectTrigger className="w-64" aria-label="推荐方式">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="natural">综合推荐</SelectItem>
+                <SelectItem value="traditional">传统数理</SelectItem>
+              </SelectContent>
+            </Select>
+            {recommendation === 'natural' && <ScoreWeightControl />}
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="birth-time" className="text-sm font-medium text-foreground">
+              出生日期与时刻{recommendation === 'natural' ? '（选填）' : ''}
+            </label>
             <Input
+              id="birth-time"
               type="datetime-local"
               value={born && !born.includes('T') && !born.includes(':') ? `${born}T12:00` : born.includes(' ') ? born.replace(' ', 'T') : born}
               onChange={(e) => setBorn(e.target.value)}
               className="w-64"
             />
-            <p className="text-xs text-muted-foreground">选择日期和时刻（用于八字时柱推算）</p>
+            <p className="text-xs text-muted-foreground">
+              {recommendation === 'natural' ? '填写出生时间后，传统分会计入五行八字和生肖。留空时按五格与三才计算。' : '用于排八字、筛选用字和计算传统分。'}
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -158,7 +180,7 @@ export function HomePage() {
             variant="celestial"
             className="w-full h-12 text-base"
             onClick={handleGenerate}
-            disabled={isGenerating || !surname.trim() || !born.trim()}
+            disabled={isGenerating || !surname.trim() || (recommendation === 'traditional' && !born.trim())}
           >
             {isGenerating ? (
               <>

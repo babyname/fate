@@ -1,24 +1,37 @@
 import { Badge } from '@/components/ui/badge';
 import { SameNameLookupButton } from '@/components/naming/SameNameLookup';
 import { WuGeLuck } from '@/components/naming/WuGeLuck';
+import { recommendationScore } from '@/lib/recommendation-scores';
 import { useAppStore } from '@/store/app';
-import type { NameResult } from '@/types/api';
-import { ArrowUpDown, Star } from 'lucide-react';
+import { useScoringPreferences } from '@/store/scoring-preferences';
+import type { NameResult, RecommendationScore, RecommendationSort } from '@/types/api';
+import { ArrowDown, ArrowUp, ArrowUpDown, Star } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
 interface CandidateTableProps {
   results: NameResult[];
+  recommendationSort: RecommendationSort;
+  onRecommendationSort: (field: RecommendationScore) => void;
 }
 
 type SortKey = 'score' | 'name' | 'san_cai';
 
-export function CandidateTable({ results }: CandidateTableProps) {
+const scoreColumns: { field: RecommendationScore; label: string }[] = [
+  { field: 'total', label: '综合分' },
+  { field: 'traditional', label: '传统数理分' },
+  { field: 'sound_and_meaning', label: '音义分' },
+];
+
+export function CandidateTable({ results, recommendationSort, onRecommendationSort }: CandidateTableProps) {
+  const hasRanking = Boolean(results[0]?.ranking);
+  const traditionalWeight = useScoringPreferences((s) => s.traditionalWeight);
   const [sortKey, setSortKey] = useState<SortKey>('score');
   const [sortDesc, setSortDesc] = useState(true);
   const setSelectedName = useAppStore((s) => s.setSelectedName);
   const setDetailModalOpen = useAppStore((s) => s.setDetailModalOpen);
 
   const sorted = useMemo(() => {
+    if (hasRanking && sortKey === 'score') return results;
     return [...results].sort((a, b) => {
       let cmp = 0;
       switch (sortKey) {
@@ -34,7 +47,7 @@ export function CandidateTable({ results }: CandidateTableProps) {
       }
       return sortDesc ? -cmp : cmp;
     });
-  }, [results, sortKey, sortDesc]);
+  }, [results, sortKey, sortDesc, hasRanking]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -63,8 +76,24 @@ export function CandidateTable({ results }: CandidateTableProps) {
                 </button>
               </th>
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">拼音</th>
+              {hasRanking && <th className="px-4 py-3 text-left text-muted-foreground font-medium">寓意</th>}
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">笔画</th>
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">五行</th>
+              {hasRanking ? scoreColumns.map(({ field, label }) => {
+                const active = sortKey === 'score' && recommendationSort.field === field;
+                const Icon = active ? (recommendationSort.descending ? ArrowDown : ArrowUp) : ArrowUpDown;
+                return (
+                  <th key={field} scope="col" aria-sort={active ? (recommendationSort.descending ? 'descending' : 'ascending') : undefined}
+                    className="whitespace-nowrap px-4 py-3 text-left text-muted-foreground font-medium">
+                    <button type="button" className="flex items-center gap-1 hover:text-foreground" onClick={() => {
+                      setSortKey('score');
+                      onRecommendationSort(field);
+                    }}>
+                      {label}<Icon aria-hidden="true" className="h-3 w-3" />
+                    </button>
+                  </th>
+                );
+              }) : <>
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">
                 <button
                   onClick={() => handleSort('score')}
@@ -75,6 +104,7 @@ export function CandidateTable({ results }: CandidateTableProps) {
                 </button>
               </th>
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">等级</th>
+              </>}
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">三才</th>
               <th scope="col" className="whitespace-nowrap px-4 py-3 text-center font-medium text-muted-foreground">五格吉凶</th>
             </tr>
@@ -94,8 +124,9 @@ export function CandidateTable({ results }: CandidateTableProps) {
                   <div className="mt-1"><SameNameLookupButton fullName={result.full_name} compact /></div>
                 </td>
                 <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                  {result.char1.pinyin} {result.char2.pinyin}
+                  {result.full_pinyin || `${result.char1.pinyin} ${result.char2.pinyin}`}
                 </td>
+                {hasRanking && <td className="min-w-40 px-4 py-3 text-muted-foreground">{result.recommendation}</td>}
                 <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
                   {result.strokes}
                 </td>
@@ -109,6 +140,11 @@ export function CandidateTable({ results }: CandidateTableProps) {
                     </Badge>
                   </div>
                 </td>
+                {hasRanking ? scoreColumns.map(({ field }) => (
+                  <td key={field} className="px-4 py-3 font-mono tabular-nums">
+                    {result.ranking ? recommendationScore(result.ranking, field, traditionalWeight).toFixed(1) : '—'}
+                  </td>
+                )) : <>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1">
                     <Star
@@ -120,6 +156,7 @@ export function CandidateTable({ results }: CandidateTableProps) {
                 <td className="px-4 py-3">
                   <span className="font-mono text-xs">{result.grade}</span>
                 </td>
+                </>}
                 <td className="px-4 py-3">
                   <Badge
                     variant={result.san_cai_luck === '吉' || result.san_cai_luck === '大吉' ? 'celestial' : 'outline'}

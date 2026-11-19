@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useCallback, useRef } from 'react';
-import type { NameResult } from '@/types/api';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import type { NameResult, RecommendationScore, RecommendationSort } from '@/types/api';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,11 +8,16 @@ import { NameCard } from '@/components/naming/NameCard';
 import { ExploreSection } from '@/components/naming/ExploreSection';
 import { CandidateTable } from '@/components/naming/CandidateTable';
 import { SameNameLookupButton } from '@/components/naming/SameNameLookup';
+import { ScoreWeightControl } from '@/components/naming/ScoreWeightControl';
 import { useAppStore } from '@/store/app';
+import { useScoringPreferences } from '@/store/scoring-preferences';
 import { api } from '@/lib/api';
+import { sortRecommendations } from '@/lib/recommendation-scores';
 import { ArrowLeft, Grid3X3, List, Search } from 'lucide-react';
 
 const PAGE_SIZE = 20;
+const FETCH_SIZE = 100;
+const DEFAULT_SORT: RecommendationSort = { field: 'total', descending: true };
 
 export function ResultsPage() {
   const { taskId } = useParams<{ taskId: string }>();
@@ -21,6 +26,8 @@ export function ResultsPage() {
   const [exploreVisited, setExploreVisited] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pagedNames, setPagedNames] = useState<NameResult[]>([]);
+  const [recommendations, setRecommendations] = useState<NameResult[] | null>(null);
+  const [sort, setSort] = useState<RecommendationSort>(DEFAULT_SORT);
   const [totalCount, setTotalCount] = useState(0);
   const [loadingPagination, setLoadingPagination] = useState(false);
   const [polling, setPolling] = useState(true);
@@ -30,14 +37,38 @@ export function ResultsPage() {
   const setStoreTopNames = useAppStore((s) => s.setTopNames);
   const setStoreTotal = useAppStore((s) => s.setTotal);
   const setIsGenerating = useAppStore((s) => s.setIsGenerating);
+  const traditionalWeight = useScoringPreferences((s) => s.traditionalWeight);
+  const recommended = useMemo(
+    () => recommendations && sortRecommendations(recommendations, DEFAULT_SORT, traditionalWeight),
+    [recommendations, traditionalWeight],
+  );
+  const sorted = useMemo(
+    () => recommended && (sort.field === 'total' && sort.descending ? recommended : sortRecommendations(recommended, sort, traditionalWeight)),
+    [recommended, sort, traditionalWeight],
+  );
+  const changeSort = (field: RecommendationScore) => {
+    setSort((previous) => ({ field, descending: previous.field !== field || !previous.descending }));
+    setCurrentPage(1);
+  };
 
   const loadPage = useCallback(async (page: number) => {
     if (!taskId) return;
     setLoadingPagination(true);
     try {
-      const res = await api.getNames(taskId, page, PAGE_SIZE);
+      const res = await api.getNames(taskId, page, page === 1 ? FETCH_SIZE : PAGE_SIZE);
       const names = res.names ?? [];
-      setPagedNames(names);
+      if (page === 1) {
+        const hasRankings = Boolean(names[0]?.ranking);
+        const remaining = hasRankings
+          ? await Promise.all(Array.from({ length: Math.max(0, Math.ceil(res.total / FETCH_SIZE) - 1) },
+              (_, index) => api.getNames(taskId, index + 2, FETCH_SIZE)))
+          : [];
+        const all = names.concat(...remaining.map((response) => response.names ?? []));
+        if (hasRankings && all.length !== res.total) throw new Error('候选名册读取不完整，请重试。');
+        setRecommendations(hasRankings ? all : null);
+        setSort(DEFAULT_SORT);
+      }
+      setPagedNames(names.slice(0, PAGE_SIZE));
       setTotalCount(res.total);
       setCurrentPage(res.page);
       setStoreTopNames(names);
@@ -48,6 +79,11 @@ export function ResultsPage() {
       setLoadingPagination(false);
     }
   }, [taskId, setStoreTopNames, setStoreTotal]);
+
+  const changePage = (page: number) => {
+    if (recommendations) setCurrentPage(page);
+    else void loadPage(page);
+  };
 
   const onGenerationDone = useCallback(async () => {
     await loadPage(1);
@@ -119,8 +155,9 @@ export function ResultsPage() {
     );
   }
 
-  const top3 = pagedNames.slice(0, 3);
-  const moreNames = pagedNames.slice(3, 7);
+  const top3 = (recommended ?? pagedNames).slice(0, 3);
+  const moreNames = (recommended ?? pagedNames).slice(3, 7);
+  const visibleNames = sorted ? sorted.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE) : pagedNames;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
@@ -174,8 +211,14 @@ export function ResultsPage() {
           <div className="h-px bg-gradient-to-r from-outline-variant to-transparent" />
 
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-serif text-base font-semibold text-foreground">候选名册</h3>
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <h3 className="font-serif text-base font-semibold text-foreground">候选名册</h3>
+                {recommendations && <ScoreWeightControl onApply={() => {
+                  setSort(DEFAULT_SORT);
+                  setCurrentPage(1);
+                }} />}
+              </div>
               <div className="flex items-center gap-2 border rounded-md p-1 bg-card">
                 <Button
                   variant={viewMode === 'table' ? 'default' : 'ghost'}
@@ -198,10 +241,10 @@ export function ResultsPage() {
               </div>
             </div>
             {viewMode === 'table' ? (
-              <CandidateTable results={pagedNames} />
+              <CandidateTable key={traditionalWeight} results={visibleNames} recommendationSort={sort} onRecommendationSort={changeSort} />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {pagedNames.map((result) => (
+                {visibleNames.map((result) => (
                   <div key={result.full_name}>
                     <NameCard name={result} showWuGeLuck />
                     <div className="px-2 pt-2"><SameNameLookupButton fullName={result.full_name} compact /></div>
@@ -216,7 +259,7 @@ export function ResultsPage() {
                   variant="outline"
                   size="sm"
                   disabled={currentPage <= 1 || loadingPagination}
-                  onClick={() => loadPage(currentPage - 1)}
+                  onClick={() => changePage(currentPage - 1)}
                 >
                   上一页
                 </Button>
@@ -227,7 +270,7 @@ export function ResultsPage() {
                   variant="outline"
                   size="sm"
                   disabled={currentPage >= totalPages || loadingPagination}
-                  onClick={() => loadPage(currentPage + 1)}
+                  onClick={() => changePage(currentPage + 1)}
                 >
                   下一页
                 </Button>

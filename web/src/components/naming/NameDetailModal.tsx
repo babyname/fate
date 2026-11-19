@@ -8,7 +8,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SameNameLookupButton } from '@/components/naming/SameNameLookup';
+import { recommendationScore } from '@/lib/recommendation-scores';
 import { wuGeFields, wuGeLuckColor } from '@/lib/wu-ge';
+import { useScoringPreferences } from '@/store/scoring-preferences';
 import { Printer, Star, Flame, Sparkles, Hexagon, BookOpen, Zap } from 'lucide-react';
 import type { NameResult } from '@/types/api';
 
@@ -27,7 +29,10 @@ const wuxingColors: Record<string, string> = {
 };
 
 export function NameDetailModal({ name, open, onOpenChange }: NameDetailModalProps) {
+  const weight = useScoringPreferences((s) => s.traditionalWeight);
   if (!name) return null;
+  const ranking = name.ranking;
+  const score = (ranking ? recommendationScore(ranking, 'total', weight) : name.score).toFixed(ranking ? 1 : 0);
 
   const handlePrint = () => {
     const printContent = `<!DOCTYPE html>
@@ -45,7 +50,8 @@ th{background:#f5f5f5}
 <body>
 <h1>${name.full_name}</h1>
 <p style="text-align:center;color:#666">${name.char1.pinyin} ${name.char2.pinyin} | ${name.strokes}画</p>
-<div class="score">${name.score.toFixed(0)}<span style="font-size:16px;color:#666"> / ${name.grade}</span></div>
+<div class="score">${score}${ranking ? '' : `<span style="font-size:16px;color:#666"> / ${name.grade}</span>`}</div>
+${ranking ? `<p>传统数理 ${ranking.traditional.toFixed(1)}（${weight}%） · 音义 ${ranking.sound_and_meaning.toFixed(1)}（${100 - weight}%）</p>` : ''}
 <h2>释义</h2>
 <p>${name.char1.meaning || '无'}；${name.char2.meaning || '无'}</p>
 ${name.has_poetry ? `<h2>诗词出处</h2>` + (name.char1.has_poetry && name.char1.poetry_origin ? `<p>${name.char1.char} — ${name.char1.poetry_origin.dynasty}·${name.char1.poetry_origin.author}《${name.char1.poetry_origin.title}》</p>${name.char1.poetry_origin.sentence ? `<p style="font-style:italic;color:#666">${name.char1.poetry_origin.sentence}</p>` : ''}` : '') + (name.char2.has_poetry && name.char2.poetry_origin ? `<p>${name.char2.char} — ${name.char2.poetry_origin.dynasty}·${name.char2.poetry_origin.author}《${name.char2.poetry_origin.title}》</p>${name.char2.poetry_origin.sentence ? `<p style="font-style:italic;color:#666">${name.char2.poetry_origin.sentence}</p>` : ''}` : '') : ''}
@@ -65,11 +71,14 @@ ${name.wu_xing ? `<h2>五行</h2><p>喜: ${name.wu_xing.xi} | 忌: ${name.wu_xin
 <h2>评分明细</h2>
 <table>
 <tr><th>维度</th><th>得分</th></tr>
+${ranking ? [...ranking.sound_detail, ...ranking.traditional_detail].map((part) =>
+  `<tr><td>${part.label}</td><td>${part.score.toFixed(1)}</td></tr>`).join('') : `
 <tr><td>文化印象</td><td>${name.score_detail.wen_hua_yin_xiang}</td></tr>
 <tr><td>五行八字</td><td>${name.score_detail.wu_xing_ba_zi}</td></tr>
 <tr><td>生肖</td><td>${name.score_detail.sheng_xiao}</td></tr>
 <tr><td>五格数理</td><td>${name.score_detail.wu_ge_shu_li}</td></tr>
 <tr><td>音韵</td><td>${name.score_detail.yin_yun}</td></tr>
+`}
 </table>
 </body></html>`;
     const win = window.open('', '_blank');
@@ -89,7 +98,7 @@ ${name.wu_xing ? `<h2>五行</h2><p>喜: ${name.wu_xing.xi} | 忌: ${name.wu_xin
               {name.full_name}
             </span>
             <span className="text-sm font-mono text-muted-foreground">
-              {name.char1.pinyin} {name.char2.pinyin}
+              {name.full_pinyin || `${name.char1.pinyin} ${name.char2.pinyin}`}
             </span>
           </DialogTitle>
           <DialogDescription className="sr-only">
@@ -102,10 +111,10 @@ ${name.wu_xing ? `<h2>五行</h2><p>喜: ${name.wu_xing.xi} | 忌: ${name.wu_xin
             <div className="flex items-center gap-2">
               <Star className="h-5 w-5 text-amber-400" />
               <span className="text-2xl font-bold font-mono text-gradient-stardust">
-                {name.score.toFixed(0)}
+                {score}
               </span>
               <span className="text-sm text-muted-foreground">综合评分</span>
-              <Badge variant="celestial">{name.grade}</Badge>
+              {!ranking && <Badge variant="celestial">{name.grade}</Badge>}
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <SameNameLookupButton fullName={name.full_name} />
@@ -117,6 +126,34 @@ ${name.wu_xing ? `<h2>五行</h2><p>喜: ${name.wu_xing.xi} | 忌: ${name.wu_xin
               )}
             </div>
           </div>
+
+          {ranking && (
+            <div className="glass-card p-4 space-y-4">
+              <p className="text-sm tabular-nums">
+                传统数理 {ranking.traditional.toFixed(1)}（{weight}%） · 音义 {ranking.sound_and_meaning.toFixed(1)}（{100 - weight}%）
+              </p>
+              {name.recommendation && <p className="text-sm text-muted-foreground">{name.recommendation}</p>}
+              {[
+                { title: '音义评分明细', parts: ranking.sound_detail },
+                { title: '传统数理评分明细', parts: ranking.traditional_detail },
+              ].map(({ title, parts }) => (
+                <section key={title} className="space-y-2">
+                  <h3 className="text-sm font-medium">{title}</h3>
+                  <dl className="space-y-1">
+                    {parts.map((part) => (
+                      <div key={part.label} className="text-sm">
+                        <div className="flex justify-between gap-2">
+                          <dt>{part.label}</dt>
+                          <dd className="text-muted-foreground">{part.score.toFixed(1)} × {(part.weight * 100).toFixed(1)}%</dd>
+                        </div>
+                        {part.reasons?.map((reason) => <dd key={reason} className="text-xs text-muted-foreground">{reason}</dd>)}
+                      </div>
+                    ))}
+                  </dl>
+                </section>
+              ))}
+            </div>
+          )}
 
           {name.has_poetry && (
             <div className="glass-card p-4 space-y-3 border-amber-500/20">
@@ -290,7 +327,7 @@ ${name.wu_xing ? `<h2>五行</h2><p>喜: ${name.wu_xing.xi} | 忌: ${name.wu_xin
             </div>
           )}
 
-          <div className="glass-card p-4 space-y-3">
+          {!ranking && <div className="glass-card p-4 space-y-3">
             <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
               <Star className="h-4 w-4 text-amber-400" />
               评分明细
@@ -316,7 +353,7 @@ ${name.wu_xing ? `<h2>五行</h2><p>喜: ${name.wu_xing.xi} | 忌: ${name.wu_xin
                 </div>
               );
             })}
-          </div>
+          </div>}
 
           {name.zhou_yi && (
             <div className="glass-card p-4 space-y-2">

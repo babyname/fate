@@ -1,4 +1,5 @@
 export interface GenerateRequest {
+  recommendation?: 'natural' | 'traditional'
   surname: string
   born: string
   sex: string
@@ -124,7 +125,29 @@ export interface ScoreDetail {
   yin_yun: number
 }
 
+export interface RecommendationScorePart {
+  label: string
+  score: number
+  weight: number
+  reasons?: string[]
+}
+
+export interface RecommendationRanking {
+  total: number
+  traditional: number
+  sound_and_meaning: number
+  uses_birth: boolean
+  sound_detail: RecommendationScorePart[]
+  traditional_detail: RecommendationScorePart[]
+}
+
+export type RecommendationScore = 'total' | 'traditional' | 'sound_and_meaning'
+export type RecommendationSort = { field: RecommendationScore; descending: boolean }
+
 export interface NameResult {
+  ranking?: RecommendationRanking
+  recommendation?: string
+  full_pinyin?: string
   rank: number
   full_name: string
   surname: string

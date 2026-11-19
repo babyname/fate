@@ -229,6 +229,10 @@ curl "http://localhost:18080/api/v1/explore?task_id=<task_id>&count=6"
 
 > 契约要点：`avoid_chars` / `require_chars` 是**逗号分隔字符串**（不是 JSON 数组）；`born` 格式为 `YYYY/MM/DD HH:MM`；`explore` 的 `names` 恒为 JSON 数组，取尽时返回 `[]` 而非 `null`；`generate` 是同步的，`state` 直接为 `done`。
 
+Web 的「综合推荐」为 `POST /api/v1/generate` 发送 `"recommendation": "natural"`。此模式允许 `born` 留空，传统分按五格与三才计算。填写出生时间时，传统分也计入五行八字和生肖。请求省略 `recommendation` 或传入 `"traditional"` 时使用传统生成流程。
+
+综合推荐任务的 `/api/v1/names` 返回完整候选名册的分页结果。每条推荐包含 `ranking.traditional`、`ranking.sound_and_meaning`、两项评分明细，以及按传统数理 40%、音义 60% 计算的 `ranking.total`。网页保存用户的权重，并据此重新计算综合分和排序。
+
 ---
 
 ## 🧩 代码集成

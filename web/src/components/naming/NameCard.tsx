@@ -1,6 +1,8 @@
 import { Badge } from '@/components/ui/badge';
 import { WuGeLuck } from '@/components/naming/WuGeLuck';
+import { recommendationScore } from '@/lib/recommendation-scores';
 import { useAppStore } from '@/store/app';
+import { useScoringPreferences } from '@/store/scoring-preferences';
 import type { NameResult } from '@/types/api';
 import { Star } from 'lucide-react';
 
@@ -18,6 +20,8 @@ interface NameCardProps {
 }
 
 export function NameCard({ name, showWuGeLuck }: NameCardProps) {
+  const weight = useScoringPreferences((s) => s.traditionalWeight);
+  const score = name.ranking ? recommendationScore(name.ranking, 'total', weight) : name.score;
   const setSelectedName = useAppStore((s) => s.setSelectedName);
   const setDetailModalOpen = useAppStore((s) => s.setDetailModalOpen);
 
@@ -27,9 +31,9 @@ export function NameCard({ name, showWuGeLuck }: NameCardProps) {
   };
 
   const scoreColor =
-    name.score >= 90
+    score >= 90
       ? 'text-gradient-stardust'
-      : name.score >= 75
+      : score >= 75
         ? 'text-gradient-celestial'
         : 'text-foreground';
 
@@ -44,19 +48,19 @@ export function NameCard({ name, showWuGeLuck }: NameCardProps) {
             {name.full_name}
           </h3>
           <p className="text-sm text-muted-foreground font-mono mt-0.5">
-            {name.char1.pinyin} {name.char2.pinyin}
+            {name.full_pinyin || `${name.char1.pinyin} ${name.char2.pinyin}`}
           </p>
         </div>
         <div className="flex items-center gap-1">
-          <Star className={`h-4 w-4 ${name.score >= 90 ? 'text-amber-400' : 'text-muted-foreground'}`} />
+          <Star className={`h-4 w-4 ${score >= 90 ? 'text-amber-400' : 'text-muted-foreground'}`} />
           <span className={`text-lg font-bold font-mono ${scoreColor}`}>
-            {name.score.toFixed(0)}
+            {score.toFixed(name.ranking ? 1 : 0)}
           </span>
         </div>
       </div>
 
       <p className="text-sm text-foreground/70 line-clamp-2 mb-3 leading-relaxed">
-        {name.char1.meaning}{name.char2.meaning ? `，${name.char2.meaning}` : ''}
+        {name.recommendation || [name.char1.meaning, name.char2.meaning].filter(Boolean).join('，')}
       </p>
 
       <div className="flex flex-wrap gap-1.5 mb-2">
@@ -74,7 +78,9 @@ export function NameCard({ name, showWuGeLuck }: NameCardProps) {
       </div>
 
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <span className="font-mono">{name.grade}</span>
+        {name.ranking ? (
+          <span className="tabular-nums">传统数理 {name.ranking.traditional.toFixed(1)} · 音义 {name.ranking.sound_and_meaning.toFixed(1)}</span>
+        ) : <span className="font-mono">{name.grade}</span>}
         <span>三才: {name.san_cai}</span>
         {name.has_poetry && (
           <Badge variant="stardust" className="text-xs py-0">诗</Badge>

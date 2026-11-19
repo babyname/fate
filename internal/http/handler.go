@@ -6,13 +6,17 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"time"
+	"unicode"
 
 	"github.com/babyname/fate/v4"
 	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/internal/naming"
 	"github.com/babyname/fate/v4/internal/repository"
+	namesvc "github.com/babyname/fate/v4/internal/service/naming"
 )
 
 type Handler struct {
@@ -25,10 +29,11 @@ type Handler struct {
 }
 
 type taskEntry struct {
-	mu      sync.RWMutex
-	result  *fate.GenerateResult
-	request generateRequest
-	created time.Time
+	mu         sync.RWMutex
+	result     *fate.GenerateResult
+	candidates []fate.NameResult
+	request    generateRequest
+	created    time.Time
 }
 
 func (e *taskEntry) loadResult() *fate.GenerateResult {
@@ -49,14 +54,15 @@ type taskStore struct {
 }
 
 type generateRequest struct {
-	Surname       string `json:"surname"`
-	Born          string `json:"born"`
-	Sex           string `json:"sex"`
-	PoetryMode    int    `json:"poetry_mode"`
-	XiYongMethod  string `json:"xi_yong_method"`
-	AvoidChars    string `json:"avoid_chars"`
-	RequireChars  string `json:"require_chars"`
-	FilterType    int    `json:"filter_type"`
+	Recommendation string `json:"recommendation"`
+	Surname        string `json:"surname"`
+	Born           string `json:"born"`
+	Sex            string `json:"sex"`
+	PoetryMode     int    `json:"poetry_mode"`
+	XiYongMethod   string `json:"xi_yong_method"`
+	AvoidChars     string `json:"avoid_chars"`
+	RequireChars   string `json:"require_chars"`
+	FilterType     int    `json:"filter_type"`
 }
 
 // NewHandler creates an initialized Handler with all routes registered.
@@ -136,10 +142,19 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	born, err := time.Parse("2006/01/02 15:04", req.Born)
-	if err != nil {
-		writeError(w, 400, "invalid born date format, use 2006/01/02 15:04")
+	natural := req.Recommendation == "natural"
+	if !natural && req.Recommendation != "" && req.Recommendation != "traditional" {
+		writeError(w, 400, "请选择有效的推荐方式。")
 		return
+	}
+	var born time.Time
+	if !natural || req.Born != "" {
+		var err error
+		born, err = time.Parse("2006/01/02 15:04", req.Born)
+		if err != nil {
+			writeError(w, 400, "invalid born date format, use 2006/01/02 15:04")
+			return
+		}
 	}
 
 	sex := fate.SexBoy
@@ -157,40 +172,90 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 		requireChars = nil
 	}
 
-	// Generate synchronously.
-	result, err := h.fate.Generate(r.Context(), fate.GenerateRequest{
-		LastName: req.Surname,
-		Born:     born,
-		Sex:      sex,
-		Filter: &fate.FilterOption{
-			CharacterFilter:     true,
-			RegularFilter:       true,
-			WuXingFilter:        true,
-			PoetryMode:          req.PoetryMode,
-			XiYongMethod:        req.XiYongMethod,
-			AvoidCharacters:     avoidChars,
-			RequireCharacters:   requireChars,
-			CharacterFilterType: fate.CharacterFilterType(req.FilterType),
-		},
-	})
-	if err != nil {
-		writeError(w, 500, "failed to generate: "+err.Error())
-		return
-	}
-
-	taskID := fmt.Sprintf("%d", time.Now().UnixNano())
 	entry := &taskEntry{
-		result:  result,
 		request: req,
 		created: time.Now(),
 	}
+	option := fate.FilterOption{
+		CharacterFilter:     true,
+		RegularFilter:       true,
+		WuXingFilter:        true,
+		PoetryMode:          req.PoetryMode,
+		XiYongMethod:        req.XiYongMethod,
+		AvoidCharacters:     avoidChars,
+		RequireCharacters:   requireChars,
+		CharacterFilterType: fate.CharacterFilterType(req.FilterType),
+	}
+	if natural {
+		surname := []rune(strings.TrimSpace(req.Surname))
+		if len(surname) < 1 || len(surname) > 2 || strings.IndexFunc(string(surname), func(char rune) bool {
+			return !unicode.Is(unicode.Han, char)
+		}) >= 0 {
+			writeError(w, 400, "请填写一个或两个汉字作为姓氏。")
+			return
+		}
+		required, avoided := uniqueHanCharacters(req.RequireChars), uniqueHanCharacters(req.AvoidChars)
+		if len(required) > 2 {
+			writeError(w, 400, "双字名最多能包含两个指定字。")
+			return
+		}
+		for _, char := range required {
+			if slices.Contains(avoided, char) {
+				writeError(w, 400, "指定字和避用字有冲突，请检查「"+char+"」。")
+				return
+			}
+		}
+		var last [2]string
+		for i, char := range surname {
+			last[i] = string(char)
+		}
+		lastName, err := h.repo.QueryLastName(r.Context(), last)
+		if err != nil {
+			writeError(w, 400, "字库无法识别这个姓氏。")
+			return
+		}
+		// Use the same stroke convention as the traditional analysis.
+		option.CharacterFilterType = fate.CharacterFilterTypeDefault
+		names, table, err := namesvc.NewPipeline(h.repo).GenerateRecommendations(r.Context(), namesvc.GenerateRequest{
+			LastName: lastName, Born: born, Sex: naming.Sex(sex), Filter: fate.NewFilter(option),
+		}, required, avoided)
+		if err != nil {
+			writeError(w, 500, "failed to generate: "+err.Error())
+			return
+		}
+		entry.candidates = names
+		entry.result = &fate.GenerateResult{TopNames: names[:min(10, len(names))], ExcellentTable: table}
+	} else {
+		result, err := h.fate.Generate(r.Context(), fate.GenerateRequest{
+			LastName: req.Surname, Born: born, Sex: sex, Filter: &option,
+		})
+		if err != nil {
+			writeError(w, 500, "failed to generate: "+err.Error())
+			return
+		}
+		entry.result = result
+	}
+
+	taskID := fmt.Sprintf("%d", time.Now().UnixNano())
 	h.store.Set(taskID, entry)
 
 	writeJSON(w, 200, map[string]any{
 		"task_id": taskID,
 		"state":   "done",
-		"total":   result.ExcellentTable.Len(),
+		"total":   entry.result.ExcellentTable.Len(),
 	})
+}
+
+func uniqueHanCharacters(input string) []string {
+	var chars []string
+	seen := make(map[rune]bool)
+	for _, char := range input {
+		if unicode.Is(unicode.Han, char) && !seen[char] {
+			chars = append(chars, string(char))
+			seen[char] = true
+		}
+	}
+	return chars
 }
 
 func (h *Handler) handleStatus(w http.ResponseWriter, r *http.Request) {
@@ -333,6 +398,9 @@ func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
 	}
 
 	topNames := result.TopNames
+	if entry.candidates != nil {
+		topNames = entry.candidates
+	}
 
 	page := 1
 	if p := r.URL.Query().Get("page"); p != "" {
@@ -351,11 +419,10 @@ func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
 	}
 
 	total := len(topNames)
-	start := (page - 1) * pageSize
-	if start >= total {
-		start = 0
+	if total == 0 || page > (total-1)/pageSize+1 {
 		page = 1
 	}
+	start := (page - 1) * pageSize
 	end := start + pageSize
 	if end > total {
 		end = total
@@ -387,10 +454,13 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			result := entry.loadResult()
 			if result != nil {
-				// Search top names for a match.
-				for i := range result.TopNames {
-					if result.TopNames[i].Char1.Char == char1 && result.TopNames[i].Char2.Char == char2 {
-						writeJSON(w, 200, map[string]any{"name_result": result.TopNames[i]})
+				names := result.TopNames
+				if entry.candidates != nil {
+					names = entry.candidates
+				}
+				for _, name := range names {
+					if name.Char1.Char == char1 && name.Char2.Char == char2 {
+						writeJSON(w, 200, map[string]any{"name_result": name})
 						return
 					}
 				}

@@ -1,4 +1,4 @@
-﻿package analysis
+package analysis
 
 import (
 	"github.com/babyname/fate/v4/ent"
@@ -54,29 +54,48 @@ type ScoreDetail struct {
 	YinYun         float64 `json:"yin_yun"`
 }
 
+type RecommendationScorePart struct {
+	Label   string   `json:"label"`
+	Score   float64  `json:"score"`
+	Weight  float64  `json:"weight"`
+	Reasons []string `json:"reasons,omitempty"`
+}
+
+type RecommendationRanking struct {
+	Total             float64                   `json:"total"`
+	Traditional       float64                   `json:"traditional"`
+	SoundAndMeaning   float64                   `json:"sound_and_meaning"`
+	UsesBirth         bool                      `json:"uses_birth"`
+	SoundDetail       []RecommendationScorePart `json:"sound_detail"`
+	TraditionalDetail []RecommendationScorePart `json:"traditional_detail"`
+}
+
 type NameResult struct {
-	Rank         int            `json:"rank"`
-	FullName     string         `json:"full_name"`
-	Surname      string         `json:"surname"`
-	FirstName    string         `json:"first_name"`
-	Strokes      string         `json:"strokes"`
-	Char1        CharInfo       `json:"char1"`
-	Char2        CharInfo       `json:"char2"`
-	WuGe         *WuGeResult    `json:"wu_ge"`
-	SanCai       string         `json:"san_cai"`
-	SanCaiLuck   string         `json:"san_cai_luck"`
-	SanCaiDetail string         `json:"san_cai_detail"`
-	JiChuYun     string         `json:"ji_chu_yun"`
-	ChengGongYun string         `json:"cheng_gong_yun"`
-	RenJiGuanXi  string         `json:"ren_ji_guan_xi"`
-	ZhouYi       *ZhouYiBasic   `json:"zhou_yi"`
-	Bazi         *BaziBasic     `json:"bazi,omitempty"`
-	WuXing       *WuXingSection `json:"wu_xing,omitempty"`
-	Score        float64        `json:"score"`
-	Grade        string         `json:"grade"`
-	ScoreDetail  ScoreDetail    `json:"score_detail"`
-	Interpret    string         `json:"interpret"`
-	HasPoetry    bool           `json:"has_poetry"`
+	Ranking        *RecommendationRanking `json:"ranking,omitempty"`
+	Recommendation string                 `json:"recommendation,omitempty"`
+	FullPinyin     string                 `json:"full_pinyin,omitempty"`
+	Rank           int                    `json:"rank"`
+	FullName       string                 `json:"full_name"`
+	Surname        string                 `json:"surname"`
+	FirstName      string                 `json:"first_name"`
+	Strokes        string                 `json:"strokes"`
+	Char1          CharInfo               `json:"char1"`
+	Char2          CharInfo               `json:"char2"`
+	WuGe           *WuGeResult            `json:"wu_ge"`
+	SanCai         string                 `json:"san_cai"`
+	SanCaiLuck     string                 `json:"san_cai_luck"`
+	SanCaiDetail   string                 `json:"san_cai_detail"`
+	JiChuYun       string                 `json:"ji_chu_yun"`
+	ChengGongYun   string                 `json:"cheng_gong_yun"`
+	RenJiGuanXi    string                 `json:"ren_ji_guan_xi"`
+	ZhouYi         *ZhouYiBasic           `json:"zhou_yi"`
+	Bazi           *BaziBasic             `json:"bazi,omitempty"`
+	WuXing         *WuXingSection         `json:"wu_xing,omitempty"`
+	Score          float64                `json:"score"`
+	Grade          string                 `json:"grade"`
+	ScoreDetail    ScoreDetail            `json:"score_detail"`
+	Interpret      string                 `json:"interpret"`
+	HasPoetry      bool                   `json:"has_poetry"`
 }
 
 type ZhouYiBasic struct {
@@ -99,14 +118,14 @@ type BaziBasic struct {
 }
 
 type WuXingSection struct {
-	Xi          string `json:"xi"`
-	Ji          string `json:"ji"`
+	Xi            string `json:"xi"`
+	Ji            string `json:"ji"`
 	RiZhuQiangRuo string `json:"ri_zhu_qiang_ruo"`
-	TiaoHouShen string `json:"tiao_hou_shen"`
-	YongShen    string `json:"yong_shen"`
-	ChouShen    string `json:"chou_shen"`
-	GeJuName    string `json:"geju_name"`
-	Analysis    string `json:"analysis"`
+	TiaoHouShen   string `json:"tiao_hou_shen"`
+	YongShen      string `json:"yong_shen"`
+	ChouShen      string `json:"chou_shen"`
+	GeJuName      string `json:"geju_name"`
+	Analysis      string `json:"analysis"`
 }
 
 type NameSource struct {
