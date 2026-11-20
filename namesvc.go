@@ -55,6 +55,15 @@ func (r *GenerateResult) Candidates(offset, limit int) []NameResult {
 	return r.TopNames[offset : offset+min(limit, len(r.TopNames)-offset)]
 }
 
+// CandidatesSorted returns a page ordered by the requested score.
+// Component scores are available when the generation used recommendation weights.
+func (r *GenerateResult) CandidatesSorted(offset, limit int, field ranking.Field, descending bool) []NameResult {
+	if r.catalogue == nil {
+		return r.Candidates(offset, limit)
+	}
+	return r.catalogue.CandidatesSorted(offset, limit, field, descending)
+}
+
 // Candidate looks up the full scored result for a generated pair of given-name characters.
 func (r *GenerateResult) Candidate(first, second string) (NameResult, bool) {
 	for _, name := range r.TopNames {

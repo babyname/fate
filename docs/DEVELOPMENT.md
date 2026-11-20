@@ -233,6 +233,8 @@ curl "http://localhost:18080/api/v1/explore?task_id=<task_id>&count=6"
 
 在自定义配比模式中，`result`、`names` 和 `name_detail` 的姓名分析会返回 `ranking`。后端在筛选并保留候选时应用权重，统一返回 `ranking.total` 和全局 `rank`。Go 调用方可通过 `GenerateRequest.RecommendationWeight` 启用同一计算，或使用公开的 `ranking` 包为已有的两个分项计算综合分。
 
+`/api/v1/names` 可用 `sort=total|traditional|sound_and_meaning` 和 `direction=asc|desc` 对完整候选名册排序后再分页。默认按综合分降序，分项排序用于已配置权重的任务。姓名的 `rank` 始终表示综合分名次，与姓名详情一致。
+
 ---
 
 ## 🧩 代码集成

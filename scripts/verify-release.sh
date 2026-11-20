@@ -184,6 +184,13 @@ check_http weighted-detail GET "/api/v1/name_detail?$WEIGHTED_DETAIL"
 check_http weight-hundred POST "/api/v1/generate" "{\"task_id\":\"$WEIGHTED_ID\",\"traditional_weight\":100}"
 TRADITIONAL_ID="$(python -c 'import json,sys; print(json.load(sys.stdin)["task_id"])' < "$OUT/http-weight-hundred.body" 2>/dev/null || true)"
 check_http weighted-traditional GET "/api/v1/names?task_id=$TRADITIONAL_ID&page=1&size=20"
+check_http sort-traditional GET "/api/v1/names?task_id=$WEIGHTED_ID&sort=traditional&direction=asc"
+check_http sort-traditional-page-2 GET "/api/v1/names?task_id=$WEIGHTED_ID&sort=traditional&direction=asc&page=2"
+check_http sort-traditional-desc GET "/api/v1/names?task_id=$WEIGHTED_ID&sort=traditional&direction=desc"
+check_http sort-sound GET "/api/v1/names?task_id=$TRADITIONAL_ID&sort=sound_and_meaning&direction=desc"
+check_http sort-sound-page-2 GET "/api/v1/names?task_id=$TRADITIONAL_ID&sort=sound_and_meaning&direction=desc&page=2"
+check_http sort-invalid-direction GET "/api/v1/names?task_id=$WEIGHTED_ID&direction=wrong" "" 400
+check_http sort-legacy-component GET "/api/v1/names?task_id=$TASK_ID&sort=traditional" "" 400
 
 check_score_weights() {
   python - "$OUT" <<'PYTHON'
@@ -213,6 +220,15 @@ for expected, key, names in [(0, "sound_and_meaning", weighted), (100, "traditio
     print(f"Expected traditional weight {expected} and total equal to {key}. Actual first ranking: {names[0]['ranking']}")
 assert body("weight-zero")["task_id"] != body("generate")["task_id"]
 assert body("weight-hundred")["task_id"] != body("weight-zero")["task_id"]
+for label, key, reverse in [("sort-traditional", "traditional", False), ("sort-sound", "sound_and_meaning", True)]:
+    left, right = body(label), body(label + "-page-2")
+    assert left["page"] == 1 and right["page"] == 2 and left["total"] == right["total"]
+    names = left["names"] + right["names"]
+    values = [name["ranking"][key] for name in names]
+    assert len(names) == len({name["full_name"] for name in names}) == 40
+    assert values == sorted(values, reverse=reverse)
+    print(f"Expected 40 distinct candidates across two pages ordered by {key}. Actual first/last scores: {values[0]}, {values[-1]}")
+assert body("sort-traditional")["names"][0]["ranking"]["traditional"] < body("sort-traditional-desc")["names"][0]["ranking"]["traditional"]
 PYTHON
 }
 step score-weights check_score_weights

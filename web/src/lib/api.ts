@@ -6,6 +6,7 @@ import type {
   ExploreResponse,
   NameDetailResponse,
   NamesResponse,
+  ScoreOrder,
 } from '@/types/api';
 
 const BASE = '/api/v1';
@@ -50,12 +51,16 @@ export const api = {
     return request(`/result?task_id=${taskId}`);
   },
 
-  getNames(taskId: string, page: number = 1, size: number = 20): Promise<NamesResponse> {
+  getNames(taskId: string, page: number = 1, size: number = 20, order?: ScoreOrder, signal?: AbortSignal): Promise<NamesResponse> {
     const params = new URLSearchParams();
     params.set('task_id', taskId);
     params.set('page', String(page));
     params.set('size', String(size));
-    return request(`/names?${params.toString()}`);
+    if (order) {
+      params.set('sort', order.field);
+      params.set('direction', order.direction);
+    }
+    return request(`/names?${params.toString()}`, { signal });
   },
 
   explore(taskId: string, count?: number, hasPoetry?: boolean, wuxing?: string): Promise<ExploreResponse> {

@@ -382,7 +382,26 @@ func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
 	if total == 0 || page > (total-1)/pageSize+1 {
 		page = 1
 	}
-	pagedNames := result.Candidates((page-1)*pageSize, pageSize)
+	field := ranking.Field(r.URL.Query().Get("sort"))
+	switch field {
+	case "":
+		field = ranking.TotalScore
+	case ranking.TotalScore:
+	case ranking.TraditionalScore, ranking.SoundMeaningScore:
+		if entry.request.TraditionalWeight == nil {
+			writeError(w, 400, "component sorting requires a weighted naming task")
+			return
+		}
+	default:
+		writeError(w, 400, "invalid candidate sort field")
+		return
+	}
+	direction := r.URL.Query().Get("direction")
+	if direction != "" && direction != "asc" && direction != "desc" {
+		writeError(w, 400, "candidate sort direction must be asc or desc")
+		return
+	}
+	pagedNames := result.CandidatesSorted((page-1)*pageSize, pageSize, field, direction != "asc")
 
 	writeJSON(w, 200, map[string]any{
 		"task_id": taskID,

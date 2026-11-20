@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { NameResult } from '@/types/api';
+import type { NameResult, ScoreField, ScoreOrder } from '@/types/api';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,7 @@ import { api } from '@/lib/api';
 import { ArrowLeft, Grid3X3, List, Search } from 'lucide-react';
 
 const PAGE_SIZE = 20;
+const COMPOSITE_ORDER: ScoreOrder = { field: 'total', direction: 'desc' };
 
 export function ResultsPage() {
   const { taskId } = useParams<{ taskId: string }>();
@@ -23,15 +24,18 @@ export function ResultsPage() {
   const [exploreVisited, setExploreVisited] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pagedNames, setPagedNames] = useState<NameResult[]>([]);
+  const [scoreOrder, setScoreOrder] = useState<ScoreOrder>(COMPOSITE_ORDER);
   const [featuredNames, setFeaturedNames] = useState<NameResult[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loadingPagination, setLoadingPagination] = useState(false);
   const [polling, setPolling] = useState(true);
   const [pollError, setPollError] = useState('');
+  const [pageError, setPageError] = useState('');
   const [reweighting, setReweighting] = useState(false);
   const [weightError, setWeightError] = useState('');
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const weightRequest = useRef<AbortController | null>(null);
+  const pageRequest = useRef<AbortController | null>(null);
 
   const setStoreTopNames = useAppStore((s) => s.setTopNames);
   const setStoreTotal = useAppStore((s) => s.setTotal);
@@ -41,9 +45,14 @@ export function ResultsPage() {
   useEffect(() => {
     setReweighting(false);
     setWeightError('');
+    setPageError('');
+    setPollError('');
+    setLoadingPagination(false);
     return () => {
       weightRequest.current?.abort();
       weightRequest.current = null;
+      pageRequest.current?.abort();
+      pageRequest.current = null;
     };
   }, [taskId]);
 
@@ -69,27 +78,44 @@ export function ResultsPage() {
     }
   };
 
-  const loadPage = useCallback(async (page: number) => {
-    if (!taskId) return;
+  const loadPage = useCallback(async (page: number, order: ScoreOrder = COMPOSITE_ORDER, initial = false) => {
+    if (!taskId || pageRequest.current) return false;
+    const controller = new AbortController();
+    pageRequest.current = controller;
     setLoadingPagination(true);
+    setPageError('');
     try {
-      const res = await api.getNames(taskId, page, PAGE_SIZE);
+      const res = await api.getNames(taskId, page, PAGE_SIZE, order, controller.signal);
+      if (controller.signal.aborted) return false;
       const names = res.names ?? [];
       setPagedNames(names);
-      if (res.page === 1) setFeaturedNames(names.slice(0, 7));
+      if (res.page === 1 && order.field === 'total' && order.direction === 'desc') setFeaturedNames(names.slice(0, 7));
       setTotalCount(res.total);
       setCurrentPage(res.page);
+      setScoreOrder(order);
       setStoreTopNames(names);
       setStoreTotal(res.total);
     } catch (error) {
-      setPollError(error instanceof Error ? error.message : '读取候选名失败。');
+      if (controller.signal.aborted) return false;
+      const message = error instanceof Error ? error.message : '读取候选名失败。';
+      if (initial) setPollError(message);
+      else setPageError(message);
     } finally {
-      setLoadingPagination(false);
+      if (pageRequest.current === controller) {
+        pageRequest.current = null;
+        setLoadingPagination(false);
+      }
     }
+    return true;
   }, [taskId, setStoreTopNames, setStoreTotal]);
 
+  const sortByScore = (field: ScoreField) => {
+    const direction = scoreOrder.field === field && scoreOrder.direction === 'desc' ? 'asc' : 'desc';
+    void loadPage(1, { field, direction });
+  };
+
   const onGenerationDone = useCallback(async () => {
-    await loadPage(1);
+    if (!await loadPage(1, COMPOSITE_ORDER, true)) return;
     setPolling(false);
     setIsGenerating(false);
   }, [loadPage, setIsGenerating]);
@@ -241,8 +267,14 @@ export function ResultsPage() {
               </div>
             </div>
             {weightError && <p role="alert" className="mb-3 text-sm text-destructive">{weightError}</p>}
+            {pageError && <p role="alert" className="mb-3 text-sm text-destructive">{pageError}</p>}
             {viewMode === 'table' ? (
-              <CandidateTable results={pagedNames} />
+              <CandidateTable
+                results={pagedNames}
+                scoreOrder={scoreOrder}
+                onScoreSort={sortByScore}
+                sorting={loadingPagination || reweighting}
+              />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {pagedNames.map((result) => (
@@ -259,8 +291,8 @@ export function ResultsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={currentPage <= 1 || loadingPagination}
-                  onClick={() => loadPage(currentPage - 1)}
+                  disabled={currentPage <= 1 || loadingPagination || reweighting}
+                  onClick={() => loadPage(currentPage - 1, scoreOrder)}
                 >
                   上一页
                 </Button>
@@ -270,8 +302,8 @@ export function ResultsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={currentPage >= totalPages || loadingPagination}
-                  onClick={() => loadPage(currentPage + 1)}
+                  disabled={currentPage >= totalPages || loadingPagination || reweighting}
+                  onClick={() => loadPage(currentPage + 1, scoreOrder)}
                 >
                   下一页
                 </Button>

@@ -132,6 +132,9 @@ export interface NameRanking {
   traditional_weight: number
 }
 
+export type ScoreField = 'total' | 'traditional' | 'sound_and_meaning';
+export type ScoreOrder = { field: ScoreField; direction: 'asc' | 'desc' };
+
 export interface NameResult {
   ranking?: NameRanking
   rank: number

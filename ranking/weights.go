@@ -28,6 +28,15 @@ type Result struct {
 	TraditionalWeight int     `json:"traditional_weight"`
 }
 
+// Field identifies a score column used to order a candidate catalogue.
+type Field string
+
+const (
+	TotalScore        Field = "total"
+	TraditionalScore  Field = "traditional"
+	SoundMeaningScore Field = "sound_and_meaning"
+)
+
 // Combine rounds each component to tenths, then rounds the weighted total.
 // Integer tenths keep the total consistent with the component scores shown to users.
 func (w Weight) Combine(traditional, soundAndMeaning float64) Result {

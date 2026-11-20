@@ -1,7 +1,9 @@
 package naming
 
 import (
+	"cmp"
 	"context"
+	"slices"
 	"sync"
 	"time"
 
@@ -236,6 +238,37 @@ func (r *GenerateResult) Candidates(offset, limit int) []analysis.NameResult {
 	names := make([]analysis.NameResult, 0, count)
 	for i, entry := range entries[offset : offset+count] {
 		if name, ok := r.buildCandidate(entry, offset+i+1); ok {
+			names = append(names, name)
+		}
+	}
+	return names
+}
+
+// CandidatesSorted orders the full catalogue before taking the requested page.
+// Each candidate retains its original composite rank for detail lookups.
+func (r *GenerateResult) CandidatesSorted(offset, limit int, field ranking.Field, descending bool) []analysis.NameResult {
+	if field == ranking.TotalScore && descending {
+		return r.Candidates(offset, limit)
+	}
+	entries := r.ExcellentTable.AllEntries()
+	if offset < 0 || offset >= len(entries) || limit <= 0 {
+		return []analysis.NameResult{}
+	}
+	order := make([]int, len(entries))
+	for i := range order {
+		order[i] = i
+	}
+	direction := 1
+	if descending {
+		direction = -1
+	}
+	slices.SortStableFunc(order, func(first, second int) int {
+		return direction * cmp.Compare(entries[first].scoreFor(field), entries[second].scoreFor(field))
+	})
+	count := min(limit, len(entries)-offset)
+	names := make([]analysis.NameResult, 0, count)
+	for _, index := range order[offset : offset+count] {
+		if name, ok := r.buildCandidate(entries[index], index+1); ok {
 			names = append(names, name)
 		}
 	}
