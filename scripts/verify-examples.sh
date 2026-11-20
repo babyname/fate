@@ -27,6 +27,7 @@ SERVER_PID=""
 
 export NO_PROXY="127.0.0.1,localhost${NO_PROXY:+,$NO_PROXY}"
 export no_proxy="$NO_PROXY"
+export PYTHONIOENCODING=utf-8
 
 mkdir -p "$OUT"
 cleanup() {
@@ -92,15 +93,15 @@ check_http() {
   local jsonfile="$OUT/examples-http-$name.json"
   local status
   local args=(-sS -o "$bodyfile" -w '%{http_code}' -X "$method")
-  if [ -n "$data" ]; then args+=(-H 'Content-Type: application/json' -d "$data"); fi
+  if [ -n "$data" ]; then args+=(-H 'Content-Type: application/json' --data-binary @-); fi
   args+=("$BASE$path")
 
   printf '== http/%s == ' "$name"
-  status="$(curl "${args[@]}" 2> "$OUT/examples-http-$name.curl.log" || true)"
+  status="$(printf '%s' "$data" | curl "${args[@]}" 2> "$OUT/examples-http-$name.curl.log" || true)"
   printf 'status=%s expected=%s\n' "${status:-000}" "$want" \
     > "$OUT/examples-http-$name.status"
 
-  python -c '
+  MSYS2_ARG_CONV_EXCL='/api/v1/' python -c '
 import json, sys
 path, status, want, bodyfile = sys.argv[1:5]
 raw = open(bodyfile, "rb").read()
@@ -188,7 +189,7 @@ echo "task_id=$TASK_ID" >> "$OUT/structure.log"
 if [ -n "$TASK_ID" ]; then
   check_http status  GET "/api/v1/status?task_id=$TASK_ID" "" 200
   check_http result  GET "/api/v1/result?task_id=$TASK_ID" "" 200
-  check_body result 'isinstance(b, dict) and isinstance(b.get("top_names"), list)'
+  check_body result 'isinstance(b, dict) and bool(b.get("top_names")) and b["top_names"][0]["surname"] == "\u5f20"'
   check_http names   GET "/api/v1/names?task_id=$TASK_ID&page=1&size=5" "" 200
   check_body names 'isinstance(b, dict) and isinstance(b.get("names"), list)'
   check_http explore GET "/api/v1/explore?task_id=$TASK_ID&count=3" "" 200
@@ -221,11 +222,11 @@ run_example http-client \
   'names is a JSON array' \
   'http-client complete: 5 endpoints OK'
 
-# 7. Repository gate (detector controls + full static gate) and the runtime
-#    proof that a nil GenerateRequest.Filter actually converges.
+# 7. Repository gate and runtime checks for the public Go API.
 step gate-self-test bash -c "cd '$ROOT' && python scripts/check_repo.py --self-test"
 step gate-full      bash -c "cd '$ROOT' && python scripts/check_repo.py"
 step nil-filter-integration bash -c "cd '$ROOT' && go test -tags integration . -run TestGenerateNilFilterCompletes -v -count=1 -timeout 120s"
+step stream-weight-integration bash -c "cd '$ROOT' && go test -tags integration . -run TestGenerateStreamRecommendationWeight -v -count=1 -timeout 120s"
 
 {
   echo "# examples/ 验收报告"

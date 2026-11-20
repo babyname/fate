@@ -121,7 +121,7 @@ func (p *Pipeline) GenerateStream(ctx context.Context, req GenerateRequest, onBa
 		batchMu.Unlock()
 
 		if seq == 1 || seq%2 == 0 {
-			snapshot := heapPreview(table, 10, surname, strokes)
+			snapshot := heapPreview(table, 10, surname)
 			onBatch(StreamBatch{
 				TopResults: snapshot,
 				Total:      table.HeapLen(),
@@ -295,14 +295,14 @@ func (r *GenerateResult) buildCandidate(entry ExcellentEntry, rank int) (analysi
 
 // heapPreview returns a lightweight preview of top N entries from the heap
 // before finalization. Uses only ExcellentEntry-level data (not full NameResult).
-func heapPreview(table *ExcellentTable, n int, surname string, strokes [2]int) []analysis.NameResult {
+func heapPreview(table *ExcellentTable, n int, surname string) []analysis.NameResult {
 	entries := table.SortedPreview(n)
 	if len(entries) == 0 {
 		return nil
 	}
 	results := make([]analysis.NameResult, 0, len(entries))
 	for i, e := range entries {
-		results = append(results, analysis.NameResult{
+		name := analysis.NameResult{
 			Rank:      i + 1,
 			Surname:   surname,
 			FullName:  surname + e.Char1 + e.Char2,
@@ -319,7 +319,13 @@ func heapPreview(table *ExcellentTable, n int, surname string, strokes [2]int) [
 				WuXing:    e.WuXing2,
 				HasPoetry: e.HasPoetry,
 			},
-		})
+		}
+		if e.ranking != nil {
+			// Keep callback results independent of the heap's score data.
+			score := *e.ranking
+			name.Ranking = &score
+		}
+		results = append(results, name)
 	}
 	return results
 }
