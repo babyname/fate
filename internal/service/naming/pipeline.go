@@ -69,7 +69,7 @@ func (p *Pipeline) Generate(ctx context.Context, req GenerateRequest) (*Generate
 	strokes := surnameStrokes(req.Filter, req.LastName)
 
 	// 2. Use pre-calculated fate data or compute it from birth info.
-	fateData := p.resolveFateData(req)
+	fateData := req.resolveFateData()
 
 	// 3. Get lucky wuge combinations for this surname.
 	lucky := wuge.GetLuckyByLastName(strokes[0], strokes[1])
@@ -102,7 +102,7 @@ func (p *Pipeline) Generate(ctx context.Context, req GenerateRequest) (*Generate
 // batches of top results via callback as workers complete.
 func (p *Pipeline) GenerateStream(ctx context.Context, req GenerateRequest, onBatch func(StreamBatch)) error {
 	strokes := surnameStrokes(req.Filter, req.LastName)
-	fateData := p.resolveFateData(req)
+	fateData := req.resolveFateData()
 	lucky := wuge.GetLuckyByLastName(strokes[0], strokes[1])
 	chars := preloadChars(ctx, p.db, lucky, req.Filter)
 	poetrySet := p.queryPoetrySet(ctx)
@@ -166,20 +166,24 @@ func (req GenerateRequest) newRater(fateData *chronosfate.FateData, strokes [2]i
 	return rater
 }
 
-// resolveFateData returns the fate data, computing it from birth info if needed.
-func (p *Pipeline) resolveFateData(req GenerateRequest) *chronosfate.FateData {
+// calculateFateData returns the fate data or computes it from the birth details.
+func (req GenerateRequest) calculateFateData() (*chronosfate.FateData, error) {
 	if req.FateData != nil {
-		return req.FateData
+		return req.FateData, nil
 	}
 	method := chronosfate.XiYongMethodBalance
 	if req.Filter.XiYongMethod() == "geju" {
 		method = chronosfate.XiYongMethodGeJu
 	}
-	fateData, err := chronosfate.GetFateData(chronosfate.FateInput{
+	return chronosfate.GetFateData(chronosfate.FateInput{
 		Calendar:     v2.NewSolarCalendar(req.Born),
 		Gender:       int(req.Sex),
 		XiYongMethod: method,
 	})
+}
+
+func (req GenerateRequest) resolveFateData() *chronosfate.FateData {
+	fateData, err := req.calculateFateData()
 	if err != nil {
 		log.Error("get fate data", err)
 	}

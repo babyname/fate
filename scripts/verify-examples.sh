@@ -227,6 +227,7 @@ step gate-self-test bash -c "cd '$ROOT' && python scripts/check_repo.py --self-t
 step gate-full      bash -c "cd '$ROOT' && python scripts/check_repo.py"
 step nil-filter-integration bash -c "cd '$ROOT' && go test -tags integration . -run TestGenerateNilFilterCompletes -v -count=1 -timeout 120s"
 step stream-weight-integration bash -c "cd '$ROOT' && go test -tags integration . -run TestGenerateStreamRecommendationWeight -v -count=1 -timeout 120s"
+step score-name-integration bash -c "cd '$ROOT' && go test -tags integration . -run TestScoreNameMatchesGeneration -v -count=1 -timeout 120s"
 
 {
   echo "# examples/ 验收报告"

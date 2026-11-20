@@ -301,12 +301,15 @@ func main() {
 | `fate.GenerateRequest` | 输入：姓氏、出生时间、性别、`*FilterOption` |
 | `Fate.Generate(ctx, req)` | 同步主链路，返回 `*GenerateResult` |
 | `Fate.GenerateStream(ctx, req, onBatch)` | 并行生成，按批次回调 `StreamBatch` |
+| `fate.ScoreName(ctx, engine, req)` | 给一个已有姓名评分，返回分数、五格和八字分析 |
 | `fate.GenerateResult` | `TopNames`、`ExcellentTable`、`CharMap`、`FateData` |
 | `fate.DefaultFilterOption()` | `Generate` / `GenerateStream` 在 `Filter == nil` 时使用的有界唯一真相源；用链式 `With*` 定制 |
 | `fate.FilterOption` / `fate.NewFilter` | 筛选选项（笔画/五行/大衍/性别/避用字等）与筛选器实例 |
 | `fate.DefaultFilter()` | 仅供旧 Session 路径使用的宽松共享实例；不得作为 `Generate` 的默认值 |
 | `fate.ExcellentTable` | 指针类型（内部含锁，禁止按值复制）；`TopN/MarkShown/Explore/Len` |
 | `fate.Session` / `fate.Input` / `fate.Output` | 旧状态机路径，仍被 `cmd/console` 使用；新代码优先用 `Generate` |
+
+已有名单可逐个调用 `fate.ScoreName`。请求传入一字或二字的 `LastName`、二字的 `FirstName`、`Born` 和 `Sex`。也可传入与生成时一致的 `FilterType`、`XiYongMethod` 和 `RecommendationWeight`。单独评分的 `Rank` 为 0，表示该名字还未参与名册排名。评分从引擎已有的字库读取用字，遇到字库缺少的名用字会返回错误。
 
 ### 可运行示例
 
