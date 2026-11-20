@@ -1,4 +1,4 @@
-﻿package analysis
+package analysis
 
 import (
 	"github.com/babyname/fate/v4/ent"
@@ -99,14 +99,14 @@ type BaziBasic struct {
 }
 
 type WuXingSection struct {
-	Xi          string `json:"xi"`
-	Ji          string `json:"ji"`
+	Xi            string `json:"xi"`
+	Ji            string `json:"ji"`
 	RiZhuQiangRuo string `json:"ri_zhu_qiang_ruo"`
-	TiaoHouShen string `json:"tiao_hou_shen"`
-	YongShen    string `json:"yong_shen"`
-	ChouShen    string `json:"chou_shen"`
-	GeJuName    string `json:"geju_name"`
-	Analysis    string `json:"analysis"`
+	TiaoHouShen   string `json:"tiao_hou_shen"`
+	YongShen      string `json:"yong_shen"`
+	ChouShen      string `json:"chou_shen"`
+	GeJuName      string `json:"geju_name"`
+	Analysis      string `json:"analysis"`
 }
 
 type NameSource struct {
