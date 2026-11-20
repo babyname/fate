@@ -2,23 +2,34 @@ import { Badge } from '@/components/ui/badge';
 import { SameNameLookupButton } from '@/components/naming/SameNameLookup';
 import { WuGeLuck } from '@/components/naming/WuGeLuck';
 import { useAppStore } from '@/store/app';
-import type { NameResult } from '@/types/api';
-import { ArrowUpDown, Star } from 'lucide-react';
+import type { NameResult, ScoreField, ScoreOrder } from '@/types/api';
+import { ArrowDown, ArrowUp, ArrowUpDown, Star } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
 interface CandidateTableProps {
   results: NameResult[];
+  scoreOrder: ScoreOrder;
+  onScoreSort: (field: ScoreField) => void;
+  sorting: boolean;
 }
 
 type SortKey = 'score' | 'name' | 'san_cai';
 
-export function CandidateTable({ results }: CandidateTableProps) {
+const SCORE_COLUMNS: { field: ScoreField; label: string }[] = [
+  { field: 'total', label: '综合分' },
+  { field: 'traditional', label: '传统数理分' },
+  { field: 'sound_and_meaning', label: '音义分' },
+];
+
+export function CandidateTable({ results, scoreOrder, onScoreSort, sorting }: CandidateTableProps) {
+  const hasRanking = Boolean(results[0]?.ranking);
   const [sortKey, setSortKey] = useState<SortKey>('score');
   const [sortDesc, setSortDesc] = useState(true);
   const setSelectedName = useAppStore((s) => s.setSelectedName);
   const setDetailModalOpen = useAppStore((s) => s.setDetailModalOpen);
 
   const sorted = useMemo(() => {
+    if (hasRanking) return results;
     return [...results].sort((a, b) => {
       let cmp = 0;
       switch (sortKey) {
@@ -34,7 +45,7 @@ export function CandidateTable({ results }: CandidateTableProps) {
       }
       return sortDesc ? -cmp : cmp;
     });
-  }, [results, sortKey, sortDesc]);
+  }, [results, sortKey, sortDesc, hasRanking]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -54,26 +65,39 @@ export function CandidateTable({ results }: CandidateTableProps) {
           <thead>
             <tr className="border-b border-white/10">
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">
-                <button
+                {hasRanking ? '名字' : <button
                   onClick={() => handleSort('name')}
                   className="flex items-center gap-1 hover:text-foreground transition-colors"
                 >
                   名字
                   <ArrowUpDown className="h-3 w-3" />
-                </button>
+                </button>}
               </th>
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">拼音</th>
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">笔画</th>
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">五行</th>
-              <th className="px-4 py-3 text-left text-muted-foreground font-medium">
-                <button
-                  onClick={() => handleSort('score')}
-                  className="flex items-center gap-1 hover:text-foreground transition-colors"
-                >
-                  评分
-                  <ArrowUpDown className="h-3 w-3" />
-                </button>
-              </th>
+              {hasRanking ? SCORE_COLUMNS.map(({ field, label }) => {
+                const active = scoreOrder.field === field;
+                const descending = scoreOrder.direction === 'desc';
+                const Icon = active ? (descending ? ArrowDown : ArrowUp) : ArrowUpDown;
+                return (
+                  <th key={field} scope="col" aria-sort={active ? (descending ? 'descending' : 'ascending') : undefined}
+                    className="whitespace-nowrap px-4 py-3 text-left text-muted-foreground font-medium">
+                    <button type="button" disabled={sorting} onClick={() => onScoreSort(field)}
+                      className="flex items-center gap-1 hover:text-foreground transition-colors">
+                      {label}
+                      <Icon aria-hidden="true" className="h-3 w-3" />
+                    </button>
+                  </th>
+                );
+              }) : (
+                <th className="px-4 py-3 text-left text-muted-foreground font-medium">
+                  <button onClick={() => handleSort('score')} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                    评分
+                    <ArrowUpDown className="h-3 w-3" />
+                  </button>
+                </th>
+              )}
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">等级</th>
               <th className="px-4 py-3 text-left text-muted-foreground font-medium">三才</th>
               <th scope="col" className="whitespace-nowrap px-4 py-3 text-center font-medium text-muted-foreground">五格吉凶</th>
@@ -114,9 +138,13 @@ export function CandidateTable({ results }: CandidateTableProps) {
                     <Star
                       className={`h-3 w-3 ${result.score >= 90 ? 'text-amber-400' : result.score >= 75 ? 'text-blue-400' : 'text-muted-foreground'}`}
                     />
-                    <span className="font-mono font-medium">{result.score.toFixed(0)}</span>
+                    <span className="font-mono font-medium">{result.score.toFixed(hasRanking ? 1 : 0)}</span>
                   </div>
                 </td>
+                {hasRanking && <>
+                  <td className="px-4 py-3 font-mono tabular-nums">{result.ranking?.traditional.toFixed(1)}</td>
+                  <td className="px-4 py-3 font-mono tabular-nums">{result.ranking?.sound_and_meaning.toFixed(1)}</td>
+                </>}
                 <td className="px-4 py-3">
                   <span className="font-mono text-xs">{result.grade}</span>
                 </td>

@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { SameNameLookupButton } from '@/components/naming/SameNameLookup';
+import { ScoreWeightControl } from '@/components/naming/ScoreWeightControl';
+import { useScoringPreferences } from '@/store/scoring-preferences';
 import { useAppStore } from '@/store/app';
 import { api } from '@/lib/api';
 import { Sparkles, Settings, Loader2, X, Plus, BookOpen } from 'lucide-react';
@@ -36,6 +38,9 @@ export function HomePage() {
   const [avoidInput, setAvoidInput] = useState('');
   const [requireInput, setRequireInput] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [weighted, setWeighted] = useState(false);
+  const traditionalWeight = useScoringPreferences((state) => state.traditionalWeight);
+  const setTraditionalWeight = useScoringPreferences((state) => state.setTraditionalWeight);
 
   const handleGenerate = useCallback(async () => {
     if (!surname.trim() || !born.trim()) {
@@ -54,6 +59,7 @@ export function HomePage() {
         born: bornFinal,
         sex,
         poetry_mode: poetryMode,
+        traditional_weight: weighted ? traditionalWeight : undefined,
         avoid_chars: avoidChars.length > 0 ? avoidChars : undefined,
         require_chars: requireChars.length > 0 ? requireChars : undefined,
       });
@@ -63,7 +69,7 @@ export function HomePage() {
       setError(err instanceof Error ? err.message : '生成失败');
       setIsGenerating(false);
     }
-  }, [surname, born, sex, poetryMode, avoidChars, requireChars, navigate, setTaskId, setIsGenerating, setTopNames, setTop10, setTotal]);
+  }, [surname, born, sex, poetryMode, weighted, traditionalWeight, avoidChars, requireChars, navigate, setTaskId, setIsGenerating, setTopNames, setTop10, setTotal]);
 
   const handleAddAvoid = useCallback(() => {
     const chars = avoidInput.trim().split('').filter((c) => c.trim() && !avoidChars.includes(c));
@@ -148,6 +154,14 @@ export function HomePage() {
             <p className="text-xs text-muted-foreground">
               诗词优先模式下，名字中的字均出自唐诗宋词诗经，更具文化底蕴
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <input type="checkbox" checked={weighted} onChange={(event) => setWeighted(event.currentTarget.checked)} />
+              自定义音义与传统数理配比
+            </label>
+            {weighted && <ScoreWeightControl traditionalWeight={traditionalWeight} onApply={setTraditionalWeight} />}
           </div>
 
           {error && (

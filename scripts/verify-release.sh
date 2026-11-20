@@ -32,9 +32,11 @@ step() {
   local log="$OUT/$name.log"
   printf '== %s == ' "$name"
   if "$@" > "$log" 2>&1; then
+    printf '0\n' > "$OUT/$name.status"
     echo PASS
     ROWS+=("| $name | PASS | [$name.log]($name.log) |")
   else
+    printf '%s\n' "$?" > "$OUT/$name.status"
     echo FAIL
     ROWS+=("| $name | FAIL | [$name.log]($name.log) |")
     RESULT=1
@@ -81,7 +83,7 @@ check_http() {
   local bodyfile="$OUT/http-$name.body" jsonfile="$OUT/http-$name.json"
   local code
   if [ "$method" = POST ]; then
-    code=$(curl -sS -X POST -H 'Content-Type: application/json' -d "$body" \
+    code=$(printf '%s' "$body" | curl -sS -X POST -H 'Content-Type: application/json' --data-binary @- \
       -o "$bodyfile" -w '%{http_code}' "$BASE$url")
   else
     code=$(curl -sS -X GET -o "$bodyfile" -w '%{http_code}' "$BASE$url")
@@ -117,6 +119,14 @@ fi
 check_http status      GET "/api/v1/status?task_id=$TASK_ID"
 check_http result      GET "/api/v1/result?task_id=$TASK_ID"
 check_http names       GET "/api/v1/names?task_id=$TASK_ID&page=1&size=20"
+check_http names-page-2 GET "/api/v1/names?task_id=$TASK_ID&page=2&size=20"
+check_http names-out-of-range GET "/api/v1/names?task_id=$TASK_ID&page=9223372036854775807&size=20"
+DETAIL_QUERY="$(python -c '
+import json, sys, urllib.parse
+name = json.load(sys.stdin)["names"][0]
+print(urllib.parse.urlencode({"task_id": sys.argv[1], "char1": name["char1"]["char"], "char2": name["char2"]["char"]}))
+' "$TASK_ID" < "$OUT/http-names-page-2.body" 2>/dev/null || true)"
+check_http name-detail GET "/api/v1/name_detail?$DETAIL_QUERY"
 check_http explore     GET "/api/v1/explore?task_id=$TASK_ID&count=6"
 check_http characters  GET "/api/v1/characters?char=%E5%BC%A0"
 check_http spa-fallback GET "/api/v1/name-score" "" 200
@@ -126,6 +136,102 @@ check_explore_array() {
   python -c 'import json,sys; b=json.load(sys.stdin); assert isinstance(b.get("names"),list), b; print("names is a JSON array, length",len(b["names"]))' < "$OUT/http-explore.body"
 }
 step explore-array check_explore_array
+
+check_candidate_pages() {
+  python - "$OUT" <<'PYTHON'
+import json
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1])
+def body(name):
+    return json.loads((root / f"http-{name}.body").read_text(encoding="utf-8"))
+
+first, second = body("names"), body("names-page-2")
+total = body("generate")["total"]
+print(f"Expected total > 20 and matching page totals. Actual generate={total}, page 1={first['total']}, page 2={second['total']}")
+assert total > 20 and first["total"] == second["total"] == total
+for p, offset in [(first, 0), (second, 20)]:
+    wanted = list(range(offset + 1, min(offset + 20, total) + 1))
+    found = [name["rank"] for name in p["names"]]
+    print(f"Expected ranks {wanted}, actual {found}")
+    assert p["page"] == offset // 20 + 1 and p["size"] == 20 and found == wanted
+    assert all(name["surname"] == "张" for name in p["names"])
+names = {name["full_name"] for name in first["names"] + second["names"]}
+print(f"Expected distinct names: {len(first['names']) + len(second['names'])}, actual: {len(names)}")
+assert len(names) == len(first["names"]) + len(second["names"])
+assert body("names-out-of-range") == first
+assert body("result")["top_names"] == first["names"][:10]
+detail = body("name-detail")["name_result"]
+print(f"Expected detail rank 21 and five-grid data. Actual rank: {detail['rank']}, five-grid data: {bool(detail['wu_ge'])}")
+assert detail == second["names"][0] and detail["wu_ge"]
+PYTHON
+}
+step candidate-pages check_candidate_pages
+
+check_http weight-invalid POST "/api/v1/generate" '{"traditional_weight":101}' 400
+check_http weight-zero POST "/api/v1/generate" "{\"task_id\":\"$TASK_ID\",\"traditional_weight\":0}"
+WEIGHTED_ID="$(python -c 'import json,sys; print(json.load(sys.stdin)["task_id"])' < "$OUT/http-weight-zero.body" 2>/dev/null || true)"
+check_http weighted-result GET "/api/v1/result?task_id=$WEIGHTED_ID"
+check_http weighted-names GET "/api/v1/names?task_id=$WEIGHTED_ID&page=1&size=20"
+check_http weighted-page-2 GET "/api/v1/names?task_id=$WEIGHTED_ID&page=2&size=20"
+WEIGHTED_DETAIL="$(python -c '
+import json, sys, urllib.parse
+name = json.load(sys.stdin)["names"][0]
+print(urllib.parse.urlencode({"task_id": sys.argv[1], "char1": name["char1"]["char"], "char2": name["char2"]["char"]}))
+' "$WEIGHTED_ID" < "$OUT/http-weighted-page-2.body" 2>/dev/null || true)"
+check_http weighted-detail GET "/api/v1/name_detail?$WEIGHTED_DETAIL"
+check_http weight-hundred POST "/api/v1/generate" "{\"task_id\":\"$WEIGHTED_ID\",\"traditional_weight\":100}"
+TRADITIONAL_ID="$(python -c 'import json,sys; print(json.load(sys.stdin)["task_id"])' < "$OUT/http-weight-hundred.body" 2>/dev/null || true)"
+check_http weighted-traditional GET "/api/v1/names?task_id=$TRADITIONAL_ID&page=1&size=20"
+check_http sort-traditional GET "/api/v1/names?task_id=$WEIGHTED_ID&sort=traditional&direction=asc"
+check_http sort-traditional-page-2 GET "/api/v1/names?task_id=$WEIGHTED_ID&sort=traditional&direction=asc&page=2"
+check_http sort-traditional-desc GET "/api/v1/names?task_id=$WEIGHTED_ID&sort=traditional&direction=desc"
+check_http sort-sound GET "/api/v1/names?task_id=$TRADITIONAL_ID&sort=sound_and_meaning&direction=desc"
+check_http sort-sound-page-2 GET "/api/v1/names?task_id=$TRADITIONAL_ID&sort=sound_and_meaning&direction=desc&page=2"
+check_http sort-invalid-direction GET "/api/v1/names?task_id=$WEIGHTED_ID&direction=wrong" "" 400
+check_http sort-legacy-component GET "/api/v1/names?task_id=$TASK_ID&sort=traditional" "" 400
+
+check_score_weights() {
+  python - "$OUT" <<'PYTHON'
+import json
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1])
+def body(name):
+    return json.loads((root / f"http-{name}.body").read_text(encoding="utf-8"))
+
+legacy = body("names")["names"]
+assert legacy and all("ranking" not in name for name in legacy)
+first = body("weighted-names")["names"]
+second = body("weighted-page-2")["names"]
+assert len(first) == len(second) == 20
+weighted = first + second
+assert [name["rank"] for name in weighted] == list(range(1, 41))
+assert [name["score"] for name in weighted] == sorted((name["score"] for name in weighted), reverse=True)
+assert body("weighted-result")["top_names"] == first[:10]
+assert body("weighted-detail")["name_result"] == second[0]
+for expected, key, names in [(0, "sound_and_meaning", weighted), (100, "traditional", body("weighted-traditional")["names"])]:
+    for name in names:
+        ranking = name["ranking"]
+        assert name["surname"] == "张"
+        assert ranking["traditional_weight"] == expected and name["score"] == ranking["total"] == ranking[key]
+    print(f"Expected traditional weight {expected} and total equal to {key}. Actual first ranking: {names[0]['ranking']}")
+assert body("weight-zero")["task_id"] != body("generate")["task_id"]
+assert body("weight-hundred")["task_id"] != body("weight-zero")["task_id"]
+for label, key, reverse in [("sort-traditional", "traditional", False), ("sort-sound", "sound_and_meaning", True)]:
+    left, right = body(label), body(label + "-page-2")
+    assert left["page"] == 1 and right["page"] == 2 and left["total"] == right["total"]
+    names = left["names"] + right["names"]
+    values = [name["ranking"][key] for name in names]
+    assert len(names) == len({name["full_name"] for name in names}) == 40
+    assert values == sorted(values, reverse=reverse)
+    print(f"Expected 40 distinct candidates across two pages ordered by {key}. Actual first/last scores: {values[0]}, {values[-1]}")
+assert body("sort-traditional")["names"][0]["ranking"]["traditional"] < body("sort-traditional-desc")["names"][0]["ranking"]["traditional"]
+PYTHON
+}
+step score-weights check_score_weights
 
 # The two unimplemented features must be gone from the frontend, and the old
 # URL must be served by the SPA fallback (HTML), never by an API handler.

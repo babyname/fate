@@ -6,6 +6,7 @@ import type {
   ExploreResponse,
   NameDetailResponse,
   NamesResponse,
+  ScoreOrder,
 } from '@/types/api';
 
 const BASE = '/api/v1';
@@ -34,6 +35,14 @@ export const api = {
     });
   },
 
+  reweight(taskId: string, traditionalWeight: number, signal: AbortSignal): Promise<GenerateResponse> {
+    return request('/generate', {
+      method: 'POST',
+      body: JSON.stringify({ task_id: taskId, traditional_weight: traditionalWeight }),
+      signal,
+    });
+  },
+
   getTaskStatus(taskId: string): Promise<TaskStatusResponse> {
     return request(`/status?task_id=${taskId}`);
   },
@@ -42,12 +51,16 @@ export const api = {
     return request(`/result?task_id=${taskId}`);
   },
 
-  getNames(taskId: string, page: number = 1, size: number = 20): Promise<NamesResponse> {
+  getNames(taskId: string, page: number = 1, size: number = 20, order?: ScoreOrder, signal?: AbortSignal): Promise<NamesResponse> {
     const params = new URLSearchParams();
     params.set('task_id', taskId);
     params.set('page', String(page));
     params.set('size', String(size));
-    return request(`/names?${params.toString()}`);
+    if (order) {
+      params.set('sort', order.field);
+      params.set('direction', order.direction);
+    }
+    return request(`/names?${params.toString()}`, { signal });
   },
 
   explore(taskId: string, count?: number, hasPoetry?: boolean, wuxing?: string): Promise<ExploreResponse> {

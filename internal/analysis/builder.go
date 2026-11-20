@@ -1,12 +1,12 @@
-﻿// Package analysis provides name analysis and report generation.
+// Package analysis provides name analysis and report generation.
 package analysis
 
 import (
 	"fmt"
 	"sort"
 
-	"github.com/babyname/fate/v4/internal/chronosfate"
 	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/internal/chronosfate"
 	"github.com/babyname/fate/v4/internal/rating"
 	"github.com/babyname/fate/v4/internal/wuge"
 	"github.com/babyname/fate/v4/internal/wuxing"
@@ -16,6 +16,12 @@ import (
 // It calculates wuge (five strokes), sancai (three talents), luck analysis, zhouyi hexagram,
 // and the overall name rating score.
 func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int, fateData *chronosfate.FateData) NameResult {
+	rater := rating.NewRaterWithStrokes(fateData, l1, l2)
+	return BuildNameResultWithRater(rank, surname, c1, c2, l1, l2, fateData, rater)
+}
+
+// BuildNameResultWithRater uses the same rating settings as the candidate generator.
+func BuildNameResultWithRater(rank int, surname string, c1, c2 *ent.Character, l1, l2 int, fateData *chronosfate.FateData, rater *rating.Rater) NameResult {
 	f1 := c1.ScienceStroke
 	f2 := c2.ScienceStroke
 
@@ -72,9 +78,7 @@ func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int
 		}
 	}
 
-	var nr *rating.NameRating
-	rater := rating.NewRaterWithStrokes(fateData, l1, l2)
-	nr = rater.RateName(surname, c1, c2)
+	nr := rater.RateName(surname, c1, c2)
 
 	strokeStr := fmt.Sprintf("%d,%d,%d", l1, f1, f2)
 	if l2 > 0 {
@@ -88,6 +92,7 @@ func BuildNameResult(rank int, surname string, c1, c2 *ent.Character, l1, l2 int
 	scoreDetail := calcScoreDetail(nr)
 
 	return NameResult{
+		Ranking:   nr.Ranking,
 		Rank:      rank,
 		FullName:  surname + c1.Char + c2.Char,
 		Surname:   surname,

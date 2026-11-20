@@ -79,6 +79,7 @@ func runScoring(
 					WuXing1:   c1.WuXing,
 					WuXing2:   c2.WuXing,
 					HasPoetry: hasPoetry,
+					ranking:   nr.Ranking,
 				})
 			}
 		}
@@ -225,6 +226,7 @@ func scoreChunk(
 					WuXing1:   c1.WuXing,
 					WuXing2:   c2.WuXing,
 					HasPoetry: hasPoetry,
+					ranking:   nr.Ranking,
 				})
 			}
 		}

@@ -13,6 +13,7 @@ import (
 	"github.com/babyname/fate/v4"
 	"github.com/babyname/fate/v4/ent"
 	"github.com/babyname/fate/v4/internal/repository"
+	"github.com/babyname/fate/v4/ranking"
 )
 
 type Handler struct {
@@ -49,14 +50,16 @@ type taskStore struct {
 }
 
 type generateRequest struct {
-	Surname       string `json:"surname"`
-	Born          string `json:"born"`
-	Sex           string `json:"sex"`
-	PoetryMode    int    `json:"poetry_mode"`
-	XiYongMethod  string `json:"xi_yong_method"`
-	AvoidChars    string `json:"avoid_chars"`
-	RequireChars  string `json:"require_chars"`
-	FilterType    int    `json:"filter_type"`
+	TaskID            string `json:"task_id,omitempty"`
+	TraditionalWeight *int   `json:"traditional_weight,omitempty"`
+	Surname           string `json:"surname"`
+	Born              string `json:"born"`
+	Sex               string `json:"sex"`
+	PoetryMode        int    `json:"poetry_mode"`
+	XiYongMethod      string `json:"xi_yong_method"`
+	AvoidChars        string `json:"avoid_chars"`
+	RequireChars      string `json:"require_chars"`
+	FilterType        int    `json:"filter_type"`
 }
 
 // NewHandler creates an initialized Handler with all routes registered.
@@ -131,6 +134,29 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 		writeError(w, 400, "invalid request body")
 		return
 	}
+	if req.TaskID != "" {
+		if req.TraditionalWeight == nil {
+			writeError(w, 400, "traditional_weight is required when updating a task")
+			return
+		}
+		entry, ok := h.store.Get(req.TaskID)
+		if !ok {
+			writeError(w, 404, "task not found")
+			return
+		}
+		weight := req.TraditionalWeight
+		req = entry.request
+		req.TraditionalWeight = weight
+	}
+	var recommendationWeight *ranking.Weight
+	if req.TraditionalWeight != nil {
+		weight, err := ranking.NewWeight(*req.TraditionalWeight)
+		if err != nil {
+			writeError(w, 400, err.Error())
+			return
+		}
+		recommendationWeight = &weight
+	}
 	if req.Surname == "" {
 		writeError(w, 400, "surname is required")
 		return
@@ -159,9 +185,10 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 
 	// Generate synchronously.
 	result, err := h.fate.Generate(r.Context(), fate.GenerateRequest{
-		LastName: req.Surname,
-		Born:     born,
-		Sex:      sex,
+		LastName:             req.Surname,
+		Born:                 born,
+		Sex:                  sex,
+		RecommendationWeight: recommendationWeight,
 		Filter: &fate.FilterOption{
 			CharacterFilter:     true,
 			RegularFilter:       true,
@@ -175,6 +202,9 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		writeError(w, 500, "failed to generate: "+err.Error())
+		return
+	}
+	if r.Context().Err() != nil {
 		return
 	}
 
@@ -332,8 +362,6 @@ func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	topNames := result.TopNames
-
 	page := 1
 	if p := r.URL.Query().Get("page"); p != "" {
 		fmt.Sscanf(p, "%d", &page)
@@ -350,18 +378,30 @@ func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	total := len(topNames)
-	start := (page - 1) * pageSize
-	if start >= total {
-		start = 0
+	total := result.CandidateCount()
+	if total == 0 || page > (total-1)/pageSize+1 {
 		page = 1
 	}
-	end := start + pageSize
-	if end > total {
-		end = total
+	field := ranking.Field(r.URL.Query().Get("sort"))
+	switch field {
+	case "":
+		field = ranking.TotalScore
+	case ranking.TotalScore:
+	case ranking.TraditionalScore, ranking.SoundMeaningScore:
+		if entry.request.TraditionalWeight == nil {
+			writeError(w, 400, "component sorting requires a weighted naming task")
+			return
+		}
+	default:
+		writeError(w, 400, "invalid candidate sort field")
+		return
 	}
-
-	pagedNames := topNames[start:end]
+	direction := r.URL.Query().Get("direction")
+	if direction != "" && direction != "asc" && direction != "desc" {
+		writeError(w, 400, "candidate sort direction must be asc or desc")
+		return
+	}
+	pagedNames := result.CandidatesSorted((page-1)*pageSize, pageSize, field, direction != "asc")
 
 	writeJSON(w, 200, map[string]any{
 		"task_id": taskID,
@@ -387,12 +427,9 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			result := entry.loadResult()
 			if result != nil {
-				// Search top names for a match.
-				for i := range result.TopNames {
-					if result.TopNames[i].Char1.Char == char1 && result.TopNames[i].Char2.Char == char2 {
-						writeJSON(w, 200, map[string]any{"name_result": result.TopNames[i]})
-						return
-					}
+				if name, found := result.Candidate(char1, char2); found {
+					writeJSON(w, 200, map[string]any{"name_result": name})
+					return
 				}
 
 				// Return partial info from CharMap.
