@@ -83,7 +83,7 @@ check_http() {
   local bodyfile="$OUT/http-$name.body" jsonfile="$OUT/http-$name.json"
   local code
   if [ "$method" = POST ]; then
-    code=$(curl -sS -X POST -H 'Content-Type: application/json' -d "$body" \
+    code=$(printf '%s' "$body" | curl -sS -X POST -H 'Content-Type: application/json' --data-binary @- \
       -o "$bodyfile" -w '%{http_code}' "$BASE$url")
   else
     code=$(curl -sS -X GET -o "$bodyfile" -w '%{http_code}' "$BASE$url")
@@ -156,6 +156,7 @@ for p, offset in [(first, 0), (second, 20)]:
     found = [name["rank"] for name in p["names"]]
     print(f"Expected ranks {wanted}, actual {found}")
     assert p["page"] == offset // 20 + 1 and p["size"] == 20 and found == wanted
+    assert all(name["surname"] == "张" for name in p["names"])
 names = {name["full_name"] for name in first["names"] + second["names"]}
 print(f"Expected distinct names: {len(first['names']) + len(second['names'])}, actual: {len(names)}")
 assert len(names) == len(first["names"]) + len(second["names"])
