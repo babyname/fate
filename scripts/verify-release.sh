@@ -169,6 +169,54 @@ PYTHON
 }
 step candidate-pages check_candidate_pages
 
+check_http weight-invalid POST "/api/v1/generate" '{"traditional_weight":101}' 400
+check_http weight-zero POST "/api/v1/generate" "{\"task_id\":\"$TASK_ID\",\"traditional_weight\":0}"
+WEIGHTED_ID="$(python -c 'import json,sys; print(json.load(sys.stdin)["task_id"])' < "$OUT/http-weight-zero.body" 2>/dev/null || true)"
+check_http weighted-result GET "/api/v1/result?task_id=$WEIGHTED_ID"
+check_http weighted-names GET "/api/v1/names?task_id=$WEIGHTED_ID&page=1&size=20"
+check_http weighted-page-2 GET "/api/v1/names?task_id=$WEIGHTED_ID&page=2&size=20"
+WEIGHTED_DETAIL="$(python -c '
+import json, sys, urllib.parse
+name = json.load(sys.stdin)["names"][0]
+print(urllib.parse.urlencode({"task_id": sys.argv[1], "char1": name["char1"]["char"], "char2": name["char2"]["char"]}))
+' "$WEIGHTED_ID" < "$OUT/http-weighted-page-2.body" 2>/dev/null || true)"
+check_http weighted-detail GET "/api/v1/name_detail?$WEIGHTED_DETAIL"
+check_http weight-hundred POST "/api/v1/generate" "{\"task_id\":\"$WEIGHTED_ID\",\"traditional_weight\":100}"
+TRADITIONAL_ID="$(python -c 'import json,sys; print(json.load(sys.stdin)["task_id"])' < "$OUT/http-weight-hundred.body" 2>/dev/null || true)"
+check_http weighted-traditional GET "/api/v1/names?task_id=$TRADITIONAL_ID&page=1&size=20"
+
+check_score_weights() {
+  python - "$OUT" <<'PYTHON'
+import json
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1])
+def body(name):
+    return json.loads((root / f"http-{name}.body").read_text(encoding="utf-8"))
+
+legacy = body("names")["names"]
+assert legacy and all("ranking" not in name for name in legacy)
+first = body("weighted-names")["names"]
+second = body("weighted-page-2")["names"]
+assert len(first) == len(second) == 20
+weighted = first + second
+assert [name["rank"] for name in weighted] == list(range(1, 41))
+assert [name["score"] for name in weighted] == sorted((name["score"] for name in weighted), reverse=True)
+assert body("weighted-result")["top_names"] == first[:10]
+assert body("weighted-detail")["name_result"] == second[0]
+for expected, key, names in [(0, "sound_and_meaning", weighted), (100, "traditional", body("weighted-traditional")["names"])]:
+    for name in names:
+        ranking = name["ranking"]
+        assert name["surname"] == "张"
+        assert ranking["traditional_weight"] == expected and name["score"] == ranking["total"] == ranking[key]
+    print(f"Expected traditional weight {expected} and total equal to {key}. Actual first ranking: {names[0]['ranking']}")
+assert body("weight-zero")["task_id"] != body("generate")["task_id"]
+assert body("weight-hundred")["task_id"] != body("weight-zero")["task_id"]
+PYTHON
+}
+step score-weights check_score_weights
+
 # The two unimplemented features must be gone from the frontend, and the old
 # URL must be served by the SPA fallback (HTML), never by an API handler.
 check_removed_ui() {

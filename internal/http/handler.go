@@ -13,6 +13,7 @@ import (
 	"github.com/babyname/fate/v4"
 	"github.com/babyname/fate/v4/ent"
 	"github.com/babyname/fate/v4/internal/repository"
+	"github.com/babyname/fate/v4/ranking"
 )
 
 type Handler struct {
@@ -49,14 +50,16 @@ type taskStore struct {
 }
 
 type generateRequest struct {
-	Surname      string `json:"surname"`
-	Born         string `json:"born"`
-	Sex          string `json:"sex"`
-	PoetryMode   int    `json:"poetry_mode"`
-	XiYongMethod string `json:"xi_yong_method"`
-	AvoidChars   string `json:"avoid_chars"`
-	RequireChars string `json:"require_chars"`
-	FilterType   int    `json:"filter_type"`
+	TaskID            string `json:"task_id,omitempty"`
+	TraditionalWeight *int   `json:"traditional_weight,omitempty"`
+	Surname           string `json:"surname"`
+	Born              string `json:"born"`
+	Sex               string `json:"sex"`
+	PoetryMode        int    `json:"poetry_mode"`
+	XiYongMethod      string `json:"xi_yong_method"`
+	AvoidChars        string `json:"avoid_chars"`
+	RequireChars      string `json:"require_chars"`
+	FilterType        int    `json:"filter_type"`
 }
 
 // NewHandler creates an initialized Handler with all routes registered.
@@ -131,6 +134,29 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 		writeError(w, 400, "invalid request body")
 		return
 	}
+	if req.TaskID != "" {
+		if req.TraditionalWeight == nil {
+			writeError(w, 400, "traditional_weight is required when updating a task")
+			return
+		}
+		entry, ok := h.store.Get(req.TaskID)
+		if !ok {
+			writeError(w, 404, "task not found")
+			return
+		}
+		weight := req.TraditionalWeight
+		req = entry.request
+		req.TraditionalWeight = weight
+	}
+	var recommendationWeight *ranking.Weight
+	if req.TraditionalWeight != nil {
+		weight, err := ranking.NewWeight(*req.TraditionalWeight)
+		if err != nil {
+			writeError(w, 400, err.Error())
+			return
+		}
+		recommendationWeight = &weight
+	}
 	if req.Surname == "" {
 		writeError(w, 400, "surname is required")
 		return
@@ -159,9 +185,10 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 
 	// Generate synchronously.
 	result, err := h.fate.Generate(r.Context(), fate.GenerateRequest{
-		LastName: req.Surname,
-		Born:     born,
-		Sex:      sex,
+		LastName:             req.Surname,
+		Born:                 born,
+		Sex:                  sex,
+		RecommendationWeight: recommendationWeight,
 		Filter: &fate.FilterOption{
 			CharacterFilter:     true,
 			RegularFilter:       true,
@@ -175,6 +202,9 @@ func (h *Handler) handleGenerate(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		writeError(w, 500, "failed to generate: "+err.Error())
+		return
+	}
+	if r.Context().Err() != nil {
 		return
 	}
 

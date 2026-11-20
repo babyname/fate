@@ -34,6 +34,14 @@ export const api = {
     });
   },
 
+  reweight(taskId: string, traditionalWeight: number, signal: AbortSignal): Promise<GenerateResponse> {
+    return request('/generate', {
+      method: 'POST',
+      body: JSON.stringify({ task_id: taskId, traditional_weight: traditionalWeight }),
+      signal,
+    });
+  },
+
   getTaskStatus(taskId: string): Promise<TaskStatusResponse> {
     return request(`/status?task_id=${taskId}`);
   },

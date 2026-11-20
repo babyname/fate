@@ -8,7 +8,9 @@ import { NameCard } from '@/components/naming/NameCard';
 import { ExploreSection } from '@/components/naming/ExploreSection';
 import { CandidateTable } from '@/components/naming/CandidateTable';
 import { SameNameLookupButton } from '@/components/naming/SameNameLookup';
+import { ScoreWeightControl } from '@/components/naming/ScoreWeightControl';
 import { useAppStore } from '@/store/app';
+import { useScoringPreferences } from '@/store/scoring-preferences';
 import { api } from '@/lib/api';
 import { ArrowLeft, Grid3X3, List, Search } from 'lucide-react';
 
@@ -26,11 +28,46 @@ export function ResultsPage() {
   const [loadingPagination, setLoadingPagination] = useState(false);
   const [polling, setPolling] = useState(true);
   const [pollError, setPollError] = useState('');
+  const [reweighting, setReweighting] = useState(false);
+  const [weightError, setWeightError] = useState('');
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const weightRequest = useRef<AbortController | null>(null);
 
   const setStoreTopNames = useAppStore((s) => s.setTopNames);
   const setStoreTotal = useAppStore((s) => s.setTotal);
   const setIsGenerating = useAppStore((s) => s.setIsGenerating);
+  const saveWeight = useScoringPreferences((s) => s.setTraditionalWeight);
+
+  useEffect(() => {
+    setReweighting(false);
+    setWeightError('');
+    return () => {
+      weightRequest.current?.abort();
+      weightRequest.current = null;
+    };
+  }, [taskId]);
+
+  const applyWeight = async (weight: number) => {
+    if (!taskId || weightRequest.current) return;
+    const controller = new AbortController();
+    weightRequest.current = controller;
+    setReweighting(true);
+    setWeightError('');
+    try {
+      const result = await api.reweight(taskId, weight, controller.signal);
+      if (controller.signal.aborted) return;
+      saveWeight(weight);
+      setPolling(true);
+      navigate(`/results/${result.task_id}`);
+    } catch (error) {
+      if (!controller.signal.aborted) setWeightError(error instanceof Error ? error.message : '重新评分失败。');
+    } finally {
+      if (weightRequest.current === controller) {
+        weightRequest.current = null;
+        setReweighting(false);
+      }
+    }
+  };
 
   const loadPage = useCallback(async (page: number) => {
     if (!taskId) return;
@@ -124,6 +161,7 @@ export function ResultsPage() {
   const top3 = featuredNames.slice(0, 3);
   const moreNames = featuredNames.slice(3);
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const ranking = featuredNames[0]?.ranking;
 
   return (
     <div className="space-y-8">
@@ -176,8 +214,11 @@ export function ResultsPage() {
           <div className="h-px bg-gradient-to-r from-outline-variant to-transparent" />
 
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-serif text-base font-semibold text-foreground">候选名册</h3>
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-3">
+                <h3 className="font-serif text-base font-semibold text-foreground">候选名册</h3>
+                {ranking && <ScoreWeightControl traditionalWeight={ranking.traditional_weight} busy={reweighting} onApply={applyWeight} />}
+              </div>
               <div className="flex items-center gap-2 border rounded-md p-1 bg-card">
                 <Button
                   variant={viewMode === 'table' ? 'default' : 'ghost'}
@@ -199,6 +240,7 @@ export function ResultsPage() {
                 </Button>
               </div>
             </div>
+            {weightError && <p role="alert" className="mb-3 text-sm text-destructive">{weightError}</p>}
             {viewMode === 'table' ? (
               <CandidateTable results={pagedNames} />
             ) : (

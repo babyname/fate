@@ -229,6 +229,10 @@ curl "http://localhost:18080/api/v1/explore?task_id=<task_id>&count=6"
 
 > 契约要点：`avoid_chars` / `require_chars` 是**逗号分隔字符串**（不是 JSON 数组）；`born` 格式为 `YYYY/MM/DD HH:MM`；`explore` 的 `names` 恒为 JSON 数组，取尽时返回 `[]` 而非 `null`；`generate` 是同步的，`state` 直接为 `done`。
 
+生成请求可传整数 `traditional_weight`（0–100）以启用自定义配比。传统数理合并五格、五行八字和生肖，音义合并文化印象和音韵。未传权重时使用原有的五维评分。已生成任务可向同一接口传 `{"task_id":"<task_id>","traditional_weight":70}`，复用原始筛选条件并生成一份新结果。
+
+在自定义配比模式中，`result`、`names` 和 `name_detail` 的姓名分析会返回 `ranking`。后端在筛选并保留候选时应用权重，统一返回 `ranking.total` 和全局 `rank`。Go 调用方可通过 `GenerateRequest.RecommendationWeight` 启用同一计算，或使用公开的 `ranking` 包为已有的两个分项计算综合分。
+
 ---
 
 ## 🧩 代码集成
