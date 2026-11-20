@@ -190,7 +190,7 @@ go build -o fate ./cmd/console
 | `POST` | `/api/v1/generate` | 同步生成，返回 `task_id`、`state`、`total` |
 | `GET` | `/api/v1/status` | 查询任务状态（`?task_id=`） |
 | `GET` | `/api/v1/result` | 精选好名：`top_names`、`top3`、`top10`、`total` |
-| `GET` | `/api/v1/names` | 分页候选名册（`?page=`、`?size=`） |
+| `GET` | `/api/v1/names` | 完整候选名册分页（`?page=`、`?size=`），返回全局排名和候选总数 |
 | `GET` | `/api/v1/explore` | 探索更多（`?count=`，可加 `has_poetry=true`、`wuxing=`） |
 | `GET` | `/api/v1/name_detail` | 名字详细分析（`?char1=`、`?char2=`，可带 `task_id`） |
 | `GET` | `/api/v1/characters` | 汉字查询（`?char=`） |
