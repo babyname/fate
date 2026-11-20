@@ -30,6 +30,39 @@ type GenerateResult struct {
 	ExcellentTable ExcellentTable
 	CharMap        map[string]CharInfo
 	FateData       *FateData
+	catalogue      *namesvc.GenerateResult
+}
+
+// CandidateCount returns the number of generated names available for paging.
+func (r *GenerateResult) CandidateCount() int {
+	if r.catalogue == nil {
+		return len(r.TopNames)
+	}
+	return r.catalogue.ExcellentTable.Len()
+}
+
+// Candidates returns up to limit scored candidates starting at the zero-based offset.
+func (r *GenerateResult) Candidates(offset, limit int) []NameResult {
+	if r.catalogue != nil {
+		return r.catalogue.Candidates(offset, limit)
+	}
+	if offset < 0 || offset >= len(r.TopNames) || limit <= 0 {
+		return []NameResult{}
+	}
+	return r.TopNames[offset : offset+min(limit, len(r.TopNames)-offset)]
+}
+
+// Candidate looks up the full scored result for a generated pair of given-name characters.
+func (r *GenerateResult) Candidate(first, second string) (NameResult, bool) {
+	for _, name := range r.TopNames {
+		if name.Char1.Char == first && name.Char2.Char == second {
+			return name, true
+		}
+	}
+	if r.catalogue != nil {
+		return r.catalogue.Candidate(first, second)
+	}
+	return NameResult{}, false
 }
 
 // Generate runs the full name generation pipeline synchronously.
@@ -69,6 +102,7 @@ func (f *fateImpl) Generate(ctx context.Context, req GenerateRequest) (*Generate
 		ExcellentTable: result.ExcellentTable,
 		CharMap:        charMap,
 		FateData:       result.FateData,
+		catalogue:      result,
 	}, nil
 }
 

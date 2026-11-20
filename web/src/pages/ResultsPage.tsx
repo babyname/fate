@@ -21,6 +21,7 @@ export function ResultsPage() {
   const [exploreVisited, setExploreVisited] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pagedNames, setPagedNames] = useState<NameResult[]>([]);
+  const [featuredNames, setFeaturedNames] = useState<NameResult[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loadingPagination, setLoadingPagination] = useState(false);
   const [polling, setPolling] = useState(true);
@@ -38,6 +39,7 @@ export function ResultsPage() {
       const res = await api.getNames(taskId, page, PAGE_SIZE);
       const names = res.names ?? [];
       setPagedNames(names);
+      if (res.page === 1) setFeaturedNames(names.slice(0, 7));
       setTotalCount(res.total);
       setCurrentPage(res.page);
       setStoreTopNames(names);
@@ -119,8 +121,8 @@ export function ResultsPage() {
     );
   }
 
-  const top3 = pagedNames.slice(0, 3);
-  const moreNames = pagedNames.slice(3, 7);
+  const top3 = featuredNames.slice(0, 3);
+  const moreNames = featuredNames.slice(3);
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (

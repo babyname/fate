@@ -49,14 +49,14 @@ type taskStore struct {
 }
 
 type generateRequest struct {
-	Surname       string `json:"surname"`
-	Born          string `json:"born"`
-	Sex           string `json:"sex"`
-	PoetryMode    int    `json:"poetry_mode"`
-	XiYongMethod  string `json:"xi_yong_method"`
-	AvoidChars    string `json:"avoid_chars"`
-	RequireChars  string `json:"require_chars"`
-	FilterType    int    `json:"filter_type"`
+	Surname      string `json:"surname"`
+	Born         string `json:"born"`
+	Sex          string `json:"sex"`
+	PoetryMode   int    `json:"poetry_mode"`
+	XiYongMethod string `json:"xi_yong_method"`
+	AvoidChars   string `json:"avoid_chars"`
+	RequireChars string `json:"require_chars"`
+	FilterType   int    `json:"filter_type"`
 }
 
 // NewHandler creates an initialized Handler with all routes registered.
@@ -332,8 +332,6 @@ func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	topNames := result.TopNames
-
 	page := 1
 	if p := r.URL.Query().Get("page"); p != "" {
 		fmt.Sscanf(p, "%d", &page)
@@ -350,18 +348,11 @@ func (h *Handler) handleNames(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	total := len(topNames)
-	start := (page - 1) * pageSize
-	if start >= total {
-		start = 0
+	total := result.CandidateCount()
+	if total == 0 || page > (total-1)/pageSize+1 {
 		page = 1
 	}
-	end := start + pageSize
-	if end > total {
-		end = total
-	}
-
-	pagedNames := topNames[start:end]
+	pagedNames := result.Candidates((page-1)*pageSize, pageSize)
 
 	writeJSON(w, 200, map[string]any{
 		"task_id": taskID,
@@ -387,12 +378,9 @@ func (h *Handler) handleNameDetail(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			result := entry.loadResult()
 			if result != nil {
-				// Search top names for a match.
-				for i := range result.TopNames {
-					if result.TopNames[i].Char1.Char == char1 && result.TopNames[i].Char2.Char == char2 {
-						writeJSON(w, 200, map[string]any{"name_result": result.TopNames[i]})
-						return
-					}
+				if name, found := result.Candidate(char1, char2); found {
+					writeJSON(w, 200, map[string]any{"name_result": name})
+					return
 				}
 
 				// Return partial info from CharMap.

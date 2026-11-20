@@ -35,6 +35,7 @@ type GenerateResult struct {
 	CharMap         map[string]*ent.Character
 	FateData        *chronosfate.FateData
 	LastNameStrokes [2]int
+	surname         string
 }
 
 // StreamBatch is delivered by GenerateStream as top results become available.
@@ -202,25 +203,49 @@ func (p *Pipeline) runScoringWithFallback(
 
 // buildResults converts the final excellent table into public result types.
 func (p *Pipeline) buildResults(table *ExcellentTable, charMap map[string]*ent.Character, strokes [2]int, fateData *chronosfate.FateData, surname string) *GenerateResult {
-	topEntries := table.TopN(10)
-	topResults := make([]analysis.NameResult, 0, len(topEntries))
-	for i, e := range topEntries {
-		c1 := charMap[e.Char1]
-		c2 := charMap[e.Char2]
-		if c1 == nil || c2 == nil {
-			continue
-		}
-		nr := analysis.BuildNameResult(i+1, surname, c1, c2, strokes[0], strokes[1], fateData)
-		topResults = append(topResults, nr)
-	}
-
-	return &GenerateResult{
-		TopNames:        topResults,
+	result := &GenerateResult{
 		ExcellentTable:  table,
 		CharMap:         charMap,
 		FateData:        fateData,
 		LastNameStrokes: strokes,
+		surname:         surname,
 	}
+	result.TopNames = result.Candidates(0, 10)
+	return result
+}
+
+// Candidates builds full results only for the requested range of the finalized table.
+func (r *GenerateResult) Candidates(offset, limit int) []analysis.NameResult {
+	entries := r.ExcellentTable.AllEntries()
+	if offset < 0 || offset >= len(entries) || limit <= 0 {
+		return []analysis.NameResult{}
+	}
+	count := min(limit, len(entries)-offset)
+	names := make([]analysis.NameResult, 0, count)
+	for i, entry := range entries[offset : offset+count] {
+		if name, ok := r.buildCandidate(entry, offset+i+1); ok {
+			names = append(names, name)
+		}
+	}
+	return names
+}
+
+// Candidate finds a generated pair and builds its full result with its catalogue rank.
+func (r *GenerateResult) Candidate(first, second string) (analysis.NameResult, bool) {
+	for i, entry := range r.ExcellentTable.AllEntries() {
+		if entry.Char1 == first && entry.Char2 == second {
+			return r.buildCandidate(entry, i+1)
+		}
+	}
+	return analysis.NameResult{}, false
+}
+
+func (r *GenerateResult) buildCandidate(entry ExcellentEntry, rank int) (analysis.NameResult, bool) {
+	first, second := r.CharMap[entry.Char1], r.CharMap[entry.Char2]
+	if first == nil || second == nil {
+		return analysis.NameResult{}, false
+	}
+	return analysis.BuildNameResult(rank, r.surname, first, second, r.LastNameStrokes[0], r.LastNameStrokes[1], r.FateData), true
 }
 
 // heapPreview returns a lightweight preview of top N entries from the heap
@@ -233,11 +258,11 @@ func heapPreview(table *ExcellentTable, n int, surname string, strokes [2]int) [
 	results := make([]analysis.NameResult, 0, len(entries))
 	for i, e := range entries {
 		results = append(results, analysis.NameResult{
-			Rank:     i + 1,
-			Surname:  surname,
-			FullName: surname + e.Char1 + e.Char2,
-			Score:    e.Score,
-			Grade:    e.Grade,
+			Rank:      i + 1,
+			Surname:   surname,
+			FullName:  surname + e.Char1 + e.Char2,
+			Score:     e.Score,
+			Grade:     e.Grade,
 			HasPoetry: e.HasPoetry,
 			Char1: analysis.CharInfo{
 				Char:      e.Char1,
