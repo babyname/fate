@@ -2,6 +2,7 @@ package analysis
 
 import (
 	"github.com/babyname/fate/v4/ent"
+	"github.com/babyname/fate/v4/ranking"
 )
 
 type GeItem struct {
@@ -55,28 +56,29 @@ type ScoreDetail struct {
 }
 
 type NameResult struct {
-	Rank         int            `json:"rank"`
-	FullName     string         `json:"full_name"`
-	Surname      string         `json:"surname"`
-	FirstName    string         `json:"first_name"`
-	Strokes      string         `json:"strokes"`
-	Char1        CharInfo       `json:"char1"`
-	Char2        CharInfo       `json:"char2"`
-	WuGe         *WuGeResult    `json:"wu_ge"`
-	SanCai       string         `json:"san_cai"`
-	SanCaiLuck   string         `json:"san_cai_luck"`
-	SanCaiDetail string         `json:"san_cai_detail"`
-	JiChuYun     string         `json:"ji_chu_yun"`
-	ChengGongYun string         `json:"cheng_gong_yun"`
-	RenJiGuanXi  string         `json:"ren_ji_guan_xi"`
-	ZhouYi       *ZhouYiBasic   `json:"zhou_yi"`
-	Bazi         *BaziBasic     `json:"bazi,omitempty"`
-	WuXing       *WuXingSection `json:"wu_xing,omitempty"`
-	Score        float64        `json:"score"`
-	Grade        string         `json:"grade"`
-	ScoreDetail  ScoreDetail    `json:"score_detail"`
-	Interpret    string         `json:"interpret"`
-	HasPoetry    bool           `json:"has_poetry"`
+	Ranking      *ranking.Result `json:"ranking,omitempty"`
+	Rank         int             `json:"rank"`
+	FullName     string          `json:"full_name"`
+	Surname      string          `json:"surname"`
+	FirstName    string          `json:"first_name"`
+	Strokes      string          `json:"strokes"`
+	Char1        CharInfo        `json:"char1"`
+	Char2        CharInfo        `json:"char2"`
+	WuGe         *WuGeResult     `json:"wu_ge"`
+	SanCai       string          `json:"san_cai"`
+	SanCaiLuck   string          `json:"san_cai_luck"`
+	SanCaiDetail string          `json:"san_cai_detail"`
+	JiChuYun     string          `json:"ji_chu_yun"`
+	ChengGongYun string          `json:"cheng_gong_yun"`
+	RenJiGuanXi  string          `json:"ren_ji_guan_xi"`
+	ZhouYi       *ZhouYiBasic    `json:"zhou_yi"`
+	Bazi         *BaziBasic      `json:"bazi,omitempty"`
+	WuXing       *WuXingSection  `json:"wu_xing,omitempty"`
+	Score        float64         `json:"score"`
+	Grade        string          `json:"grade"`
+	ScoreDetail  ScoreDetail     `json:"score_detail"`
+	Interpret    string          `json:"interpret"`
+	HasPoetry    bool            `json:"has_poetry"`
 }
 
 type ZhouYiBasic struct {
