@@ -308,6 +308,11 @@ def has_parent_replace(gomod: str) -> bool:
     return bool(re.search(r"(?m)^\s*replace\s+\S+\s*=>\s*\.\./", gomod))
 
 
+def is_runtime_db_file(path: str) -> bool:
+    """A committed runtime DB is a second source of truth — never tracked."""
+    return bool(re.search(r"\.(db|sqlite3|sqlite)$", path, re.I))
+
+
 def check_architecture() -> None:
     """Structural guard for the CE/EE + data-source separation.
 
@@ -321,6 +326,13 @@ def check_architecture() -> None:
     crawlers = sorted(f for f in t if is_crawler_path(f))
     record("arch: no data-production scripts in CE repo", not crawlers,
            "; ".join(crawlers))
+
+    # Runtime DB is a generated product (cmd/dbinit from embedded contract),
+    # never a committed artifact. A tracked .db/.sqlite3 would reintroduce the
+    # "which copy is the truth?" confusion the datasources split removed.
+    db_files = sorted(f for f in t if is_runtime_db_file(f))
+    record("arch: no runtime database file tracked in CE repo", not db_files,
+           "; ".join(db_files))
 
     gomod = read("go.mod")
     record("arch: no parent-directory replace in go.mod", not has_parent_replace(gomod))
@@ -427,6 +439,8 @@ def self_test() -> int:
         ("parent replace flagged", has_parent_replace,
          "replace github.com/babyname/fate/v4 => ../fate",
          "require github.com/babyname/fate/v4 v4.3.0"),
+        ("runtime db file flagged", is_runtime_db_file,
+         "resources/character.sqlite3", "resources/character.json"),
         ("evidence dir flagged", is_evidence_path,
          "tests\\acceptance\\v4.3.0\\evidence\\x.body", "tests/acceptance/v4.3.0/report.md"),
     ]
