@@ -285,6 +285,61 @@ def check_contracts() -> None:
            f"actual={sorted(actual)} listed={sorted(listed)}")
 
 
+def is_crawler_path(path: str) -> bool:
+    """Data production must not live in the CE engine repo.
+
+    fate only CONSUMES data (//go:embed character.json); scraping scripts and
+    import/processing tools belong to the data source repo. Detect by path,
+    not by content, so a renamed script still fires.
+    """
+    p = path.replace("\\", "/").lower()
+    return (p.startswith("data/download/") or p.startswith("data/seed/")
+            or p.startswith("tools/import") or p.startswith("cmd/import")
+            or bool(re.search(r"(crawler|spider|scraper|抓取|爬虫)", p)))
+
+
+def has_parent_replace(gomod: str) -> bool:
+    """qiming depends on fate through a public interface, not ../fate.
+
+    A replace pointing at a parent/sibling directory couples the two repos
+    and breaks independent clone/build. Only tagged versions are allowed in a
+    committed go.mod.
+    """
+    return bool(re.search(r"(?m)^\s*replace\s+\S+\s*=>\s*\.\./", gomod))
+
+
+def check_architecture() -> None:
+    """Structural guard for the CE/EE + data-source separation.
+
+    Three invariants, all derived from the data-flow direction:
+    data sources produce data; fate consumes it; qiming depends on fate via
+    public interfaces. None of these may be expressed in the CE repo.
+    """
+    # Data production scripts were migrated to the datasources repo (2026-11-23).
+    # fate only consumes data via //go:embed; no crawler/import tool may live here.
+    t = tracked()
+    crawlers = sorted(f for f in t if is_crawler_path(f))
+    record("arch: no data-production scripts in CE repo", not crawlers,
+           "; ".join(crawlers))
+
+    gomod = read("go.mod")
+    record("arch: no parent-directory replace in go.mod", not has_parent_replace(gomod))
+
+    embed = read("resources/embed.go")
+    embedded = sorted(set(re.findall(r"//go:embed\s+([^\s]+)", embed)))
+    record("arch: data entry is single-source embed", embedded == ["all:static", "character.json"],
+           f"embedded={embedded}")
+
+    # Consumer schema is the contract for any data producer (datasources).
+    # verify_dataset.py is self-tested; here we assert the committed dataset
+    # still satisfies it, so a corrupt character.json turns the gate red.
+    verifier = ROOT / "scripts" / "verify_dataset.py"
+    proc = subprocess.run([sys.executable, str(verifier)], capture_output=True, text=True)
+    detail = [ln for ln in proc.stdout.splitlines() if ln.startswith(("PASS", "FAIL", "FAIL   "))]
+    record("arch: character.json satisfies consumer contract", proc.returncode == 0,
+           detail[-1] if detail else proc.stderr.strip()[:200] or f"rc={proc.returncode}")
+
+
 def check_versions() -> None:
     v = read("VERSION").strip()
     db = read("DB_VERSION").strip()
@@ -365,6 +420,13 @@ def self_test() -> int:
          "tests/acceptance/v4.3.0/evidence/go-build.log", "status"),
         ("evidence path flagged", is_evidence_path,
          "tests/acceptance/v4.3.0/evidence/go-build.log", "docs/ACCEPTANCE.md"),
+        ("crawler script flagged", is_crawler_path,
+         "data/download/chinese_poetry.py", "resources/embed.go"),
+        ("crawler by keyword", is_crawler_path,
+         "tools/poetry-spider.go", "tools/check_chars.go"),
+        ("parent replace flagged", has_parent_replace,
+         "replace github.com/babyname/fate/v4 => ../fate",
+         "require github.com/babyname/fate/v4 v4.3.0"),
         ("evidence dir flagged", is_evidence_path,
          "tests\\acceptance\\v4.3.0\\evidence\\x.body", "tests/acceptance/v4.3.0/report.md"),
     ]
@@ -430,12 +492,14 @@ def main() -> int:
         check_bom(files, "staged")
         check_static_assets()
         check_contracts()
+        check_architecture()
         check_versions()
     else:
         check_pollution(tracked() + untracked(), "tracked+untracked")
         check_evidence_untracked()
         check_static_assets()
         check_contracts()
+        check_architecture()
         check_versions()
         check_acceptance_assets()
         rng = "HEAD~1" if args.ci else "HEAD"
