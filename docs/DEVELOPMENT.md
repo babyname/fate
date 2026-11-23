@@ -338,21 +338,19 @@ func main() {
 └─────────────────────────────────────────────┘
 ```
 
+> **数据来源**：fate 只消费数据，不生产数据。`character.json` 等字库产物由
+> [datasources](https://github.com/babyname/datasources) 仓生产并发 Release，
+> fate 通过 `//go:embed` 加载。数据抓取 / 清洗 / 导入脚本不在本仓。
+
 ### 目录结构
 
 ```
 fate/
 ├── cmd/                # 命令行入口
-│   ├── console/        #   主 CLI（name / dbinit / dictctl）
+│   ├── console/        #   主 CLI
 │   ├── server/         #   Web 服务
-│   ├── dbinit/         #   数据库初始化
-│   ├── character/      #   汉字数据工具
-│   ├── dictctl/        #   字典管理工具
-│   └── tools/          #   开发调试工具
+│   └── dbinit/         #   数据库初始化（从 resources/character.json 建库）
 ├── config/             # 配置定义
-├── data/               # 种子数据
-│   ├── chinese-poetry/ #   诗词库
-│   └── seed/           #   基础数据
 ├── docs/               # 文档 & 截图
 ├── ent/                # Ent Schema & 生成代码
 ├── internal/           # 内部包
