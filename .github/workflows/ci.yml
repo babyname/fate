@@ -40,6 +40,16 @@ jobs:
       - name: Repository gate
         run: python scripts/check_repo.py --ci
 
+      # Same action and version constraint as the release job. Without this,
+      # a broken .goreleaser.yml passes every PR check and only fails at tag
+      # time, after the release workflow has already been triggered.
+      - name: GoReleaser config check
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: check --config .goreleaser.yml
+
       - name: Prepare test databases
         run: |
           go run ./cmd/dbinit -db fate
