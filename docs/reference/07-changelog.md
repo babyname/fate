@@ -1,5 +1,27 @@
 # 更新日志
 
+## v4.3.1 (2026-11-24)
+
+**架构与数据职责**
+
+- 数据采集与清洗脚本（`data/download/*.py`、`DATA_SOURCES.md`）迁至独立 `datasources` 仓；fate 仅通过 `//go:embed` 消费 `character.json` 数据契约，不再管理数据源。
+- 数据契约校验器入库：`scripts/verify_dataset.py` 校验字段、类型、唯一性与五行枚举，防止上游产物漂移。
+
+**门禁强化**
+
+- 架构门禁禁止运行时数据库文件（`.db` / `.sqlite3`）入库——运行时库由 `cmd/dbinit` 从 embed 契约生成，入库会造成第二个真相源。
+- 强制纯 Go sqlite 驱动：禁止 `go.mod` 直接 require 或源码 import `mattn/go-sqlite3`（CGO），`CGO_ENABLED=0` 交叉构建为唯一发布路径；驱动统一 `sqlite3ent/sqlite3`。
+- 提交信息门禁落到 `commit-msg` 钩子：Conventional Commit 前缀 + 英文 subject + LF，中文标题在提交时即被拒绝，不再等到 CI。
+- 全量静态门禁扩至 24 项，含检测器必中 / 必不中反例。
+
+**文档**
+
+- `docs/DEVELOPMENT.md` 更新数据来源归属与目录布局；版本号统一 `4.3.1` / `v4.3.1`。
+
+> 本次为工程治理版本，最终用户功能与 API 契约无变化（仍为 v4.3.0 的 8 个 `/api/v1/*` 端点）。
+
+---
+
 ## v4.3.0 (2026-11-15)
 
 **修复**

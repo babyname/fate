@@ -2,14 +2,14 @@
 
 > 本文件由 v4.2.0 时期的 README 迁出，保留架构、目录结构、Web API、代码集成、编译与发布说明。
 > 面向用户的使用说明见仓库根目录 [README.md](../README.md)。
-> Web API 与代码集成章节已对齐 v4.3.0；其余架构、目录结构与历史版本描述仍反映迁出时状态，实际以 [源码](../internal/http/handler.go) 与 [发布配置](../.goreleaser.yml) 为准。
+> Web API 与代码集成章节已对齐 v4.3.1；其余架构、目录结构与历史版本描述仍反映迁出时状态，实际以 [源码](../internal/http/handler.go) 与 [发布配置](../.goreleaser.yml) 为准。
 > 可直接运行的示例见 [examples/README.md](../examples/README.md)。
 
 ---
 
 <p align="center">
   <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat&logo=go" alt="Go Version" />
-  <img src="https://img.shields.io/badge/version-4.3.0-blue" alt="Version" />
+  <img src="https://img.shields.io/badge/version-4.3.1-blue" alt="Version" />
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
   <img src="https://img.shields.io/badge/module-v4-7B42BC" alt="Module v4" />
 </p>
@@ -413,7 +413,7 @@ fate/
 
 | 系列 | 最新 | 标签 |
 |------|------|------|
-| v4.x | v4.3.0 | `v4.3.0` |
+| v4.x | v4.3.1 | `v4.3.1` |
 | v3.x | v3.6.0 | `v3.0.0` ~ `v3.6.0`（共 14 个发布） |
 | v2.x | v2.0.2 | `v2.0.0` ~ `v2.0.2` |
 
