@@ -245,9 +245,18 @@ for line in remote.stdout.splitlines():
     elif ref not in tags:
         tags[ref] = sha
 local = subprocess.run(["git", "tag", "-l"], cwd=root, capture_output=True, text=True).stdout.split()
-assert set(local) == set(tags), (
-    f"tag names differ: local-only={sorted(set(local) - set(tags))} "
-    f"remote-only={sorted(set(tags) - set(local))}")
+# `backup-*` tags are deliberately local-only (e.g. backup-evidence-v4.3.0,
+# created before the evidence history rewrite). They must never be pushed.
+# Whitelist ONLY that prefix; every other local-only/remote-only tag is still
+# a real inconsistency and must fail the gate.
+backup = sorted(t for t in local if t.startswith("backup-"))
+publishable = [t for t in local if not t.startswith("backup-")]
+print("local backup tags (intentionally not pushed):", ", ".join(backup) or "none")
+assert not [t for t in backup if t in tags], (
+    "backup tag leaked to origin: " + ", ".join(t for t in backup if t in tags))
+assert set(publishable) == set(tags), (
+    f"tag names differ: local-only={sorted(set(publishable) - set(tags))} "
+    f"remote-only={sorted(set(tags) - set(publishable))}")
 bad = []
 for t in tags:
     got = subprocess.run(["git", "rev-parse", "-q", "--verify", f"refs/tags/{t}^{{commit}}"],
