@@ -324,6 +324,22 @@ def is_runtime_db_file(path: str) -> bool:
     return bool(re.search(r"\.(db|sqlite3|sqlite)$", path, re.I))
 
 
+def direct_cgo_sqlite(gomod: str) -> bool:
+    """mattn/go-sqlite3 as a DIRECT require —— CGO driver, forbidden.
+
+    It may still appear transitively in go.sum via entgo.io/ent's test deps;
+    that never enters the CGO_ENABLED=0 production binary. The gate targets
+    the direct require line and the source imports, not transitive checksums.
+    """
+    return bool(re.search(
+        r"(?m)^\s*github\.com/mattn/go-sqlite3\s+v", gomod))
+
+
+def imports_cgo_sqlite(source: str) -> bool:
+    """A single Go source importing the CGO sqlite driver."""
+    return "github.com/mattn/go-sqlite3" in source
+
+
 def check_architecture() -> None:
     """Structural guard for the CE/EE + data-source separation.
 
@@ -347,6 +363,17 @@ def check_architecture() -> None:
 
     gomod = read("go.mod")
     record("arch: no parent-directory replace in go.mod", not has_parent_replace(gomod))
+
+    # Pure-Go sqlite is mandatory: CGO_ENABLED=0 cross-builds (ARM64) fail with
+    # mattn/go-sqlite3. Enforce the direct require + every source import.
+    record("arch: no CGO sqlite driver in go.mod", not direct_cgo_sqlite(gomod))
+    go_sources = [f for f in t if f.endswith(".go")]
+    cgo_imports = sorted(f for f in go_sources if imports_cgo_sqlite(read(f)))
+    record("arch: no source imports CGO sqlite driver", not cgo_imports,
+           "; ".join(cgo_imports))
+    db_layer = read("internal/database/database.go")
+    record("arch: pure-Go sqlite3ent driver is imported",
+           "github.com/sqlite3ent/sqlite3" in db_layer)
 
     embed = read("resources/embed.go")
     embedded = sorted(set(re.findall(r"//go:embed\s+([^\s]+)", embed)))
@@ -439,6 +466,12 @@ def self_test() -> int:
         ("commit-msg hook accepts English", lambda b: not commit_msg_errors(b),
          b"refactor(arch): codify role contract\n\nbody",
          "refactor(arch): \u56fa\u5316\u804c\u8d23\u5951\u7ea6".encode()),
+        ("CGO sqlite direct require", direct_cgo_sqlite,
+         "\tgithub.com/mattn/go-sqlite3 v1.14.42",
+         "\tgithub.com/sqlite3ent/sqlite3 v1.50.0"),
+        ("CGO sqlite source import", imports_cgo_sqlite,
+         '_ "github.com/mattn/go-sqlite3"',
+         '_ "github.com/sqlite3ent/sqlite3"'),
         ("local refs", lambda h: len(local_refs(h)) == 2,
          '<script src="/js/a.js"></script><link href="/css/b.css">',
          '<link href="https://fonts.example/x"><script src="/js/a.js"></script>'),
