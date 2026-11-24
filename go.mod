@@ -8,7 +8,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/sqlite3ent/sqlite3 v1.50.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
-	golang.org/x/sync v0.20.0
+	golang.org/x/sync v0.25.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -39,4 +39,4 @@ require (
 	modernc.org/sqlite v1.50.0 // indirect
 )
 
-go 1.25.0
+go 1.26.0
