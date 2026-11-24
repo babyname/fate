@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# FATE commit-msg gate (AGENTS.md §1): English, conventional, LF only.
+# The subject rule is the SAME detector used by check_repo.py --ci, so the
+# local hook and CI cannot drift apart. Never bypass with --no-verify.
+set -e
+ROOT=$(git rev-parse --show-toplevel)
+exec python "$ROOT/scripts/check_repo.py" --commit-msg "$1"

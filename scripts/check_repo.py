@@ -112,6 +112,17 @@ def is_conventional(subject: str) -> bool:
     return bool(CONVENTIONAL.match(subject)) and not has_cjk(subject)
 
 
+def commit_msg_errors(raw: bytes) -> list[str]:
+    """commit-msg hook path: same subject rules as check_commits, no CR/LF drift."""
+    subject = raw.split(b"\n", 1)[0].decode("utf-8", "replace").strip()
+    bad: list[str] = []
+    if has_cr(raw):
+        bad.append("CR byte in message")
+    if not is_conventional(subject):
+        bad.append(f"non-English/non-conventional subject: {subject!r}")
+    return bad
+
+
 def local_refs(html: str) -> set[str]:
     """Local /js/... and /css/... paths referenced by index.html."""
     return {
@@ -422,6 +433,12 @@ def self_test() -> int:
         ("CJK message", has_cjk, cjk_msg, "ci(gate): add checks"),
         ("CR message", has_cr, b"subject\r\nbody", b"subject\nbody"),
         ("conventional subject", is_conventional, "fix(ci): add checks", "random words"),
+        ("commit-msg hook rejects CJK", lambda b: bool(commit_msg_errors(b)),
+         "refactor(arch): \u56fa\u5316\u804c\u8d23\u5951\u7ea6".encode(),
+         b"refactor(arch): codify role contract\n\nbody"),
+        ("commit-msg hook accepts English", lambda b: not commit_msg_errors(b),
+         b"refactor(arch): codify role contract\n\nbody",
+         "refactor(arch): \u56fa\u5316\u804c\u8d23\u5951\u7ea6".encode()),
         ("local refs", lambda h: len(local_refs(h)) == 2,
          '<script src="/js/a.js"></script><link href="/css/b.css">',
          '<link href="https://fonts.example/x"><script src="/js/a.js"></script>'),
@@ -488,15 +505,22 @@ def main() -> int:
     ap.add_argument("--ci", action="store_true", help="CI: use HEAD~1 range, run Go checks")
     ap.add_argument("--self-test", action="store_true", help="detector positive/negative controls")
     ap.add_argument("--commits", metavar="RANGE", help="also audit a commit range")
+    ap.add_argument("--commit-msg", metavar="FILE",
+                    help="commit-msg hook: validate one message file before the commit")
     args = ap.parse_args()
 
     if args.self_test:
         return self_test()
 
-    print(f"FATE repository gate  mode={'ci' if args.ci else 'staged' if args.staged else 'full'}")
+    print(f"FATE repository gate  mode="
+          f"{'commit-msg' if args.commit_msg else 'ci' if args.ci else 'staged' if args.staged else 'full'}")
     print(f"root={ROOT}\n")
 
-    if args.staged:
+    if args.commit_msg:
+        raw = Path(args.commit_msg).read_bytes()
+        bad = commit_msg_errors(raw)
+        record("commit message: English conventional subject, LF", not bad, "; ".join(bad))
+    elif args.staged:
         files = staged()
         if not files:
             print("no staged files; nothing to check")
