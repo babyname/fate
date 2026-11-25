@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"sort"
 	"sync"
+
+	"github.com/babyname/fate/v4/ranking"
 )
 
 const excellentTableCapacity = 10000
@@ -20,6 +22,19 @@ type ExcellentEntry struct {
 	WuXing1   string  `json:"wu_xing1"`
 	WuXing2   string  `json:"wu_xing2"`
 	HasPoetry bool    `json:"has_poetry"`
+	ranking   *ranking.Result
+}
+
+func (e ExcellentEntry) scoreFor(field ranking.Field) float64 {
+	if e.ranking != nil {
+		switch field {
+		case ranking.TraditionalScore:
+			return e.ranking.Traditional
+		case ranking.SoundMeaningScore:
+			return e.ranking.SoundAndMeaning
+		}
+	}
+	return e.Score
 }
 
 type excellentMinHeap []ExcellentEntry
@@ -208,4 +223,3 @@ func (t *ExcellentTable) ShownCount() int {
 	defer t.mu.RUnlock()
 	return len(t.shown)
 }
-

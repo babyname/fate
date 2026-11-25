@@ -1,4 +1,5 @@
 export interface GenerateRequest {
+  traditional_weight?: number
   surname: string
   born: string
   sex: string
@@ -124,7 +125,18 @@ export interface ScoreDetail {
   yin_yun: number
 }
 
+export interface NameRanking {
+  total: number
+  traditional: number
+  sound_and_meaning: number
+  traditional_weight: number
+}
+
+export type ScoreField = 'total' | 'traditional' | 'sound_and_meaning';
+export type ScoreOrder = { field: ScoreField; direction: 'asc' | 'desc' };
+
 export interface NameResult {
+  ranking?: NameRanking
   rank: number
   full_name: string
   surname: string

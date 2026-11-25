@@ -7,6 +7,7 @@ import (
 	"github.com/babyname/fate/v4/ent"
 	"github.com/babyname/fate/v4/internal/naming"
 	namesvc "github.com/babyname/fate/v4/internal/service/naming"
+	"github.com/babyname/fate/v4/ranking"
 )
 
 // GenerateRequest is the public input for synchronous name generation.
@@ -22,6 +23,8 @@ type GenerateRequest struct {
 	// a bounded, Web-equivalent configuration. DefaultFilter() is never used
 	// by Generate because its unbounded stroke range does not converge.
 	Filter *FilterOption
+	// RecommendationWeight opts in to weighting traditional and sound-and-meaning scores.
+	RecommendationWeight *ranking.Weight
 }
 
 // GenerateResult is the output of synchronous name generation.
@@ -50,6 +53,15 @@ func (r *GenerateResult) Candidates(offset, limit int) []NameResult {
 		return []NameResult{}
 	}
 	return r.TopNames[offset : offset+min(limit, len(r.TopNames)-offset)]
+}
+
+// CandidatesSorted returns a page ordered by the requested score.
+// Component scores are available when the generation used recommendation weights.
+func (r *GenerateResult) CandidatesSorted(offset, limit int, field ranking.Field, descending bool) []NameResult {
+	if r.catalogue == nil {
+		return r.Candidates(offset, limit)
+	}
+	return r.catalogue.CandidatesSorted(offset, limit, field, descending)
 }
 
 // Candidate looks up the full scored result for a generated pair of given-name characters.
@@ -82,10 +94,11 @@ func (f *fateImpl) Generate(ctx context.Context, req GenerateRequest) (*Generate
 	// 3. Create pipeline and run generation.
 	pipe := namesvc.NewPipeline(f.db)
 	result, err := pipe.Generate(ctx, namesvc.GenerateRequest{
-		LastName: lastName,
-		Born:     req.Born,
-		Sex:      naming.Sex(req.Sex),
-		Filter:   flt,
+		LastName:             lastName,
+		Born:                 req.Born,
+		Sex:                  naming.Sex(req.Sex),
+		Filter:               flt,
+		RecommendationWeight: req.RecommendationWeight,
 	})
 	if err != nil {
 		return nil, err
@@ -125,10 +138,11 @@ func (f *fateImpl) GenerateStream(ctx context.Context, req GenerateRequest, onBa
 	// Wrap the public onBatch to convert internal StreamBatch to public type.
 	// Since StreamBatch is a type alias, no conversion is needed.
 	return pipe.GenerateStream(ctx, namesvc.GenerateRequest{
-		LastName: lastName,
-		Born:     req.Born,
-		Sex:      naming.Sex(req.Sex),
-		Filter:   flt,
+		LastName:             lastName,
+		Born:                 req.Born,
+		Sex:                  naming.Sex(req.Sex),
+		Filter:               flt,
+		RecommendationWeight: req.RecommendationWeight,
 	}, func(batch namesvc.StreamBatch) {
 		onBatch(batch)
 	})

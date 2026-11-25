@@ -229,6 +229,13 @@ curl "http://localhost:18080/api/v1/explore?task_id=<task_id>&count=6"
 
 > 契约要点：`avoid_chars` / `require_chars` 是**逗号分隔字符串**（不是 JSON 数组）；`born` 格式为 `YYYY/MM/DD HH:MM`；`explore` 的 `names` 恒为 JSON 数组，取尽时返回 `[]` 而非 `null`；`generate` 是同步的，`state` 直接为 `done`。
 
+生成请求可传整数 `traditional_weight`（0–100）以启用自定义配比。传统数理合并五格、五行八字和生肖，音义合并文化印象和音韵。未传权重时使用原有的五维评分。已生成任务可向同一接口传 `{"task_id":"<task_id>","traditional_weight":70}`，复用原始筛选条件并生成一份新结果。
+
+在自定义配比模式中，`result`、`names` 和 `name_detail` 的姓名分析会返回 `ranking`。后端在筛选并保留候选时应用权重，统一返回 `ranking.total` 和全局 `rank`。Go 调用方可通过 `GenerateRequest.RecommendationWeight` 启用同一计算，或使用公开的 `ranking` 包为已有的两个分项计算综合分。
+`GenerateStream` 也会在预览批次和最终批次中返回 `Ranking`。预览名次以当时已生成的候选为准，最终批次给出完整名册的名次。
+
+`/api/v1/names` 可用 `sort=total|traditional|sound_and_meaning` 和 `direction=asc|desc` 对完整候选名册排序后再分页。默认按综合分降序，分项排序用于已配置权重的任务。姓名的 `rank` 始终表示综合分名次，与姓名详情一致。
+
 ---
 
 ## 🧩 代码集成
@@ -294,12 +301,15 @@ func main() {
 | `fate.GenerateRequest` | 输入：姓氏、出生时间、性别、`*FilterOption` |
 | `Fate.Generate(ctx, req)` | 同步主链路，返回 `*GenerateResult` |
 | `Fate.GenerateStream(ctx, req, onBatch)` | 并行生成，按批次回调 `StreamBatch` |
+| `fate.ScoreName(ctx, engine, req)` | 给一个已有姓名评分，返回分数、五格和八字分析 |
 | `fate.GenerateResult` | `TopNames`、`ExcellentTable`、`CharMap`、`FateData` |
 | `fate.DefaultFilterOption()` | `Generate` / `GenerateStream` 在 `Filter == nil` 时使用的有界唯一真相源；用链式 `With*` 定制 |
 | `fate.FilterOption` / `fate.NewFilter` | 筛选选项（笔画/五行/大衍/性别/避用字等）与筛选器实例 |
 | `fate.DefaultFilter()` | 仅供旧 Session 路径使用的宽松共享实例；不得作为 `Generate` 的默认值 |
 | `fate.ExcellentTable` | 指针类型（内部含锁，禁止按值复制）；`TopN/MarkShown/Explore/Len` |
 | `fate.Session` / `fate.Input` / `fate.Output` | 旧状态机路径，仍被 `cmd/console` 使用；新代码优先用 `Generate` |
+
+已有名单可逐个调用 `fate.ScoreName`。请求传入一字或二字的 `LastName`、二字的 `FirstName`、`Born` 和 `Sex`。也可传入与生成时一致的 `FilterType`、`XiYongMethod` 和 `RecommendationWeight`。单独评分的 `Rank` 为 0，表示该名字还未参与名册排名。评分从引擎已有的字库读取用字，遇到字库缺少的名用字会返回错误。
 
 ### 可运行示例
 

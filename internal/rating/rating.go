@@ -9,6 +9,15 @@ import (
 	"github.com/babyname/fate/v4/internal/chronosfate"
 	"github.com/babyname/fate/v4/internal/wuge"
 	"github.com/babyname/fate/v4/internal/wuxing"
+	"github.com/babyname/fate/v4/ranking"
+)
+
+const (
+	cultureWeight  = 0.20
+	birthWeight    = 0.25
+	zodiacWeight   = 0.10
+	fiveGridWeight = 0.30
+	soundWeight    = 0.15
 )
 
 type NameRating struct {
@@ -25,12 +34,14 @@ type NameRating struct {
 	ShengXiaoDetail string
 	WuGeDetail      string
 	YinYunDetail    string
+	Ranking         *ranking.Result
 }
 
 type Rater struct {
 	fateData *chronosfate.FateData
 	l1       int
 	l2       int
+	weight   *ranking.Weight
 }
 
 func NewRater(fateData *chronosfate.FateData) *Rater {
@@ -39,6 +50,13 @@ func NewRater(fateData *chronosfate.FateData) *Rater {
 
 func NewRaterWithStrokes(fateData *chronosfate.FateData, l1, l2 int) *Rater {
 	return &Rater{fateData: fateData, l1: l1, l2: l2}
+}
+
+// WithRecommendationWeight returns a rater that scores using the selected ratio.
+func (r *Rater) WithRecommendationWeight(weight ranking.Weight) *Rater {
+	weighted := *r
+	weighted.weight = &weight
+	return &weighted
 }
 
 func (r *Rater) RateName(surname string, c1, c2 *ent.Character) *NameRating {
@@ -50,19 +68,22 @@ func (r *Rater) RateName(surname string, c1, c2 *ent.Character) *NameRating {
 	r.rateWuGe(rating, c1, c2)
 	r.rateYinYun(rating, c1, c2)
 
-	wenHuaWeight := 0.20
-	wuXingWeight := 0.25
-	shengXiaoWeight := 0.10
-	wuGeWeight := 0.30
-	yinYunWeight := 0.15
-
-	rating.TotalScore = math.Round(
-		(rating.WenHuaScore*wenHuaWeight+
-			rating.WuXingScore*wuXingWeight+
-			rating.ShengXiaoScore*shengXiaoWeight+
-			rating.WuGeScore*wuGeWeight+
-			rating.YinYunScore*yinYunWeight)*10,
-	) / 10
+	if r.weight == nil {
+		rating.TotalScore = math.Round(
+			(rating.WenHuaScore*cultureWeight+
+				rating.WuXingScore*birthWeight+
+				rating.ShengXiaoScore*zodiacWeight+
+				rating.WuGeScore*fiveGridWeight+
+				rating.YinYunScore*soundWeight)*10,
+		) / 10
+	} else {
+		traditional := (rating.WuXingScore*birthWeight + rating.ShengXiaoScore*zodiacWeight + rating.WuGeScore*fiveGridWeight) /
+			(birthWeight + zodiacWeight + fiveGridWeight)
+		soundAndMeaning := (rating.WenHuaScore*cultureWeight + rating.YinYunScore*soundWeight) / (cultureWeight + soundWeight)
+		weighted := r.weight.Combine(traditional, soundAndMeaning)
+		rating.Ranking = &weighted
+		rating.TotalScore = weighted.Total
+	}
 
 	rating.Grade = scoreToGrade(rating.TotalScore)
 	rating.Interpret = r.generateInterpret(surname, c1, c2, rating)

@@ -28,6 +28,7 @@ const wuxingColors: Record<string, string> = {
 
 export function NameDetailModal({ name, open, onOpenChange }: NameDetailModalProps) {
   if (!name) return null;
+  const score = name.score.toFixed(name.ranking ? 1 : 0);
 
   const handlePrint = () => {
     const printContent = `<!DOCTYPE html>
@@ -45,7 +46,8 @@ th{background:#f5f5f5}
 <body>
 <h1>${name.full_name}</h1>
 <p style="text-align:center;color:#666">${name.char1.pinyin} ${name.char2.pinyin} | ${name.strokes}画</p>
-<div class="score">${name.score.toFixed(0)}<span style="font-size:16px;color:#666"> / ${name.grade}</span></div>
+<div class="score">${score}<span style="font-size:16px;color:#666"> / ${name.grade}</span></div>
+${name.ranking ? `<p>传统数理 ${name.ranking.traditional.toFixed(1)} · 音义 ${name.ranking.sound_and_meaning.toFixed(1)}（传统数理占 ${name.ranking.traditional_weight}%）</p>` : ''}
 <h2>释义</h2>
 <p>${name.char1.meaning || '无'}；${name.char2.meaning || '无'}</p>
 ${name.has_poetry ? `<h2>诗词出处</h2>` + (name.char1.has_poetry && name.char1.poetry_origin ? `<p>${name.char1.char} — ${name.char1.poetry_origin.dynasty}·${name.char1.poetry_origin.author}《${name.char1.poetry_origin.title}》</p>${name.char1.poetry_origin.sentence ? `<p style="font-style:italic;color:#666">${name.char1.poetry_origin.sentence}</p>` : ''}` : '') + (name.char2.has_poetry && name.char2.poetry_origin ? `<p>${name.char2.char} — ${name.char2.poetry_origin.dynasty}·${name.char2.poetry_origin.author}《${name.char2.poetry_origin.title}》</p>${name.char2.poetry_origin.sentence ? `<p style="font-style:italic;color:#666">${name.char2.poetry_origin.sentence}</p>` : ''}` : '') : ''}
@@ -102,7 +104,7 @@ ${name.wu_xing ? `<h2>五行</h2><p>喜: ${name.wu_xing.xi} | 忌: ${name.wu_xin
             <div className="flex items-center gap-2">
               <Star className="h-5 w-5 text-amber-400" />
               <span className="text-2xl font-bold font-mono text-gradient-stardust">
-                {name.score.toFixed(0)}
+                {score}
               </span>
               <span className="text-sm text-muted-foreground">综合评分</span>
               <Badge variant="celestial">{name.grade}</Badge>
@@ -117,6 +119,12 @@ ${name.wu_xing ? `<h2>五行</h2><p>喜: ${name.wu_xing.xi} | 忌: ${name.wu_xin
               )}
             </div>
           </div>
+
+          {name.ranking && (
+            <p className="text-sm tabular-nums text-muted-foreground">
+              传统数理 {name.ranking.traditional.toFixed(1)}（{name.ranking.traditional_weight}%） · 音义 {name.ranking.sound_and_meaning.toFixed(1)}（{100 - name.ranking.traditional_weight}%）
+            </p>
+          )}
 
           {name.has_poetry && (
             <div className="glass-card p-4 space-y-3 border-amber-500/20">

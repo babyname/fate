@@ -1,7 +1,9 @@
 package naming
 
 import (
+	"cmp"
 	"context"
+	"slices"
 	"sync"
 	"time"
 
@@ -14,6 +16,7 @@ import (
 	"github.com/babyname/fate/v4/internal/rating"
 	"github.com/babyname/fate/v4/internal/repository"
 	"github.com/babyname/fate/v4/internal/wuge"
+	"github.com/babyname/fate/v4/ranking"
 	v2 "github.com/godcong/chronos/v2"
 )
 
@@ -21,11 +24,12 @@ import (
 // FateData may be nil (the pipeline will compute it from Born/Sex).
 // If FateData is nil, Born must be set. Otherwise Born may be zero.
 type GenerateRequest struct {
-	LastName [2]*ent.Character
-	Born     time.Time
-	Sex      naming.Sex
-	Filter   filter.Filter
-	FateData *chronosfate.FateData
+	LastName             [2]*ent.Character
+	Born                 time.Time
+	Sex                  naming.Sex
+	Filter               filter.Filter
+	FateData             *chronosfate.FateData
+	RecommendationWeight *ranking.Weight
 }
 
 // GenerateResult holds the output of a completed generation run.
@@ -36,6 +40,7 @@ type GenerateResult struct {
 	FateData        *chronosfate.FateData
 	LastNameStrokes [2]int
 	surname         string
+	rater           *rating.Rater
 }
 
 // StreamBatch is delivered by GenerateStream as top results become available.
@@ -64,7 +69,7 @@ func (p *Pipeline) Generate(ctx context.Context, req GenerateRequest) (*Generate
 	strokes := surnameStrokes(req.Filter, req.LastName)
 
 	// 2. Use pre-calculated fate data or compute it from birth info.
-	fateData := p.resolveFateData(req)
+	fateData := req.resolveFateData()
 
 	// 3. Get lucky wuge combinations for this surname.
 	lucky := wuge.GetLuckyByLastName(strokes[0], strokes[1])
@@ -76,7 +81,7 @@ func (p *Pipeline) Generate(ctx context.Context, req GenerateRequest) (*Generate
 	poetrySet := p.queryPoetrySet(ctx)
 
 	// 6. Create rater with fate data and surname strokes.
-	rater := rating.NewRaterWithStrokes(fateData, strokes[0], strokes[1])
+	rater := req.newRater(fateData, strokes)
 
 	// 7. Score all candidates with 3-tier filter strictness fallback.
 	table := NewExcellentTable()
@@ -89,7 +94,7 @@ func (p *Pipeline) Generate(ctx context.Context, req GenerateRequest) (*Generate
 	charMap := buildCharMap(chars)
 
 	// 10. Convert top entries to analysis.NameResult slices.
-	result := p.buildResults(table, charMap, strokes, fateData, surnameStr(req.LastName))
+	result := p.buildResults(table, charMap, strokes, fateData, surnameStr(req.LastName), rater)
 	return result, nil
 }
 
@@ -97,11 +102,11 @@ func (p *Pipeline) Generate(ctx context.Context, req GenerateRequest) (*Generate
 // batches of top results via callback as workers complete.
 func (p *Pipeline) GenerateStream(ctx context.Context, req GenerateRequest, onBatch func(StreamBatch)) error {
 	strokes := surnameStrokes(req.Filter, req.LastName)
-	fateData := p.resolveFateData(req)
+	fateData := req.resolveFateData()
 	lucky := wuge.GetLuckyByLastName(strokes[0], strokes[1])
 	chars := preloadChars(ctx, p.db, lucky, req.Filter)
 	poetrySet := p.queryPoetrySet(ctx)
-	rater := rating.NewRaterWithStrokes(fateData, strokes[0], strokes[1])
+	rater := req.newRater(fateData, strokes)
 	surname := surnameStr(req.LastName)
 
 	table := NewExcellentTable()
@@ -116,7 +121,7 @@ func (p *Pipeline) GenerateStream(ctx context.Context, req GenerateRequest, onBa
 		batchMu.Unlock()
 
 		if seq == 1 || seq%2 == 0 {
-			snapshot := heapPreview(table, 10, surname, strokes)
+			snapshot := heapPreview(table, 10, surname)
 			onBatch(StreamBatch{
 				TopResults: snapshot,
 				Total:      table.HeapLen(),
@@ -142,7 +147,7 @@ func (p *Pipeline) GenerateStream(ctx context.Context, req GenerateRequest, onBa
 
 	table.Finalize()
 	charMap := buildCharMap(chars)
-	result := p.buildResults(table, charMap, strokes, fateData, surname)
+	result := p.buildResults(table, charMap, strokes, fateData, surname, rater)
 
 	onBatch(StreamBatch{
 		TopResults: result.TopNames,
@@ -153,20 +158,32 @@ func (p *Pipeline) GenerateStream(ctx context.Context, req GenerateRequest, onBa
 	return nil
 }
 
-// resolveFateData returns the fate data, computing it from birth info if needed.
-func (p *Pipeline) resolveFateData(req GenerateRequest) *chronosfate.FateData {
+func (req GenerateRequest) newRater(fateData *chronosfate.FateData, strokes [2]int) *rating.Rater {
+	rater := rating.NewRaterWithStrokes(fateData, strokes[0], strokes[1])
+	if req.RecommendationWeight != nil {
+		rater = rater.WithRecommendationWeight(*req.RecommendationWeight)
+	}
+	return rater
+}
+
+// calculateFateData returns the fate data or computes it from the birth details.
+func (req GenerateRequest) calculateFateData() (*chronosfate.FateData, error) {
 	if req.FateData != nil {
-		return req.FateData
+		return req.FateData, nil
 	}
 	method := chronosfate.XiYongMethodBalance
 	if req.Filter.XiYongMethod() == "geju" {
 		method = chronosfate.XiYongMethodGeJu
 	}
-	fateData, err := chronosfate.GetFateData(chronosfate.FateInput{
+	return chronosfate.GetFateData(chronosfate.FateInput{
 		Calendar:     v2.NewSolarCalendar(req.Born),
 		Gender:       int(req.Sex),
 		XiYongMethod: method,
 	})
+}
+
+func (req GenerateRequest) resolveFateData() *chronosfate.FateData {
+	fateData, err := req.calculateFateData()
 	if err != nil {
 		log.Error("get fate data", err)
 	}
@@ -202,13 +219,14 @@ func (p *Pipeline) runScoringWithFallback(
 }
 
 // buildResults converts the final excellent table into public result types.
-func (p *Pipeline) buildResults(table *ExcellentTable, charMap map[string]*ent.Character, strokes [2]int, fateData *chronosfate.FateData, surname string) *GenerateResult {
+func (p *Pipeline) buildResults(table *ExcellentTable, charMap map[string]*ent.Character, strokes [2]int, fateData *chronosfate.FateData, surname string, rater *rating.Rater) *GenerateResult {
 	result := &GenerateResult{
 		ExcellentTable:  table,
 		CharMap:         charMap,
 		FateData:        fateData,
 		LastNameStrokes: strokes,
 		surname:         surname,
+		rater:           rater,
 	}
 	result.TopNames = result.Candidates(0, 10)
 	return result
@@ -230,6 +248,37 @@ func (r *GenerateResult) Candidates(offset, limit int) []analysis.NameResult {
 	return names
 }
 
+// CandidatesSorted orders the full catalogue before taking the requested page.
+// Each candidate retains its original composite rank for detail lookups.
+func (r *GenerateResult) CandidatesSorted(offset, limit int, field ranking.Field, descending bool) []analysis.NameResult {
+	if field == ranking.TotalScore && descending {
+		return r.Candidates(offset, limit)
+	}
+	entries := r.ExcellentTable.AllEntries()
+	if offset < 0 || offset >= len(entries) || limit <= 0 {
+		return []analysis.NameResult{}
+	}
+	order := make([]int, len(entries))
+	for i := range order {
+		order[i] = i
+	}
+	direction := 1
+	if descending {
+		direction = -1
+	}
+	slices.SortStableFunc(order, func(first, second int) int {
+		return direction * cmp.Compare(entries[first].scoreFor(field), entries[second].scoreFor(field))
+	})
+	count := min(limit, len(entries)-offset)
+	names := make([]analysis.NameResult, 0, count)
+	for _, index := range order[offset : offset+count] {
+		if name, ok := r.buildCandidate(entries[index], index+1); ok {
+			names = append(names, name)
+		}
+	}
+	return names
+}
+
 // Candidate finds a generated pair and builds its full result with its catalogue rank.
 func (r *GenerateResult) Candidate(first, second string) (analysis.NameResult, bool) {
 	for i, entry := range r.ExcellentTable.AllEntries() {
@@ -245,19 +294,19 @@ func (r *GenerateResult) buildCandidate(entry ExcellentEntry, rank int) (analysi
 	if first == nil || second == nil {
 		return analysis.NameResult{}, false
 	}
-	return analysis.BuildNameResult(rank, r.surname, first, second, r.LastNameStrokes[0], r.LastNameStrokes[1], r.FateData), true
+	return analysis.BuildNameResultWithRater(rank, r.surname, first, second, r.LastNameStrokes[0], r.LastNameStrokes[1], r.FateData, r.rater), true
 }
 
 // heapPreview returns a lightweight preview of top N entries from the heap
 // before finalization. Uses only ExcellentEntry-level data (not full NameResult).
-func heapPreview(table *ExcellentTable, n int, surname string, strokes [2]int) []analysis.NameResult {
+func heapPreview(table *ExcellentTable, n int, surname string) []analysis.NameResult {
 	entries := table.SortedPreview(n)
 	if len(entries) == 0 {
 		return nil
 	}
 	results := make([]analysis.NameResult, 0, len(entries))
 	for i, e := range entries {
-		results = append(results, analysis.NameResult{
+		name := analysis.NameResult{
 			Rank:      i + 1,
 			Surname:   surname,
 			FullName:  surname + e.Char1 + e.Char2,
@@ -274,7 +323,13 @@ func heapPreview(table *ExcellentTable, n int, surname string, strokes [2]int) [
 				WuXing:    e.WuXing2,
 				HasPoetry: e.HasPoetry,
 			},
-		})
+		}
+		if e.ranking != nil {
+			// Keep callback results independent of the heap's score data.
+			score := *e.ranking
+			name.Ranking = &score
+		}
+		results = append(results, name)
 	}
 	return results
 }

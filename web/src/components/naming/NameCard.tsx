@@ -50,7 +50,7 @@ export function NameCard({ name, showWuGeLuck }: NameCardProps) {
         <div className="flex items-center gap-1">
           <Star className={`h-4 w-4 ${name.score >= 90 ? 'text-amber-400' : 'text-muted-foreground'}`} />
           <span className={`text-lg font-bold font-mono ${scoreColor}`}>
-            {name.score.toFixed(0)}
+            {name.score.toFixed(name.ranking ? 1 : 0)}
           </span>
         </div>
       </div>
@@ -80,6 +80,11 @@ export function NameCard({ name, showWuGeLuck }: NameCardProps) {
           <Badge variant="stardust" className="text-xs py-0">诗</Badge>
         )}
       </div>
+      {name.ranking && (
+        <p className="mt-2 text-xs tabular-nums text-muted-foreground">
+          传统数理 {name.ranking.traditional.toFixed(1)} · 音义 {name.ranking.sound_and_meaning.toFixed(1)}
+        </p>
+      )}
       {showWuGeLuck && (
         <div className="mt-3 border-t border-white/10 pt-3">
           <WuGeLuck wuGe={name.wu_ge} />
